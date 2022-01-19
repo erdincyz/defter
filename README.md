@@ -8,7 +8,7 @@
 * Görsellik ön plandadır. Belgeye fotoğraf, video, (herhangi)dosya ekleyebilme ve browserdan (ve diğer yazılımlardan) kopyala yapıştır, sürükle bırak yazı(HMTL destekler),ekleyebilme desteği vardır.
 * HTML içeren yazi nesnelerini, nesneye sağ tıklayınca açılan menüdeki **Web Sayfası Olarak** göster özelliğini kullanarak tekrar içerdiği linklere tıklanabilir hale getirebilirsiniz.
 * Mesela sahneye taşıyacağınız, **veya** izlemekte olduğunuz bir videodan ekran görüntüsü alıp, sahneye yapıştıracağınız o resmin üzerine çift tıklayınca, resmin tıkladığınız noktasında bir metin kutusu oluşur. Böylece resmin üzerine de dilediğiniz kadar not alabilirsiniz. 
-
+* Sahneyi PDF dosyası olarak kaydedebilirsiniz.
 
 **GPLv3** lisanslıdır.
 
