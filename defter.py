@@ -40,8 +40,8 @@ from PySide6.QtCore import (Qt, QRectF, QCoreApplication, QSettings, QPoint, Slo
 from PySide6.QtWebEngineWidgets import QWebEngineView  # QWebEnginePage, #QWebEngineProfile, QWebEngineSettings
 
 from PySide6.QtPrintSupport import QPrinter
+from canta import shared
 from canta.printPreviewDialog import PrintPreviewDialog
-from canta.shared import unicode_to_bool, renk_degismis_nesne_yazi_rengi
 from canta.scene import Scene
 from canta.view import View
 from canta.ekranKutuphane import EkranKutuphane
@@ -1531,10 +1531,10 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def init_settings(self):
-        QCoreApplication.setOrganizationName("argekod")
-        QCoreApplication.setOrganizationDomain("argekod")
-        QCoreApplication.setApplicationName("Defter")
-        self.settings = QSettings("_settings.ini", QSettings.IniFormat)
+        QCoreApplication.setOrganizationName(shared.DEFTER_ORG_NAME)
+        QCoreApplication.setOrganizationDomain(shared.DEFTER_ORG_DOMAIN)
+        QCoreApplication.setApplicationName(shared.DEFTER_APP_NAME)
+        self.settings = QSettings(shared.DEFTER_AYARLAR_DOSYA_ADRES, QSettings.IniFormat)
         # self.settings.clear()
 
     # ---------------------------------------------------------------------
@@ -1633,7 +1633,7 @@ class DefterAnaPencere(QMainWindow):
         self.settings.beginGroup("GuiSettings")
         self.settings.setValue("winGeometry", self.saveGeometry())
         self.settings.setValue("winState", self.saveState(0))  # version=0
-        self.settings.setValue("alwaysOnTop", unicode_to_bool(self.actionAlwaysOnTopToggle.isChecked()))
+        self.settings.setValue("alwaysOnTop", shared.unicode_to_bool(self.actionAlwaysOnTopToggle.isChecked()))
         self.settings.setValue("kutuphaneArkaPlanRengi", self.ekranKutuphane.backgroundBrush().color())
         self.settings.setValue("treeViewIconSize", self.cModel.treeViewIconSize)
         self.settings.setValue("treeViewSatirYuksekligi", self.cModel.treeViewSatirYuksekligi)
@@ -1977,7 +1977,7 @@ class DefterAnaPencere(QMainWindow):
         # if temiz_mi:
         if self.tabWidget.cModel.degismis_sayfa_var_mi():
 
-            self.tabBar.setTabTextColor(idx, renk_degismis_nesne_yazi_rengi)
+            self.tabBar.setTabTextColor(idx, shared.renk_degismis_nesne_yazi_rengi)
 
             self.actionSaveFile.setEnabled(True)
             if self.cModel.saveFilePath:
@@ -2054,7 +2054,7 @@ class DefterAnaPencere(QMainWindow):
         self.tabBar.setTabText(idx, yazi)  #
         # ---------------------------------------------------------------------
         if self.tabWidget.cModel.degismis_sayfa_var_mi():
-            self.tabBar.setTabTextColor(idx, renk_degismis_nesne_yazi_rengi)
+            self.tabBar.setTabTextColor(idx, shared.renk_degismis_nesne_yazi_rengi)
         else:
             self.tabBar.setTabTextColor(idx, self.tabBar.palette().color(QPalette.Text))
         # ---------------------------------------------------------------------

@@ -7,6 +7,7 @@ __date__ = '3/28/16'
 
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QTextEdit, QPushButton, QLineEdit
 from PySide6.QtCore import Qt, Slot, QCoreApplication, QSettings
+from canta import shared
 
 
 ########################################################################
@@ -56,12 +57,11 @@ class CommandDialog(QDialog):
 
     # ---------------------------------------------------------------------
     def init_settings(self):
-        QCoreApplication.setOrganizationName("argekod")
-        QCoreApplication.setOrganizationDomain("argekod")
-        QCoreApplication.setApplicationName("Defter")
-        self.settings = QSettings("./_settings.ini", QSettings.IniFormat)
+        QCoreApplication.setOrganizationName(shared.DEFTER_ORG_NAME)
+        QCoreApplication.setOrganizationDomain(shared.DEFTER_ORG_DOMAIN)
+        QCoreApplication.setApplicationName(shared.DEFTER_APP_NAME)
+        self.settings = QSettings(shared.DEFTER_AYARLAR_DOSYA_ADRES, QSettings.IniFormat)
         # self.settings.clear()
-
     # ---------------------------------------------------------------------
     def read_settings(self):
         self.settings.beginGroup("CommandDialogSettings")

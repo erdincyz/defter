@@ -5,9 +5,17 @@ __project_name__ = 'Defter'
 __author__ = 'argekod'
 __date__ = '3/28/16'
 
+
+import os
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QGraphicsItem
+
+DEFTER_KLASOR_ADRES = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+DEFTER_AYARLAR_DOSYA_ADRES = os.path.join(DEFTER_KLASOR_ADRES, "_settings.ini")
+DEFTER_ORG_NAME = "argekod"
+DEFTER_ORG_DOMAIN = "argekod"
+DEFTER_APP_NAME = "Defter"
 
 renk_degismis_nesne_yazi_rengi = QColor(232, 50, 120)
 # renk_degismis_nesne_yazi_rengi = QColor(0,0,255)

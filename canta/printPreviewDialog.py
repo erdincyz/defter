@@ -15,7 +15,7 @@ from PySide6.QtWidgets import QVBoxLayout, QToolBar, QMainWindow, QLineEdit, QLa
     QSizePolicy, QComboBox, QWidget, QFormLayout, QDockWidget, QPushButton, QHBoxLayout, QButtonGroup, \
     QRadioButton, QGroupBox, QCheckBox, QFileDialog
 
-from canta.shared import TEXT_ITEM_TYPE
+from canta import shared
 
 import canta.icons_rc
 
@@ -203,7 +203,7 @@ class PrintPreviewDialog(QMainWindow):
 
         if self.parent().cScene.selectionQueue:
             self.radioSelection.setEnabled(True)
-            if self.parent().cScene.activeItem.type() == TEXT_ITEM_TYPE:
+            if self.parent().cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 self.radioContent.setEnabled(True)
 
         self.radioBtnGroup.buttonClicked.connect(self.act_radio_button_toggled)
@@ -529,10 +529,10 @@ class PrintPreviewDialog(QMainWindow):
 
     # ---------------------------------------------------------------------
     def init_settings(self):
-        QCoreApplication.setOrganizationName("argekod")
-        QCoreApplication.setOrganizationDomain("argekod")
-        QCoreApplication.setApplicationName("Defter")
-        self.settings = QSettings("_settings.ini", QSettings.IniFormat)
+        QCoreApplication.setOrganizationName(shared.DEFTER_ORG_NAME)
+        QCoreApplication.setOrganizationDomain(shared.DEFTER_ORG_DOMAIN)
+        QCoreApplication.setApplicationName(shared.DEFTER_APP_NAME)
+        self.settings = QSettings(shared.DEFTER_AYARLAR_DOSYA_ADRES, QSettings.IniFormat)
         # self.settings.clear()
 
     # ---------------------------------------------------------------------
