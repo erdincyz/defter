@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="32"
+   height="32"
+   viewBox="0 0 8.4666665 8.4666669"
+   version="1.1"
+   id="svg8"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs2" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     transform="translate(0,-288.53332)">
+    <g
+       id="g4855"
+       transform="matrix(1.0424263,0,0,1.0450727,-0.19453261,-12.77357)"
+       style="stroke-width:0.95808506">
+      <circle
+         r="0.99921918"
+         cy="289.79343"
+         cx="4.2333331"
+         id="path4845"
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.95808506;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+      <rect
+         y="290.06009"
+         x="1.7458942"
+         height="5.3921361"
+         width="4.9479213"
+         id="rect4843"
+         style="fill:none;fill-opacity:0.35597247;stroke:#000000;stroke-width:0.86227655;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+      <rect
+         y="290.49429"
+         x="3.0521576"
+         height="0.68959504"
+         width="2.3863294"
+         id="rect4847"
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.958085;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+      <circle
+         style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.95808506;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+         id="circle4849"
+         cx="4.2333331"
+         cy="289.79343"
+         r="0.36138436" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:3.93747px;line-height:2.46092px;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="3.0194714"
+       y="294.8624"
+       id="text4901"><tspan
+         id="tspan4899"
+         x="3.0194714"
+         y="294.8624"
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px">T</tspan></text>
+  </g>
+</svg>
