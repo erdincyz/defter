@@ -1,4 +1,4 @@
-###Hoşgeldiniz
+### Hoşgeldiniz
 İnşallah, **Defter** vakit buldukça ve ihtiyaç duyuldukça halen geliştirilmekte olan açık kaynak bir yazılımdır. 
 
 * Sayfanın her hangi bir yerine çift tıklayıp, hızlıca not almak için,
@@ -10,10 +10,10 @@
 * Mesela sahneye taşıyacağınız, **veya** izlemekte olduğunuz bir videodan ekran görüntüsü alıp, sahneye yapıştıracağınız o resmin üzerine çift tıklayınca, resmin tıkladığınız noktasında bir metin kutusu oluşur. Böylece resmin üzerine de dilediğiniz kadar not alabilirsiniz. 
 
 
-**GPL** lisanslıdır.
+**GPLv3** lisanslıdır.
 
 **Birçok Bug (Hata)** ve **tam olarak eklenmemiş özellikler** içerir. İyice kurcalayıp denemeden **önemli işler** için kullanma**MA**nız tavsiye edilir.
 
 **Bilinen hataları ve eklenmek niyetinde olunan özellikleri (şu an güncel olmamakla beraber)** bu sayfadaki **Issues** kısmından takip edebilirsiniz.
 
-###Teşekkürler.
+### Teşekkürler.
