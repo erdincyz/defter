@@ -1,14 +1,20 @@
-###Dörtgen Aracı
+### Dörtgen Aracı
+
 **SPACE** basılı iken tekrar tekrar cizim yapabilirisiniz.
 
-###Yuvarlak Aracı
+---
+
+### Yuvarlak Aracı
 **SPACE** basılı iken tekrar tekrar cizim yapabilirisiniz.
 
+---
 
-###Yazi Nesnesi
+### Yazi Nesnesi
 **CTRL + çift tık** = Web adresi olarak aç
 
 **SHIFT + CTRL + çift tık** = Yazıyı google da ara
+
+---
 
 ### Kalem 
 **SHIFT + Fare Tekeri** = Çizgi kalınlığı değiştirir.
