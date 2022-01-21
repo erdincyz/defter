@@ -7307,7 +7307,9 @@ class DefterAnaPencere(QMainWindow):
 
         count = self.stylePresetsListWidget.count()
 
+        # ! burayi for dongusune cevirmeyin...
         if count < 10:
+            preset.setToolTip("Alt + {}".format(count))
             # def make_callback(_dosya):
             #     return lambda: self.act_open_def_file(_dosya)
             #

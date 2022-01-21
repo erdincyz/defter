@@ -22,3 +22,8 @@
 **SHIFT + Fare sol tuş basılı iken sürükle** = Çizgi kalınlığı değiştirir.
 
 **CTRL + Fare sol tuş ile istenen noktalar tıklanarak** = Çoklu çizgi veya çokgen çizilebilir. Normal kalemle çizime başlandıktan sonra, **CTRL** basılırsa çizime düz çizgi ile devam edilebilir.
+
+---
+
+### Stiller Paneli
+İlk 9 stil **Alt + 1**, **Alt + 2 ... vb.** kısayollar ile uygulanabilir.
