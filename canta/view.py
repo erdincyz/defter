@@ -66,10 +66,9 @@ class View(QGraphicsView):
     def contextMenuEvent(self, event):
         QGraphicsView.contextMenuEvent(self, event)
 
-        # if some item was under the mouse and showed its context menu, the event will
-        # have been accepted
+        # mouse altinda bir nesne varsa ve sag click menusunu gosterdiyse event.accepted() doner.
         if not event.isAccepted():
-            self.scene().parent().view_context_menu(event.globalPos())
+            self.scene().parent().view_context_menu_goster(event.globalPos())
             # TODO: gerek var mi?
             # event.accept()
 

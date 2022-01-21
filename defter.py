@@ -872,6 +872,13 @@ class DefterAnaPencere(QMainWindow):
         self.stylePresetsListWidget.itemDoubleClicked.connect(self.act_apply_selected_style)
         # self.stylePresetsListWidget.addItem(ListWidgetItem("asd"))
 
+        # -- YUZEN STILLER LISTWIDGET --
+        self.yuzenStylePresetsListWidget = QListWidget(self)
+        self.yuzenStylePresetsListWidget.setSpacing(3)
+        self.yuzenStylePresetsListWidget.itemDoubleClicked.connect(self.act_apply_selected_style)
+        self.yuzenStylePresetsListWidget.hide()
+        # -- YUZEN STILLER LISTWIDGET --
+
         anaWidgetLayout.addWidget(self.stylePresetsListWidget)
 
         btnLayout = QHBoxLayout()
@@ -3196,6 +3203,11 @@ class DefterAnaPencere(QMainWindow):
                                          lambda throw_away=0: self.close_selected_tab(self.tabWidget.currentIndex()))
         hot_close_active_tab.setContext(Qt.ApplicationShortcut)
 
+        hot_stil_uygula_yuzen_listwidget_goster_gizle = QShortcut(QKeySequence("Alt+0"),
+                                                                  self,
+                                                                  self.stil_uygula_yuzen_listwidget_goster_gizle)
+        hot_stil_uygula_yuzen_listwidget_goster_gizle.setContext(Qt.ApplicationShortcut)
+
         # lambda: self.toolsToolBar.setVisible(not self.toolsToolBar.isVisible())
 
         # hot_clean_mode = QShortcut(QKeySequence("Ctrl+H"),
@@ -4112,7 +4124,7 @@ class DefterAnaPencere(QMainWindow):
                                           ))
 
     # ---------------------------------------------------------------------
-    def view_context_menu(self, pos):
+    def view_context_menu_goster(self, pos):
         menu = QMenu()
 
         menu.addActions((self.actionPaste,
@@ -4130,14 +4142,23 @@ class DefterAnaPencere(QMainWindow):
 
         menu.exec(pos)  # sync, blocks main loop, modal
         # baska yerlerde popup kullaniyoruz, viewda olmuyor, menu acilip hemen kapaniyor.
-        # menu.popup(pos)  # asynch , does not block main lopp, non modal
+        # menu.popup(pos)  # async , does not block main lopp, non modal
 
     # ---------------------------------------------------------------------
-    def ekran_kutuphane_context_menu(self, pos):
+    def ekran_kutuphane_context_menu_goster(self, pos):
 
         self.kutuphaneEkranContextMenu.exec(pos)  # sync, blocks main loop, modal
         # baska yerlerde popup kullaniyoruz, viewda olmuyor, menu acilip hemen kapaniyor.
-        # menu.popup(pos)  # asynch , does not block main lopp, non modal
+        # menu.popup(pos)  # async , does not block main lopp, non modal
+
+    # ---------------------------------------------------------------------
+    def stil_uygula_yuzen_listwidget_goster_gizle(self):
+        if not self.yuzenStylePresetsListWidget.isVisible():
+            self.yuzenStylePresetsListWidget.move(QCursor.pos())
+            self.yuzenStylePresetsListWidget.resize(200, self.yuzenStylePresetsListWidget.count() * 21)
+            self.yuzenStylePresetsListWidget.setVisible(1)
+        else:
+            self.yuzenStylePresetsListWidget.setVisible(0)
 
     # ---------------------------------------------------------------------
     def olustur_tools_toolbar(self):
@@ -4191,7 +4212,6 @@ class DefterAnaPencere(QMainWindow):
         self.actionAddImageItem.setShortcut(QKeySequence("I"))
         self.actionAddImageItem.triggered.connect(self.act_add_image_item)
         self.recentImagesMenu.aboutToShow.connect(self.on_recent_images_menu_about_to_show)
-
 
         self.actionAddVideoItem = QAction(QIcon(':icons/file-video.png'), self.tr("Add Video"), actionGroup)
         self.actionAddVideoItem.setShortcut(QKeySequence("V"))
@@ -7305,6 +7325,15 @@ class DefterAnaPencere(QMainWindow):
 
         self.stylePresetsListWidget.addItem(preset)
 
+        preset2 = ListWidgetItem(presetName)
+        preset2.setForeground(fg)
+        preset2.setBackground(bg)
+        preset2.setCizgiRengi(cizgiRengi)
+        preset2.setPen(QPen(pen))
+        preset2.setPresetFont(font)
+        preset2.setFont(font2)
+        self.yuzenStylePresetsListWidget.addItem(preset2)
+
         count = self.stylePresetsListWidget.count()
 
         # ! burayi for dongusune cevirmeyin...
@@ -7373,9 +7402,14 @@ class DefterAnaPencere(QMainWindow):
         if msgBox.clickedButton() == deleteButton:
 
             for item in self.stylePresetsListWidget.selectedItems():
-                itemToDelete = self.stylePresetsListWidget.takeItem(self.stylePresetsListWidget.row(item))
+                row = self.stylePresetsListWidget.row(item)
+                itemToDelete = self.stylePresetsListWidget.takeItem(row)
                 # itemToDelete = None
                 del itemToDelete
+
+                itemToDelete2 = self.yuzenStylePresetsListWidget.takeItem(row)
+                # itemToDelete = None
+                del itemToDelete2
 
     # ---------------------------------------------------------------------
     @Slot(QListWidgetItem)
@@ -7539,6 +7573,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_clear_style_presets(self):
         self.stylePresetsListWidget.clear()
+        self.yuzenStylePresetsListWidget.clear()
 
     # ---------------------------------------------------------------------
     def get_style_presets_list_for_saving_binary(self):

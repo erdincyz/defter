@@ -27,3 +27,5 @@
 
 ### Stiller Paneli
 İlk 9 stil **Alt + 1**, **Alt + 2 ... vb.** kısayollar ile uygulanabilir.
+
+**Alt + 0** ile farenin bulundugu yerde baska bir stiller listesi açıp kapatılabilir.
