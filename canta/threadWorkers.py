@@ -46,8 +46,8 @@ from PySide6.QtCore import QObject, Slot, Signal, QPointF
 class DownloadWorker(QObject):
     downloadWithThread = Signal(str, str, QPointF)
 
-    finished = Signal(str, str, QPointF)
-    failed = Signal()
+    finished = Signal(str, str, QPointF, QObject)
+    failed = Signal(QObject)
     log = Signal(str, int, int)
     percentage = Signal(int)
 
@@ -70,11 +70,11 @@ class DownloadWorker(QObject):
             opener.retrieve(url, imageSavePath, reporthook=self.report)
 
             self.log.emit("Image succesfully downloaded", 5000, 1)
-            self.finished.emit(url, imageSavePath, scenePos)
+            self.finished.emit(url, imageSavePath, scenePos, self)
 
         except HTTPError as e:
             self.log.emit("Could not load image: {} ({})".format(url, e), 5000, 2)
-            self.failed.emit()
+            self.failed.emit(self)
 
     # ---------------------------------------------------------------------
     def report(self, count, blockSize, totalSize):

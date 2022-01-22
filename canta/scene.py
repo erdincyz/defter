@@ -10,7 +10,7 @@ import os
 import uuid
 import shutil
 
-from PySide6.QtCore import (Qt, QRectF, QPointF, Slot, Signal, QThread, QLineF)
+from PySide6.QtCore import (Qt, QRectF, QPointF, Slot, Signal, QThread, QLineF, QObject)
 from PySide6.QtGui import (QPixmap, QCursor, QPen, QImage, QUndoStack)
 from PySide6.QtWidgets import (QApplication, QGraphicsScene)
 # from sub.items.base import BaseItem
@@ -1443,8 +1443,8 @@ class Scene(QGraphicsScene):
         # super(Scene, self).dropEvent(event)
 
     # ---------------------------------------------------------------------
-    @Slot(str, str, QPointF)
-    def dThread_finished(self, url, imagePath, scenePos):
+    @Slot(str, str, QPointF, QObject)
+    def dThread_finished(self, url, imagePath, scenePos, worker):
 
         pixMap = QPixmap(imagePath)
         # pixMap = QPixmap(image)
@@ -1466,8 +1466,8 @@ class Scene(QGraphicsScene):
         self.dthread_clean()
 
     # ---------------------------------------------------------------------
-    @Slot()
-    def dthread_clean(self):
+    @Slot(QObject)
+    def dthread_clean(self, worker):
         self.dThread.quit()
         self.dThread.deleteLater()
         self.dWorker.deleteLater()

@@ -35,7 +35,7 @@ from PySide6.QtWidgets import (QMainWindow, QWidget, QDockWidget, QVBoxLayout, Q
 
 from PySide6.QtCore import (Qt, QRectF, QCoreApplication, QSettings, QPoint, Slot, QSizeF, QSize, QFile, QSaveFile,
                             QIODevice, QDataStream, QMimeData, QByteArray, QPointF, qCompress, qUncompress, QLocale,
-                            QThread, QUrl, QLineF)
+                            QThread, QUrl, QLineF, QObject)
 
 from PySide6.QtWebEngineWidgets import QWebEngineView  # QWebEnginePage, #QWebEngineProfile, QWebEngineSettings
 
@@ -3746,9 +3746,10 @@ class DefterAnaPencere(QMainWindow):
         self.actionShowAsWebPage.triggered.connect(self.act_show_as_web_page)
 
         self.actionConvertToWebItem = QAction(QIcon(':icons/icons/text-html.png'),
-                                              self.tr("Convert to web item (Experimental && Slow)"),
+                                              self.tr("~Convert to web item (Experimental && Slow)"),
                                               self.itemContextMenu)
         self.actionConvertToWebItem.triggered.connect(self.act_convert_to_web_item)
+        self.actionConvertToWebItem.setDisabled(True)
 
         # ---------------------------------------------------------------------
         self.actionEmbedImage = QAction(QIcon(":icons/command.png"), self.tr("Embed image(s) to document"),
@@ -7893,8 +7894,8 @@ class DefterAnaPencere(QMainWindow):
             #     print("hata")
 
     # ---------------------------------------------------------------------
-    @Slot(str, str, QPointF)
-    def dThread_finished(self, url, imagePath, scenePos):
+    @Slot(str, str, QPointF, QObject)
+    def dThread_finished(self, url, imagePath, scenePos, worker):
         # todo: COK ONEMLİ, İmajlari temp klasore kaydedip sonra actigimizda yok o klasor.
         # dosyayi kaydederken adresleri degistirmek ya da embed etmek mi lazim.
         # acaba ayri bir klasor mu yapsak web images gibisnden
@@ -7909,20 +7910,21 @@ class DefterAnaPencere(QMainWindow):
         self.cScene.activeItem.setHtml(text)
         self.cScene.activeItem.update()
 
-        self.sender().failed.emit()
+        # self.sender().failed.emit()
+        self.dthread_clean(worker)
         if self.imgUrlList:
             self.create_thread(self.imgUrlList.pop(0))
         else:
             self.is_fetching = False
 
     # ---------------------------------------------------------------------
-    @Slot()
-    def dthread_clean(self):
+    @Slot(QObject)
+    def dthread_clean(self, worker):
 
-        self.workerThreadDict[self.sender()].quit()  # thread
-        self.workerThreadDict[self.sender()].deleteLater()  # thread
-        self.sender().deleteLater()  # worker
-        del self.workerThreadDict[self.sender()]
+        self.workerThreadDict[worker].quit()  # thread
+        self.workerThreadDict[worker].deleteLater()  # thread
+        worker.deleteLater()  # worker
+        del self.workerThreadDict[worker]
 
         # print("{} active threads".format(len(self.workerThreadDict)))
         self.log(self.tr("{} active threads").format(len(self.workerThreadDict)), 0)
@@ -7943,7 +7945,7 @@ class DefterAnaPencere(QMainWindow):
             threads = self.workerThreadDict.values()
 
             for worker in workers:
-                worker.failed.emit()
+                worker.failed.emit(worker)
 
             count = len(workers)
             while count > 0:
