@@ -496,6 +496,12 @@ class Image(BaseItem):
             self.scene().undoRedo.undoableSetFontSize(self.scene().undoStack, "change text size", self, size)
 
     # ---------------------------------------------------------------------
+    def update_painter_text_rect(self):
+        # dummy method
+        # basede var, ordaki hesaplamalari yapmasin
+        pass
+
+    # ---------------------------------------------------------------------
     def paint(self, painter, option, widget=None):
 
         painter.setClipRect(option.exposedRect)

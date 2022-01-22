@@ -4012,11 +4012,12 @@ class DefterAnaPencere(QMainWindow):
         # self.actionKutuphaneDosyaYonetcisindeGoster.setShortcutContext(Qt.ApplicationShortcut)
         self.actionKutuphaneDosyaYonetcisindeGoster.triggered.connect(self.act_kut_dosya_yoneticisinde_goster)
 
-        self.actionKutuphaneSahnedeGoster = QAction(QIcon(":icons/icons/text-html.png"), self.tr("Show in scene"),
+        self.actionKutuphaneSahnedeGoster = QAction(QIcon(":icons/icons/text-html.png"), self.tr("~Show in scene"),
                                                     self.kutuphaneNesneContextMenu)
         # self.actionKutuphaneDosyaYonetcisindeGoster.setShortcut(QKeySequence("P"))
         # self.actionKutuphaneDosyaYonetcisindeGoster.setShortcutContext(Qt.ApplicationShortcut)
         self.actionKutuphaneSahnedeGoster.triggered.connect(self.act_kut_dosya_yoneticisinde_goster)
+        self.actionKutuphaneSahnedeGoster.setDisabled(True)
 
         self.kutuphaneNesneContextMenu.addActions((self.actionKutuphaneNesneSil,
                                                    self.actionKutuphaneDosyaYonetcisindeGoster,
@@ -7217,7 +7218,6 @@ class DefterAnaPencere(QMainWindow):
         else:
             self.currentFont.setPointSize(value)
             self.cScene.setFont(QFont(self.currentFont))
-
 
     # ---------------------------------------------------------------------
     @Slot(int)

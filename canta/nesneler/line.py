@@ -38,7 +38,7 @@ class LineItem(QGraphicsItem):
 
         self.secili_nesne_kalem_kalinligi = 1
 
-        self.handleSize = 15
+        self.handleSize = 25
         self.resizeHandleSize = QSizeF(self.handleSize, self.handleSize)
         self.create_resize_handles()
 
@@ -68,9 +68,6 @@ class LineItem(QGraphicsItem):
         self.painterTextOption.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
 
         self.painterTextScale = 1
-        self.painterTextRect = QRectF()
-        # self.painterTextRect = QRectF(self.boundingRect())
-        # self.painterTextRect = self.update_painter_text_rect()
 
         self.cosmeticSelect = False
         self.isActiveItem = False
@@ -271,9 +268,7 @@ class LineItem(QGraphicsItem):
             # self.scene().unite_with_scene_rect(self.sceneBoundingRect())
             self._resizing = False
             self.scene().unite_with_scene_rect(self.sceneBoundingRect())
-            self.update_painter_text_rect()
 
-            # self.update_painter_text_rect()
         super(LineItem, self).mouseReleaseEvent(event)
 
         if self.childItems():
@@ -360,8 +355,6 @@ class LineItem(QGraphicsItem):
             self.scene().parent().change_transform_box_values(self)
             # self.setPos(x, y)
             # return QGraphicsItem.mouseMoveEvent(self, event)
-
-            # self.update_painter_text_rect()
 
         # event.accept()
         else:
@@ -632,7 +625,6 @@ class LineItem(QGraphicsItem):
 
         self.update()
 
-
     # ---------------------------------------------------------------------
     def setCizgiKalinligi(self, width):
         self._pen.setWidthF(width)
@@ -730,20 +722,8 @@ class LineItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def update_painter_text_rect(self):
-        r = QRectF(self.boundingRect())
-        print(r)
-        size = self.boundingRect().size()
-        # size.setWidth(self.sceneWidth() - self.textPadding)
-        size.setWidth(self.sceneWidth() - self.textPadding)
-        size.setHeight(size.height() + self.fontPointSize())
-        # r.setSize(self._rect.size() / scale)
-        r.setSize(size / self.painterTextScale)
-        # r.moveCenter(self.boundingRect().center())
-        yeniOrtaNokta = self._line.center()
-        yeniOrtaNokta.setY(yeniOrtaNokta.y() - self._pen.widthF())
-        r.moveCenter(yeniOrtaNokta)
-        self.painterTextRect = r
-
+        # dummy method
+        pass
 
     # ---------------------------------------------------------------------
     def setPen(self, pen):
@@ -903,19 +883,11 @@ class LineItem(QGraphicsItem):
             return shape().controlPointRect();
         }
 
-
         """
-
-        return self.shape().controlPointRect()
-        # return self.path().controlPointRect()
-
-        # if self._boundingRect.isNull():
-        #     if self.pen().widthF() == 0.0:
-        #         self._boundingRect = self._path.controlPointRect()
-        #     else:
-        #         self._boundingRect = self.shape().controlPointRect()
-        #
-        # return self._boundingRect
+        rect = self.shape().controlPointRect()
+        if self._text:
+            rect.setHeight(max(rect.height(), self.fontPointSize()))
+        return rect
 
     # ---------------------------------------------------------------------
     def shape(self):
@@ -928,27 +900,9 @@ class LineItem(QGraphicsItem):
         path.addPolygon(self.ok_polygon)
         path.addEllipse(self.p1Handle)
         path.addEllipse(self.p2Handle)
-        path.addRect(self.painterTextRect)
-        return self.qt_graphicsItem_shapeFromPath(path, self.pen())
-        # return self.qt_graphicsItem_shapeFromPath(self._path, self.pen())
-
-    # # ---------------------------------------------------------------------
-    # def update_painter_text_scale(self):
-    #     if self.parentItem():
-    #         a = self.parentItem().scale()
-    #     else:
-    #         a = 1
-    #     self.painterTextScale = 1 / self.scale() / a
-    #
-    # # ---------------------------------------------------------------------
-    # def update_painter_text_rect(self):
-    #     r = QRectF(self._rect)
-    #     size = self._rect.size()
-    #     size.setWidth(self.sceneWidth() - self.textPadding)
-    #     # r.setSize(self._rect.size() / scale)
-    #     r.setSize(size / self.painterTextScale)
-    #     r.moveCenter(self._rect.center())
-    #     self.painterTextRect = r
+        # kalem kalinligini da ekliyoruz
+        path = self.qt_graphicsItem_shapeFromPath(path, self.pen())
+        return path
 
     # ---------------------------------------------------------------------
     def paint(self, painter, option, widget=None):
@@ -970,6 +924,8 @@ class LineItem(QGraphicsItem):
         # path.cubicTo(80, 0, 50, 50, 80, 80)
         #
         # painter.drawPath(path)
+        # painter.drawPath(self.shape())
+        # painter.drawRect(self.boundingRect())
 
         if self._text:
             # painter.setWorldMatrixEnabled(False)
@@ -977,23 +933,17 @@ class LineItem(QGraphicsItem):
             painter.setFont(self._font)
             # painter.setPen(self.textPen)
             painter.setPen(self.yaziRengi)
-            # painter.translate(self.boundingRect().center())
-            # painter.rotate(-self.rotation())
-            aci = math.atan2(-self._line.dy(), self._line.dx())
-            # print(aci)
-            aci = aci * 180 / math.pi
-            painter.rotate(-aci)
+            painter.translate(self.boundingRect().center())
+            # aci = math.atan2(-self._line.dy(), self._line.dx())
+            # aci = aci * 180 / math.pi
+            # painter.rotate(- aci)
+            painter.rotate(- self._line.angle())
             painter.scale(self.painterTextScale, self.painterTextScale)
-            # painter.translate(-self.boundingRect().center())
-            # metrics = painter.fontMetrics()
-            # text = metrics.elidedText(self.text(), Qt.ElideRight, self.boundingRect().width())
-            # TODO: self.boundingRect().width() calismadi, sceneWidth() de biraz maliyetli, optimize edilebilir.
-            # txt = metrics.elidedText(self._text, Qt.ElideRight, self.sceneWidth() / scale)
-            # painter.drawText(self.boundingRect(), Qt.AlignCenter | Qt.AlignVCenter, txt)
-            painter.drawText(self.painterTextRect, self._text, self.painterTextOption)
+            painter.translate(-self.boundingRect().center())
+            # painter.drawText(self.boundingRect(), Qt.AlignCenter | Qt.AlignVCenter, self._text)
+            painter.drawText(self.boundingRect(), self._text, self.painterTextOption)
             painter.restore()
             # painter.setWorldMatrixEnabled(True)
-
 
         if option.state & QStyle.State_Selected or self.cosmeticSelect:
 
@@ -1026,17 +976,18 @@ class LineItem(QGraphicsItem):
             #     for i in range(path.elementCount()):
             #         painter.drawPoint(QPointF(path.elementAt(i).x, path.elementAt(i).y))
 
-        # # # # # debug start - pos() # # # # #
+        # # # # # # debug start - pos() # # # # #
+        # painter.setBrush(Qt.NoBrush)
         # p = self.pos()
         # s = self.scenePos()
         # painter.drawText(self.boundingRect(), "{},  {}\n{},  {}".format(p.x(),p.y(),s.x(), s.y()))
         # painter.drawRect(self.boundingRect())
-        # painter.drawRect(p.x(),p.y(),100,100)
-        # painter.drawRect(s.x(),s.y(),100,100)
+        # # painter.drawRect(p.x(),p.y(),100,100)
+        # # painter.drawRect(s.x(),s.y(),100,100)
         # painter.drawRect(0,0,15,15)
-        # painter.drawRect(self.path().controlPointRect())
-        # painter.drawRect(self.boundingRect())
-        # # # # # debug end - pos() # # # # #
+        # # painter.drawRect(self.path().controlPointRect())
+        # # painter.drawRect(self.boundingRect())
+        # # # # # # debug end - pos() # # # # #
 
     # ---------------------------------------------------------------------
     def wheelEvent(self, event):
@@ -1163,7 +1114,6 @@ class LineItem(QGraphicsItem):
             self.scene().undoableScaleLineItemByScalingPath("scale", self, scaledPath)
 
             # bunu undoableScaleLineItemByScalingPath icinden cagiriyoruz
-            # self.item.update_painter_text_rect()
 
         # self.setTransformOriginPoint(self.boundingRect().center())
 
@@ -1183,7 +1133,6 @@ class LineItem(QGraphicsItem):
 
         # undoableScale  scaleWithOffset i cagiriyor. orda guncelliyoruz alttakileri.
         # self.update_painter_text_scale()
-        # self.update_painter_text_rect()
 
     # ---------------------------------------------------------------------
     def repositionChildItems(self, diff):
@@ -1200,7 +1149,6 @@ class LineItem(QGraphicsItem):
         self.moveBy(diff.x(), diff.y())
         # self.updateBoundingRect()
         self.update_painter_text_scale()
-        self.update_painter_text_rect()
 
     # ---------------------------------------------------------------------
     def rotateWithOffset(self, angle):
@@ -1209,7 +1157,6 @@ class LineItem(QGraphicsItem):
         cYeni = self.sceneCenter()
         diff = cEski - cYeni
         self.moveBy(diff.x(), diff.y())
-        self.update_painter_text_rect()
 
     # ---------------------------------------------------------------------
     def rotateItem(self, delta):
@@ -1225,7 +1172,6 @@ class LineItem(QGraphicsItem):
             # bu p1 den rotate ediyor
             # self.scene().undoableRotate("Rotate", self, self.rotation() - 5)
             self.scene().undoRedo.undoableRotateBaseItem(self.scene().undoStack, "rotate", self, self.rotation() - 5)
-        self.update_painter_text_rect()
         # self.update()
 
     # # ---------------------------------------------------------------------
