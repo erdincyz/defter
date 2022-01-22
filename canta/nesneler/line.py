@@ -68,6 +68,7 @@ class LineItem(QGraphicsItem):
         self.painterTextOption.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
 
         self.painterTextScale = 1
+        self.painterTextRect = QRectF()
 
         self.cosmeticSelect = False
         self.isActiveItem = False
@@ -81,6 +82,7 @@ class LineItem(QGraphicsItem):
 
         self.baglanmis_nesneler = {}
         self.oklar_dxdy_nokta = {}
+
     # ---------------------------------------------------------------------
     def setArkaPlanRengi(self, col):
         # dummy method
@@ -207,6 +209,7 @@ class LineItem(QGraphicsItem):
             # !! burda lambda kullanmazsak, self.is_temp_text_item_empty ,self daha olsumadigi icin,
             # selfi null olarak goruyor ve baglanti kuramiyor.
             self.tempTextItem.textItemFocusedOut.connect(lambda: self.is_temp_text_item_empty())
+            self.update_painter_text_rect()
 
         super(LineItem, self).mouseDoubleClickEvent(event)
 
@@ -268,6 +271,7 @@ class LineItem(QGraphicsItem):
             # self.scene().unite_with_scene_rect(self.sceneBoundingRect())
             self._resizing = False
             self.scene().unite_with_scene_rect(self.sceneBoundingRect())
+            self.update_painter_text_rect()
 
         super(LineItem, self).mouseReleaseEvent(event)
 
@@ -352,6 +356,7 @@ class LineItem(QGraphicsItem):
 
             self.setLine(line)  # mouse release eventten gonderiyoruz undoya
             self.update_resize_handles()
+            self.update_painter_text_rect()
             self.scene().parent().change_transform_box_values(self)
             # self.setPos(x, y)
             # return QGraphicsItem.mouseMoveEvent(self, event)
@@ -722,8 +727,16 @@ class LineItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def update_painter_text_rect(self):
-        # dummy method
-        pass
+        r = QRectF()
+        r.setWidth(self._line.length())
+        # r.setHeight(self.fontPointSize()- self.textPadding)
+        r.setHeight(self.fontPointSize())
+        # r.setSize(size / self.painterTextScale)
+        # r.moveCenter(self.boundingRect().center())
+        yeniOrtaNokta = self._line.center()
+        yeniOrtaNokta.setY(yeniOrtaNokta.y() - self._pen.widthF())
+        r.moveCenter(yeniOrtaNokta)
+        self.painterTextRect = r
 
     # ---------------------------------------------------------------------
     def setPen(self, pen):
@@ -933,15 +946,16 @@ class LineItem(QGraphicsItem):
             painter.setFont(self._font)
             # painter.setPen(self.textPen)
             painter.setPen(self.yaziRengi)
-            painter.translate(self.boundingRect().center())
+            painter.translate(self.line().center())
             # aci = math.atan2(-self._line.dy(), self._line.dx())
             # aci = aci * 180 / math.pi
             # painter.rotate(- aci)
             painter.rotate(- self._line.angle())
             painter.scale(self.painterTextScale, self.painterTextScale)
-            painter.translate(-self.boundingRect().center())
+            painter.translate(-self.line().center())
             # painter.drawText(self.boundingRect(), Qt.AlignCenter | Qt.AlignVCenter, self._text)
-            painter.drawText(self.boundingRect(), self._text, self.painterTextOption)
+            # painter.drawText(self.boundingRect(), self._text, self.painterTextOption)
+            painter.drawText(self.painterTextRect, self._text, self.painterTextOption)
             painter.restore()
             # painter.setWorldMatrixEnabled(True)
 
