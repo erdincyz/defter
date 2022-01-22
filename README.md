@@ -1,3 +1,6 @@
+![ScreenShot](https://raw.githubusercontent.com/argekod/gorseller/master/_defter/defter_ekran_goruntusu.jpg)
+
+
 ### Hoşgeldiniz
 İnşallah, **Defter** vakit buldukça ve ihtiyaç duyuldukça halen geliştirilmekte olan açık kaynak bir yazılımdır. 
 
