@@ -108,31 +108,6 @@ class DefterAnaPencere(QMainWindow):
 
         self.setAttribute(Qt.WA_DeleteOnClose)
 
-        ########################################################################
-        # self.setAttribute(Qt.WA_DeleteOnClose)
-        # self.setWindowFlags(Qt.SubWindow)
-        # self.setWindowFlags(Qt.ToolTip)
-        # self.setWindowFlags(Qt.SplashScreen)
-        # self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
-        # self.setWindowFlags(Qt.FramelessWindowHint | Qt.SplashScreen)
-        # self.setWindowFlags(Qt.FramelessWindowHint | Qt.ToolTip)
-        # self.setWindowFlags(Qt.Tool)
-        # self.setWindowFlags(Qt.SubWindow | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-        # self.setWindowFlags(Qt.Widget | Qt.FramelessWindowHint| Qt.WindowStaysOnTopHint)
-        # self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-        # self.setParent(None)
-        # self.setWindowFlags(Qt.WindowStaysOnTopHint)
-
-        # self.setAttribute(Qt.WA_TranslucentBackground)
-        # self.setAttribute(Qt.WA_NoSystemBackground)
-
-        # self.setAttribute(Qt.WA_PaintOnScreen)
-        # self.setAttribute(Qt.WA_OpaquePaintEvent, False)
-        # self.setStyleSheet("QWidget{background:transparent;}")
-        # self.setStyleSheet("QWidget{background-color:none;}")
-        # self.setStyleSheet("background-color: rgba(255, 255, 255, 40%);")
-        ########################################################################
-
         self.clipboard = QApplication.clipboard()
         self.clipboard.dataChanged.connect(self.on_clipboard_data_changed)
 
@@ -874,6 +849,7 @@ class DefterAnaPencere(QMainWindow):
 
         # -- YUZEN STILLER LISTWIDGET --
         self.yuzenStylePresetsListWidget = QListWidget(self)
+        self.yuzenStylePresetsListWidget.setMaximumHeight(500)
         self.yuzenStylePresetsListWidget.setSpacing(3)
         self.yuzenStylePresetsListWidget.itemDoubleClicked.connect(self.act_apply_selected_style)
         self.yuzenStylePresetsListWidget.hide()
@@ -1035,8 +1011,8 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def olustur_kutuphaneDW(self):
-        self.kutuphaneDw = QDockWidget(self)
-        self.kutuphaneBaslik = QLabel(self.tr("- Library -"), self.kutuphaneDw)
+        self.kutuphaneDW = QDockWidget(self)
+        self.kutuphaneBaslik = QLabel(self.tr("- Library -"), self.kutuphaneDW)
         self.kutuphaneBaslik.setStyleSheet("QLabel {"
                                            "font-size:1.2em; "
                                            "font-weight:bold;"
@@ -1048,22 +1024,22 @@ class DefterAnaPencere(QMainWindow):
                                            "color:#fff; "
                                            "background-color:#9ab;}")
         self.kutuphaneBaslik.setAlignment(Qt.AlignCenter)
-        self.kutuphaneDw.setTitleBarWidget(self.kutuphaneBaslik)
-        self.kutuphaneDw.setWindowTitle(self.tr("Library"))
-        self.kutuphaneDw.setObjectName("kutuphaneDockWidget")
-        self.kutuphaneDw.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea | Qt.BottomDockWidgetArea)
-        self.kutuphaneDw.setFeatures(QDockWidget.DockWidgetMovable |
+        self.kutuphaneDW.setTitleBarWidget(self.kutuphaneBaslik)
+        self.kutuphaneDW.setWindowTitle(self.tr("Library"))
+        self.kutuphaneDW.setObjectName("kutuphaneDockWidget")
+        self.kutuphaneDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea | Qt.BottomDockWidgetArea)
+        self.kutuphaneDW.setFeatures(QDockWidget.DockWidgetMovable |
                                      QDockWidget.DockWidgetClosable |
                                      # QDockWidget.DockWidgetVerticalTitleBar|
                                      QDockWidget.DockWidgetFloatable
                                      )
-        self.addDockWidget(Qt.LeftDockWidgetArea, self.kutuphaneDw)
+        self.addDockWidget(Qt.LeftDockWidgetArea, self.kutuphaneDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
 
-        base = QWidget(self.kutuphaneDw)
+        base = QWidget(self.kutuphaneDW)
         base.setContentsMargins(0, 0, 0, 0)
-        self.kutuphaneDw.setWidget(base)
+        self.kutuphaneDW.setWidget(base)
         layBase = QVBoxLayout(base)
         layButonlar = QHBoxLayout()
         layBase.addLayout(layButonlar)
@@ -3533,49 +3509,46 @@ class DefterAnaPencere(QMainWindow):
         toolBarsMenu.aboutToShow.connect(self.on_tool_bars_menu_about_to_show)
 
         self.actionToggleToolsToolbar = QAction(QIcon(':icons/arrow.png'), self.tr('Tools'), toolBarsMenu)
-        # self.actionToggleToolsToolbar.setShortcut(QKeySequence("Ctrl+T"))
+        self.actionToggleToolsToolbar.setShortcut(QKeySequence("Ctrl+1"))
         self.actionToggleToolsToolbar.setCheckable(True)
         self.actionToggleToolsToolbar.triggered.connect(
             lambda: self.toolsToolBar.setVisible(not self.toolsToolBar.isVisible()))
 
         self.actionTogglePropertiesToolbar = QAction(QIcon(':icons/rectangle.png'), self.tr('Properties'),
                                                      toolBarsMenu)
-        # self.actionTogglePropertiesToolbar.setShortcut(QKeySequence("N"))
+        self.actionTogglePropertiesToolbar.setShortcut(QKeySequence("Ctrl+2"))
         self.actionTogglePropertiesToolbar.setCheckable(True)
         self.actionTogglePropertiesToolbar.triggered.connect(
             lambda: self.propertiesToolBar.setVisible(not self.propertiesToolBar.isVisible()))
 
-        self.actionToggleAlignToolbar = QAction(QIcon(':icons/align-top-edges.png'),
-                                                self.tr('Mirror - Align - Distribute'),
-                                                toolBarsMenu)
-        # self.actionToggleAlignToolbar.setShortcut(QKeySequence("Ctrl + M"))
-        self.actionToggleAlignToolbar.setCheckable(True)
-        self.actionToggleAlignToolbar.triggered.connect(
-            lambda: self.alignToolBar.setVisible(not self.alignToolBar.isVisible()))
-
         self.actionToggleFontToolbar = QAction(QIcon(':icons/t.png'), self.tr('Font'), toolBarsMenu)
-        # self.actionToggleFontToolbar.setShortcut(QKeySequence("Ctrl + Shift + F"))
+        self.actionToggleFontToolbar.setShortcut(QKeySequence("Ctrl+3"))
         self.actionToggleFontToolbar.setCheckable(True)
         self.actionToggleFontToolbar.triggered.connect(
             lambda: self.fontToolBar.setVisible(not self.fontToolBar.isVisible()))
 
-        #actionToggleRenkAracCubugu
-
-        self.actionToggleRenkAracCubugu = QAction(QIcon(':icons/color-wheel.png'), self.tr('Color'), toolBarsMenu)
-        # self.actionToggleFontToolbar.setShortcut(QKeySequence("Ctrl + Shift + F"))
-        self.actionToggleRenkAracCubugu.setCheckable(True)
-        self.actionToggleRenkAracCubugu.triggered.connect(
-            lambda: self.renkAracCubugu.setVisible(not self.renkAracCubugu.isVisible()))
-
-
         self.actionTogglecizgiOzellikleriToolBar = QAction(QIcon(':icons/pen.png'), self.tr('Line'), toolBarsMenu)
-        # self.actionTogglecizgiOzellikleriToolBar.setShortcut(QKeySequence("Ctrl + Alt + C"))
+        self.actionTogglecizgiOzellikleriToolBar.setShortcut(QKeySequence("Ctrl+4"))
         self.actionTogglecizgiOzellikleriToolBar.setCheckable(True)
         self.actionTogglecizgiOzellikleriToolBar.triggered.connect(
             lambda: self.cizgiOzellikleriToolBar.setVisible(not self.cizgiOzellikleriToolBar.isVisible()))
 
+        self.actionToggleRenkAracCubugu = QAction(QIcon(':icons/color-wheel.png'), self.tr('Color'), toolBarsMenu)
+        self.actionToggleRenkAracCubugu.setShortcut(QKeySequence("Ctrl+5"))
+        self.actionToggleRenkAracCubugu.setCheckable(True)
+        self.actionToggleRenkAracCubugu.triggered.connect(
+            lambda: self.renkAracCubugu.setVisible(not self.renkAracCubugu.isVisible()))
+
+        self.actionToggleAlignToolbar = QAction(QIcon(':icons/align-top-edges.png'),
+                                                self.tr('Mirror - Align - Distribute'),
+                                                toolBarsMenu)
+        self.actionToggleAlignToolbar.setShortcut(QKeySequence("Ctrl+6"))
+        self.actionToggleAlignToolbar.setCheckable(True)
+        self.actionToggleAlignToolbar.triggered.connect(
+            lambda: self.alignToolBar.setVisible(not self.alignToolBar.isVisible()))
+
         self.actionToggleUtilitiesToolbar = QAction(QIcon(':icons/properties.png'), self.tr('Utilities'), toolBarsMenu)
-        # self.actionToggleUtilitiesToolbar.setShortcut(QKeySequence("N"))
+        self.actionToggleUtilitiesToolbar.setShortcut(QKeySequence("Ctrl+7"))
         self.actionToggleUtilitiesToolbar.setCheckable(True)
         self.actionToggleUtilitiesToolbar.triggered.connect(
             lambda: self.utilitiesToolBar.setVisible(not self.utilitiesToolBar.isVisible()))
@@ -3587,6 +3560,52 @@ class DefterAnaPencere(QMainWindow):
                                  self.actionToggleRenkAracCubugu,
                                  self.actionToggleAlignToolbar,
                                  self.actionToggleUtilitiesToolbar))
+
+        dockWidgetsMenu = QMenu(self.tr("Panels"), self.viewMenu)
+        dockWidgetsMenu.aboutToShow.connect(self.on_dock_widgets_menu_about_to_show)
+
+        self.actionToggleSayfalarDW = QAction(QIcon(':icons/properties.png'), self.tr('Pages'), dockWidgetsMenu)
+        self.actionToggleSayfalarDW.setShortcut(QKeySequence("Ctrl+Alt+1"))
+        self.actionToggleSayfalarDW.setCheckable(True)
+        self.actionToggleSayfalarDW.triggered.connect(
+            lambda: self.sayfalarDW.setVisible(not self.sayfalarDW.isVisible()))
+
+        self.actionToggleKutuphaneDW = QAction(QIcon(':icons/properties.png'), self.tr('Library'), dockWidgetsMenu)
+        self.actionToggleKutuphaneDW.setShortcut(QKeySequence("Ctrl+Alt+2"))
+        self.actionToggleKutuphaneDW.setCheckable(True)
+        self.actionToggleKutuphaneDW.triggered.connect(
+            lambda: self.kutuphaneDW.setVisible(not self.kutuphaneDW.isVisible()))
+
+        self.actionToggleYaziOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Text Properties'), dockWidgetsMenu)
+        self.actionToggleYaziOzellikleriDW.setShortcut(QKeySequence("Ctrl+Alt+3"))
+        self.actionToggleYaziOzellikleriDW.setCheckable(True)
+        self.actionToggleYaziOzellikleriDW.triggered.connect(
+            lambda: self.yaziOzellikleriDW.setVisible(not self.yaziOzellikleriDW.isVisible()))
+
+        self.actionToggleNesneOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Item Properties'), dockWidgetsMenu)
+        self.actionToggleNesneOzellikleriDW.setShortcut(QKeySequence("Ctrl+Alt+4"))
+        self.actionToggleNesneOzellikleriDW.setCheckable(True)
+        self.actionToggleNesneOzellikleriDW.triggered.connect(
+            lambda: self.nesneOzellikleriDW.setVisible(not self.nesneOzellikleriDW.isVisible()))
+
+        self.actionToggleCizgiOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Line&Pen Properties'), dockWidgetsMenu)
+        self.actionToggleCizgiOzellikleriDW.setShortcut(QKeySequence("Ctrl+Alt+5"))
+        self.actionToggleCizgiOzellikleriDW.setCheckable(True)
+        self.actionToggleCizgiOzellikleriDW.triggered.connect(
+            lambda: self.cizgiOzellikleriDW.setVisible(not self.cizgiOzellikleriDW.isVisible()))
+
+        self.actionToggleStillerDW = QAction(QIcon(':icons/properties.png'), self.tr('Style Presets'), dockWidgetsMenu)
+        self.actionToggleStillerDW.setShortcut(QKeySequence("Ctrl+Alt+6"))
+        self.actionToggleStillerDW.setCheckable(True)
+        self.actionToggleStillerDW.triggered.connect(
+            lambda: self.stillerDW.setVisible(not self.stillerDW.isVisible()))
+
+        dockWidgetsMenu.addActions((self.actionToggleSayfalarDW,
+                                    self.actionToggleKutuphaneDW,
+                                    self.actionToggleYaziOzellikleriDW,
+                                    self.actionToggleNesneOzellikleriDW,
+                                    self.actionToggleCizgiOzellikleriDW,
+                                    self.actionToggleStillerDW))
 
         self.zoomMenu = QMenu(self.tr("Zoom"), self.viewMenu)
         self.zoomMenu.setIcon(QIcon(":/icons/zoom.png"))
@@ -3633,7 +3652,7 @@ class DefterAnaPencere(QMainWindow):
         self.addAction(self.actionCleanMode)
 
         self.actionToggleStatusBar = QAction(self.tr("Status Bar"), self.viewMenu)
-        # self.actionToggleStatusBar.setShortcut(QKeySequence("Ctrl+H"))
+        self.actionToggleStatusBar.setShortcut(QKeySequence("Alt+S"))
         self.actionToggleStatusBar.triggered.connect(
             lambda: self._statusBar.setVisible(not self._statusBar.isVisible()))
         self.actionToggleStatusBar.setCheckable(True)
@@ -3642,17 +3661,28 @@ class DefterAnaPencere(QMainWindow):
         # self.actionToggleStatusBar.setShortcutContext(Qt.ApplicationShortcut)
         # self.addAction(self.actionToggleStatusBar)
 
+        self.actionToggleMenuBar = QAction(self.tr("Menu bar"), self.viewMenu)
+        self.actionToggleMenuBar.setShortcut(QKeySequence("Alt+M"))
+        self.actionToggleMenuBar.triggered.connect(
+            lambda: self.mBar.setVisible(not self.mBar.isVisible()))
+        self.actionToggleMenuBar.setCheckable(True)
+        self.actionToggleMenuBar.setStatusTip(self.tr("Toggles menu bar visibility."))
+        self.actionToggleMenuBar.setToolTip(self.tr("Toggles menu bar visibility."))
+
         self.viewMenu.addActions((self.viewMenu.addMenu(self.zoomMenu),
                                   self.viewMenu.addSeparator(),
                                   self.viewMenu.addMenu(toolBarsMenu),
+                                  self.viewMenu.addSeparator(),
+                                  self.viewMenu.addMenu(dockWidgetsMenu),
+                                  self.viewMenu.addSeparator(),
                                   self.actionToggleStatusBar,
-                                  self.fileMenu.addSeparator(),
+                                  self.actionToggleMenuBar,
+                                  self.actionCleanMode,
+                                  self.viewMenu.addSeparator(),
                                   self.actionSetBackgroundImage,
                                   self.actionClearBackgroundImage,
-                                  self.viewMenu.addSeparator(),
                                   self.actionChangeBackgroundColor,
                                   self.viewMenu.addSeparator(),
-                                  self.actionCleanMode,
                                   self.actionReopenLastClosedTab
                                   ))
 
@@ -4090,8 +4120,16 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionToggleRenkAracCubugu,
                                           self.actionTogglecizgiOzellikleriToolBar,
                                           self.actionToggleUtilitiesToolbar,
+                                          # dockWidgetsMenu actions
+                                          self.actionToggleSayfalarDW,
+                                          self.actionToggleKutuphaneDW,
+                                          self.actionToggleYaziOzellikleriDW,
+                                          self.actionToggleNesneOzellikleriDW,
+                                          self.actionToggleCizgiOzellikleriDW,
+                                          self.actionToggleStillerDW,
                                           # view menu actions
                                           self.actionToggleStatusBar,
+                                          self.actionToggleMenuBar,
                                           self.actionCleanMode,
                                           # zoom menu actions
                                           self.actionZoomIn,
@@ -4156,7 +4194,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def stil_uygula_yuzen_listwidget_goster_gizle(self):
         if not self.yuzenStylePresetsListWidget.isVisible():
-            self.yuzenStylePresetsListWidget.move(QCursor.pos())
+            self.yuzenStylePresetsListWidget.move(self.cView.mapFromGlobal(QCursor.pos()))
             self.yuzenStylePresetsListWidget.resize(200, self.yuzenStylePresetsListWidget.count() * 21)
             self.yuzenStylePresetsListWidget.setVisible(1)
         else:
@@ -4916,6 +4954,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def on_view_menu_about_to_show(self):
         self.actionToggleStatusBar.setChecked(self._statusBar.isVisible())
+        self.actionToggleMenuBar.setChecked(self.mBar.isVisible())
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -4927,6 +4966,16 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleFontToolbar.setChecked(self.fontToolBar.isVisible())
         self.actionToggleRenkAracCubugu.setChecked(self.renkAracCubugu.isVisible())
         self.actionTogglecizgiOzellikleriToolBar.setChecked(self.cizgiOzellikleriToolBar.isVisible())
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def on_dock_widgets_menu_about_to_show(self):
+        self.actionToggleSayfalarDW.setChecked(self.sayfalarDW.isVisible())
+        self.actionToggleKutuphaneDW.setChecked(self.kutuphaneDW.isVisible())
+        self.actionToggleYaziOzellikleriDW.setChecked(self.yaziOzellikleriDW.isVisible())
+        self.actionToggleNesneOzellikleriDW.setChecked(self.nesneOzellikleriDW.isVisible())
+        self.actionToggleCizgiOzellikleriDW.setChecked(self.cizgiOzellikleriDW.isVisible())
+        self.actionToggleStillerDW.setChecked(self.stillerDW.isVisible())
 
     # ---------------------------------------------------------------------
     # @Slot() # this is called directly from base's overriden contextMenuEvent
@@ -7675,7 +7724,7 @@ class DefterAnaPencere(QMainWindow):
             self.cizgiOzellikleriDW.hide()
             self.stillerDW.hide()
             self.sayfalarDW.hide()
-            self.kutuphaneDw.hide()
+            self.kutuphaneDW.hide()
         else:
             self.mBar.show()
             self._statusBar.show()
