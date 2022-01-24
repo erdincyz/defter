@@ -844,7 +844,9 @@ class DefterAnaPencere(QMainWindow):
         # self.stylePresetsListWidget.setViewMode(self.stylePresetsListWidget.IconMode)
         # self.stylePresetsListWidget.setMovement(self.stylePresetsListWidget.Free)
         self.stylePresetsListWidget.setSpacing(3)
+        # self.stylePresetsListWidget.setSelectionMode(self.stylePresetsListWidget.ExtendedSelection)
         self.stylePresetsListWidget.itemDoubleClicked.connect(self.act_apply_selected_style)
+        self.stylePresetsListWidget.itemSelectionChanged.connect(self.act_stylePresetsListWidget_secim_degisti)
         # self.stylePresetsListWidget.addItem(ListWidgetItem("asd"))
 
         # -- YUZEN STILLER LISTWIDGET --
@@ -862,9 +864,10 @@ class DefterAnaPencere(QMainWindow):
         addStylePresetBtn = QPushButton(self.tr("Add"), self.stillerDWBaseWidget)
         # addStylePresetBtn.setFixedWidth(50)
         addStylePresetBtn.clicked.connect(self.act_add_style_preset)
-        removeStylePresetBtn = QPushButton(self.tr("Remove"), self.stillerDWBaseWidget)
-        # removeStylePresetBtn.setFixedWidth(50)
-        removeStylePresetBtn.clicked.connect(self.act_remove_style_preset)
+        self.removeStylePresetBtn = QPushButton(self.tr("Remove"), self.stillerDWBaseWidget)
+        # self.removeStylePresetBtn.setFixedWidth(50)
+        self.removeStylePresetBtn.clicked.connect(self.act_remove_style_preset)
+        self.removeStylePresetBtn.setDisabled(True)
         stylePrestesMenuBtn = QPushButton("☰", self.stillerDWBaseWidget)
         stylePrestesMenuBtn.setFixedWidth(30)
 
@@ -904,7 +907,7 @@ class DefterAnaPencere(QMainWindow):
         stylePrestesMenuBtn.setMenu(stylePresetsMenu)
 
         btnLayout.addWidget(addStylePresetBtn)
-        btnLayout.addWidget(removeStylePresetBtn)
+        btnLayout.addWidget(self.removeStylePresetBtn)
         btnLayout.addWidget(stylePrestesMenuBtn)
         anaWidgetLayout.addLayout(btnLayout)
 
@@ -6723,28 +6726,47 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_sag_tiklanan_butona_renk_secip_ata(self, btn, tip):
 
-        # TODO: currentColorChanged signal
         # bir de belki sag tiklayinca bg colora transparent secengi olsun.
 
-        eski_renk = btn.renkArkaplan
-        if not eski_renk:
-            eski_renk = QColor()
+        if tip == "yazi":
+            yeni_renk = self.act_set_item_text_color(col=None)
+        elif tip == "arka":
+            yeni_renk = self.act_set_item_background_color(col=None)
+        elif tip == "cizgi":
+            yeni_renk = self.act_set_item_line_color(col=None)
 
-        col = QColorDialog.getColor(eski_renk,
-                                    self,
-                                    self.tr("Palette Color"),
-                                    QColorDialog.DontUseNativeDialog |
-                                    QColorDialog.ShowAlphaChannel)
-        if not col.isValid():
+        if not yeni_renk.isValid():
             return
 
-        btn.arkaplan_rengi_degistir(col)
-        if tip == "yazi":
-            self.act_set_item_text_color_with_pallete_button(btn)
-        elif tip == "arka":
-            self.act_set_item_background_color_with_pallete_button(btn)
-        elif tip == "cizgi":
-            self.act_set_item_line_color_with_pallete_button(btn)
+        btn.arkaplan_rengi_degistir(yeni_renk)
+
+    # # ---------------------------------------------------------------------
+    # @Slot()
+    # def act_sag_tiklanan_butona_renk_secip_ata(self, btn, tip):
+    #
+    #     # TODO: currentColorChanged signal
+    #     # bir de belki sag tiklayinca bg colora transparent secengi olsun.
+    #
+    #     eski_renk = btn.renkArkaplan
+    #     if not eski_renk:
+    #         eski_renk = QColor()
+    #
+    #     col = QColorDialog.getColor(eski_renk,
+    #                                 self,
+    #                                 self.tr("Palette Color"),
+    #                                 QColorDialog.DontUseNativeDialog |
+    #                                 QColorDialog.ShowAlphaChannel)
+    #     if not col.isValid():
+    #         return
+    #
+    #     btn.arkaplan_rengi_degistir(col)
+    #     if tip == "yazi":
+    #         self.act_set_item_text_color_with_pallete_button(btn)
+    #     elif tip == "arka":
+    #         self.act_set_item_background_color_with_pallete_button(btn)
+    #     elif tip == "cizgi":
+    #         self.act_set_item_line_color_with_pallete_button(btn)
+
     # ---------------------------------------------------------------------
     @Slot()
     def act_set_item_text_color_with_pallete_button(self, btn):
@@ -6784,7 +6806,6 @@ class DefterAnaPencere(QMainWindow):
                 return
             self.onizle_set_item_text_color(col=None, ilkHaleDondur=True)
 
-
         # nesne(ler) icin degistir
         if self.cScene.selectionQueue:
             if len(self.cScene.selectionQueue) > 1:
@@ -6798,6 +6819,8 @@ class DefterAnaPencere(QMainWindow):
         else:  # sahne icin degistir
             self.yaziRengi = self.cScene.yaziRengi = col
             self.degistir_yazi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=True)
+
+        return col
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -6852,6 +6875,8 @@ class DefterAnaPencere(QMainWindow):
             self._pen.setColor(col)
             self.cScene.scenePen = QPen(self._pen)
             self.degistir_cizgi_rengi_ikonu(col, nesne_arkaplan_ikonu_guncelle=True)
+
+        return col
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -6914,6 +6939,8 @@ class DefterAnaPencere(QMainWindow):
         else:  # sahne icin degistir
             self.arkaPlanRengi = self.cScene.arkaPlanRengi = col
             self.degistir_nesne_arkaplan_rengi_ikonu()
+
+        return col
 
     # ---------------------------------------------------------------------
     def degistir_yazi_rengi_ikonu(self, yaziRengi=None, nesne_arkaplan_ikonu_guncelle=True):
@@ -7431,10 +7458,17 @@ class DefterAnaPencere(QMainWindow):
             self._add_style_preset_to_list_widget(presetName, fg, bg, cizgiRengi, pen, font)
 
     # ---------------------------------------------------------------------
+    def act_stylePresetsListWidget_secim_degisti(self):
+        if self.stylePresetsListWidget.selectedItems():
+            self.removeStylePresetBtn.setEnabled(True)
+        else:
+            self.removeStylePresetBtn.setEnabled(False)
+
+    # ---------------------------------------------------------------------
     @Slot()
     def act_remove_style_preset(self):
 
-        # itemToDelete = self.stylePresetsListWidget.takeItem(self.stylePresetsListWidget.currentRow())
+        # if self.stylePresetsListWidget.selectedItems():
 
         msgBox = QMessageBox(self)
         msgBox.setWindowTitle(self.tr("Defter: Delete style preset?"))
