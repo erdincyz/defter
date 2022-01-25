@@ -5329,7 +5329,7 @@ class DefterAnaPencere(QMainWindow):
                 action.triggered.connect(lambda: self.actionAddImageItem.setChecked(True))
                 count = len(self.recentImagesMenu.actions())
                 if count < 9:
-                    action.setShortcut(QKeySequence("Ctrl+{}".format(count + 1)))
+                    action.setShortcut(QKeySequence("Alt+Shift+{}".format(count + 1)))
                 # action.triggered.connect(self.toggle_transforms_for_base)
                 self.recentImagesMenu.addAction(action)
             self.lastDirForImages = os.path.dirname(filePath)
@@ -7422,7 +7422,7 @@ class DefterAnaPencere(QMainWindow):
             # action.triggered.connect(make_callback(dosya))
 
             preset_hotkey = QShortcut(QKeySequence("Alt+{}".format(count)),
-                                      self.stylePresetsListWidget,
+                                      self,
                                       lambda throw_away=0: self.act_apply_selected_style(preset))
             preset_hotkey.setContext(Qt.ApplicationShortcut)
 

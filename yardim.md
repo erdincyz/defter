@@ -10,9 +10,8 @@
 ---
 
 ### Yazi Nesnesi
-**CTRL + çift tık** = Web adresi olarak aç
+**CTRL + çift tık** = Nesne kutusunu yazıya gore daralt.
 
-**SHIFT + CTRL + çift tık** = Yazıyı google da ara
 
 ---
 
