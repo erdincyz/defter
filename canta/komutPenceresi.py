@@ -62,6 +62,7 @@ class CommandDialog(QDialog):
         QCoreApplication.setApplicationName(shared.DEFTER_APP_NAME)
         self.settings = QSettings(shared.DEFTER_AYARLAR_DOSYA_ADRES, QSettings.IniFormat)
         # self.settings.clear()
+
     # ---------------------------------------------------------------------
     def read_settings(self):
         self.settings.beginGroup("CommandDialogSettings")

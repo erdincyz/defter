@@ -31,7 +31,7 @@ from PySide6.QtWidgets import (QMainWindow, QWidget, QDockWidget, QVBoxLayout, Q
                                QFileDialog, QToolBar, QMenuBar, QMenu, QColorDialog, QMessageBox,
                                QStatusBar, QSizePolicy, QLabel, QPushButton, QScrollArea,
                                QDialog, QTextEdit, QInputDialog, QListWidget, QListWidgetItem,
-                               QLineEdit, QToolButton, QComboBox, QButtonGroup)
+                               QLineEdit, QToolButton, QComboBox, QButtonGroup, QSizeGrip)
 
 from PySide6.QtCore import (Qt, QRectF, QCoreApplication, QSettings, QPoint, Slot, QSizeF, QSize, QFile, QSaveFile,
                             QIODevice, QDataStream, QMimeData, QByteArray, QPointF, qCompress, qUncompress, QLocale,
@@ -67,13 +67,14 @@ from canta.fontComboBox import FontComboBox
 # from canta.ozelliklerAcilirMenu import OzelliklerAcilirMenu
 from canta.nesneler.web import Web
 # from canta.syntaxHighlighter import HtmlHighlighter
-from canta.listWidgtItem import ListWidgetItem, ListWidgetItemDelegate
+from canta.listWidgetItem import ListWidgetItem, ListWidgetItemDelegate
 from canta.threadWorkers import DownloadWorker
 from canta.htmlParsers import ImgSrcParser
 from canta.treeView import TreeView
 from canta.treeDelegate import TreeDelegate
 from canta.treeSayfa import Sayfa
 from canta.pushButton import PushButton
+from canta.yuzenWidget import YuzenWidget
 from canta.with_signals_updates_blocked import signals_blocked_and_updates_disabled as signals_updates_blocked, \
     signals_blocked
 import canta.icons_rc
@@ -81,6 +82,7 @@ import canta.icons_rc
 from canta import undoRedoFonksiyolar as undoRedo
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
+
 VERSION = "(v0.9)"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
@@ -186,6 +188,7 @@ class DefterAnaPencere(QMainWindow):
         self.olustur_nesne_ozellikleriDW()
         self.olustur_cizgi_ozellikleriDW()
         self.olustur_stillerDW()
+        self.olustur_yuzen_stillerDW()
 
         self.read_gui_settings()
         # self.actionAlwaysOnTopToggle u , read_gui_settingste sinyalleri block ederek set ediyoruz.
@@ -786,6 +789,22 @@ class DefterAnaPencere(QMainWindow):
         # anaWidgetLayout.addStretch()
 
     # ---------------------------------------------------------------------
+    def olustur_yuzen_stillerDW(self):
+
+        self.stillerYuzenWidget = YuzenWidget(self)
+        self.stillerYuzenWidget.hide()
+
+        self.yuzenStylePresetsListWidget = QListWidget(self.stillerYuzenWidget)
+        self.yuzenStylePresetsListWidget.setMinimumWidth(100)
+        self.yuzenStylePresetsListWidget.setMinimumHeight(100)
+        # self.yuzenStylePresetsListWidget.setMaximumHeight(500)
+        # self.yuzenStylePresetsListWidget.resize(250, 100)
+        self.yuzenStylePresetsListWidget.setSpacing(3)
+        self.yuzenStylePresetsListWidget.itemDoubleClicked.connect(self.act_apply_selected_style)
+
+        self.stillerYuzenWidget.ekleWidget(self.yuzenStylePresetsListWidget)
+
+    # ---------------------------------------------------------------------
     def olustur_stillerDW(self):
         self.stillerDW = QDockWidget(self)
         self.stillerBaslik = QLabel(self.tr("- Style Presets -"), self.stillerDW)
@@ -848,14 +867,6 @@ class DefterAnaPencere(QMainWindow):
         self.stylePresetsListWidget.itemDoubleClicked.connect(self.act_apply_selected_style)
         self.stylePresetsListWidget.itemSelectionChanged.connect(self.act_stylePresetsListWidget_secim_degisti)
         # self.stylePresetsListWidget.addItem(ListWidgetItem("asd"))
-
-        # -- YUZEN STILLER LISTWIDGET --
-        self.yuzenStylePresetsListWidget = QListWidget(self)
-        self.yuzenStylePresetsListWidget.setMaximumHeight(500)
-        self.yuzenStylePresetsListWidget.setSpacing(3)
-        self.yuzenStylePresetsListWidget.itemDoubleClicked.connect(self.act_apply_selected_style)
-        self.yuzenStylePresetsListWidget.hide()
-        # -- YUZEN STILLER LISTWIDGET --
 
         anaWidgetLayout.addWidget(self.stylePresetsListWidget)
 
@@ -3313,12 +3324,12 @@ class DefterAnaPencere(QMainWindow):
             self.act_export_selected_text_item_content_as_pdf)
 
         self.actionPrintOrExportAsPdf = QAction(QIcon(':icons/print.png'),
-                                                       self.tr("Print && Export as PDF"), self.mBar)
+                                                self.tr("Print && Export as PDF"), self.mBar)
         self.actionPrintOrExportAsPdf.setShortcut(QKeySequence("Ctrl+P"))
         self.actionPrintOrExportAsPdf.triggered.connect(self.act_print_document)
 
         self.actionExportPageAsImage = QAction(QIcon(':icons/file-image.png'),
-                                                       self.tr("Export Page as Image"), self.mBar)
+                                               self.tr("Export Page as Image"), self.mBar)
         self.actionExportPageAsImage.setShortcut(QKeySequence("Ctrl+Shift+P"))
         self.actionExportPageAsImage.triggered.connect(self.act_export_page_as_image)
 
@@ -3579,19 +3590,22 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleKutuphaneDW.triggered.connect(
             lambda: self.kutuphaneDW.setVisible(not self.kutuphaneDW.isVisible()))
 
-        self.actionToggleYaziOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Text Properties'), dockWidgetsMenu)
+        self.actionToggleYaziOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Text Properties'),
+                                                     dockWidgetsMenu)
         self.actionToggleYaziOzellikleriDW.setShortcut(QKeySequence("Ctrl+Alt+3"))
         self.actionToggleYaziOzellikleriDW.setCheckable(True)
         self.actionToggleYaziOzellikleriDW.triggered.connect(
             lambda: self.yaziOzellikleriDW.setVisible(not self.yaziOzellikleriDW.isVisible()))
 
-        self.actionToggleNesneOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Item Properties'), dockWidgetsMenu)
+        self.actionToggleNesneOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Item Properties'),
+                                                      dockWidgetsMenu)
         self.actionToggleNesneOzellikleriDW.setShortcut(QKeySequence("Ctrl+Alt+4"))
         self.actionToggleNesneOzellikleriDW.setCheckable(True)
         self.actionToggleNesneOzellikleriDW.triggered.connect(
             lambda: self.nesneOzellikleriDW.setVisible(not self.nesneOzellikleriDW.isVisible()))
 
-        self.actionToggleCizgiOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Line&Pen Properties'), dockWidgetsMenu)
+        self.actionToggleCizgiOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Line&Pen Properties'),
+                                                      dockWidgetsMenu)
         self.actionToggleCizgiOzellikleriDW.setShortcut(QKeySequence("Ctrl+Alt+5"))
         self.actionToggleCizgiOzellikleriDW.setCheckable(True)
         self.actionToggleCizgiOzellikleriDW.triggered.connect(
@@ -3740,10 +3754,11 @@ class DefterAnaPencere(QMainWindow):
         self.actionUnPinItem.setShortcut(QKeySequence("Shift+k"))
         self.actionUnPinItem.triggered.connect(self.act_unpin_item)
 
-        self.actionEditCommand = QAction(QIcon(":icons/command.png"), self.tr("Edit Command"), self.itemContextMenu)
+        self.actionEditCommand = QAction(QIcon(":icons/command.png"), self.tr("~Edit Command"), self.itemContextMenu)
         self.actionEditCommand.setShortcut(QKeySequence("Shift+C"))
         self.actionEditCommand.triggered.connect(lambda: self.act_edit_command(self.cScene.activeItem))
         # self.actionEditCommand.setShortcutContext(Qt.WindowShortcut)
+        self.actionEditCommand.setDisabled(True)
 
         self.actionAddSelectedItemStyleAsAPreset = QAction(QIcon(':icons/icons/text-html.png'),
                                                            self.tr("Add selected item's style as a preset"),
@@ -4196,12 +4211,15 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def stil_uygula_yuzen_listwidget_goster_gizle(self):
-        if not self.yuzenStylePresetsListWidget.isVisible():
-            self.yuzenStylePresetsListWidget.move(self.cView.mapFromGlobal(QCursor.pos()))
-            self.yuzenStylePresetsListWidget.resize(200, self.yuzenStylePresetsListWidget.count() * 21)
-            self.yuzenStylePresetsListWidget.setVisible(1)
+
+        # if not self.yuzenStylePresetsListWidget.isVisible():
+        if not self.stillerYuzenWidget.isVisible():
+            self.stillerYuzenWidget.move(self.cView.mapFromGlobal(QCursor.pos()))
+            # self.yuzenStylePresetsListWidget.resize(250, self.yuzenStylePresetsListWidget.count() * 21)
+            # self.stillerYuzenWidget.adjustSize()
+            self.stillerYuzenWidget.setVisible(1)
         else:
-            self.yuzenStylePresetsListWidget.setVisible(0)
+            self.stillerYuzenWidget.setVisible(0)
 
     # ---------------------------------------------------------------------
     def olustur_tools_toolbar(self):
@@ -6692,8 +6710,8 @@ class DefterAnaPencere(QMainWindow):
         renkDialog.setWindowTitle(baslik)
         renkDialog.setOptions(
             QColorDialog.DontUseNativeDialog
-                              | QColorDialog.ShowAlphaChannel
-                              )
+            | QColorDialog.ShowAlphaChannel
+        )
         if anlikRenkGonderilecekFonksiyon:
             renkDialog.currentColorChanged.connect(anlikRenkGonderilecekFonksiyon)
 
@@ -6923,7 +6941,7 @@ class DefterAnaPencere(QMainWindow):
             if len(self.cScene.selectionQueue) > 1:
                 self.cScene.undoStack.beginMacro(self.tr("change items' background color"))
             for item in self.cScene.selectionQueue:
-                if item.type() == Group.Type or item.type() == LineItem.Type :
+                if item.type() == Group.Type or item.type() == LineItem.Type:
                     continue
                     # for c in item.childItems():
                     #     c.undoableSetItemBackgroundColor(self.cScene.undoStack,
@@ -6994,7 +7012,7 @@ class DefterAnaPencere(QMainWindow):
         painterTC.setPen(pen)
         # painterTC.drawText(pixFont.rect(), Qt.AlignCenter, "A")
         # painterTC.drawRect(2, 2, 12, 12)
-        painterTC.drawLine(0,16,16,0)
+        painterTC.drawLine(0, 16, 16, 0)
         painterTC.end()
         painterTC = None
         del painterTC
@@ -8885,7 +8903,8 @@ class DefterAnaPencere(QMainWindow):
         if self.pDialog.cboxAsViewed.isChecked():
             sahne.setSceneRect(self.cView.mapToScene(basilacakRect.toRect()).boundingRect())
             kagitPozisyonBoyutRect = printer.pageLayout().paintRectPixels(printer.resolution())
-            self.cView.render(painter, QRectF(kagitPozisyonBoyutRect), self.cView.mapFromScene(basilacakRect.toRect()).boundingRect())
+            self.cView.render(painter, QRectF(kagitPozisyonBoyutRect),
+                              self.cView.mapFromScene(basilacakRect.toRect()).boundingRect())
         else:
             sahne.setSceneRect(basilacakRect)
             sahne.render(painter)
@@ -8917,7 +8936,7 @@ class DefterAnaPencere(QMainWindow):
         # sigdirma algoritmasi 
         # basilacak karenin genisliginin kagit genisligine oranina gore
         # basilacak karenin yuksekligi tekrar ayarlaniyor
-        baski_kagit_genislik_orani = basilacakRect.width() /kagitPozisyonBoyutRect.width()
+        baski_kagit_genislik_orani = basilacakRect.width() / kagitPozisyonBoyutRect.width()
         oranlanmis_basilacakRect_yukseklik = kagitPozisyonBoyutRect.height() * baski_kagit_genislik_orani
         basilacakRect.setHeight(oranlanmis_basilacakRect_yukseklik)
 
@@ -9000,8 +9019,6 @@ class DefterAnaPencere(QMainWindow):
                            printer.width(), printer.height() / 2),
                     viewport.adjusted(0, 0, 0, -viewport.height() / 2));
         """
-
-
 
         # bunda 1 pixel adjust var, get_visible_rect ile alakasi
         # oldugunu hatirlatmasi icin yorum olarak eklendi
