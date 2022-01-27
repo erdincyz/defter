@@ -2,8 +2,8 @@
 # .
 
 __project_name__ = 'Defter'
+__date__ = '26/1/22'
 __author__ = 'argekod'
-__date__ = '1/26/22'
 
 from PySide6.QtCore import Qt, QPoint
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton
@@ -25,6 +25,7 @@ class YuzenWidget(QWidget):
         self.setToolTip(self.tr("Move with left mouse button, resize with right mouse button."))
 
         self.mPos = QPoint()
+        self.sagClick = False
 
         self.anaLay = QVBoxLayout(self)
         self.anaLay.setContentsMargins(0, 0, 0, 0)
