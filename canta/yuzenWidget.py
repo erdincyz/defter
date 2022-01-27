@@ -22,17 +22,18 @@ class YuzenWidget(QWidget):
         self.setWindowFlags(Qt.FramelessWindowHint)
         # self.setSizeGripEnabled(True)
         self.setStatusTip(self.tr("Move with left mouse button, resize with right mouse button."))
-        self.setToolTip(self.tr("Move with left mouse button, resize with right mouse button."))
+        # self.setToolTip(self.tr("Move with left mouse button, resize with right mouse button."))
 
         self.mPos = QPoint()
         self.sagClick = False
+        self.solClick = False
 
         self.anaLay = QVBoxLayout(self)
-        self.anaLay.setContentsMargins(0, 0, 0, 0)
+        self.anaLay.setContentsMargins(1, 0, 1, 1)
         self.anaLay.setSpacing(0)
         # self.anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
         baslikLay = QHBoxLayout()
-        baslikLay.setContentsMargins(0, 1, 1, 1)
+        baslikLay.setContentsMargins(0, 0, 0, 0)
         baslikLay.setSpacing(0)
 
         # tasiWidget = QWidget(self)
@@ -82,8 +83,13 @@ class YuzenWidget(QWidget):
     # ---------------------------------------------------------------------
     # QtGui.QMouseEvent
     def mousePressEvent(self, event) -> None:
-        self.mPos = event.pos()
+
         super(YuzenWidget, self).mousePressEvent(event)
+
+        if event.button() == Qt.LeftButton:
+            self.mPos = event.pos()
+            self.solClick = True
+            self.setCursor(Qt.ClosedHandCursor)
 
         if event.button() == Qt.RightButton:
             self.sagDragx = event.x()
@@ -91,6 +97,7 @@ class YuzenWidget(QWidget):
             self.enSagX = self.width()
             self.enAltY = self.height()
             self.sagClick = True
+            self.setCursor(Qt.SizeAllCursor)
 
     # ---------------------------------------------------------------------
     def mouseMoveEvent(self, event) -> None:
@@ -112,3 +119,5 @@ class YuzenWidget(QWidget):
     def mouseReleaseEvent(self, event):
         super(YuzenWidget, self).mouseReleaseEvent(event)
         self.sagClick = False
+        self.solClick = False
+        self.setCursor(Qt.ArrowCursor)

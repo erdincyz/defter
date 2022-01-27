@@ -802,6 +802,9 @@ class DefterAnaPencere(QMainWindow):
         self.yuzenStylePresetsListWidget.setSpacing(3)
         self.yuzenStylePresetsListWidget.itemDoubleClicked.connect(self.act_apply_selected_style)
 
+        delegate = ListWidgetItemDelegate(self.yuzenStylePresetsListWidget)
+        self.yuzenStylePresetsListWidget.setItemDelegate(delegate)
+
         self.stillerYuzenWidget.ekleWidget(self.yuzenStylePresetsListWidget)
 
     # ---------------------------------------------------------------------
@@ -3522,6 +3525,10 @@ class DefterAnaPencere(QMainWindow):
         toolBarsMenu = QMenu(self.tr("Toolbars"), self.viewMenu)
         toolBarsMenu.aboutToShow.connect(self.on_tool_bars_menu_about_to_show)
 
+        self.actionTumAracCubuklariniGoster = QAction(QIcon(':icons/hepsini-goster.png'), self.tr('Show All'), toolBarsMenu)
+        self.actionTumAracCubuklariniGoster.setShortcut(QKeySequence("Ctrl+0"))
+        self.actionTumAracCubuklariniGoster.triggered.connect(self.act_tum_arac_cubuklarini_goster)
+
         self.actionToggleToolsToolbar = QAction(QIcon(':icons/arrow.png'), self.tr('Tools'), toolBarsMenu)
         self.actionToggleToolsToolbar.setShortcut(QKeySequence("Ctrl+1"))
         self.actionToggleToolsToolbar.setCheckable(True)
@@ -3567,7 +3574,8 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleUtilitiesToolbar.triggered.connect(
             lambda: self.utilitiesToolBar.setVisible(not self.utilitiesToolBar.isVisible()))
 
-        toolBarsMenu.addActions((self.actionToggleToolsToolbar,
+        toolBarsMenu.addActions((self.actionTumAracCubuklariniGoster,
+                                 self.actionToggleToolsToolbar,
                                  self.actionTogglePropertiesToolbar,
                                  self.actionToggleFontToolbar,
                                  self.actionTogglecizgiOzellikleriToolBar,
@@ -3577,6 +3585,10 @@ class DefterAnaPencere(QMainWindow):
 
         dockWidgetsMenu = QMenu(self.tr("Panels"), self.viewMenu)
         dockWidgetsMenu.aboutToShow.connect(self.on_dock_widgets_menu_about_to_show)
+
+        self.actionTumPanelleriGoster = QAction(QIcon(':icons/hepsini-goster.png'), self.tr('Show all'), dockWidgetsMenu)
+        self.actionTumPanelleriGoster.setShortcut(QKeySequence("Ctrl+Alt+0"))
+        self.actionTumPanelleriGoster.triggered.connect(self.act_tum_panelleri_goster)
 
         self.actionToggleSayfalarDW = QAction(QIcon(':icons/properties.png'), self.tr('Pages'), dockWidgetsMenu)
         self.actionToggleSayfalarDW.setShortcut(QKeySequence("Ctrl+Alt+1"))
@@ -3617,7 +3629,8 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleStillerDW.triggered.connect(
             lambda: self.stillerDW.setVisible(not self.stillerDW.isVisible()))
 
-        dockWidgetsMenu.addActions((self.actionToggleSayfalarDW,
+        dockWidgetsMenu.addActions((self.actionTumPanelleriGoster,
+                                    self.actionToggleSayfalarDW,
                                     self.actionToggleKutuphaneDW,
                                     self.actionToggleYaziOzellikleriDW,
                                     self.actionToggleNesneOzellikleriDW,
@@ -3650,7 +3663,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionResetZoom = QAction(QIcon(":/icons/zoom-reset.png"), self.tr("Reset zoom"), self.zoomMenu)
         self.actionResetZoom.triggered.connect(lambda: self.cView.zoomInitial())
-        self.actionResetZoom.setShortcut(QKeySequence("Ctrl+0"))
+        self.actionResetZoom.setShortcut(QKeySequence("Ctrl+R"))
         self.actionResetZoom.setShortcutContext(Qt.ApplicationShortcut)
 
         self.zoomMenu.addActions((self.actionZoomIn,
@@ -4131,6 +4144,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionDeleteItem,
                                           self.actionSelectAll,
                                           # tool bar menu actions
+                                          self.actionTumAracCubuklariniGoster,
                                           self.actionToggleToolsToolbar,
                                           self.actionTogglePropertiesToolbar,
                                           self.actionToggleAlignToolbar,
@@ -4139,6 +4153,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionTogglecizgiOzellikleriToolBar,
                                           self.actionToggleUtilitiesToolbar,
                                           # dockWidgetsMenu actions
+                                          self.actionTumPanelleriGoster,
                                           self.actionToggleSayfalarDW,
                                           self.actionToggleKutuphaneDW,
                                           self.actionToggleYaziOzellikleriDW,
@@ -4217,9 +4232,9 @@ class DefterAnaPencere(QMainWindow):
             self.stillerYuzenWidget.move(self.cView.mapFromGlobal(QCursor.pos()))
             # self.yuzenStylePresetsListWidget.resize(250, self.yuzenStylePresetsListWidget.count() * 21)
             # self.stillerYuzenWidget.adjustSize()
-            self.stillerYuzenWidget.setVisible(1)
+            self.stillerYuzenWidget.setVisible(True)
         else:
-            self.stillerYuzenWidget.setVisible(0)
+            self.stillerYuzenWidget.setVisible(False)
 
     # ---------------------------------------------------------------------
     def olustur_tools_toolbar(self):
@@ -4989,6 +5004,16 @@ class DefterAnaPencere(QMainWindow):
         self.actionTogglecizgiOzellikleriToolBar.setChecked(self.cizgiOzellikleriToolBar.isVisible())
 
     # ---------------------------------------------------------------------
+    def act_tum_arac_cubuklarini_goster(self):
+        self.toolsToolBar.setVisible(True)
+        self.propertiesToolBar.setVisible(True)
+        self.utilitiesToolBar.setVisible(True)
+        self.alignToolBar.setVisible(True)
+        self.fontToolBar.setVisible(True)
+        self.renkAracCubugu.setVisible(True)
+        self.cizgiOzellikleriToolBar.setVisible(True)
+
+    # ---------------------------------------------------------------------
     @Slot()
     def on_dock_widgets_menu_about_to_show(self):
         self.actionToggleSayfalarDW.setChecked(self.sayfalarDW.isVisible())
@@ -4997,6 +5022,15 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleNesneOzellikleriDW.setChecked(self.nesneOzellikleriDW.isVisible())
         self.actionToggleCizgiOzellikleriDW.setChecked(self.cizgiOzellikleriDW.isVisible())
         self.actionToggleStillerDW.setChecked(self.stillerDW.isVisible())
+
+    # ---------------------------------------------------------------------
+    def act_tum_panelleri_goster(self):
+        self.sayfalarDW.setVisible(True)
+        self.kutuphaneDW.setVisible(True)
+        self.yaziOzellikleriDW.setVisible(True)
+        self.nesneOzellikleriDW.setVisible(True)
+        self.cizgiOzellikleriDW.setVisible(True)
+        self.stillerDW.setVisible(True)
 
     # ---------------------------------------------------------------------
     # @Slot() # this is called directly from base's overriden contextMenuEvent
@@ -7434,6 +7468,7 @@ class DefterAnaPencere(QMainWindow):
         # ! burayi for dongusune cevirmeyin...
         if count < 10:
             preset.setToolTip("Alt + {}".format(count))
+            preset2.setToolTip("Alt + {}".format(count))
             # def make_callback(_dosya):
             #     return lambda: self.act_open_def_file(_dosya)
             #
