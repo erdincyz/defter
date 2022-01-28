@@ -440,6 +440,20 @@ class Text(QGraphicsTextItem):
         return self._command
 
     # ---------------------------------------------------------------------
+    def yazi_kutusunu_daralt(self):
+        # self._rect.setSize(QSizeF(self.doc.size()))
+        r = QRectF(self._rect)
+        # r.setSize(QSizeF(self.textWidth(), self.doc.size().height()))
+        r.setSize(QSizeF(self.doc.size()))
+        self.setRect(r)
+
+    # ---------------------------------------------------------------------
+    def setFont(self, font):
+        super(Text, self).setFont(font)
+        if self.parentItem():
+            self.yazi_kutusunu_daralt()
+
+    # ---------------------------------------------------------------------
     def setFontPointSize(self, fontPointSize):
         font = self.font()
         font.setPointSize(fontPointSize)
@@ -535,7 +549,6 @@ class Text(QGraphicsTextItem):
 
         self.update()
 
-
     # ---------------------------------------------------------------------
     def setYaziRengi(self, col):
 
@@ -607,9 +620,7 @@ class Text(QGraphicsTextItem):
         # elif event.modifiers() == Qt.ControlModifier | Qt.ShiftModifier:
         #     self.scene().parent().web_browser_ac("https://www.google.com/search?q=" + self.text())
         if event.modifiers() == Qt.ControlModifier:
-            # self._rect.setSize(QSizeF(self.doc.textWidth(), self.doc.size().height()))
-            self._rect.setSize(QSizeF(self.doc.size()))
-            self.setRect(QRectF(self._rect))
+            self.yazi_kutusunu_daralt()
 
         else:
             # if self.textInteractionFlags() == Qt.NoTextInteraction:

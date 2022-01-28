@@ -8,7 +8,7 @@ __date__ = '3/27/16'
 import os
 from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtWidgets import QGraphicsView, QApplication
-from PySide6.QtCore import Qt, QRectF, Slot, QPointF
+from PySide6.QtCore import Qt, QRectF, Slot
 
 
 ########################################################################
@@ -104,12 +104,12 @@ class View(QGraphicsView):
         # painter.drawRect(rectf.center().x(),rectf.center().y(),10,10)
         # painter.setPen(QPen(Qt.blue))
         # painter.drawRect(self.get_visible_rect())
+        # painter.setPen(QPen(Qt.green))
         # painter.drawRect(self.scene().itemsBoundingRect())
         # painter.setPen(QPen(Qt.red))
         # painter.drawRect(self.scene().sceneRect())
-        # painter.setPen(QPen(Qt.green))
         # painter.setPen(QPen(Qt.yellow))
-        # painter.drawRect(self.kagitPozisyonBoyutRect)
+        # # painter.drawRect(self.kagitPozisyonBoyutRect)
         # painter.drawRect(self.debug_rect)
         # # ---  pos debug end   ---
 
@@ -405,7 +405,7 @@ class View(QGraphicsView):
             self.setSceneRect(self.scene().itemsBoundingRect())
             self.fitInView(self.scene().sceneRect(), Qt.KeepAspectRatio)
             # self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
-        self.setSceneRect(self.get_visible_rect())
+        # self.setSceneRect(self.get_visible_rect())
 
         if self.scene().selectedItems():
             self.scene().activeItem.update_resize_handles(force=True)
@@ -419,17 +419,19 @@ class View(QGraphicsView):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         if self.scene().selectionQueue:
             yeniRect = QRectF()
-            # en_yukardaki_item_pos = QPointF()
             for item in self.scene().selectionQueue:
                 # if item.isVisible():
-                yeniRect = yeniRect.united(item.boundingRect().translated(item.pos()))
-                # yeniRect = yeniRect.united(item.boundingRect())
-                # if en_yukardaki_item_pos.y() > item.pos().y():
-                #     en_yukardaki_item_pos = item.pos()
+                if not item.parentItem():
+                    yeniRect = yeniRect.united(item.boundingRect().translated(item.pos()))
+                else:
+                    # parent edilmis nesnelerin pos degerleri parenta gore
+                    # bunlari sahneye goreye cevirmek lazim
+                    itemPosMappedFromParent = item.mapFromParent(item.pos())
+                    itemScenePos = item.mapToScene(itemPosMappedFromParent)
+                    yeniRect = yeniRect.united(item.boundingRect().translated(itemScenePos))
 
-            # yeniRect = yeniRect.translated(en_yukardaki_item_pos)
             self.setSceneRect(yeniRect)
-            # self.debug_rect = yeniRect
+            self.debug_rect = yeniRect
             # self.fitInView(self.scene().sceneRect(), Qt.KeepAspectRatio)
             self.fitInView(yeniRect, Qt.KeepAspectRatio)
             # self.setSceneRect(self.get_visible_rect())
