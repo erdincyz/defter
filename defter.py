@@ -1919,9 +1919,9 @@ class DefterAnaPencere(QMainWindow):
         # buna gerek kalmadı, cmodel ve scene giden temDir ayni.. bi bakilabilir.. dursun simdilik.
         # sayfa.scene.tempDirPath = self.cModel.tempDirPath
 
-    # ---------------------------------------------------------------------
-    def yazyaz(self, bir=None, iki=None):
-        print("sahne silindi", bir, iki)
+    # # ---------------------------------------------------------------------
+    # def yazyaz(self, bir=None, iki=None):
+    #     print("sahne silindi", bir, iki)
 
     # ---------------------------------------------------------------------
     def create_scene(self, tempDirPath):
@@ -1930,7 +1930,7 @@ class DefterAnaPencere(QMainWindow):
 
         scene = Scene(tempDirPath, self.yaziRengi, self.arkaPlanRengi, QPen(self._pen), self)
         # scene.setSceneRect(QRectF(0, 0, 400, 600))
-        scene.destroyed.connect(self.yazyaz)
+        # scene.destroyed.connect(self.yazyaz)
 
         # self.cScene.textItemSelected.connect(self.text_item_selected)
         view = View(scene, self)
@@ -3641,30 +3641,32 @@ class DefterAnaPencere(QMainWindow):
         self.zoomMenu.setIcon(QIcon(":/icons/zoom.png"))
 
         self.actionZoomIn = QAction(QIcon(":/icons/zoom-in.png"), self.tr("Zoom in"), self.zoomMenu)
-        self.actionZoomIn.triggered.connect(lambda: self.cView.zoomIn())
-        self.actionZoomIn.setShortcut(QKeySequence(Qt.ControlModifier + Qt.Key_Plus))
+        # self.actionZoomIn.setShortcut(QKeySequence(Qt.ControlModifier + Qt.Key_Plus))
+        self.actionZoomIn.setShortcut(QKeySequence("Ctrl++"))
         self.actionZoomIn.setShortcutContext(Qt.ApplicationShortcut)
+        self.actionZoomIn.triggered.connect(lambda: self.cView.zoomIn())
 
         self.actionZoomOut = QAction(QIcon(":/icons/zoom-out.png"), self.tr("Zoom out"), self.zoomMenu)
-        self.actionZoomOut.triggered.connect(lambda: self.cView.zoomOut())
-        self.actionZoomOut.setShortcut(QKeySequence(Qt.ControlModifier + Qt.Key_Minus))
+        # self.actionZoomOut.setShortcut(QKeySequence(Qt.ControlModifier + Qt.Key_Minus))
+        self.actionZoomOut.setShortcut(QKeySequence("Ctrl+-"))
         self.actionZoomOut.setShortcutContext(Qt.ApplicationShortcut)
+        self.actionZoomOut.triggered.connect(lambda: self.cView.zoomOut())
 
         self.actionZoomToFit = QAction(QIcon(":/icons/zoom-fit.png"), self.tr("Zoom to fit"), self.zoomMenu)
-        self.actionZoomToFit.triggered.connect(lambda: self.cView.zoomToFit())
-        self.actionZoomToFit.setShortcut(QKeySequence("Ctrl+F"))
+        self.actionZoomToFit.setShortcut(QKeySequence("Ctrl+/"))
         self.actionZoomToFit.setShortcutContext(Qt.ApplicationShortcut)
+        self.actionZoomToFit.triggered.connect(lambda: self.cView.zoomToFit())
 
         self.actionZoomToSelection = QAction(QIcon(":/icons/zoom-select.png"), self.tr("Zoom to selection"),
                                              self.zoomMenu)
-        self.actionZoomToSelection.triggered.connect(lambda: self.cView.zoomToSelection())
-        self.actionZoomToSelection.setShortcut(QKeySequence("F"))
+        self.actionZoomToSelection.setShortcut(QKeySequence("Ctrl+Shift+/"))
         self.actionZoomToSelection.setShortcutContext(Qt.ApplicationShortcut)
+        self.actionZoomToSelection.triggered.connect(lambda: self.cView.zoomToSelection())
 
         self.actionResetZoom = QAction(QIcon(":/icons/zoom-reset.png"), self.tr("Reset zoom"), self.zoomMenu)
-        self.actionResetZoom.triggered.connect(lambda: self.cView.zoomInitial())
-        self.actionResetZoom.setShortcut(QKeySequence("Ctrl+R"))
+        self.actionResetZoom.setShortcut(QKeySequence("Ctrl+*"))
         self.actionResetZoom.setShortcutContext(Qt.ApplicationShortcut)
+        self.actionResetZoom.triggered.connect(lambda: self.cView.zoomInitial())
 
         self.zoomMenu.addActions((self.actionZoomIn,
                                   self.actionZoomOut,
@@ -3674,30 +3676,30 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionCleanMode = QAction(self.tr("Clean Mode"), self.viewMenu)
         self.actionCleanMode.setShortcut(QKeySequence("Ctrl+H"))
-        self.actionCleanMode.triggered.connect(self.act_clean_mode)
         self.actionCleanMode.setCheckable(True)
         self.actionCleanMode.setStatusTip(self.tr("Clean Mode"))
         self.actionCleanMode.setToolTip(self.tr("Clean Mode"))
+        self.actionCleanMode.triggered.connect(self.act_clean_mode)
         # self.actionCleanMode.setShortcutContext(Qt.ApplicationShortcut)
         self.addAction(self.actionCleanMode)
 
         self.actionToggleStatusBar = QAction(self.tr("Status Bar"), self.viewMenu)
         self.actionToggleStatusBar.setShortcut(QKeySequence("Alt+S"))
-        self.actionToggleStatusBar.triggered.connect(
-            lambda: self._statusBar.setVisible(not self._statusBar.isVisible()))
         self.actionToggleStatusBar.setCheckable(True)
         self.actionToggleStatusBar.setStatusTip(self.tr("Toggles status bar visibility."))
         self.actionToggleStatusBar.setToolTip(self.tr("Toggles status bar visibility."))
+        self.actionToggleStatusBar.triggered.connect(
+            lambda: self._statusBar.setVisible(not self._statusBar.isVisible()))
         # self.actionToggleStatusBar.setShortcutContext(Qt.ApplicationShortcut)
         # self.addAction(self.actionToggleStatusBar)
 
         self.actionToggleMenuBar = QAction(self.tr("Menu bar"), self.viewMenu)
         self.actionToggleMenuBar.setShortcut(QKeySequence("Alt+M"))
-        self.actionToggleMenuBar.triggered.connect(
-            lambda: self.mBar.setVisible(not self.mBar.isVisible()))
         self.actionToggleMenuBar.setCheckable(True)
         self.actionToggleMenuBar.setStatusTip(self.tr("Toggles menu bar visibility."))
         self.actionToggleMenuBar.setToolTip(self.tr("Toggles menu bar visibility."))
+        self.actionToggleMenuBar.triggered.connect(
+            lambda: self.mBar.setVisible(not self.mBar.isVisible()))
 
         self.viewMenu.addActions((self.viewMenu.addMenu(self.zoomMenu),
                                   self.viewMenu.addSeparator(),

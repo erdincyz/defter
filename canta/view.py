@@ -8,7 +8,7 @@ __date__ = '3/27/16'
 import os
 from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtWidgets import QGraphicsView, QApplication
-from PySide6.QtCore import Qt, QRectF, Slot
+from PySide6.QtCore import Qt, QRectF, Slot, QPointF
 
 
 ########################################################################
@@ -44,6 +44,8 @@ class View(QGraphicsView):
         self.setCacheMode(QGraphicsView.CacheBackground)
 
         self.setTransformationAnchor(self.AnchorUnderMouse)
+
+        # self.debug_rect=QRectF()
 
     # def scrollContentsBy(self, p_int, p_int_1):
     #     pass
@@ -108,6 +110,7 @@ class View(QGraphicsView):
         # painter.setPen(QPen(Qt.green))
         # painter.setPen(QPen(Qt.yellow))
         # painter.drawRect(self.kagitPozisyonBoyutRect)
+        # painter.drawRect(self.debug_rect)
         # # ---  pos debug end   ---
 
         if self.backgroundImagePixmap:
@@ -183,6 +186,18 @@ class View(QGraphicsView):
                 #     self.verticalScrollBar().setSingleStep(0)
 
         # print(self.viewportEvent())/
+
+        if key == Qt.Key_Home:
+            self.verticalScrollBar().setValue(self.verticalScrollBar().minimum())
+
+        if key == Qt.Key_End:
+            self.verticalScrollBar().setValue(self.verticalScrollBar().maximum())
+
+        if key == Qt.Key_PageUp:
+            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - self.viewport().rect().height() + 10)
+
+        if key == Qt.Key_PageDown:
+            self.verticalScrollBar().setValue(self.verticalScrollBar().value() + self.viewport().rect().height() - 10)
 
         super(View, self).keyPressEvent(event)
 
@@ -404,12 +419,21 @@ class View(QGraphicsView):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         if self.scene().selectionQueue:
             yeniRect = QRectF()
+            # en_yukardaki_item_pos = QPointF()
             for item in self.scene().selectionQueue:
                 # if item.isVisible():
                 yeniRect = yeniRect.united(item.boundingRect().translated(item.pos()))
+                # yeniRect = yeniRect.united(item.boundingRect())
+                # if en_yukardaki_item_pos.y() > item.pos().y():
+                #     en_yukardaki_item_pos = item.pos()
+
+            # yeniRect = yeniRect.translated(en_yukardaki_item_pos)
             self.setSceneRect(yeniRect)
-            self.fitInView(self.scene().sceneRect(), Qt.KeepAspectRatio)
-            self.setSceneRect(self.get_visible_rect())
+            # self.debug_rect = yeniRect
+            # self.fitInView(self.scene().sceneRect(), Qt.KeepAspectRatio)
+            self.fitInView(yeniRect, Qt.KeepAspectRatio)
+            # self.setSceneRect(self.get_visible_rect())
+            # self.centerOn(0, 0)
 
             # if self.scene().selectedItems():
             self.scene().activeItem.update_resize_handles(force=True)
