@@ -141,7 +141,7 @@ class Scene(QGraphicsScene):
 
         self.parent().cModel.embededImageCounter += 1
         imgPath = os.path.join(imageFolder,
-                            "{}-{}".format(self.parent().cModel.embededImageCounter, baseName))
+                               "{}-{}".format(self.parent().cModel.embededImageCounter, baseName))
 
         if os.path.exists(imgPath):
             # tekrar bu fonksiyonu cagiriyoruz, her cagrildiginda sayac + 1 artiyor
@@ -161,7 +161,7 @@ class Scene(QGraphicsScene):
             os.makedirs(videoDirectory)
         self.parent().cModel.embededVideoCounter += 1
         videoPath = os.path.join(videoDirectory,
-                            "{}-{}".format(self.parent().cModel.embededVideoCounter, baseName))
+                                 "{}-{}".format(self.parent().cModel.embededVideoCounter, baseName))
 
         if os.path.exists(videoPath):
             # 2_1_basename seklinde basa ekler
@@ -176,7 +176,7 @@ class Scene(QGraphicsScene):
             os.makedirs(fileDirectory)
         self.parent().cModel.embededFileCounter += 1
         filePath = os.path.join(fileDirectory,
-                            "{}-{}".format(self.parent().cModel.embededFileCounter, baseName))
+                                "{}-{}".format(self.parent().cModel.embededFileCounter, baseName))
 
         if os.path.exists(filePath):
             # 2_1_basename seklinde basa ekler
@@ -573,6 +573,10 @@ class Scene(QGraphicsScene):
                     # else: normal ok cizme islemiyle devam
 
                     self.drawLineItem.temp_append(event.scenePos())
+                    # ok nesnesinde path nesnesindeki gibi close path yok
+                    # o yuzden burda isDrawingFinished = True diyoruz.
+                    # line.temp_append() icinde deMEmek de tercih edildi.
+                    self.drawLineItem.isDrawingFinished = True
                     self.removeItem(self.drawLineItem)
                     undoRedo.undoableAddItem(self.undoStack, description=self.tr("add line"), scene=self,
                                              item=self.drawLineItem)
@@ -581,6 +585,8 @@ class Scene(QGraphicsScene):
                     self.toolType = self.NoTool
                     self.views()[0].setMouseTracking(False)
                     self.parent().setCursor(Qt.ArrowCursor)
+                    # self.parent().setCursor(Qt.ArrowCursor)
+                    self.parent().actionSwitchToSelectionTool.setChecked(True)
                 # return QGraphicsScene.mousePressEvent(self, event)
                 return
 
@@ -779,7 +785,16 @@ class Scene(QGraphicsScene):
     #         super(Scene, self).wheelEvent(event)
     # ---------------------------------------------------------------------
     def tekerlek_ile_firca_boyu_degistir(self, angleDeltaY):
-        if self.toolType == self.DrawPathTool:
+        # ok cizerken self.fircaBoyutuItem kullanmiyoruz.
+        if self.toolType == self.DrawLineTool:
+            if angleDeltaY > 0:
+                cap = self.parent().fircaBuyult()
+            else:
+                cap = self.parent().fircaKucult()
+
+            self.drawLineItem.setCizgiKalinligi(cap)
+
+        elif self.toolType == self.DrawPathTool:
             if self.fircaBoyutuItem:
                 if angleDeltaY > 0:
                     cap = self.parent().fircaBuyult()
@@ -945,15 +960,7 @@ class Scene(QGraphicsScene):
 
                 if self.toolType == self.DrawPathTool:
                     if not self.fircaBoyutuItem:
-                        # self.views()[0].setMouseTracking(True)
-                        rect = QRectF(-self.scenePen.widthF() / 2, -self.scenePen.widthF() / 2, self.scenePen.widthF(),
-                                      self.scenePen.widthF())
-                        pen = QPen(self.scenePen.color(), 2, Qt.DashLine, Qt.RoundCap, Qt.RoundJoin)
-                        self.fircaBoyutuItem = YuvarlakFircaBoyutu(self.fircaSonPos, rect, Qt.transparent,
-                                                                   # self.scenePen,
-                                                                   pen)
-                        self.parent().increase_zvalue(self.fircaBoyutuItem)
-                        self.addItem(self.fircaBoyutuItem)
+                        self._fircaBoyutuItem_olustur()
 
         # elif event.modifiers() & Qt.ShiftModifier:
         #     if event.key() == Qt.Key_Up:
@@ -978,6 +985,18 @@ class Scene(QGraphicsScene):
             # event.accept()
 
         super(Scene, self).keyPressEvent(event)
+
+    # ---------------------------------------------------------------------
+    def _fircaBoyutuItem_olustur(self):
+        # self.views()[0].setMouseTracking(True)
+        rect = QRectF(-self.scenePen.widthF() / 2, -self.scenePen.widthF() / 2, self.scenePen.widthF(),
+                      self.scenePen.widthF())
+        pen = QPen(self.scenePen.color(), 2, Qt.DashLine, Qt.RoundCap, Qt.RoundJoin)
+        self.fircaBoyutuItem = YuvarlakFircaBoyutu(self.fircaSonPos, rect, Qt.transparent,
+                                                   # self.scenePen,
+                                                   pen)
+        self.parent().increase_zvalue(self.fircaBoyutuItem)
+        self.addItem(self.fircaBoyutuItem)
 
     # ---------------------------------------------------------------------
     def keyReleaseEvent(self, event):

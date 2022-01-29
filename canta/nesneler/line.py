@@ -834,6 +834,7 @@ class LineItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def move_start_point(self):
+        self.isDrawingFinished = False
         # point = self.mapFromScene(point)
         point = QPointF(0, 0)
         self.line().setP1(point)
@@ -1014,10 +1015,10 @@ class LineItem(QGraphicsItem):
         shift = int(Qt.ShiftModifier)
         alt = int(Qt.AltModifier)
 
-        # ctrlAlt = int(Qt.ControlModifier) + int(Qt.AltModifier)
+        ctrlAlt = int(Qt.ControlModifier) + int(Qt.AltModifier)
         ctrlShift = int(Qt.ControlModifier) + int(Qt.ShiftModifier)
-        # altShift = int(Qt.AltModifier) + int(Qt.ShiftModifier)
-        # ctrlAltShift = int(Qt.ControlModifier) + int(Qt.AltModifier) + int(Qt.ShiftModifier)
+        altShift = int(Qt.AltModifier) + int(Qt.ShiftModifier)
+        ctrlAltShift = int(Qt.ControlModifier) + int(Qt.AltModifier) + int(Qt.ShiftModifier)
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
@@ -1039,15 +1040,20 @@ class LineItem(QGraphicsItem):
             # self.changeBackgroundColorAlpha(event.delta())
             self.changeLineColorAlpha(event.delta())
 
-        # elif toplam == ctrlAlt:
-        #     self.changeTextColorAlpha(event.delta())
+        elif toplam == ctrlAlt:
+            self.changeTextColorAlpha(event.delta())
 
-        # elif toplam == ctrlAltShift:
-        #     self.changeFontSize(event.delta())
+        elif toplam == ctrlAltShift:
+            self.changeFontSize(event.delta())
 
-        # elif toplam == altShift:
-        #     # self.changeImageItemTextBackgroundColorAlpha(event.delta())
-        #     self.changeLineColorAlpha(event.delta())
+        elif toplam == altShift:
+            if self.isDrawingFinished:
+                self._cizgi_kalinligi_degistir_undo_ile(event.delta())
+            # else:
+                # self.scene().tekerlek_ile_firca_boyu_degistir(event.delta())
+
+        if not self.isDrawingFinished:
+            self.scene().tekerlek_ile_firca_boyu_degistir(event.delta())
 
         # elif toplam == ctrlAltShift:
         #     if not self.isFrozen:
@@ -1209,6 +1215,16 @@ class LineItem(QGraphicsItem):
     #         self.scene().undoRedo.undoableSetItemBackgroundColorAlpha(self.scene().undoStack,
     #                                                                   "change item's background alpha",
     #                                                                   self, col)
+    # ---------------------------------------------------------------------
+    def _cizgi_kalinligi_degistir_undo_ile(self, delta):
+
+        if delta > 0:
+            cap = self.scene().parent().fircaBuyult()
+        else:
+            cap = self.scene().parent().fircaKucult()
+
+        self.scene().undoRedo.undoableSetLineWidthF(self.scene().undoStack, "change item's line width", self,
+                                                    cap)
 
     # ---------------------------------------------------------------------
     def changeLineColorAlpha(self, delta):
