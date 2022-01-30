@@ -100,6 +100,143 @@ class Scene(QGraphicsScene):
         self._kimlik_nesne_sozluk = {}
 
     # ---------------------------------------------------------------------
+    def get_properties_for_save(self):
+        view = self.views()[0]
+        properties = {"yaziRengi": self.yaziRengi,
+                      "arkaPlanRengi": self.arkaPlanRengi,
+                      "scenePen": self.scenePen,
+                      "sceneRect": self.sceneRect(),
+                      # "embededImageCounter": self.embededImageCounter,
+                      "backgroundBrush": view.backgroundBrush(),
+                      "backgroundImagePath": view.backgroundImagePath,
+                      # "viewMatrix": self.views()[0].matrix()
+                      "viewTransform": view.transform(),
+                      "viewHorizontalScrollBarValue": view.horizontalScrollBar().value(),
+                      "viewVerticalScrollBarValue": view.verticalScrollBar().value()
+                      }
+        return properties
+
+    # ---------------------------------------------------------------------
+    def set_tool(self, toolType, itemText=None, dosyaYolu=None, pos=None):
+        # parca bir cok yerde bunu kapatmaktansa basta kapatıp
+        # asagida gerekirse aciyoruz
+        # setMouseTracking kullanan araclardan sadece DrawPathTool tekrar tekrar cizim yapiyor
+        # digerleri tek islem yapiyor ve tooldan cikiyor yani set_tool yani burasi cagriliyor
+        # DrawPathToolda surekli cizim yapabildiğimiz için kapatmaya gerek yok
+        # aslında bunu da fircaBoyutuItem icin aciyoruz sadece (ilerde baska seylerde de kullanabiliriz)
+        self.views()[0].setMouseTracking(False)
+        self.finish_interactive_tools()
+        self.cancel_mirror_tools()
+
+        self.toolType = toolType
+        self.dosyaYolu = dosyaYolu
+        self.itemText = itemText
+
+        if self.activeItem:
+            # bu ozellikle, sahneye cift tiklayip daha hic bir sey yazilmamis text objesi icin konuldu,
+            # yoksa 2 defa bu sahne classindaki is_text_item_empty cagriliyor ve problem oluyor.
+            # TODO: buna daha da bi bakilabilir. normalde problem olmamasi lazim. bu gecici bir cozum.
+            # mesela sahnede bos text secili ve yanip sonerken, yeni bir kare cizmek icin toolu secip
+            # sahneye tikladigimda, hata oluyor. text item deselected oluyor, textitemdaki itemchange sebebi ile
+            # selectionqqueden bu gecici text item temizleniyor.
+            # sonra kare cizmek icin tiklaninca focus da kayboluyor, textteki focusout da is_text_item_empty cagirip
+            # orda da selecitonQueue dan temizlemem var.
+            # ordan sinyal gidiyor is_text_item_empty calisiyor, sonra da undoRedoAdditem clearSelection var
+            # orda mi problem acaba. 2. defa mi caigiryor.
+            # veya hani araya mouseclickevent giriyor bu lost focusu kaybedemedn event undoRedoAdditem
+            # cagirip orda da, clearselection sebebi ile focus kaybolma falan derken, event bitince bi de tekrar text
+            # signallerinden mi cagriliyor, gibi.. anladın sen.
+            self.activeItem.clearFocus()
+
+        if toolType == self.NoTool:
+            self.parent().setCursor(Qt.ArrowCursor)
+            return
+
+        elif toolType == self.TextTool:
+            pixmap = QPixmap(':icons/cursor-text.png')
+        elif toolType == self.RectTool:
+            pixmap = QPixmap(':icons/cursor-rectangle.png')
+        elif toolType == self.DrawLineTool:
+            self.views()[0].setMouseTracking(True)
+            pixmap = QPixmap(':icons/cursor-line.png')
+            self.drawLineItem = None
+        elif toolType == self.EllipseTool:
+            pixmap = QPixmap(':icons/cursor-circle.png')
+        elif toolType == self.DrawPathTool:
+            pixmap = QPixmap(':icons/cursor-pen.png')
+            # self.pathItem = PathItem(self.yaziRengi, self.arkaPlanRengi, QPen(self.scenePen))
+            # self.addItem(self.pathItem)
+            self.views()[0].setMouseTracking(True)
+            self.pathItem = None
+        elif toolType == self.ImageTool:
+            pixmap = QPixmap(':icons/cursor-image.png')
+        elif toolType == self.VideoTool:
+            pixmap = QPixmap(":icons/cursor-pen.png")
+        elif toolType == self.DosyaAraci:
+            pixmap = QPixmap(":icons/cursor-pen.png")
+
+        elif toolType == self.MirrorX:
+            r = self.views()[0].get_visible_rect()
+            self.mirrorLineItem = MirrorLine(posFeedback=pos, axis="x")
+            self.mirrorLineItem.setLine(pos.x(),
+                                        r.top(),
+                                        pos.x(),
+                                        r.bottom())
+
+            self.views()[0].setMouseTracking(True)
+            self.addItem(self.mirrorLineItem)
+            self.mirrorLineItem.updateScale()
+            self.parent().setCursor(Qt.ArrowCursor)
+            return
+
+        elif toolType == self.MirrorY:
+            r = self.views()[0].get_visible_rect()
+            self.mirrorLineItem = MirrorLine(posFeedback=pos, axis="y")
+            self.mirrorLineItem.setLine(r.left(),
+                                        pos.y(),
+                                        r.right(),
+                                        pos.y())
+
+            self.views()[0].setMouseTracking(True)
+            self.addItem(self.mirrorLineItem)
+            self.mirrorLineItem.updateScale()
+            self.parent().setCursor(Qt.ArrowCursor)
+            return
+            # vh = self.views()[0].height()
+            # pixmap = QPixmap(1,vh)
+            # # pix.fill(Qt.transparent)
+            # painter = QPainter(pixmap)
+            # painter.drawLine(0,0,0,vh)
+            # painter.end()
+            # painter = None
+            # del painter
+        elif toolType == self.CropImageTool:
+            self.activeItem._isCropping = True
+            self.parent().setCursor(Qt.CrossCursor)
+            return
+
+        # pixmap.setMask(pixmap.mask())
+        # cursor = QCursor(pixmap.scaled(QSize(20, 20)))
+        self.parent().setCursor(QCursor(pixmap))
+        # mesela drawpath tool secildi, hemen sahne uzerine gelindi shifte basildi
+        # firca boyutu ayarlamak icin, focus yoksa  key press event calismiyor
+        # tabi tool secildi , sayfa degistirldi yine focus gidiyor.
+        # acaba follow focus mu yapsak
+        # self.views()[0].setFocus()
+
+    # ---------------------------------------------------------------------
+    def unite_with_scene_rect(self, rect):
+        unitedRect = self.sceneRect().united(rect)
+        visRect = self.views()[0].get_visible_rect()
+        if unitedRect.size().width() * unitedRect.size().height() > visRect.size().width() * visRect.size().height():
+            # self.setSceneRect(visRect.united(unitedRect))
+            self.setSceneRect(unitedRect)
+        # else:
+        #     self.setSceneRect(visRect)
+
+        self.parent().tw_sayfa_guncelle()
+
+    # ---------------------------------------------------------------------
     def addItem(self, item):
         self._kimlik_nesne_sozluk[item._kim] = item
         super(Scene, self).addItem(item)
@@ -245,129 +382,223 @@ class Scene(QGraphicsScene):
         undoRedo.undoableMove(self.undoStack, self.tr("Item moved"), movedItem, eskiPosition)
 
     # ---------------------------------------------------------------------
-    def get_properties_for_save(self):
-        view = self.views()[0]
-        properties = {"yaziRengi": self.yaziRengi,
-                      "arkaPlanRengi": self.arkaPlanRengi,
-                      "scenePen": self.scenePen,
-                      "sceneRect": self.sceneRect(),
-                      # "embededImageCounter": self.embededImageCounter,
-                      "backgroundBrush": view.backgroundBrush(),
-                      "backgroundImagePath": view.backgroundImagePath,
-                      # "viewMatrix": self.views()[0].matrix()
-                      "viewTransform": view.transform(),
-                      "viewHorizontalScrollBarValue": view.horizontalScrollBar().value(),
-                      "viewVerticalScrollBarValue": view.verticalScrollBar().value()
-                      }
-        return properties
+    def cancel_mirror_tools(self):
+        if self.mirrorLineItem:
+            self.views()[0].setMouseTracking(False)
+            self.removeItem(self.mirrorLineItem)
+            self.mirrorLineItem = None
 
     # ---------------------------------------------------------------------
-    def set_tool(self, toolType, itemText=None, dosyaYolu=None, pos=None):
-        # parca bir cok yerde bunu kapatmaktansa basta kapatıp
-        # asagida gerekirse aciyoruz
-        # setMouseTracking kullanan araclardan sadece DrawPathTool tekrar tekrar cizim yapiyor
-        # digerleri tek islem yapiyor ve tooldan cikiyor yani set_tool yani burasi cagriliyor
-        # DrawPathToolda surekli cizim yapabildiğimiz için kapatmaya gerek yok
-        # aslında bunu da fircaBoyutuItem icin aciyoruz sadece (ilerde baska seylerde de kullanabiliriz)
-        self.views()[0].setMouseTracking(False)
-        self.finish_interactive_tools()
-        self.cancel_mirror_tools()
+    def finish_interactive_tools(self, kapat=True):
 
-        self.toolType = toolType
-        self.dosyaYolu = dosyaYolu
-        self.itemText = itemText
+        if self.toolType == self.DrawPathTool:
+            if self.pathItem:
 
+                if self.pathItem.path().elementCount() > 1:
+                    if self.pathItem.path().elementCount() == 2:
+                        kapat = False
+                    self.pathItem.close_path(kapat)
+                    self.removeItem(self.pathItem)
+                    # resim nesnesi uzerine ciziyorsak
+
+                    ilk_nokta = self.pathItem.mapToScene(QPointF(self.pathItem.path().elementAt(0).x,
+                                                                 self.pathItem.path().elementAt(0).y))
+                    son_nokta = self.pathItem.mapToScene(
+                        QPointF(self.pathItem.path().elementAt(self.pathItem.path().elementCount() - 1).x,
+                                self.pathItem.path().elementAt(self.pathItem.path().elementCount() - 1).y))
+
+                    ustuneCizilenResimNesnesi = None
+
+                    for nokta in [ilk_nokta, son_nokta]:
+                        nesne = self.itemAt(nokta, self.views()[0].transform())
+                        if nesne:
+                            if nesne.type() == Image.Type:
+                                ustuneCizilenResimNesnesi = nesne
+                                break
+
+                    if ustuneCizilenResimNesnesi:
+                        self.undoStack.beginMacro(self.tr("draw on image"))
+                        undoRedo.undoableAddItem(self.undoStack, description=self.tr("add path"), scene=self,
+                                                 item=self.pathItem, sec=False)
+                        yeniPos = ustuneCizilenResimNesnesi.mapFromScene(self.pathItem.scenePos())
+                        undoRedo.undoableParent(self.undoStack, self.tr("_parent"), self.pathItem,
+                                                ustuneCizilenResimNesnesi, yeniPos)
+                        self.undoStack.endMacro()
+                    else:
+                        undoRedo.undoableAddItem(self.undoStack, description=self.tr("add path"), scene=self,
+                                                 item=self.pathItem, sec=False)
+
+                    self.pathItem = None
+                    # DrawPathTool da setMouseTracking surekli acik
+                    # self.views()[0].setMouseTracking(False)
+                else:
+                    self.removeItem(self.pathItem)
+                    self.pathItem = None
+                    # DrawPathTool da setMouseTracking surekli acik
+                    # self.views()[0].setMouseTracking(False)
+
+                return
+
+        elif self.toolType == self.DrawLineTool:
+
+            if self.drawLineItem:
+                if self.drawLineItem.length() > 0:
+
+                    self.removeItem(self.drawLineItem)
+                    undoRedo.undoableAddItem(self.undoStack, description=self.tr("add line"), scene=self,
+                                             item=self.drawLineItem)
+                    self.drawLineItem = None
+                    self.views()[0].setMouseTracking(False)
+                else:
+                    self.removeItem(self.drawLineItem)
+                    self.drawLineItem = None
+                    self.views()[0].setMouseTracking(False)
+
+        elif self.toolType == self.CropImageTool:
+            # diger durumlar icin Image.itemChange deselected kullanildi.
+            if self.activeItem and self.activeItem.type() == Image.Type:
+                self.activeItem.finish_crop()
+                # self.activeItem._isCropping = False
+                # self.activeItem.rubberBand.hide()
+                # self.activeItem.rubberBand.deleteLater()
+                # self.activeItem.rubberBand = None
+
+        self.toolType = self.NoTool
+        self.parent().setCursor(Qt.ArrowCursor)
+        # self.deleteLater()
+        self.parent().actionSwitchToSelectionTool.setChecked(True)
+
+    # ---------------------------------------------------------------------
+    def _fircaBoyutuItem_olustur(self):
+        # self.views()[0].setMouseTracking(True)
+        rect = QRectF(-self.scenePen.widthF() / 2, -self.scenePen.widthF() / 2, self.scenePen.widthF(),
+                      self.scenePen.widthF())
+        pen = QPen(self.scenePen.color(), 2, Qt.DashLine, Qt.RoundCap, Qt.RoundJoin)
+        self.fircaBoyutuItem = YuvarlakFircaBoyutu(self.fircaSonPos, rect, Qt.transparent,
+                                                   # self.scenePen,
+                                                   pen)
+        self.parent().increase_zvalue(self.fircaBoyutuItem)
+        self.addItem(self.fircaBoyutuItem)
+
+    # # ---------------------------------------------------------------------
+    # bunu alttaki self.tekerlek_ile_firca_boyu_degistir e tasidik
+    # view daki wheel eventten cagiriyoruz
+    # yoksa hem scroll ediyor hem de firca boyutu degistiriyordu veya ikisi de olmuyordu.
+    # def wheelEvent(self, event):
+    #     # factor = 1.41 ** (event.delta() / 240.0)
+    #     # self.scale(factor, factor)
+    #     if self.toolType == self.DrawPathTool:
+    #         if event.modifiers() & Qt.ShiftModifier:
+    #             if self.fircaBoyutuItem:
+    #
+    #                 if event.delta() > 0:
+    #                     cap = self.parent().fircaBuyult()
+    #                 else:
+    #                     cap = self.parent().fircaKucult()
+    #
+    #                 rect = QRectF(-cap / 2, -cap / 2, cap, cap)
+    #                 self.fircaBoyutuItem.setRect(rect)
+    #
+    #     else:
+    #         super(Scene, self).wheelEvent(event)
+
+    # ---------------------------------------------------------------------
+    def tekerlek_ile_firca_boyu_degistir(self, angleDeltaY):
+        # ok cizerken self.fircaBoyutuItem kullanmiyoruz.
+        if self.toolType == self.DrawLineTool:
+            if angleDeltaY > 0:
+                cap = self.parent().fircaBuyult()
+            else:
+                cap = self.parent().fircaKucult()
+
+            self.drawLineItem.setCizgiKalinligi(cap)
+
+        elif self.toolType == self.DrawPathTool:
+            if self.fircaBoyutuItem:
+                if angleDeltaY > 0:
+                    cap = self.parent().fircaBuyult()
+                else:
+                    cap = self.parent().fircaKucult()
+
+                rect = QRectF(-cap / 2, -cap / 2, cap, cap)
+                self.fircaBoyutuItem.setRect(rect)
+
+    # ---------------------------------------------------------------------
+    def shift_drag_ile_firca_boyu_degistir(self, yariCap):
+        if self.toolType == self.DrawPathTool:
+
+            if self.fircaBoyutuItem:
+                cap = 2 * yariCap
+                self.parent().fircaDirektDegerGir(cap)
+
+                rect = QRectF(-yariCap, -yariCap, cap, cap)
+                self.fircaBoyutuItem.setRect(rect)
+
+    # ---------------------------------------------------------------------
+    def yazi_yazilmiyorsa_nesneyi_kaydir(self, x, y):
+        devam = False
+
+        # TODO: basitlesitrilebilir , if hasattr(self.activeItem, 'tempTextItem'): ile belki..
         if self.activeItem:
-            # bu ozellikle, sahneye cift tiklayip daha hic bir sey yazilmamis text objesi icin konuldu,
-            # yoksa 2 defa bu sahne classindaki is_text_item_empty cagriliyor ve problem oluyor.
-            # TODO: buna daha da bi bakilabilir. normalde problem olmamasi lazim. bu gecici bir cozum.
-            # mesela sahnede bos text secili ve yanip sonerken, yeni bir kare cizmek icin toolu secip
-            # sahneye tikladigimda, hata oluyor. text item deselected oluyor, textitemdaki itemchange sebebi ile
-            # selectionqqueden bu gecici text item temizleniyor.
-            # sonra kare cizmek icin tiklaninca focus da kayboluyor, textteki focusout da is_text_item_empty cagirip
-            # orda da selecitonQueue dan temizlemem var.
-            # ordan sinyal gidiyor is_text_item_empty calisiyor, sonra da undoRedoAdditem clearSelection var
-            # orda mi problem acaba. 2. defa mi caigiryor.
-            # veya hani araya mouseclickevent giriyor bu lost focusu kaybedemedn event undoRedoAdditem
-            # cagirip orda da, clearselection sebebi ile focus kaybolma falan derken, event bitince bi de tekrar text
-            # signallerinden mi cagriliyor, gibi.. anladın sen.
-            self.activeItem.clearFocus()
+            if self.activeItem.type() == Text.Type:
+                if not self.activeItem.hasFocus():
+                    devam = True
 
-        if toolType == self.NoTool:
-            self.parent().setCursor(Qt.ArrowCursor)
-            return
+            # bu ikisinde tempTextItem yok
+            elif self.activeItem.type() == Group.Type:
+                devam = True
+            # bu ikisinde tempTextItem yok
+            elif self.activeItem.type() == LineItem.Type:
+                devam = True
+            # geri kalanlarda tempTextItem var, (nesne uzerine yazi yazdigimiz item bu)
+            else:
+                if not self.activeItem.tempTextItem:
+                    devam = True
 
-        elif toolType == self.TextTool:
-            pixmap = QPixmap(':icons/cursor-text.png')
-        elif toolType == self.RectTool:
-            pixmap = QPixmap(':icons/cursor-rectangle.png')
-        elif toolType == self.DrawLineTool:
-            self.views()[0].setMouseTracking(True)
-            pixmap = QPixmap(':icons/cursor-line.png')
-            self.drawLineItem = None
-        elif toolType == self.EllipseTool:
-            pixmap = QPixmap(':icons/cursor-circle.png')
-        elif toolType == self.DrawPathTool:
-            pixmap = QPixmap(':icons/cursor-pen.png')
-            # self.pathItem = PathItem(self.yaziRengi, self.arkaPlanRengi, QPen(self.scenePen))
-            # self.addItem(self.pathItem)
-            self.views()[0].setMouseTracking(True)
-            self.pathItem = None
-        elif toolType == self.ImageTool:
-            pixmap = QPixmap(':icons/cursor-image.png')
-        elif toolType == self.VideoTool:
-            pixmap = QPixmap(":icons/cursor-pen.png")
-        elif toolType == self.DosyaAraci:
-            pixmap = QPixmap(":icons/cursor-pen.png")
+        # tek nesne icin, ne kadar secili nesne olursa olsun , yani self.activeItem icin
+        # if devam:
+        #     eskiPos = self.activeItem.pos()
+        #     self.activeItem.moveBy(x, y)
+        #     self.when_item_moved(self.activeItem, eskiPos)
 
-        elif toolType == self.MirrorX:
-            r = self.views()[0].get_visible_rect()
-            self.mirrorLineItem = MirrorLine(posFeedback=pos, axis="x")
-            self.mirrorLineItem.setLine(pos.x(),
-                                        r.top(),
-                                        pos.x(),
-                                        r.bottom())
+        # butun secili nesneler icin
+        if devam:
+            items = self.get_selected_top_level_items()
 
-            self.views()[0].setMouseTracking(True)
-            self.addItem(self.mirrorLineItem)
-            self.mirrorLineItem.updateScale()
-            self.parent().setCursor(Qt.ArrowCursor)
-            return
+            self.undoStack.beginMacro(self.tr("Item(s) moved"))
 
-        elif toolType == self.MirrorY:
-            r = self.views()[0].get_visible_rect()
-            self.mirrorLineItem = MirrorLine(posFeedback=pos, axis="y")
-            self.mirrorLineItem.setLine(r.left(),
-                                        pos.y(),
-                                        r.right(),
-                                        pos.y())
+            for item in items:
+                eskiPos = item.pos()
+                item.moveBy(x, y)
+                self.when_item_moved(item, eskiPos)
 
-            self.views()[0].setMouseTracking(True)
-            self.addItem(self.mirrorLineItem)
-            self.mirrorLineItem.updateScale()
-            self.parent().setCursor(Qt.ArrowCursor)
-            return
-            # vh = self.views()[0].height()
-            # pixmap = QPixmap(1,vh)
-            # # pix.fill(Qt.transparent)
-            # painter = QPainter(pixmap)
-            # painter.drawLine(0,0,0,vh)
-            # painter.end()
-            # painter = None
-            # del painter
-        elif toolType == self.CropImageTool:
-            self.activeItem._isCropping = True
-            self.parent().setCursor(Qt.CrossCursor)
-            return
+            self.undoStack.endMacro()
 
-        # pixmap.setMask(pixmap.mask())
-        # cursor = QCursor(pixmap.scaled(QSize(20, 20)))
-        self.parent().setCursor(QCursor(pixmap))
-        # mesela drawpath tool secildi, hemen sahne uzerine gelindi shifte basildi
-        # firca boyutu ayarlamak icin, focus yoksa  key press event calismiyor
-        # tabi tool secildi , sayfa degistirldi yine focus gidiyor.
-        # acaba follow focus mu yapsak
-        # self.views()[0].setFocus()
+    # ---------------------------------------------------------------------
+    # @Slot(QGraphicsTextItem)
+    @Slot(object)
+    def is_text_item_empty(self, textItem):
+        # self.childItems() kontrolu de, yazi bir baska nesnenin parenti iken silinmis olabilir diye.
+        if not textItem.toPlainText() and not textItem.childItems():
+            # self.selectionQueue.remove(textItem)
+            # self.removeItem(textItem)
+            # undoableRemoveItem icine koymak durumundayiz yoksa yazisi olan nesne daha sonra ici silinince
+            # sahneden siliniyor, undo redo durumunda ise problem cunku nesne yok, vs..
+            undoRedo.undoableRemoveItem(self.undoStack, self.tr("auto delete empty text item"), self, textItem,
+                                        addToUnGroupedRootItems=False)
+
+            # textItem.deleteLater()
+
+    # ---------------------------------------------------------------------
+    def create_empty_text_object_with_double_click(self, scenePos):
+        textItem = Text(scenePos, self.yaziRengi, self.arkaPlanRengi, QPen(self.scenePen), self.font())
+        textItem.set_document_url(self.tempDirPath)
+        textItem.textItemFocusedOut.connect(self.is_text_item_empty)
+        self.parent().increase_zvalue(textItem)
+        # textItem.textItemSelectedChanged.connect(self.textItemSelected)
+        # self.addItem(textItem)
+        undoRedo.undoableAddItem(self.undoStack, description=self.tr("add text"), scene=self, item=textItem)
+        textItem.setFocus()
 
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
@@ -384,17 +615,6 @@ class Scene(QGraphicsScene):
         elif event.button() == Qt.MiddleButton:
             self.views()[0].zoomToFit()
         super(Scene, self).mouseDoubleClickEvent(event)
-
-    # ---------------------------------------------------------------------
-    def create_empty_text_object_with_double_click(self, scenePos):
-        textItem = Text(scenePos, self.yaziRengi, self.arkaPlanRengi, QPen(self.scenePen), self.font())
-        textItem.set_document_url(self.tempDirPath)
-        textItem.textItemFocusedOut.connect(self.is_text_item_empty)
-        self.parent().increase_zvalue(textItem)
-        # textItem.textItemSelectedChanged.connect(self.textItemSelected)
-        # self.addItem(textItem)
-        undoRedo.undoableAddItem(self.undoStack, description=self.tr("add text"), scene=self, item=textItem)
-        textItem.setFocus()
 
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):
@@ -558,19 +778,20 @@ class Scene(QGraphicsScene):
                     self.addItem(self.drawLineItem)
                     ustuneOkCizilenItem = self.itemAt(event.scenePos(), self.views()[0].transform())
                     if ustuneOkCizilenItem:
-                        # item sabit icindeki cizgi degisiyor mousemoveda,diyoruz simdilik
+                        # item sabit, icindeki cizgi degisiyor mousemoveda,diyoruz simdilik
                         # if not self.drawLineItem in ustuneOkCizilenItem.oklar_dxdy_nokta.keys():
                         ustuneOkCizilenItem.ok_ekle(self.drawLineItem, event.scenePos(), 1)
                 else:
                     ustuneOkCizilenItemList = self.items(event.scenePos(), deviceTransform=self.views()[0].transform())
-                    if len(ustuneOkCizilenItemList) > 1:  # bu asamada cizdigimiz ok listeye dahil
-                        if ustuneOkCizilenItemList[1] == self.drawLineItem:
-                            # z index , ok nesnenin ustunde ise. listede 0. sirada, nesne 1. sirada
-                            ustuneOkCizilenItemList[0].ok_ekle(self.drawLineItem, event.scenePos(), 2)
-                        else:
-                            ustuneOkCizilenItemList[1].ok_ekle(self.drawLineItem, event.scenePos(), 2)
 
-                    # else: normal ok cizme islemiyle devam
+                    # bazen veya (eskiden?) cizilen ok da listelenebiliyor(du).
+                    if self.drawLineItem in ustuneOkCizilenItemList:
+                        ustuneOkCizilenItemList.remove(self.drawLineItem)
+
+                    if ustuneOkCizilenItemList:
+                        ustuneOkCizilenItemList[0].ok_ekle(self.drawLineItem, event.scenePos(), 2)
+
+                    # normal ok cizme islemiyle devam
 
                     self.drawLineItem.temp_append(event.scenePos())
                     # ok nesnesinde path nesnesindeki gibi close path yok
@@ -693,18 +914,6 @@ class Scene(QGraphicsScene):
         super(Scene, self).mouseMoveEvent(event)
 
     # ---------------------------------------------------------------------
-    def unite_with_scene_rect(self, rect):
-        unitedRect = self.sceneRect().united(rect)
-        visRect = self.views()[0].get_visible_rect()
-        if unitedRect.size().width() * unitedRect.size().height() > visRect.size().width() * visRect.size().height():
-            # self.setSceneRect(visRect.united(unitedRect))
-            self.setSceneRect(unitedRect)
-        # else:
-        #     self.setSceneRect(visRect)
-
-        self.parent().tw_sayfa_guncelle()
-
-    # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
 
         if event.button() == Qt.LeftButton:
@@ -761,139 +970,6 @@ class Scene(QGraphicsScene):
 
         super(Scene, self).mouseReleaseEvent(event)
         # print(self.selectionQueue)
-
-    # # ---------------------------------------------------------------------
-    # bunu alttaki self.tekerlek_ile_firca_boyu_degistir e tasidik
-    # view daki wheel eventten cagiriyoruz
-    # yoksa hem scroll ediyor hem de firca boyutu degistiriyordu veya ikisi de olmuyordu.
-    # def wheelEvent(self, event):
-    #     # factor = 1.41 ** (event.delta() / 240.0)
-    #     # self.scale(factor, factor)
-    #     if self.toolType == self.DrawPathTool:
-    #         if event.modifiers() & Qt.ShiftModifier:
-    #             if self.fircaBoyutuItem:
-    #
-    #                 if event.delta() > 0:
-    #                     cap = self.parent().fircaBuyult()
-    #                 else:
-    #                     cap = self.parent().fircaKucult()
-    #
-    #                 rect = QRectF(-cap / 2, -cap / 2, cap, cap)
-    #                 self.fircaBoyutuItem.setRect(rect)
-    #
-    #     else:
-    #         super(Scene, self).wheelEvent(event)
-    # ---------------------------------------------------------------------
-    def tekerlek_ile_firca_boyu_degistir(self, angleDeltaY):
-        # ok cizerken self.fircaBoyutuItem kullanmiyoruz.
-        if self.toolType == self.DrawLineTool:
-            if angleDeltaY > 0:
-                cap = self.parent().fircaBuyult()
-            else:
-                cap = self.parent().fircaKucult()
-
-            self.drawLineItem.setCizgiKalinligi(cap)
-
-        elif self.toolType == self.DrawPathTool:
-            if self.fircaBoyutuItem:
-                if angleDeltaY > 0:
-                    cap = self.parent().fircaBuyult()
-                else:
-                    cap = self.parent().fircaKucult()
-
-                rect = QRectF(-cap / 2, -cap / 2, cap, cap)
-                self.fircaBoyutuItem.setRect(rect)
-
-    # ---------------------------------------------------------------------
-    def shift_drag_ile_firca_boyu_degistir(self, yariCap):
-        if self.toolType == self.DrawPathTool:
-
-            if self.fircaBoyutuItem:
-                cap = 2 * yariCap
-                self.parent().fircaDirektDegerGir(cap)
-
-                rect = QRectF(-yariCap, -yariCap, cap, cap)
-                self.fircaBoyutuItem.setRect(rect)
-
-    # ---------------------------------------------------------------------
-    def finish_interactive_tools(self, kapat=True):
-
-        if self.toolType == self.DrawPathTool:
-            if self.pathItem:
-
-                if self.pathItem.path().elementCount() > 1:
-                    if self.pathItem.path().elementCount() == 2:
-                        kapat = False
-                    self.pathItem.close_path(kapat)
-                    self.removeItem(self.pathItem)
-                    # resim nesnesi uzerine ciziyorsak
-
-                    ilk_nokta = self.pathItem.mapToScene(QPointF(self.pathItem.path().elementAt(0).x,
-                                                                 self.pathItem.path().elementAt(0).y))
-                    son_nokta = self.pathItem.mapToScene(
-                        QPointF(self.pathItem.path().elementAt(self.pathItem.path().elementCount() - 1).x,
-                                self.pathItem.path().elementAt(self.pathItem.path().elementCount() - 1).y))
-
-                    ustuneCizilenResimNesnesi = None
-
-                    for nokta in [ilk_nokta, son_nokta]:
-                        nesne = self.itemAt(nokta, self.views()[0].transform())
-                        if nesne:
-                            if nesne.type() == Image.Type:
-                                ustuneCizilenResimNesnesi = nesne
-                                break
-
-                    if ustuneCizilenResimNesnesi:
-                        self.undoStack.beginMacro(self.tr("draw on image"))
-                        undoRedo.undoableAddItem(self.undoStack, description=self.tr("add path"), scene=self,
-                                                 item=self.pathItem, sec=False)
-                        yeniPos = ustuneCizilenResimNesnesi.mapFromScene(self.pathItem.scenePos())
-                        undoRedo.undoableParent(self.undoStack, self.tr("_parent"), self.pathItem,
-                                                ustuneCizilenResimNesnesi, yeniPos)
-                        self.undoStack.endMacro()
-                    else:
-                        undoRedo.undoableAddItem(self.undoStack, description=self.tr("add path"), scene=self,
-                                                 item=self.pathItem, sec=False)
-
-                    self.pathItem = None
-                    # DrawPathTool da setMouseTracking surekli acik
-                    # self.views()[0].setMouseTracking(False)
-                else:
-                    self.removeItem(self.pathItem)
-                    self.pathItem = None
-                    # DrawPathTool da setMouseTracking surekli acik
-                    # self.views()[0].setMouseTracking(False)
-
-                return
-
-        elif self.toolType == self.DrawLineTool:
-
-            if self.drawLineItem:
-                if self.drawLineItem.length() > 0:
-
-                    self.removeItem(self.drawLineItem)
-                    undoRedo.undoableAddItem(self.undoStack, description=self.tr("add line"), scene=self,
-                                             item=self.drawLineItem)
-                    self.drawLineItem = None
-                    self.views()[0].setMouseTracking(False)
-                else:
-                    self.removeItem(self.drawLineItem)
-                    self.drawLineItem = None
-                    self.views()[0].setMouseTracking(False)
-
-        elif self.toolType == self.CropImageTool:
-            # diger durumlar icin Image.itemChange deselected kullanildi.
-            if self.activeItem and self.activeItem.type() == Image.Type:
-                self.activeItem.finish_crop()
-                # self.activeItem._isCropping = False
-                # self.activeItem.rubberBand.hide()
-                # self.activeItem.rubberBand.deleteLater()
-                # self.activeItem.rubberBand = None
-
-        self.toolType = self.NoTool
-        self.parent().setCursor(Qt.ArrowCursor)
-        # self.deleteLater()
-        self.parent().actionSwitchToSelectionTool.setChecked(True)
 
     # ---------------------------------------------------------------------
     def keyPressEvent(self, event):
@@ -987,18 +1063,6 @@ class Scene(QGraphicsScene):
         super(Scene, self).keyPressEvent(event)
 
     # ---------------------------------------------------------------------
-    def _fircaBoyutuItem_olustur(self):
-        # self.views()[0].setMouseTracking(True)
-        rect = QRectF(-self.scenePen.widthF() / 2, -self.scenePen.widthF() / 2, self.scenePen.widthF(),
-                      self.scenePen.widthF())
-        pen = QPen(self.scenePen.color(), 2, Qt.DashLine, Qt.RoundCap, Qt.RoundJoin)
-        self.fircaBoyutuItem = YuvarlakFircaBoyutu(self.fircaSonPos, rect, Qt.transparent,
-                                                   # self.scenePen,
-                                                   pen)
-        self.parent().increase_zvalue(self.fircaBoyutuItem)
-        self.addItem(self.fircaBoyutuItem)
-
-    # ---------------------------------------------------------------------
     def keyReleaseEvent(self, event):
 
         if event.key() == Qt.Key_Space:
@@ -1017,68 +1081,6 @@ class Scene(QGraphicsScene):
                     self.fircaBoyutuItem = None
 
         super(Scene, self).keyReleaseEvent(event)
-
-    # ---------------------------------------------------------------------
-    def yazi_yazilmiyorsa_nesneyi_kaydir(self, x, y):
-        devam = False
-
-        # TODO: basitlesitrilebilir , if hasattr(self.activeItem, 'tempTextItem'): ile belki..
-        if self.activeItem:
-            if self.activeItem.type() == Text.Type:
-                if not self.activeItem.hasFocus():
-                    devam = True
-
-            # bu ikisinde tempTextItem yok
-            elif self.activeItem.type() == Group.Type:
-                devam = True
-            # bu ikisinde tempTextItem yok
-            elif self.activeItem.type() == LineItem.Type:
-                devam = True
-            # geri kalanlarda tempTextItem var, (nesne uzerine yazi yazdigimiz item bu)
-            else:
-                if not self.activeItem.tempTextItem:
-                    devam = True
-
-        # tek nesne icin, ne kadar secili nesne olursa olsun , yani self.activeItem icin
-        # if devam:
-        #     eskiPos = self.activeItem.pos()
-        #     self.activeItem.moveBy(x, y)
-        #     self.when_item_moved(self.activeItem, eskiPos)
-
-        # butun secili nesneler icin
-        if devam:
-            items = self.get_selected_top_level_items()
-
-            self.undoStack.beginMacro(self.tr("Item(s) moved"))
-
-            for item in items:
-                eskiPos = item.pos()
-                item.moveBy(x, y)
-                self.when_item_moved(item, eskiPos)
-
-            self.undoStack.endMacro()
-
-    # ---------------------------------------------------------------------
-    # @Slot(QGraphicsTextItem)
-    @Slot(object)
-    def is_text_item_empty(self, textItem):
-        # self.childItems() kontrolu de, yazi bir baska nesnenin parenti iken silinmis olabilir diye.
-        if not textItem.toPlainText() and not textItem.childItems():
-            # self.selectionQueue.remove(textItem)
-            # self.removeItem(textItem)
-            # undoableRemoveItem icine koymak durumundayiz yoksa yazisi olan nesne daha sonra ici silinince
-            # sahneden siliniyor, undo redo durumunda ise problem cunku nesne yok, vs..
-            undoRedo.undoableRemoveItem(self.undoStack, self.tr("auto delete empty text item"), self, textItem,
-                                        addToUnGroupedRootItems=False)
-
-            # textItem.deleteLater()
-
-    # ---------------------------------------------------------------------
-    def cancel_mirror_tools(self):
-        if self.mirrorLineItem:
-            self.views()[0].setMouseTracking(False)
-            self.removeItem(self.mirrorLineItem)
-            self.mirrorLineItem = None
 
     # ---------------------------------------------------------------------
     def dragEnterEvent(self, event):

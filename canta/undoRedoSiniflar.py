@@ -146,6 +146,9 @@ class UndoableMove(QUndoCommand):
         # self.movedItem.moveBy(-self.dx, -self.dy)
         self.movedItem.setPos(self.eskiPosition)
         self.movedItem.ok_guncelle()
+
+        # ok bagli iken nesne olarak tasinirsa, bagli oldugu nesnelere bagliligi devam ettigi halde baglanti noktalarina
+        # olan bagi gevsetiliyor (offset)
         if self.movedItem.type() == shared.LINE_ITEM_TYPE:
             if self.movedItem.baglanmis_nesneler:
                 for baglanmis_nesne_kimlik, nokta in self.movedItem.baglanmis_nesneler.items():  # dict items()
@@ -163,6 +166,8 @@ class UndoableMove(QUndoCommand):
         self.movedItem.setPos(self.yeniPosition)
         self.movedItem.ok_guncelle()
 
+        # ok bagli iken nesne olarak tasinirsa, bagli oldugu nesnelere bagliligi devam ettigi halde baglanti noktalarina
+        # olan bagi gevsetiliyor (offset)
         if self.movedItem.type() == shared.LINE_ITEM_TYPE:
             if self.movedItem.baglanmis_nesneler:
                 for baglanmis_nesne_kimlik, nokta in self.movedItem.baglanmis_nesneler.items():  # dict items()
@@ -619,14 +624,14 @@ class UndoableResizeLineItem(QUndoCommand):
         self.eskiLine = eskiLine
         self.degisenNokta = degisenNokta
 
-        self.varsa_eski_baglanmis_nesne_p1 = None
-        self.varsa_eski_baglanmis_nesne_p2 = None
+        self.p1_in_baglandigi_eski_nesne = None
+        self.p2_in_baglandigi_eski_nesne = None
         for baglanmis_nesne_kimlik, nokta in self.cizgiNesnesi.baglanmis_nesneler.items():  # dict.items()
             baglanmis_nesne = self.scene._kimlik_nesne_sozluk[baglanmis_nesne_kimlik]
             if 1 == nokta:
-                self.varsa_eski_baglanmis_nesne_p1 = baglanmis_nesne
+                self.p1_in_baglandigi_eski_nesne = baglanmis_nesne
             if 2 == nokta:
-                self.varsa_eski_baglanmis_nesne_p2 = baglanmis_nesne
+                self.p2_in_baglandigi_eski_nesne = baglanmis_nesne
 
     # ---------------------------------------------------------------------
     # def id(self):
@@ -650,46 +655,37 @@ class UndoableResizeLineItem(QUndoCommand):
 
         if self.degisenNokta == 1:
             p1_scene_pos = self.cizgiNesnesi.mapToScene(self.yeniLine.p1())
-            p1_ustuneOkCizilenItemList = self.scene.items(p1_scene_pos,
+            ustuneOkCizilenItemList_p1 = self.scene.items(p1_scene_pos,
                                                           deviceTransform=self.scene.views()[0].transform())
+            # bazen veya (eskiden?) cizilen ok da listelenebiliyor(du).
+            if self.cizgiNesnesi in ustuneOkCizilenItemList_p1:
+                ustuneOkCizilenItemList_p1.remove(self.cizgiNesnesi)
+            if ustuneOkCizilenItemList_p1:
+                p1_in_baglanacagi_yeni_nesne = ustuneOkCizilenItemList_p1[0]
 
-            if len(p1_ustuneOkCizilenItemList) > 1:  # bu asamada cizdigimiz ok listeye dahil
-                if self.varsa_eski_baglanmis_nesne_p1:
-                    self.varsa_eski_baglanmis_nesne_p1.ok_sil(self.cizgiNesnesi)
-                if p1_ustuneOkCizilenItemList[1] == self.cizgiNesnesi:
-                    p1_ustuneOkCizilenItemList[0].ok_ekle(self.cizgiNesnesi, p1_scene_pos, 1)
-                else:
-                    p1_ustuneOkCizilenItemList[1].ok_ekle(self.cizgiNesnesi, p1_scene_pos, 1)
-            else:
-                # noktanin yeni pozisyonunda bir nesne yoksa, varsa eski nesneye gore ayarlama yapiyor
-                if self.varsa_eski_baglanmis_nesne_p1:
-                    self.varsa_eski_baglanmis_nesne_p1.ok_ekle(self.cizgiNesnesi, p1_scene_pos, 1)
+                if self.p1_in_baglandigi_eski_nesne:  # noktayi bosluktan yeni nesnenin ustune tasiyor da olabiliriz 
+                    if not p1_in_baglanacagi_yeni_nesne._kim == self.p1_in_baglandigi_eski_nesne._kim:
+                        self.p1_in_baglandigi_eski_nesne.ok_sil(self.cizgiNesnesi)
+                p1_in_baglanacagi_yeni_nesne.ok_ekle(self.cizgiNesnesi, p1_scene_pos, 1)
+            # else: # noktanin yeni pozisyonunda bir nesne yoksa, eski nesneye gore ayarlama yapiyor
 
         elif self.degisenNokta == 2:
             p2_scene_pos = self.cizgiNesnesi.mapToScene(self.yeniLine.p2())
-            p2_ustuneOkCizilenItemList = self.scene.items(p2_scene_pos,
+            ustuneOkCizilenItemList_p2 = self.scene.items(p2_scene_pos,
                                                           deviceTransform=self.scene.views()[0].transform())
+            # bazen veya (eskiden?) cizilen ok da listelenebiliyor(du).
+            if self.cizgiNesnesi in ustuneOkCizilenItemList_p2:
+                ustuneOkCizilenItemList_p2.remove(self.cizgiNesnesi)
+            if ustuneOkCizilenItemList_p2:
+                p2_in_baglanacagi_yeni_nesne = ustuneOkCizilenItemList_p2[0]
 
-            if len(p2_ustuneOkCizilenItemList) > 1:  # bu asamada cizdigimiz ok listeye dahil
-                if self.varsa_eski_baglanmis_nesne_p2:
-                    self.varsa_eski_baglanmis_nesne_p2.ok_sil(self.cizgiNesnesi)
-                if p2_ustuneOkCizilenItemList[1] == self.cizgiNesnesi:
-                    p2_ustuneOkCizilenItemList[0].ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
-                else:
-                    p2_ustuneOkCizilenItemList[1].ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
-            else:
-                # noktanin yeni pozisyonunda bir nesne yoksa, varsa eski nesneye gore ayarlama yapiyor
-                if self.varsa_eski_baglanmis_nesne_p2:
-                    self.varsa_eski_baglanmis_nesne_p2.ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
-
-        else:
-            if self.varsa_eski_baglanmis_nesne_p1:
-                p1_scene_pos = self.cizgiNesnesi.mapToScene(self.yeniLine.p1())
-                self.varsa_eski_baglanmis_nesne_p1.ok_ekle(self.cizgiNesnesi, p1_scene_pos, 1)
-
-            if self.varsa_eski_baglanmis_nesne_p2:
-                p2_scene_pos = self.cizgiNesnesi.mapToScene(self.yeniLine.p2())
-                self.varsa_eski_baglanmis_nesne_p2.ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
+                if self.p2_in_baglandigi_eski_nesne:  # noktayi bosluktan yeni nesnenin ustune tasiyor da olabiliriz
+                    if not p2_in_baglanacagi_yeni_nesne._kim == self.p2_in_baglandigi_eski_nesne._kim:
+                        self.p2_in_baglandigi_eski_nesne.ok_sil(self.cizgiNesnesi)
+                p2_in_baglanacagi_yeni_nesne.ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
+            # else: # noktanin yeni pozisyonunda bir nesne yoksa, eski nesneye gore ayarlama yapiyor
+        # else:
+        #     print(self.degisenNokta)
 
     # ---------------------------------------------------------------------
     def undo(self):
@@ -701,46 +697,35 @@ class UndoableResizeLineItem(QUndoCommand):
 
         if self.degisenNokta == 1:
             p1_scene_pos = self.cizgiNesnesi.mapToScene(self.eskiLine.p1())
-            p1_ustuneOkCizilenItemList = self.scene.items(p1_scene_pos,
+            ustuneOkCizilenItemList_p1 = self.scene.items(p1_scene_pos,
                                                           deviceTransform=self.scene.views()[0].transform())
+            # bazen veya (eskiden?) cizilen ok da listelenebiliyor(du).
+            if self.cizgiNesnesi in ustuneOkCizilenItemList_p1:
+                ustuneOkCizilenItemList_p1.remove(self.cizgiNesnesi)
+            if ustuneOkCizilenItemList_p1:
+                p1_in_baglanacagi_yeni_nesne = ustuneOkCizilenItemList_p1[0]
 
-            if len(p1_ustuneOkCizilenItemList) > 1:  # bu asamada cizdigimiz ok listeye dahil
-                if self.varsa_eski_baglanmis_nesne_p1:
-                    self.varsa_eski_baglanmis_nesne_p1.ok_sil(self.cizgiNesnesi)
-                if p1_ustuneOkCizilenItemList[1] == self.cizgiNesnesi:
-                    p1_ustuneOkCizilenItemList[0].ok_ekle(self.cizgiNesnesi, p1_scene_pos, 1)
-                else:
-                    p1_ustuneOkCizilenItemList[1].ok_ekle(self.cizgiNesnesi, p1_scene_pos, 1)
-            else:
-                # noktanin eski ama gorece yeni pozisyonunda bir nesne yoksa, varsa eski nesneye gore ayarlama yapiyor
-                if self.varsa_eski_baglanmis_nesne_p1:
-                    self.varsa_eski_baglanmis_nesne_p1.ok_ekle(self.cizgiNesnesi, p1_scene_pos, 1)
+                if self.p1_in_baglandigi_eski_nesne:  # noktayi bosluktan yeni nesnenin ustune tasiyor da olabiliriz
+                    if not p1_in_baglanacagi_yeni_nesne._kim == self.p1_in_baglandigi_eski_nesne._kim:
+                        self.p1_in_baglandigi_eski_nesne.ok_sil(self.cizgiNesnesi)
+                p1_in_baglanacagi_yeni_nesne.ok_ekle(self.cizgiNesnesi, p1_scene_pos, 1)
+            # else: # noktanin yeni pozisyonunda bir nesne yoksa, eski nesneye gore ayarlama yapiyor
 
         elif self.degisenNokta == 2:
             p2_scene_pos = self.cizgiNesnesi.mapToScene(self.eskiLine.p2())
-            p2_ustuneOkCizilenItemList = self.scene.items(p2_scene_pos,
+            ustuneOkCizilenItemList_p2 = self.scene.items(p2_scene_pos,
                                                           deviceTransform=self.scene.views()[0].transform())
+            # bazen veya (eskiden?) cizilen ok da listelenebiliyor(du).
+            if self.cizgiNesnesi in ustuneOkCizilenItemList_p2:
+                ustuneOkCizilenItemList_p2.remove(self.cizgiNesnesi)
+            if ustuneOkCizilenItemList_p2:
+                p2_in_baglanacagi_yeni_nesne = ustuneOkCizilenItemList_p2[0]
 
-            if len(p2_ustuneOkCizilenItemList) > 1:  # bu asamada cizdigimiz ok listeye dahil
-                if self.varsa_eski_baglanmis_nesne_p2:
-                    self.varsa_eski_baglanmis_nesne_p2.ok_sil(self.cizgiNesnesi)
-                if p2_ustuneOkCizilenItemList[1] == self.cizgiNesnesi:
-                    p2_ustuneOkCizilenItemList[0].ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
-                else:
-                    p2_ustuneOkCizilenItemList[1].ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
-            else:
-                # noktanin eski ama gorece yeni pozisyonunda bir nesne yoksa, varsa eski nesneye gore ayarlama yapiyor
-                if self.varsa_eski_baglanmis_nesne_p2:
-                    self.varsa_eski_baglanmis_nesne_p2.ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
-
-        else:
-            if self.varsa_eski_baglanmis_nesne_p1:
-                p1_scene_pos = self.cizgiNesnesi.mapToScene(self.eskiLine.p1())
-                self.varsa_eski_baglanmis_nesne_p1.ok_ekle(self.cizgiNesnesi, p1_scene_pos, 1)
-
-            if self.varsa_eski_baglanmis_nesne_p2:
-                p2_scene_pos = self.cizgiNesnesi.mapToScene(self.eskiLine.p2())
-                self.varsa_eski_baglanmis_nesne_p2.ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
+                if self.p2_in_baglandigi_eski_nesne:  # noktayi bosluktan yeni nesnenin ustune tasiyor da olabiliriz
+                    if not p2_in_baglanacagi_yeni_nesne._kim == self.p2_in_baglandigi_eski_nesne._kim:
+                        self.p2_in_baglandigi_eski_nesne.ok_sil(self.cizgiNesnesi)
+                p2_in_baglanacagi_yeni_nesne.ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
+            # else: # noktanin yeni pozisyonunda bir nesne yoksa, eski nesneye gore ayarlama yapiyor
 
 
 ########################################################################

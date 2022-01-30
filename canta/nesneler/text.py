@@ -111,7 +111,7 @@ class Text(QGraphicsTextItem):
         self.oklar_dxdy_nokta = {}
 
     # ---------------------------------------------------------------------
-    def ok_ekle(self, ok, scenepPos, nokta):
+    def ok_ekle(self, ok, scenepPos, okunHangiNoktasi):
 
         # self.oklar_dxdy_nokta.append((ok, self.mapFromScene(scenePos)))
         sceneCenter = self.sceneCenter()
@@ -119,13 +119,14 @@ class Text(QGraphicsTextItem):
         dy = sceneCenter.y() - scenepPos.y()
 
         # self.oklar_dxdy_nokta[ok._kim] = (dx, dy, nokta)
-        self.oklar_dxdy_nokta[ok] = (dx, dy, nokta)
+        self.oklar_dxdy_nokta[ok] = (dx, dy, okunHangiNoktasi)
 
-        ok.baglanmis_nesneler[self._kim] = nokta
+        ok.baglanmis_nesneler[self._kim] = okunHangiNoktasi
 
     # ---------------------------------------------------------------------
     def ok_sil(self, ok):
         del self.oklar_dxdy_nokta[ok]
+        del ok.baglanmis_nesneler[self._kim]
 
     # ---------------------------------------------------------------------
     def ok_guncelle(self):

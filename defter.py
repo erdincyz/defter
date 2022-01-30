@@ -2406,13 +2406,13 @@ class DefterAnaPencere(QMainWindow):
             lineItem.isFrozen = itemDict["isFrozen"]
             lineItem._command = itemDict["command"]
             lineItem._text = itemDict.get("text", "")
-            lineItem.baglanmis_nesneler = itemDict.get("baglanmis_nesneler")
 
             if isPaste:
                 lineItem._kim = uuid.uuid4().hex
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, lineItem)
             else:
                 lineItem._kim = itemDict.get("kim")
+                lineItem.baglanmis_nesneler = itemDict.get("baglanmis_nesneler")
                 # self.cScene.addItem(lineItem)
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, lineItem)
             return lineItem
@@ -2429,6 +2429,7 @@ class DefterAnaPencere(QMainWindow):
             rectItem.isFrozen = itemDict["isFrozen"]
             rectItem._text = itemDict["text"]
             rectItem._command = itemDict["command"]
+
             if isPaste:
                 rectItem._kim = uuid.uuid4().hex
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, rectItem)
@@ -2451,7 +2452,6 @@ class DefterAnaPencere(QMainWindow):
             ellipseItem.isFrozen = itemDict["isFrozen"]
             ellipseItem._text = itemDict["text"]
             ellipseItem._command = itemDict["command"]
-            ellipseItem._kim = itemDict.get("kim")
 
             if isPaste:
                 ellipseItem._kim = uuid.uuid4().hex
@@ -2475,6 +2475,7 @@ class DefterAnaPencere(QMainWindow):
             pathItem.isFrozen = itemDict["isFrozen"]
             pathItem._text = itemDict["text"]
             pathItem._command = itemDict["command"]
+
             if isPaste:
                 pathItem._kim = uuid.uuid4().hex
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, pathItem)
@@ -2519,6 +2520,7 @@ class DefterAnaPencere(QMainWindow):
             imageItem._text = itemDict["text"]
             imageItem._command = itemDict["command"]
             # imageItem.reload_image_after_scale()
+
             if isPaste:
                 imageItem._kim = uuid.uuid4().hex
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, imageItem)
@@ -2547,6 +2549,7 @@ class DefterAnaPencere(QMainWindow):
             textItem.isPinned = itemDict["isPinned"]
             textItem.isFrozen = itemDict["isFrozen"]
             textItem._command = itemDict["command"]
+
             if isPaste:
                 textItem._kim = uuid.uuid4().hex
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, textItem)
@@ -2576,6 +2579,7 @@ class DefterAnaPencere(QMainWindow):
             groupItem.setZValue(itemDict["zValue"])
             groupItem.isPinned = itemDict["isPinned"]
             groupItem.isFrozen = itemDict["isFrozen"]
+
             if isPaste:
                 groupItem._kim = uuid.uuid4().hex
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, groupItem)
@@ -2615,6 +2619,7 @@ class DefterAnaPencere(QMainWindow):
             videoItem._text = itemDict["text"]
             videoItem._command = itemDict["command"]
             # videoItem.reload_image_after_scale()
+
             if isPaste:
                 videoItem._kim = uuid.uuid4().hex
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, videoItem)
@@ -2657,6 +2662,7 @@ class DefterAnaPencere(QMainWindow):
             dosyaNesnesi._text = itemDict["text"]
             dosyaNesnesi._command = itemDict["command"]
             # dosyaNesnesi.reload_image_after_scale()
+
             if isPaste:
                 dosyaNesnesi._kim = uuid.uuid4().hex
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, dosyaNesnesi)

@@ -84,19 +84,54 @@ class LineItem(QGraphicsItem):
         self.oklar_dxdy_nokta = {}
 
     # ---------------------------------------------------------------------
-    def setArkaPlanRengi(self, col):
-        # dummy method
-        pass
+    def type(self):
+        return LineItem.Type
 
     # ---------------------------------------------------------------------
-    def brush(self):
-        # bu nesnede brush kullanmiyoruz ama diger nesnelerin ilgili methodlariyla uyumlu olsun diye
-        # ekliyoruz, setArkaplanRengi de bu minvalde
-        # return Qt.NoBrush
-        return QBrush()
+    def get_properties_for_save_binary(self):
+        properties = {"type": self.type(),
+                      # "painterPath": self.path(),
+                      "kim": self._kim,
+                      "line": self._line,
+                      "pos": self.pos(),
+                      "rotation": self.rotation(),
+                      "scale": self.scale(),
+                      "zValue": self.zValue(),
+                      "pen": self._pen,
+                      "font": self._font,
+                      "text": self.text(),
+                      "isPinned": self.isPinned,
+                      "isFrozen": self.isFrozen,
+                      "command": self._command,
+                      "baglanmis_nesneler": self.baglanmis_nesneler,
+                      }
+        return properties
 
     # ---------------------------------------------------------------------
-    def ok_ekle(self, ok, scenepPos, nokta):
+    def move_start_point(self):
+        self.isDrawingFinished = False
+        # point = self.mapFromScene(point)
+        point = QPointF(0, 0)
+        self.line().setP1(point)
+
+    # ---------------------------------------------------------------------
+    def temp_prepend(self, point):
+        point = self.mapFromScene(point)
+        line = QLineF(self._line)
+        line.setP1(point)
+        self.setLine(line)
+        self.update_resize_handles()
+
+    # ---------------------------------------------------------------------
+    def temp_append(self, point):
+        point = self.mapFromScene(point)
+        line = QLineF(self._line)
+        line.setP2(point)
+        self.setLine(line)
+        self.update_resize_handles()
+
+    # ---------------------------------------------------------------------
+    def ok_ekle(self, ok, scenepPos, okunHangiNoktasi):
 
         # self.oklar_dxdy_nokta.append((ok, self.mapFromScene(scenePos)))
         sceneCenter = self.sceneCenter()
@@ -104,14 +139,14 @@ class LineItem(QGraphicsItem):
         dy = sceneCenter.y() - scenepPos.y()
 
         # self.oklar_dxdy_nokta[ok._kim] = (dx, dy, nokta)
-        self.oklar_dxdy_nokta[ok] = (dx, dy, nokta)
+        self.oklar_dxdy_nokta[ok] = (dx, dy, okunHangiNoktasi)
 
-        ok.baglanmis_nesneler[self._kim] = nokta
-        # aynı nokta birden fazla eklenemiyor simdilik o yuzden if kontrolu yok veya set yapmadik.
+        ok.baglanmis_nesneler[self._kim] = okunHangiNoktasi
 
     # ---------------------------------------------------------------------
     def ok_sil(self, ok):
         del self.oklar_dxdy_nokta[ok]
+        del ok.baglanmis_nesneler[self._kim]
 
     # ---------------------------------------------------------------------
     def ok_guncelle(self):
@@ -124,10 +159,6 @@ class LineItem(QGraphicsItem):
                     ok.temp_prepend(QPointF(scx - dxdy_nokta[0], scy - dxdy_nokta[1]))
                 elif dxdy_nokta[2] == 2:
                     ok.temp_append(QPointF(scx - dxdy_nokta[0], scy - dxdy_nokta[1]))
-
-    # ---------------------------------------------------------------------
-    def type(self):
-        return LineItem.Type
 
     # ---------------------------------------------------------------------
     def create_resize_handles(self):
@@ -183,6 +214,28 @@ class LineItem(QGraphicsItem):
         self.isPinned = False
 
     # ---------------------------------------------------------------------
+    def setArkaPlanRengi(self, col):
+        # dummy method
+        pass
+
+    # ---------------------------------------------------------------------
+    def brush(self):
+        # bu nesnede brush kullanmiyoruz ama diger nesnelerin ilgili methodlariyla uyumlu olsun diye
+        # ekliyoruz, setArkaplanRengi de bu minvalde
+        # return Qt.NoBrush
+        return QBrush()
+
+    # ---------------------------------------------------------------------
+    def is_temp_text_item_empty(self):
+        tmpText = self.tempTextItem.toPlainText()
+        self.scene().undoRedo.undoableItemSetText(self.scene().undoStack, "change text", self,
+                                                  self.tempEskiText, tmpText)
+        # if not tmpText:
+        self.scene().removeItem(self.tempTextItem)
+        self.tempTextItem.deleteLater()
+        self.tempTextItem = None
+
+    # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
         # eger cizim yapiyorken , yani daha sahneye resmi olarak eklemedik
         # o zaman cizimibitirmeden cift tiklarsak cokgen nesnesinin yazi yazma kutucugu aciliyor
@@ -212,16 +265,6 @@ class LineItem(QGraphicsItem):
             self.update_painter_text_rect()
 
         super(LineItem, self).mouseDoubleClickEvent(event)
-
-    # ---------------------------------------------------------------------
-    def is_temp_text_item_empty(self):
-        tmpText = self.tempTextItem.toPlainText()
-        self.scene().undoRedo.undoableItemSetText(self.scene().undoStack, "change text", self,
-                                                  self.tempEskiText, tmpText)
-        # if not tmpText:
-        self.scene().removeItem(self.tempTextItem)
-        self.tempTextItem.deleteLater()
-        self.tempTextItem = None
 
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):
@@ -420,26 +463,6 @@ class LineItem(QGraphicsItem):
                           | self.ItemIsMovable
                           | self.ItemIsFocusable)
         self._isPinned = value
-
-    # ---------------------------------------------------------------------
-    def get_properties_for_save_binary(self):
-        properties = {"type": self.type(),
-                      # "painterPath": self.path(),
-                      "kim": self._kim,
-                      "line": self._line,
-                      "pos": self.pos(),
-                      "rotation": self.rotation(),
-                      "scale": self.scale(),
-                      "zValue": self.zValue(),
-                      "pen": self._pen,
-                      "font": self._font,
-                      "text": self.text(),
-                      "isPinned": self.isPinned,
-                      "isFrozen": self.isFrozen,
-                      "command": self._command,
-                      "baglanmis_nesneler": self.baglanmis_nesneler,
-                      }
-        return properties
 
     # ---------------------------------------------------------------------
     def itemChange(self, change, value):
@@ -831,29 +854,6 @@ class LineItem(QGraphicsItem):
             c.flipVertical(self.sceneCenter().y())
         if eskiRot:
             self.rotateWithOffset(eskiRot)
-
-    # ---------------------------------------------------------------------
-    def move_start_point(self):
-        self.isDrawingFinished = False
-        # point = self.mapFromScene(point)
-        point = QPointF(0, 0)
-        self.line().setP1(point)
-
-    # ---------------------------------------------------------------------
-    def temp_prepend(self, point):
-        point = self.mapFromScene(point)
-        line = QLineF(self._line)
-        line.setP1(point)
-        self.setLine(line)
-        self.update_resize_handles()
-
-    # ---------------------------------------------------------------------
-    def temp_append(self, point):
-        point = self.mapFromScene(point)
-        line = QLineF(self._line)
-        line.setP2(point)
-        self.setLine(line)
-        self.update_resize_handles()
 
     # ---------------------------------------------------------------------
     def qt_graphicsItem_shapeFromPath(self, path, pen):
