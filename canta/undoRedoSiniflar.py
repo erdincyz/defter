@@ -98,6 +98,11 @@ class UndoableRemoveItem(QUndoCommand):
         if self.addToUnGroupedRootItems:
             self.scene.unGroupedRootItems.discard(self.item)
 
+        # oklar varsa, oktan bu nesneyi sil
+        if self.item.oklar_dxdy_nokta:
+            for ok in self.item.oklar_dxdy_nokta.keys():
+                del ok.baglanmis_nesneler[self.item._kim]
+
     # # ---------------------------------------------------------------------
     # def append_all_childitems_in_hierarchy_to_selection_queue(self, i):
     #     for c in i.childItems():
@@ -125,6 +130,11 @@ class UndoableRemoveItem(QUndoCommand):
         if self.addToUnGroupedRootItems:
             self.scene.unGroupedRootItems.add(self.item)
         # self.scene.select_all_children_recursively(self.item, cosmeticSelect=False, topmostParent=True)
+
+        # oklar varsa oka bu nesneyi kaydet
+        if self.item.oklar_dxdy_nokta:
+            for ok, dx_dy_nokta in self.item.oklar_dxdy_nokta.items():
+                ok.baglanmis_nesneler[self.item._kim] = dx_dy_nokta[2]
 
 
 ########################################################################

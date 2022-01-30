@@ -3480,28 +3480,28 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionBringToFront = QAction(QIcon(':icons/bring-front.png'), self.tr("Bring to &Front"), self.editMenu)
         self.actionBringToFront.setShortcut(QKeySequence("Ctrl+Up"))
-        self.actionBringToFront.triggered.connect(self.act_bring_to_front)
         self.actionBringToFront.setStatusTip(self.tr("Bring item to front"))
         self.actionBringToFront.setToolTip(self.tr("Bring item to front"))
+        self.actionBringToFront.triggered.connect(self.act_bring_to_front)
 
         self.actionSendToBack = QAction(QIcon(':icons/send-back.png'), self.tr("Send to &Back"), self.editMenu)
         self.actionSendToBack.setShortcut(QKeySequence("Ctrl+Down"))
-        self.actionSendToBack.triggered.connect(self.act_send_to_back)
         self.actionSendToBack.setStatusTip(self.tr("Send item to back"))
         self.actionSendToBack.setToolTip(self.tr("Send item to back"))
+        self.actionSendToBack.triggered.connect(self.act_send_to_back)
 
         self.actionDeleteItem = QAction(QIcon(':icons/delete.png'), self.tr("&Delete"), self.editMenu)
         self.actionDeleteItem.setShortcut(QKeySequence("Delete"))
-        self.actionDeleteItem.triggered.connect(self.act_delete_item)
         self.actionDeleteItem.setStatusTip(self.tr("Delete item"))
         self.actionDeleteItem.setToolTip(self.tr("Delete item"))
+        self.actionDeleteItem.triggered.connect(self.act_delete_item)
         self.actionDeleteItem.setDisabled(True)
 
         self.actionSelectAll = QAction(QIcon(':icons/select-all.png'), self.tr("&Select All"), self.editMenu)
         self.actionSelectAll.setShortcut(QKeySequence("Ctrl+A"))
-        self.actionSelectAll.triggered.connect(self.act_select_all)
         self.actionSelectAll.setStatusTip(self.tr("Select All"))
         self.actionSelectAll.setToolTip(self.tr("Select All"))
+        self.actionSelectAll.triggered.connect(self.act_select_all)
 
         self.editMenu.addActions((self.actionUndo,
                                   self.actionRedo,
