@@ -782,14 +782,26 @@ class Scene(QGraphicsScene):
                         # if not self.drawLineItem in ustuneOkCizilenItem.oklar_dxdy_nokta.keys():
                         ustuneOkCizilenItem.ok_ekle(self.drawLineItem, event.scenePos(), 1)
                 else:
+                    oku_normal_parent_et = False
                     ustuneOkCizilenItemList = self.items(event.scenePos(), deviceTransform=self.views()[0].transform())
-
                     # bazen veya (eskiden?) cizilen ok da listelenebiliyor(du).
                     if self.drawLineItem in ustuneOkCizilenItemList:
                         ustuneOkCizilenItemList.remove(self.drawLineItem)
-
                     if ustuneOkCizilenItemList:
-                        ustuneOkCizilenItemList[0].ok_ekle(self.drawLineItem, event.scenePos(), 2)
+                        # okun iki noktasi da ayni nesne ustunde olacak ise
+                        # burda ikinci noktayi koydugumuzda, okun  nesneye olan ilk bagini cozup
+                        # sonra hiç bir noktasini baglamadan normal parent ediyoruz
+                        # asagi tasindi
+                        if self.drawLineItem in ustuneOkCizilenItemList[0].oklar_dxdy_nokta:
+                            # undoRedo.undoableAddItem ile ekledikten sonra parent ediyoruz
+                            # bu asamada yaparsak gecici oku parent etmis oluruz ki siliniyor zaten az sonra
+                            oku_normal_parent_et = True
+
+                        else:
+                            # beklenen normal islem bu
+                            # okun ilk noktasi boslukta ya da baska nesneye bagli
+                            # burda da okun ikinci noktasini uzerine tikladigimiz nesneye bagliyoruz
+                            ustuneOkCizilenItemList[0].ok_ekle(self.drawLineItem, event.scenePos(), 2)
 
                     # normal ok cizme islemiyle devam
 
@@ -801,6 +813,20 @@ class Scene(QGraphicsScene):
                     self.removeItem(self.drawLineItem)
                     undoRedo.undoableAddItem(self.undoStack, description=self.tr("add line"), scene=self,
                                              item=self.drawLineItem)
+
+                    # bunu yukardaki if kontrolunden buraya tasimak gerekti
+                    # undoRedo.undoableAddItem ile ekledikten sonra oku parent ediyoruz
+                    # oncesinde yaparsak gecici oku parent etmis oluruz ki
+                    # siliniyor zaten undoRedo.undoableAddItem ile asil ok nesnesini sahneye eklemeden once
+                    if oku_normal_parent_et:
+                        #  once az once drawLineItem olsuturulurken olasi baglanmis
+                        #  ilk nokta bagliligini cozuyoruz
+                        ustuneOkCizilenItemList[0].ok_sil(self.drawLineItem)
+                        # su an okun 2 noktasi da hic bir yere baglai degil, okta da baglanmis_nesneler = {}
+                        yeniPos = ustuneOkCizilenItemList[0].mapFromScene(self.drawLineItem.scenePos())
+                        undoRedo.undoableParent(self.undoStack, self.tr("_parent"), self.drawLineItem,
+                                                ustuneOkCizilenItemList[0], QPointF(yeniPos))
+
                     self.drawLineItem = None
 
                     self.toolType = self.NoTool

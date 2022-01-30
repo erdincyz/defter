@@ -667,7 +667,12 @@ class UndoableResizeLineItem(QUndoCommand):
                     if not p1_in_baglanacagi_yeni_nesne._kim == self.p1_in_baglandigi_eski_nesne._kim:
                         self.p1_in_baglandigi_eski_nesne.ok_sil(self.cizgiNesnesi)
                 p1_in_baglanacagi_yeni_nesne.ok_ekle(self.cizgiNesnesi, p1_scene_pos, 1)
-            # else: # noktanin yeni pozisyonunda bir nesne yoksa, eski nesneye gore ayarlama yapiyor
+            else:
+                # eski nesne uzerinden bosluga tasidik noktayi ve hala eski nesneye bagli, pozisyon ayarlamasi yapiliyor
+                # bir benzeri UndoableMove() da var. Ok nesne olarak tasinirsa ve bagli oldugu nesneler varsa
+                # bagli oldugu noktalarin pozisyon ayarlamasi yapilior (offset)
+                if self.p1_in_baglandigi_eski_nesne:
+                    self.p1_in_baglandigi_eski_nesne.ok_ekle(self.cizgiNesnesi, p1_scene_pos, 1)
 
         elif self.degisenNokta == 2:
             p2_scene_pos = self.cizgiNesnesi.mapToScene(self.yeniLine.p2())
@@ -683,7 +688,12 @@ class UndoableResizeLineItem(QUndoCommand):
                     if not p2_in_baglanacagi_yeni_nesne._kim == self.p2_in_baglandigi_eski_nesne._kim:
                         self.p2_in_baglandigi_eski_nesne.ok_sil(self.cizgiNesnesi)
                 p2_in_baglanacagi_yeni_nesne.ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
-            # else: # noktanin yeni pozisyonunda bir nesne yoksa, eski nesneye gore ayarlama yapiyor
+            else:
+                # eski nesne uzerinden bosluga tasidik noktayi ve hala eski nesneye bagli, pozisyon ayarlamasi yapiliyor
+                # bir benzeri UndoableMove() da var. Ok nesne olarak tasinirsa ve bagli oldugu nesneler varsa
+                # bagli oldugu noktalarin pozisyon ayarlamasi yapilior (offset)
+                if self.p2_in_baglandigi_eski_nesne:
+                    self.p2_in_baglandigi_eski_nesne.ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
         # else:
         #     print(self.degisenNokta)
 
@@ -709,7 +719,12 @@ class UndoableResizeLineItem(QUndoCommand):
                     if not p1_in_baglanacagi_yeni_nesne._kim == self.p1_in_baglandigi_eski_nesne._kim:
                         self.p1_in_baglandigi_eski_nesne.ok_sil(self.cizgiNesnesi)
                 p1_in_baglanacagi_yeni_nesne.ok_ekle(self.cizgiNesnesi, p1_scene_pos, 1)
-            # else: # noktanin yeni pozisyonunda bir nesne yoksa, eski nesneye gore ayarlama yapiyor
+            else:
+                # eski nesne uzerinden bosluga tasidik noktayi ve hala eski nesneye bagli, pozisyon ayarlamasi yapiliyor
+                # bir benzeri UndoableMove() da var. Ok nesne olarak tasinirsa ve bagli oldugu nesneler varsa
+                # bagli oldugu noktalarin pozisyon ayarlamasi yapilior (offset)
+                if self.p1_in_baglandigi_eski_nesne:
+                    self.p1_in_baglandigi_eski_nesne.ok_ekle(self.cizgiNesnesi, p1_scene_pos, 1)
 
         elif self.degisenNokta == 2:
             p2_scene_pos = self.cizgiNesnesi.mapToScene(self.eskiLine.p2())
@@ -725,8 +740,12 @@ class UndoableResizeLineItem(QUndoCommand):
                     if not p2_in_baglanacagi_yeni_nesne._kim == self.p2_in_baglandigi_eski_nesne._kim:
                         self.p2_in_baglandigi_eski_nesne.ok_sil(self.cizgiNesnesi)
                 p2_in_baglanacagi_yeni_nesne.ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
-            # else: # noktanin yeni pozisyonunda bir nesne yoksa, eski nesneye gore ayarlama yapiyor
-
+            else:
+                # eski nesne uzerinden bosluga tasidik noktayi ve hala eski nesneye bagli, pozisyon ayarlamasi yapiliyor
+                # bir benzeri UndoableMove() da var. Ok nesne olarak tasinirsa ve bagli oldugu nesneler varsa
+                # bagli oldugu noktalarin pozisyon ayarlamasi yapilior (offset)
+                if self.p2_in_baglandigi_eski_nesne:
+                    self.p2_in_baglandigi_eski_nesne.ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
 
 ########################################################################
 class UndoableScaleBaseItemByResizing(QUndoCommand):
