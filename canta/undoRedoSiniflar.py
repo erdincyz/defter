@@ -98,10 +98,17 @@ class UndoableRemoveItem(QUndoCommand):
         if self.addToUnGroupedRootItems:
             self.scene.unGroupedRootItems.discard(self.item)
 
-        # oklar varsa, oktan bu nesneyi sil
+        # oklar varsa, oktan bu nesneyi sil, (silinen nesne bir ok nesnesi degil)
         if self.item.oklar_dxdy_nokta:
             for ok in self.item.oklar_dxdy_nokta.keys():
                 del ok.baglanmis_nesneler[self.item._kim]
+
+        # silinen ok ise, okun baglanmis oldugu nesnelerden okun bilgisini siliyoruz
+        if self.item.type() == shared.LINE_ITEM_TYPE:
+            if self.item.baglanmis_nesneler:
+                for baglanmis_nesne_kimlik, nokta in self.item.baglanmis_nesneler.items():  # dict items()
+                    baglanmis_nesne = self.scene._kimlik_nesne_sozluk[baglanmis_nesne_kimlik]
+                    del baglanmis_nesne.oklar_dxdy_nokta[self.item]
 
     # # ---------------------------------------------------------------------
     # def append_all_childitems_in_hierarchy_to_selection_queue(self, i):
@@ -135,6 +142,18 @@ class UndoableRemoveItem(QUndoCommand):
         if self.item.oklar_dxdy_nokta:
             for ok, dx_dy_nokta in self.item.oklar_dxdy_nokta.items():
                 ok.baglanmis_nesneler[self.item._kim] = dx_dy_nokta[2]
+
+        # silinen ok ise, okun eski bagli oldugu nesnelere okun bilgisini tekrar ekliyoruz
+        if self.itmovedItemem.type() == shared.LINE_ITEM_TYPE:
+            if self.item.baglanmis_nesneler:
+                for baglanmis_nesne_kimlik, nokta in self.item.baglanmis_nesneler.items():  # dict items()
+                    baglanmis_nesne = self.scene._kimlik_nesne_sozluk[baglanmis_nesne_kimlik]
+                    if nokta == 1:
+                        baglanmis_nesne.ok_ekle(self.item, self.item.mapToScene(self.item._line.p1()),
+                                                1)
+                    if nokta == 2:
+                        baglanmis_nesne.ok_ekle(self.item, self.item.mapToScene(self.item._line.p2()),
+                                                2)
 
 
 ########################################################################
@@ -756,6 +775,7 @@ class UndoableResizeLineItem(QUndoCommand):
                 # bagli oldugu noktalarin pozisyon ayarlamasi yapilior (offset)
                 if self.p2_in_baglandigi_eski_nesne:
                     self.p2_in_baglandigi_eski_nesne.ok_ekle(self.cizgiNesnesi, p2_scene_pos, 2)
+
 
 ########################################################################
 class UndoableScaleBaseItemByResizing(QUndoCommand):
