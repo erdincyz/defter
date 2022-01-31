@@ -2790,6 +2790,7 @@ class DefterAnaPencere(QMainWindow):
         self.cScene.undoStack.endMacro()
         ustSayfa = sayfa
         self.oklari_bagla()
+        self.tw_sayfa_guncelle()
         if "ic_sayfalar" in sceneDict:
             # parent = True  # ic_sayfalar ayni seviyede ayni parenta sahip olduklari icin
             # ilk donguden sonra parent false ediyoruz ki, ilk dongude alt sayfa ekliyor,

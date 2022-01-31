@@ -213,12 +213,12 @@ class TreeView(QTreeView):
         actionResimKucuk = menu.addAction("Küçük")
         actionResimOrta = menu.addAction("Orta")
         actionResimBuyuk = menu.addAction("Buyuk")
-        menu.addSeparator()
-        actionKopyala = menu.addAction("Çoğalt")
-        actionOzellikler = menu.addAction("Ozellikler")
-        menu.addSection("Resmet")
-        actionGozuken = menu.addAction("Gozuken")
-        actionGozuken = menu.addAction("Tum Sahne")
+        # menu.addSeparator()
+        # actionKopyala = menu.addAction("Çoğalt")
+        # actionOzellikler = menu.addAction("Ozellikler")
+        # menu.addSection("Resmet")
+        # actionGozuken = menu.addAction("Gozuken")
+        # actionGozuken = menu.addAction("Tum Sahne")
         action = menu.exec_(self.mapToGlobal(event.pos()))
 
         if action == actionListe:

@@ -234,7 +234,8 @@ class Scene(QGraphicsScene):
         # else:
         #     self.setSceneRect(visRect)
 
-        self.parent().tw_sayfa_guncelle()
+        # mouseRelease a koydugumuz icin iptal bu.
+        # self.parent().tw_sayfa_guncelle()
 
     # ---------------------------------------------------------------------
     def addItem(self, item):
@@ -941,6 +942,8 @@ class Scene(QGraphicsScene):
 
     # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
+
+        self.parent().tw_sayfa_guncelle()
 
         if event.button() == Qt.LeftButton:
             self.views()[0].setDragModeRubberBandDrag()

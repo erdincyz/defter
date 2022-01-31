@@ -61,7 +61,8 @@ class UndoableAddItem(QUndoCommand):
         if isinstance(self.item, BaseItem):
             self.item.update_resize_handles(force=True)
         self.scene.clearSelection()
-        self.item.setSelected(self.sec)
+        # setSelected iptal edildi. Nesne sayisi cok olan dosyalarin acilis hizi yari yariyadan fazla dusuyor.
+        # self.item.setSelected(self.sec)
         # alt satiri burda cagirmiyoruz cunku bazi nesneler ilk once bos olarak ekleniyor, icerikleri sonra ekleniyor.
         # self.scene.unite_with_scene_rect(self.item.mapRectToScene(self.item.boundingRect()))
 
