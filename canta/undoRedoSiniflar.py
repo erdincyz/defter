@@ -145,7 +145,7 @@ class UndoableRemoveItem(QUndoCommand):
                 ok.baglanmis_nesneler[self.item._kim] = dx_dy_nokta[2]
 
         # silinen ok ise, okun eski bagli oldugu nesnelere okun bilgisini tekrar ekliyoruz
-        if self.itmovedItemem.type() == shared.LINE_ITEM_TYPE:
+        if self.item.type() == shared.LINE_ITEM_TYPE:
             if self.item.baglanmis_nesneler:
                 for baglanmis_nesne_kimlik, nokta in self.item.baglanmis_nesneler.items():  # dict items()
                     baglanmis_nesne = self.scene._kimlik_nesne_sozluk[baglanmis_nesne_kimlik]
@@ -1629,6 +1629,32 @@ class UndoableItemSetText(QUndoCommand):
     # ---------------------------------------------------------------------
     def undo(self):
         self.item.setText(self.eski_text)
+
+
+########################################################################
+class UndoableConvertToPlainText(QUndoCommand):
+    """ """
+
+    # ---------------------------------------------------------------------
+    def __init__(self, description, item, parent=None):
+        """ """
+        super(UndoableConvertToPlainText, self).__init__(description, parent)
+
+        self.item = item
+        self.html = item.toHtml()
+
+    # ---------------------------------------------------------------------
+    def redo(self):
+        text = self.item.toPlainText()
+        self.item.document().clear()
+        self.item.setPlainText(text)
+        self.item.isPlainText = True
+
+    # ---------------------------------------------------------------------
+    def undo(self):
+        self.item.document().clear()
+        self.item.setHtml(self.html)
+        self.item.isPlainText = False
 
 
 ########################################################################

@@ -3794,7 +3794,7 @@ class DefterAnaPencere(QMainWindow):
         # ---------------------------------------------------------------------
 
         self.actionConvertToPlainText = QAction(QIcon(":icons/command.png"),
-                                                self.tr("Convert selected item(s) to plain text (No Undo)"),
+                                                self.tr("Convert selected item(s) to plain text"),
                                                 self.itemContextMenu)
         self.actionConvertToPlainText.setShortcut(QKeySequence("Ctrl+Alt+P"))
         self.actionConvertToPlainText.triggered.connect(self.act_convert_to_plain_text)
@@ -5851,7 +5851,10 @@ class DefterAnaPencere(QMainWindow):
             # return
         elif mimeData.hasHtml():
             textItem.setHtml(mimeData.html())
-            self.act_convert_to_plain_text(textItem)
+            text = textItem.toPlainText()
+            textItem.document().clear()
+            textItem.setPlainText(text)
+            textItem.isPlainText = True
             textItem.textItemFocusedOut.connect(lambda: self.cScene.is_text_item_empty(textItem))
             self.increase_zvalue(textItem)
             undoRedo.undoableAddItem(self.cScene.undoStack, self.tr("_paste"), self.cScene, textItem)
@@ -8254,15 +8257,19 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_convert_to_plain_text(self):
-        for item in self.cScene.selectionQueue:
-            if item.type() == Text.Type:
-                if not item.isPlainText:
-                    text = item.toPlainText()
-                    item.document().clear()
-                    # item.setHtml("")
-                    # item.setPlainText("")
-                    item.setPlainText(text)
-                    item.isPlainText = True
+
+        if self.cScene.selectionQueue:
+            yaziNesneleri = []
+            for item in self.cScene.selectionQueue:
+                if item.type() == Text.Type:
+                    yaziNesneleri.append(item)
+
+            if len(yaziNesneleri) > 1:
+                self.cScene.undoStack.beginMacro(self.tr("convert to plain text"))
+            for item in yaziNesneleri:
+                undoRedo.undoableConvertToPlainText(self.cScene.undoStack, self.tr("convert to plain text"), item)
+            if len(yaziNesneleri) > 1:
+                self.cScene.undoStack.endMacro()
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -8296,7 +8303,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_embed_images(self):
-        # burda macroyu basa koydum, sanki asagidaki dongude embed islemi
+        # burda macro basa kondu, sanki asagidaki dongude embed islemi
         # gerceklesmeyebilir gibi dursa da, self.actionEmbedImage , embeded imaj secili degilse, gozukmediginden dolayi.
         # bu arada diyelim ki bir sekilde hic undoableEmbedImage cagrilmadi o zaman makro yine gozukuyor undo stackta!!
 

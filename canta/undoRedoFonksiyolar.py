@@ -16,7 +16,7 @@ from canta.undoRedoSiniflar import UndoableSayfaAdiDegistir, UndoableAddItem, Un
     UndoableSetImageOpacity, UndoableSetSceneBackgroundBrush, UndoableSetPinStatus, UndoableItemSetText, \
     UndoableItemCustomCommand, UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, \
     UndoableResizeLineItem, UndoableMovePathPoint, UndoableSetTextAlignment, UndoableSetCharacterFormat, \
-    UndoableSetLineWidthF
+    UndoableSetLineWidthF, UndoableConvertToPlainText
 
 
 # ---------------------------------------------------------------------
@@ -231,6 +231,11 @@ def undoableSetPinStatus(undoStack, description, item, value):
 # ---------------------------------------------------------------------
 def undoableItemSetText(undoStack, description, item, eskiText, text):
     command = UndoableItemSetText(description, item, eskiText, text)
+    undoStack.push(command)
+
+# ---------------------------------------------------------------------
+def undoableConvertToPlainText(undoStack, description, item):
+    command = UndoableConvertToPlainText(description, item)
     undoStack.push(command)
 
 
