@@ -20,8 +20,11 @@
 **Bilinen hataları ve eklenmek niyetinde olunan özellikleri (şu an güncel olmamakla beraber)** bu sayfadaki **[Issues](https://github.com/argekod/defter/issues)** kısmından takip edebilirsiniz.
 
 ### KURULUM
-Sisteminizde Python3 ve PySide6 yüklü olması gerekiyor.
-Python3 yüklü ise PySide6 yi komut satirindan
+Sisteminizde Python 3 ve PySide6 yüklü olması gerekiyor.
+
+Python 3' ü [https://www.python.org/downloads/](https://www.python.org/downloads/) adresinden indirebilirsiniz.
+
+Python 3 yüklü ise PySide6' yi komut satirindan
 ```
 pip install -U PySide6
 
@@ -60,7 +63,10 @@ It can bu used for;
 
 ### INSTALLING
 It works on Python3 and needs PySide6 module.
-If you have python3 already, you can install PySide6 with:
+
+You can download Python 3 from [https://www.python.org/downloads/](https://www.python.org/downloads/)
+
+If you have Python 3 already, you can install PySide6 with:
 ```
 pip install -U PySide6
 
