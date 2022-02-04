@@ -22,6 +22,7 @@ class Text(QGraphicsTextItem):
 
     # textItemSelectedChanged = Signal(QGraphicsTextItem)
 
+    # ---------------------------------------------------------------------
     def __init__(self, cursorPos, yaziRengi, arkaPlanRengi, pen, font, rect=None, text=None, parent=None):
         super(Text, self).__init__(text, parent)
 
@@ -57,7 +58,7 @@ class Text(QGraphicsTextItem):
         self._eskiRectBeforeResize = None
         self._eskiPosBeforeResize = None
 
-        self.secili_nesne_kalem_kalinligi = 1
+        self.secili_nesne_kalem_kalinligi = 0
         self.handleSize = 10
         self.resizeHandleSize = QSizeF(self.handleSize, self.handleSize)
         self.create_resize_handles()

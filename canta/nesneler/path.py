@@ -53,7 +53,7 @@ class PathItem(QGraphicsItem):
                       self.ItemIsMovable |
                       self.ItemIsFocusable)
 
-        self.secili_nesne_kalem_kalinligi = 1
+        self.secili_nesne_kalem_kalinligi = 0
 
         self._pen = pen
         self._brush = QBrush()

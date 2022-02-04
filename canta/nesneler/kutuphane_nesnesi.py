@@ -118,26 +118,6 @@ class KutuphaneNesnesi(QGraphicsItem):
     def sceneHeight(self):
         return self.sceneBottom() - self.sceneTop()
 
-    # # ---------------------------------------------------------------------
-    # def sceneRight(self):
-    #     return max(self.mapToScene(self.rect().topRight()).x(),
-    #                self.mapToScene(self.rect().bottomRight()).x())
-    #
-    # # ---------------------------------------------------------------------
-    # def sceneLeft(self):
-    #     return min(self.mapToScene(self.rect().topLeft()).x(),
-    #                self.mapToScene(self.rect().bottomLeft()).x())
-
-    # # ---------------------------------------------------------------------
-    # def sceneTop(self):
-    #     return min(self.mapToScene(self.rect().topLeft()).y(),
-    #                self.mapToScene(self.rect().topRight()).y())
-    #
-    # # ---------------------------------------------------------------------
-    # def sceneBottom(self):
-    #     return max(self.mapToScene(self.rect().bottomRight()).y(),
-    #                self.mapToScene(self.rect().bottomLeft()).y())
-
     # ---------------------------------------------------------------------
     def sceneRight(self):
         return max(self.mapToScene(self.rect().topLeft()).x(),
@@ -206,16 +186,6 @@ class KutuphaneNesnesi(QGraphicsItem):
     # ---------------------------------------------------------------------
     def rect(self):
         return self._rect
-
-    # ---------------------------------------------------------------------
-    def boundingRectt(self):
-        # TODO: burda ince bir durum var ama. neyse .  simdilik asagidaki ile devam.
-        if self._boundingRect.isNull():
-            halfpw = self.pen().widthF() / 2.0
-            self._boundingRect = QRectF(self.rect())
-            if halfpw:
-                return self._boundingRect.adjusted(-halfpw, -halfpw, halfpw, halfpw)
-        return self._boundingRect
 
     # ---------------------------------------------------------------------
     def boundingRect(self):
@@ -323,25 +293,6 @@ class KutuphaneNesnesi(QGraphicsItem):
     #     return self._text
 
     # ---------------------------------------------------------------------
-    def itemChange___(self, change, value):
-        # if change == self.ItemPositionChange:
-        # if change == self.ItemSelectedChange:
-        # if change == self.ItemSelectedHasChanged:
-        if change == self.ItemSelectedChange:
-            if value:
-                self.scene().parent().item_selected(self)
-            else:
-                self.scene().parent().item_deselected(self)
-        # elif change == self.ItemParentChange:
-        #     if value:
-        #         if value.type() == QGraphicsItem.UserType + 7:  # this is Group's custom type value,
-        #             print("evet")
-
-        # return QGraphicsRectItem.itemChange(self, change, value)
-        return value
-        # super(Rect, self).itemChange(change, value)
-
-    # ---------------------------------------------------------------------
     def contextMenuEvent(self, event):
         # TODO: bu alttaki iki satir aktif idi, ve de ctrl harici sag tiklayinca
         # (base- text -path -group nesnelerinin contextMenuEventinde var)
@@ -363,23 +314,6 @@ class KutuphaneNesnesi(QGraphicsItem):
         """sahneden nesneleri secebilir"""
 
         super(KutuphaneNesnesi, self).mouseDoubleClickEvent(event)
-
-    # ---------------------------------------------------------------------
-    def keyPressEvent(self, event):
-
-        # item ok tuslari ile hareket scene icinde
-
-        # if event.modifiers() & Qt.ControlModifier:
-        #     if event.key() == Qt.Key_Up:
-        #         self.moveBy(0, -10)
-        #     if event.key() == Qt.Key_Down:
-        #         self.moveBy(0, 10)
-        #     if event.key() == Qt.Key_Right:
-        #         self.moveBy(10, 0)
-        #     if event.key() == Qt.Key_Left:
-        #         self.moveBy(-10, 0)
-
-        super(KutuphaneNesnesi, self).keyPressEvent(event)
 
     # ---------------------------------------------------------------------
     def setCizgiRengi(self, col):
@@ -458,6 +392,7 @@ class KutuphaneNesnesi(QGraphicsItem):
             self.onizlemePixmapItem.setVisible(False)
         super(KutuphaneNesnesi, self).hoverLeaveEvent(QGraphicsSceneHoverEvent)
 
+    # ---------------------------------------------------------------------
     def mouseMoveEvent(self, e):
         # if e.buttons() != Qt.RightButton:
         #     return
@@ -495,9 +430,11 @@ class KutuphaneNesnesi(QGraphicsItem):
 
         self.setCursor(Qt.OpenHandCursor)
 
+    # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
         self.setCursor(Qt.OpenHandCursor)
 
+    # ---------------------------------------------------------------------
     def mousePressEvent(self, event):
         self.setCursor(Qt.ClosedHandCursor)
         # QGraphicsItem.mousePressEvent(self, e)

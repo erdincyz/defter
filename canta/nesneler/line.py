@@ -36,7 +36,7 @@ class LineItem(QGraphicsItem):
 
         self.setPos(pos)
 
-        self.secili_nesne_kalem_kalinligi = 1
+        self.secili_nesne_kalem_kalinligi = 0
 
         self.handleSize = 25
         self.resizeHandleSize = QSizeF(self.handleSize, self.handleSize)

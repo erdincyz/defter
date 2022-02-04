@@ -17,6 +17,7 @@ from canta import shared
 class BaseItem(QGraphicsItem):
     Type = shared.BASE_ITEM_TYPE
 
+    # ---------------------------------------------------------------------
     def __init__(self, pos, rect, yaziRengi, arkaPlanRengi, pen, font, parent=None):
         super(BaseItem, self).__init__(parent)
         # QGraphicsItem.__init__(self, parent,scene)
@@ -149,28 +150,10 @@ class BaseItem(QGraphicsItem):
     def sceneHeight(self):
         return self.sceneBottom() - self.sceneTop()
 
-    # # ---------------------------------------------------------------------
-    # def sceneRight(self):
-    #     return max(self.mapToScene(self.rect().topRight()).x(),
-    #                self.mapToScene(self.rect().bottomRight()).x())
-    #
-    # # ---------------------------------------------------------------------
-    # def sceneLeft(self):
-    #     return min(self.mapToScene(self.rect().topLeft()).x(),
-    #                self.mapToScene(self.rect().bottomLeft()).x())
-
-    # # ---------------------------------------------------------------------
-    # def sceneTop(self):
-    #     return min(self.mapToScene(self.rect().topLeft()).y(),
-    #                self.mapToScene(self.rect().topRight()).y())
-    #
-    # # ---------------------------------------------------------------------
-    # def sceneBottom(self):
-    #     return max(self.mapToScene(self.rect().bottomRight()).y(),
-    #                self.mapToScene(self.rect().bottomLeft()).y())
-
     # ---------------------------------------------------------------------
     def sceneRight(self):
+        # 4 koseyi de dikkate aliyoruz, mesela sadece sagdakileri degil,
+        # cunku nesneyi saga veya sola dogru cizebiliyoruz. Ya da saga veya sola dogru boyutunu degistirebiliyoruz.
         return max(self.mapToScene(self.rect().topLeft()).x(),
                    self.mapToScene(self.rect().topRight()).x(),
                    self.mapToScene(self.rect().bottomRight()).x(),
@@ -502,15 +485,14 @@ class BaseItem(QGraphicsItem):
         # )
 
         _selectionLineBgColor = QColor.fromHsv(col.hue(),
-                                              0,
-                                              20 if col.value() > 127 else 250)
+                                               0,
+                                               20 if col.value() > 127 else 250)
 
         _activeItemLineColor = QColor(self.activeItemLineColor)
         if col.hue() > 300 or col.hue() < 30:
             _activeItemLineColor.setHsv((col.hue() + 150) % 360,
-                                            self.activeItemLineColor.saturation(),
-                                            self.activeItemLineColor.value())
-
+                                        self.activeItemLineColor.saturation(),
+                                        self.activeItemLineColor.value())
 
         # selectionLineFgColor = QColor.fromHsv(col.hue(),
         #                                       0,
@@ -747,16 +729,23 @@ class BaseItem(QGraphicsItem):
             # painter.setPen(self.selectionPenTop)
             # painter.drawRect(self.rect())
 
-            ########################################################################
+            #######################################################################
             # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
-            ########################################################################
+            #######################################################################
             # if not self.isPinned and not self.isFrozen and self.isActiveItem:
             #     # painter.setPen(self.handlePen)
-            #     painter.drawRect(self.topLeftHandle)
-            #     painter.drawRect(self.topRightHandle)
-            #     painter.drawRect(self.bottomRightHandle)
-            #     painter.drawRect(self.bottomLeftHandle)
-            ########################################################################
+            #     # painter.drawRect(self.topLeftHandle)
+            #     # painter.drawRect(self.topRightHandle)
+            #     # painter.drawRect(self.bottomRightHandle)
+            #     # painter.drawRect(self.bottomLeftHandle)
+            #
+            #     # painter.setPen(QPen(Qt.red, 3))
+            #     # painter.drawPoint(self.topLeftHandle.center())
+            #     # painter.drawPoint(self.topRightHandle.center())
+            #     # painter.drawPoint(self.bottomRightHandle.center())
+            #     # painter.drawPoint(self.bottomLeftHandle.center())
+
+            #######################################################################
 
         # font = painter.font()
         # font.setPointSize(self.fontPointSize)
@@ -857,21 +846,9 @@ class BaseItem(QGraphicsItem):
         self.tempTextItem = None
 
     # ---------------------------------------------------------------------
-    def keyPressEvent(self, event):
-
-        # item ok tuslari ile hareket scene icinde
-
-        # if event.modifiers() & Qt.ControlModifier:
-        #     if event.key() == Qt.Key_Up:
-        #         self.moveBy(0, -10)
-        #     if event.key() == Qt.Key_Down:
-        #         self.moveBy(0, 10)
-        #     if event.key() == Qt.Key_Right:
-        #         self.moveBy(10, 0)
-        #     if event.key() == Qt.Key_Left:
-        #         self.moveBy(-10, 0)
-
-        super(BaseItem, self).keyPressEvent(event)
+    # def keyPressEvent(self, event):
+    #
+    #     super(BaseItem, self).keyPressEvent(event)
 
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):

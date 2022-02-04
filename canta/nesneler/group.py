@@ -28,7 +28,7 @@ class Group(QGraphicsItem):
                       # | self.ItemIsFocusable
                       )
 
-        self.secili_nesne_kalem_kalinligi = 1
+        self.secili_nesne_kalem_kalinligi = 0
         self.cizgiTipi = Qt.SolidLine
         self.cizgiUcuTipi = Qt.RoundCap
         self.cizgiBirlesimTipi = Qt.RoundJoin

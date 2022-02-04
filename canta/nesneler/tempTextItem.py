@@ -132,35 +132,6 @@ class TempTextItem(QGraphicsTextItem):
         return self.font().pointSize()
 
     # ---------------------------------------------------------------------
-    def changeFontSizeee(self, delta):
-
-        # font = self.font()
-        size = self.fontPointSize()
-
-        if delta > 0:
-            # font.setPointSize(size + 1)
-            size += 1
-
-        else:
-            if size > 10:
-                # font.setPointSize(size - 1)
-                size -= 1
-            else:
-                # undolari biriktermesin diye donuyoruz,
-                # yoksa zaten ayni size de yeni bir undolu size komutu veriyor.
-                return
-
-        # self.setFont(font)
-        if self.childItems():
-            self.scene().undoStack.beginMacro("change text size")
-            # self.scene().undoableSetFontSize("change text size", self, size)
-            for c in self.childItems():
-                c.changeFontSize(delta)
-            self.scene().undoStack.endMacro()
-        # else:
-        #     self.scene().undoableSetFontSize("change text size", self, size)
-
-    # ---------------------------------------------------------------------
     def focusOutEvent(self, event):
         # self.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.setTextInteractionFlags(Qt.NoTextInteraction)

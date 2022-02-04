@@ -275,8 +275,6 @@ class VideoItem(BaseItem):
                       "text": self.text(),
                       "isPinned": self.isPinned,
                       "isFrozen": self.isFrozen,
-                      # "isMirrorX": self.isMirrorX,
-                      # "isMirrorY": self.isMirrorY,
                       "command": self._command,
                       }
         return properties
