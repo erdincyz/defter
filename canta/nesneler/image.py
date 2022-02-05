@@ -291,6 +291,8 @@ class Image(BaseItem):
         if not rectf.isEmpty():
             srectf = self.mapRectToScene(rectf)
             pixmap = QPixmap(srectf.size().toSize())
+            # son bir update, yoksa bazen crop rect cizgisi kaliyor render icinde
+            self.update(rectf)
             painter = QPainter()
 
             if not painter.begin(pixmap):
