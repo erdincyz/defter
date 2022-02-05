@@ -23,6 +23,8 @@ class LineItem(QGraphicsItem):
 
         self._kim = uuid.uuid4().hex
 
+        self.setAcceptHoverEvents(True)
+
         # cizim icin False baslamak dogru olabilirdi ama
         # kopyalama ve dosyadan yukleme gibi durumlarda bu false kalıyor
         # o yuzden True baslayip, cizim de ilk noktada(move_start_point) False ediyoruz
@@ -409,15 +411,13 @@ class LineItem(QGraphicsItem):
             super(LineItem, self).mouseMoveEvent(event)
 
         # super(BaseItem, self).mouseMoveEvent(event)
-
     # ---------------------------------------------------------------------
     def hoverEnterEvent(self, event):
-        # TODO: bu hoverlarda bu kareler yerine mouse icon
-        # degisse koselere ykenarlar ayaklastikca
-        # TODO: bu saved cursor olmadi tam.
-        # if self.isSelected() and not self.isFrozen:
-        self.saved_cursor = self.scene().parent().cursor()
-
+        # event propagationdan dolayi bos da olsa burda implement etmek lazim
+        # mousePress,release,move,doubleclick de bu mantıkta...
+        # baska yerden baslayip mousepress ile , mousemove baska, mouseReleas baska widgetta gibi
+        # icinden cikilmaz durumlara sebep olabiliyor.
+        # ayrica override edince accept() de edilmis oluyor mouseeventler
         super(LineItem, self).hoverEnterEvent(event)
 
     # ---------------------------------------------------------------------
@@ -426,21 +426,19 @@ class LineItem(QGraphicsItem):
 
         # cursor = self.scene().parent().cursor()
 
-        if self.isSelected() and not self.isFrozen:
-            if self.p1Handle.contains(event.pos()) or self.bottomRightHandle.contains(event.pos()):
-                self.scene().parent().setCursor(Qt.SizeAllCursor)
+        # if self.isSelected() and not self.isFrozen:
+        if not self.isFrozen and self.scene().toolType == self.scene().NoTool:
+            if self.p1Handle.contains(event.pos()) or self.p2Handle.contains(event.pos()):
+                self.scene().parent().setCursor(Qt.SizeAllCursor, gecici_mi=True)
             else:
-                self.scene().parent().setCursor(Qt.ArrowCursor)
-                # self.setCursor(self.saved_cursor)
+                self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
 
         super(LineItem, self).hoverMoveEvent(event)
 
     # ---------------------------------------------------------------------
     def hoverLeaveEvent(self, event):
-        # self.sagUstKare.hide()
-        if self.isSelected() and not self.isFrozen:
-            # self.scene().parent().setCursor(Qt.ArrowCursor)
-            self.scene().parent().setCursor(self.saved_cursor)
+
+        self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
 
         super(LineItem, self).hoverLeaveEvent(event)
 

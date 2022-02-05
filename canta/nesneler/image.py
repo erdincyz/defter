@@ -155,6 +155,7 @@ class Image(BaseItem):
         if self._isCropping:
             self.cropRectF = QRectF(self.crop_first_point, event.pos()).normalized()
             self.update(self.cropRectF)
+            # self.update(self.cropRectF.adjusted(-10, -10, 10, 10))
             # super(Image, self).mouseMoveEvent(event)
 
             # print(QRectF(self.crop_first_point, self.crop_release_point))
@@ -285,43 +286,47 @@ class Image(BaseItem):
     def finish_crop(self):
         rectf = self.cropRectF
         # croppedPixmap = self.pixmap.copy(rect)
-        srectf = self.mapRectToScene(rectf)
-        pixmap = QPixmap(srectf.size().toSize())
-        painter = QPainter()
+        # secim disari tasarsa
+        rectf = rectf.intersected(self._rect)
+        if not rectf.isEmpty():
+            srectf = self.mapRectToScene(rectf)
+            pixmap = QPixmap(srectf.size().toSize())
+            painter = QPainter()
 
-        if not painter.begin(pixmap):
-            # print("hata")
-            self._isCropping = False
-            self.cropRectF = QRectF()
-            return
+            if not painter.begin(pixmap):
+                # print("hata")
+                self._isCropping = False
+                self.cropRectF = QRectF()
+                return
 
-        painter.setRenderHint(QPainter.Antialiasing)
-        self.scene().render(painter, QRectF(), srectf)
+            painter.setRenderHint(QPainter.Antialiasing)
+            self.scene().render(painter, QRectF(), srectf)
 
-        painter.end()
+            painter.end()
 
-        # image = QImage(self.pixmap.copy(rect))
-        fileName = os.path.splitext(os.path.basename(self.filePathForSave))[0]
-        imageSavePath = self.scene().get_unique_path_for_embeded_image("cropped_{}.jpg".format(fileName))
-        pixmap.save(imageSavePath)
+            # image = QImage(self.pixmap.copy(rect))
+            fileName = os.path.splitext(os.path.basename(self.filePathForSave))[0]
+            imageSavePath = self.scene().get_unique_path_for_embeded_image("cropped_{}.jpg".format(fileName))
+            pixmap.save(imageSavePath)
 
-        pos = self.scenePos()
+            pos = self.scenePos()
 
-        pos.setX(pos.x() + 5)
-        pos.setY(pos.y() + 5)
+            pos.setX(pos.x() + 5)
+            pos.setY(pos.y() + 5)
 
-        imageItem = Image(imageSavePath, pos, rectf, self.yaziRengi, self.arkaPlanRengi,
-                          self._pen, self.font(), isEmbeded=True)
+            imageItem = Image(imageSavePath, pos, rectf, self.yaziRengi, self.arkaPlanRengi,
+                              self._pen, self.font(), isEmbeded=True)
 
-        self.scene().parent().increase_zvalue(imageItem)
-        self.scene().undoRedo.undoableAddItem(self.scene().undoStack, "add new cropped image", self.scene(),
-                                              imageItem)
-        imageItem.reload_image_after_scale()
-        self.scene().unite_with_scene_rect(imageItem.sceneBoundingRect())
+            self.scene().parent().increase_zvalue(imageItem)
+            self.scene().undoRedo.undoableAddItem(self.scene().undoStack, "add new cropped image", self.scene(),
+                                                  imageItem)
+            imageItem.reload_image_after_scale()
+            self.scene().unite_with_scene_rect(imageItem.sceneBoundingRect())
+            self.scene().parent().setCursor(Qt.ArrowCursor)
 
-        # self.scene().parent().setCursor(Qt.ArrowCursor)
         self._isCropping = False
         self.cropRectF = QRectF()
+        self.scene().parent().setCursor(Qt.ArrowCursor)
 
     # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
@@ -333,14 +338,29 @@ class Image(BaseItem):
         self.reload_image_after_scale()
 
     # ---------------------------------------------------------------------
+    def hoverEnterEvent(self, event):
+        # event propagationdan dolayi bos da olsa burda implement etmek lazim
+        # mousePress,release,move,doubleclick de bu mantıkta...
+        # baska yerden baslayip mousepress ile , mousemove baska, mouseReleas baska widgetta gibi
+        # icinden cikilmaz durumlara sebep olabiliyor.
+        # ayrica override edince accept() de edilmis oluyor mouseeventler
+        super(Image, self).hoverEnterEvent(event)
+
+    # ---------------------------------------------------------------------
     def hoverMoveEvent(self, event):
         # self.sagUstKare.hide()
 
         # cursor = self.scene().parent().cursor()
         if self._isCropping:
-            self.scene().parent().setCursor(Qt.CrossCursor)
+            self.scene().parent().setCursor(Qt.CrossCursor, gecici_mi=True)
         else:
             super(Image, self).hoverMoveEvent(event)
+
+    # ---------------------------------------------------------------------
+    def hoverLeaveEvent(self, event):
+        if self._isCropping:
+            self.finish_crop()
+        super(Image, self).hoverLeaveEvent(event)
 
     # ---------------------------------------------------------------------
     def itemChange(self, change, value):
@@ -351,8 +371,6 @@ class Image(BaseItem):
             if value:
                 self.scene().parent().item_selected(self)
             else:  # yani deselected
-                # if self._isCropping:   # buna gerek yok sanki, if yavaslatir diye...
-                self._isCropping = False
                 self.scene().parent().item_deselected(self)
 
         # return QGraphicsRectItem.itemChange(self, change, value)

@@ -1032,39 +1032,36 @@ class BaseItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def hoverEnterEvent(self, event):
-        # TODO: bu hoverlarda bu kareler yerine mouse icon
-        # degisse koselere ykenarlar ayaklastikca
-        # TODO: bu saved cursor olmadi tam.
-        # if self.isSelected() and not self.isFrozen:
-        self.saved_cursor = self.scene().parent().cursor()
-
+        # event propagationdan dolayi bos da olsa burda implement etmek lazim
+        # mousePress,release,move,doubleclick de bu mantıkta...
+        # baska yerden baslayip mousepress ile , mousemove baska, mouseReleas baska widgetta gibi
+        # icinden cikilmaz durumlara sebep olabiliyor.
+        # ayrica override edince accept() de edilmis oluyor mouseeventler
         super(BaseItem, self).hoverEnterEvent(event)
 
     # ---------------------------------------------------------------------
     def hoverMoveEvent(self, event):
-        # self.sagUstKare.hide()
 
         # cursor = self.scene().parent().cursor()
 
-        if self.isSelected() and not self.isFrozen:
+        # if self.isSelected() and not self.isFrozen and self.scene().toolType == self.scene().NoTool:
+        if not self.isFrozen and self.scene().toolType == self.scene().NoTool:
             if self.topLeftHandle.contains(event.pos()) or self.bottomRightHandle.contains(event.pos()):
-                self.scene().parent().setCursor(Qt.SizeFDiagCursor)
-                # self.setCursor(Qt.SizeFDiagCursor)
+                self.scene().parent().setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
+                # self.setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
             elif self.topRightHandle.contains(event.pos()) or self.bottomLeftHandle.contains(event.pos()):
-                self.scene().parent().setCursor(Qt.SizeBDiagCursor)
-                # self.setCursor(Qt.SizeBDiagCursor)
+                self.scene().parent().setCursor(Qt.SizeBDiagCursor, gecici_mi=True)
+                # self.setCursor(Qt.SizeBDiagCursor, gecici_mi=True)
             else:
-                self.scene().parent().setCursor(Qt.ArrowCursor)
-                # self.setCursor(self.saved_cursor)
+                self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
 
         super(BaseItem, self).hoverMoveEvent(event)
 
     # ---------------------------------------------------------------------
     def hoverLeaveEvent(self, event):
-        # self.sagUstKare.hide()
-        if self.isSelected() and not self.isFrozen:
-            # self.scene().parent().setCursor(Qt.ArrowCursor)
-            self.scene().parent().setCursor(self.saved_cursor)
+        # if self.isSelected() and not self.isFrozen:
+        # self.setCursor(self.saved_cursor)
+        self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
 
         super(BaseItem, self).hoverLeaveEvent(event)
 

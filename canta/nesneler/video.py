@@ -140,20 +140,20 @@ class VideoItem(BaseItem):
         self.videoPlayIkonu = QPainterPath()
         self.videoPlayIkonu.moveTo(olcekli_mesafe, olcekli_mesafe)
         self.videoPlayIkonu.lineTo(olcekli_mesafe, self.ikonBoyutu - olcekli_mesafe)
-        self.videoPlayIkonu.lineTo(self.ikonBoyutu - olcekli_mesafe, self.ikonBoyutu/2)
+        self.videoPlayIkonu.lineTo(self.ikonBoyutu - olcekli_mesafe, self.ikonBoyutu / 2)
         self.videoPlayIkonu.lineTo(olcekli_mesafe, olcekli_mesafe)
 
         self.videoPauseIkonu = QPainterPath()
         self.videoPauseIkonu.moveTo(olcekli_mesafe, olcekli_mesafe)
         self.videoPauseIkonu.lineTo(olcekli_mesafe, self.ikonBoyutu - olcekli_mesafe)
-        self.videoPauseIkonu.moveTo(3*olcekli_mesafe, olcekli_mesafe)
-        self.videoPauseIkonu.lineTo(3*olcekli_mesafe, self.ikonBoyutu - olcekli_mesafe)
+        self.videoPauseIkonu.moveTo(3 * olcekli_mesafe, olcekli_mesafe)
+        self.videoPauseIkonu.lineTo(3 * olcekli_mesafe, self.ikonBoyutu - olcekli_mesafe)
 
         self.videoStopIkonu = QPainterPath()
         self.videoStopIkonu.addRect(olcekli_mesafe,
                                     olcekli_mesafe,
-                                    self.ikonBoyutu-2*olcekli_mesafe,
-                                    self.ikonBoyutu-2*olcekli_mesafe)
+                                    self.ikonBoyutu - 2 * olcekli_mesafe,
+                                    self.ikonBoyutu - 2 * olcekli_mesafe)
 
         # self.videoBosDaireIkonu = QPainterPath()
         # self.videoBosDaireIkonu.addEllipse(self.videoSliderEllipseRect)
@@ -209,8 +209,9 @@ class VideoItem(BaseItem):
         self.audioSliderEllipseRect.moveCenter(
             QPointF(self.videoItem.boundingRect().center().x(), self.audioSliderEllipseRect.center().y()))
 
-        self.audioSliderEllipseRect.moveCenter(QPointF(self.audioSliderEllipseRect.x() / self.videoItem.size().width() * 100,
-                                                   self.audioSliderEllipseRect.center().y()))
+        self.audioSliderEllipseRect.moveCenter(
+            QPointF(self.audioSliderEllipseRect.x() / self.videoItem.size().width() * 100,
+                    self.audioSliderEllipseRect.center().y()))
 
         # self.videoSliderEllipseRect.moveCenter(
         #     QPointF(self.videoSliderEllipseRect.x(), self.playControlsY))
@@ -425,6 +426,15 @@ class VideoItem(BaseItem):
             self.audioSliderEllipseStartDrag = False
 
     # ---------------------------------------------------------------------
+    def hoverEnterEvent(self, event):
+        # event propagationdan dolayi bos da olsa burda implement etmek lazim
+        # mousePress,release,move,doubleclick de bu mantıkta...
+        # baska yerden baslayip mousepress ile , mousemove baska, mouseReleas baska widgetta gibi
+        # icinden cikilmaz durumlara sebep olabiliyor.
+        # ayrica override edince accept() de edilmis oluyor mouseeventler
+        super(VideoItem, self).hoverEnterEvent(event)
+
+    # ---------------------------------------------------------------------
     def hoverMoveEvent(self, event):
         # self.sagUstKare.hide()
 
@@ -442,6 +452,15 @@ class VideoItem(BaseItem):
                 self.isAudioSliderHovered = False
 
         super(VideoItem, self).hoverMoveEvent(event)
+
+    # ---------------------------------------------------------------------
+    def hoverLeaveEvent(self, event):
+        # event propagationdan dolayi bos da olsa burda implement etmek lazim
+        # mousePress,release,move,doubleclick de bu mantıkta...
+        # baska yerden baslayip mousepress ile , mousemove baska, mouseReleas baska widgetta gibi
+        # icinden cikilmaz durumlara sebep olabiliyor.
+        # ayrica override edince accept() de edilmis oluyor mouseeventler
+        super(VideoItem, self).hoverLeaveEvent(event)
 
     # ---------------------------------------------------------------------
     def paint_warning_image(self, painter, option, widget=None):

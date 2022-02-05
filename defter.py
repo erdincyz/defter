@@ -163,6 +163,8 @@ class DefterAnaPencere(QMainWindow):
         # clean_mode icin
         self.state_before_clean_mode = None
 
+        self.imlec_arac = None
+
         self.init_settings()
         self.read_user_settings()
         self.olustur_sayfalarDW()
@@ -224,6 +226,12 @@ class DefterAnaPencere(QMainWindow):
     #     for item in self.findChildren(QAction):
     #         # print(item.parent().text())
     #         print(item.text()," --> ",item.shortcut().toString())
+
+    # ---------------------------------------------------------------------
+    def setCursor(self, cursor, gecici_mi=False):
+        if not gecici_mi:
+            self.imlec_arac = cursor
+        super(DefterAnaPencere, self).setCursor(cursor)
 
     # ---------------------------------------------------------------------
     def olustur_yazi_ozellikleriDW(self):
@@ -1204,23 +1212,23 @@ class DefterAnaPencere(QMainWindow):
         #         self.sayfalarDWTreeView.blockSignals(False)
         #     # item.setForeground(0, Qt.blue)
 
-    # ---------------------------------------------------------------------
-    def mouseDoubleClickEvent(self, a0):
-        super(DefterAnaPencere, self).mouseDoubleClickEvent(a0)
-        undoStack = self.findChildren(QUndoStack, options=Qt.FindChildrenRecursively)
-        view = self.findChildren(View, options=Qt.FindChildrenRecursively)
-        scene = self.findChildren(Scene, options=Qt.FindChildrenRecursively)
-        modeller = self.tabWidget.modeller
-        cModel = self.tabWidget.cModel
-        sayfalar = list(cModel.iterItems(cModel.kokSayfa))
+    # # ---------------------------------------------------------------------
+    # def mouseDoubleClickEvent(self, a0):
+    #     super(DefterAnaPencere, self).mouseDoubleClickEvent(a0)
+    #     undoStack = self.findChildren(QUndoStack, options=Qt.FindChildrenRecursively)
+    #     view = self.findChildren(View, options=Qt.FindChildrenRecursively)
+    #     scene = self.findChildren(Scene, options=Qt.FindChildrenRecursively)
+    #     modeller = self.tabWidget.modeller
+    #     cModel = self.tabWidget.cModel
+    #     sayfalar = list(cModel.iterItems(cModel.kokSayfa))
+    #
+    #     print(undoStack)
+    #     print(view)
+    #     print(scene)
+    #     print(modeller)
+    #     print(sayfalar)
 
-        print(undoStack)
-        print(view)
-        print(scene)
-        print(modeller)
-        print(sayfalar)
-
-        # print([i.parent() for i in undoStack])
+    # print([i.parent() for i in undoStack])
 
     # ---------------------------------------------------------------------
     def ekle_sil_butonlari_guncelle(self):
@@ -3532,7 +3540,8 @@ class DefterAnaPencere(QMainWindow):
         toolBarsMenu = QMenu(self.tr("Toolbars"), self.viewMenu)
         toolBarsMenu.aboutToShow.connect(self.on_tool_bars_menu_about_to_show)
 
-        self.actionTumAracCubuklariniGoster = QAction(QIcon(':icons/hepsini-goster.png'), self.tr('Show All'), toolBarsMenu)
+        self.actionTumAracCubuklariniGoster = QAction(QIcon(':icons/hepsini-goster.png'), self.tr('Show All'),
+                                                      toolBarsMenu)
         self.actionTumAracCubuklariniGoster.setShortcut(QKeySequence("Ctrl+0"))
         self.actionTumAracCubuklariniGoster.triggered.connect(self.act_tum_arac_cubuklarini_goster)
 
@@ -3593,7 +3602,8 @@ class DefterAnaPencere(QMainWindow):
         dockWidgetsMenu = QMenu(self.tr("Panels"), self.viewMenu)
         dockWidgetsMenu.aboutToShow.connect(self.on_dock_widgets_menu_about_to_show)
 
-        self.actionTumPanelleriGoster = QAction(QIcon(':icons/hepsini-goster.png'), self.tr('Show all'), dockWidgetsMenu)
+        self.actionTumPanelleriGoster = QAction(QIcon(':icons/hepsini-goster.png'), self.tr('Show all'),
+                                                dockWidgetsMenu)
         self.actionTumPanelleriGoster.setShortcut(QKeySequence("Ctrl+Alt+0"))
         self.actionTumPanelleriGoster.triggered.connect(self.act_tum_panelleri_goster)
 
@@ -6170,7 +6180,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_mirror_x(self, mPos):
-        self.cScene.set_tool(toolType=Scene.NoTool)  # bu cancel_mirror_toolsu da cagiriyor.
+        self.cScene.set_tool(toolType=Scene.NoTool)  # bu finish_interactive_toolsu da cagiriyor.
 
         mposx = mPos.x()
 
@@ -6222,7 +6232,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_mirror_y(self, mPos):
-        self.cScene.set_tool(toolType=Scene.NoTool)  # bu cancel_mirror_toolsu da cagiriyor.
+        self.cScene.set_tool(toolType=Scene.NoTool)  # bu finish_interactive_toolsu da cagiriyor.
 
         mposy = mPos.y()
 

@@ -359,6 +359,15 @@ class KutuphaneNesnesi(QGraphicsItem):
         self.setBrush(QBrush(col))
 
     # ---------------------------------------------------------------------
+    def hoverMoveEvent(self, event):
+        # event propagationdan dolayi bos da olsa burda implement etmek lazim
+        # mousePress,release,move,doubleclick de bu mantıkta...
+        # baska yerden baslayip mousepress ile , mousemove baska, mouseReleas baska widgetta gibi
+        # icinden cikilmaz durumlara sebep olabiliyor.
+        # ayrica override edince accept() de edilmis oluyor mouseeventler
+        super(KutuphaneNesnesi, self).hoverMoveEvent(event)
+
+    # ---------------------------------------------------------------------
     def hoverEnterEvent(self, QGraphicsSceneHoverEvent):
         # TODO: bu daha optimize edilebilir hatta iimage ve bunun normal pixmapleri de
         # scale kısmı verimli degil gibi

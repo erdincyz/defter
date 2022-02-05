@@ -124,9 +124,13 @@ class Scene(QGraphicsScene):
         # digerleri tek islem yapiyor ve tooldan cikiyor yani set_tool yani burasi cagriliyor
         # DrawPathToolda surekli cizim yapabildiğimiz için kapatmaya gerek yok
         # aslında bunu da fircaBoyutuItem icin aciyoruz sadece (ilerde baska seylerde de kullanabiliriz)
-        self.views()[0].setMouseTracking(False)
+        # GUNCELLEME: self.views()[0].hasMouseTracking(), False donduruyor ama tracking yapiyor!?
+        # sonra self.views()[0].setMouseTracking(False) veya True dersek bu sefer hover eventler calismamaya basliyor
+        # Fonksiyonallik devam etsin diye su an kapatıyoruz alt satırı
+        # ve tum self.views()[0].setMouseTracking(False veya True) lari, derinlemesine bakmak lazim.
+        # view da acik oldugu halde false dondurme ihtimali, fare tiklamadan da move event cagriliyor
+        # self.views()[0].setMouseTracking(False)
         self.finish_interactive_tools()
-        self.cancel_mirror_tools()
 
         self.toolType = toolType
         self.dosyaYolu = dosyaYolu
@@ -149,7 +153,8 @@ class Scene(QGraphicsScene):
             self.activeItem.clearFocus()
 
         if toolType == self.NoTool:
-            self.parent().setCursor(Qt.ArrowCursor)
+            # finish_interactive_tools ta alt satir cagriliyor
+            # self.parent().setCursor(Qt.ArrowCursor)
             return
 
         elif toolType == self.TextTool:
@@ -157,7 +162,7 @@ class Scene(QGraphicsScene):
         elif toolType == self.RectTool:
             pixmap = QPixmap(':icons/cursor-rectangle.png')
         elif toolType == self.DrawLineTool:
-            self.views()[0].setMouseTracking(True)
+            # self.views()[0].setMouseTracking(True)
             pixmap = QPixmap(':icons/cursor-line.png')
             self.drawLineItem = None
         elif toolType == self.EllipseTool:
@@ -166,7 +171,7 @@ class Scene(QGraphicsScene):
             pixmap = QPixmap(':icons/cursor-pen.png')
             # self.pathItem = PathItem(self.yaziRengi, self.arkaPlanRengi, QPen(self.scenePen))
             # self.addItem(self.pathItem)
-            self.views()[0].setMouseTracking(True)
+            # self.views()[0].setMouseTracking(True)
             self.pathItem = None
         elif toolType == self.ImageTool:
             pixmap = QPixmap(':icons/cursor-image.png')
@@ -183,7 +188,7 @@ class Scene(QGraphicsScene):
                                         pos.x(),
                                         r.bottom())
 
-            self.views()[0].setMouseTracking(True)
+            # self.views()[0].setMouseTracking(True)
             self.addItem(self.mirrorLineItem)
             self.mirrorLineItem.updateScale()
             self.parent().setCursor(Qt.ArrowCursor)
@@ -197,7 +202,7 @@ class Scene(QGraphicsScene):
                                         r.right(),
                                         pos.y())
 
-            self.views()[0].setMouseTracking(True)
+            # self.views()[0].setMouseTracking(True)
             self.addItem(self.mirrorLineItem)
             self.mirrorLineItem.updateScale()
             self.parent().setCursor(Qt.ArrowCursor)
@@ -383,14 +388,11 @@ class Scene(QGraphicsScene):
         undoRedo.undoableMove(self.undoStack, self.tr("Item moved"), movedItem, eskiPosition)
 
     # ---------------------------------------------------------------------
-    def cancel_mirror_tools(self):
+    def finish_interactive_tools(self, kapat=True):
+
         if self.mirrorLineItem:
-            self.views()[0].setMouseTracking(False)
             self.removeItem(self.mirrorLineItem)
             self.mirrorLineItem = None
-
-    # ---------------------------------------------------------------------
-    def finish_interactive_tools(self, kapat=True):
 
         if self.toolType == self.DrawPathTool:
             if self.pathItem:
@@ -430,13 +432,9 @@ class Scene(QGraphicsScene):
                                                  item=self.pathItem, sec=False)
 
                     self.pathItem = None
-                    # DrawPathTool da setMouseTracking surekli acik
-                    # self.views()[0].setMouseTracking(False)
                 else:
                     self.removeItem(self.pathItem)
                     self.pathItem = None
-                    # DrawPathTool da setMouseTracking surekli acik
-                    # self.views()[0].setMouseTracking(False)
 
                 return
 
@@ -449,21 +447,22 @@ class Scene(QGraphicsScene):
                     undoRedo.undoableAddItem(self.undoStack, description=self.tr("add line"), scene=self,
                                              item=self.drawLineItem)
                     self.drawLineItem = None
-                    self.views()[0].setMouseTracking(False)
                 else:
                     self.removeItem(self.drawLineItem)
                     self.drawLineItem = None
-                    self.views()[0].setMouseTracking(False)
 
         elif self.toolType == self.CropImageTool:
-            # diger durumlar icin Image.itemChange deselected kullanildi.
+            # diger durumlar icin Image.hoverLeaveEvent() kullanildi.
             if self.activeItem and self.activeItem.type() == Image.Type:
                 self.activeItem.finish_crop()
-                # self.activeItem._isCropping = False
-                # self.activeItem.rubberBand.hide()
-                # self.activeItem.rubberBand.deleteLater()
-                # self.activeItem.rubberBand = None
 
+        self.no_toola_gec()
+
+    # ---------------------------------------------------------------------
+    def no_toola_gec(self):
+        # GUNCELLEME (set tool icindeki guncellemeye bakiniz)
+        # Alt satir simdilik iptal
+        # self.views()[0].setMouseTracking(False)
         self.toolType = self.NoTool
         self.parent().setCursor(Qt.ArrowCursor)
         # self.deleteLater()
@@ -471,7 +470,6 @@ class Scene(QGraphicsScene):
 
     # ---------------------------------------------------------------------
     def _fircaBoyutuItem_olustur(self):
-        # self.views()[0].setMouseTracking(True)
         rect = QRectF(-self.scenePen.widthF() / 2, -self.scenePen.widthF() / 2, self.scenePen.widthF(),
                       self.scenePen.widthF())
         pen = QPen(self.scenePen.color(), 2, Qt.DashLine, Qt.RoundCap, Qt.RoundJoin)
@@ -708,9 +706,10 @@ class Scene(QGraphicsScene):
                 # self.addItem(textItem)
                 undoRedo.undoableAddItem(self.undoStack, description=self.tr("add text"), scene=self, item=textItem)
                 # self.itemText = None
-                self.toolType = self.NoTool
-                self.parent().setCursor(Qt.ArrowCursor)
-                self.parent().actionSwitchToSelectionTool.setChecked(True)
+                self.no_toola_gec()
+                # self.toolType = self.NoTool
+                # self.parent().setCursor(Qt.ArrowCursor)
+                # self.parent().actionSwitchToSelectionTool.setChecked(True)
                 return QGraphicsScene.mousePressEvent(self, event)
 
             # elif self.toolType == self.ImageTool:
@@ -724,28 +723,30 @@ class Scene(QGraphicsScene):
 
             elif self.toolType == self.ImageTool:
                 self.parent().ekle_resim_direkt(self.dosyaYolu, event.scenePos())
-                self.toolType = self.NoTool
-                self.parent().setCursor(Qt.ArrowCursor)
-                self.parent().actionSwitchToSelectionTool.setChecked(True)
+                self.no_toola_gec()
+                # self.toolType = self.NoTool
+                # self.parent().setCursor(Qt.ArrowCursor)
+                # self.parent().actionSwitchToSelectionTool.setChecked(True)
                 return QGraphicsScene.mousePressEvent(self, event)
 
             elif self.toolType == self.VideoTool:
                 self.parent().ekle_video_direkt(self.dosyaYolu, event.scenePos())
-                self.toolType = self.NoTool
-                self.parent().setCursor(Qt.ArrowCursor)
-                self.parent().actionSwitchToSelectionTool.setChecked(True)
+                self.no_toola_gec()
+                # self.toolType = self.NoTool
+                # self.parent().setCursor(Qt.ArrowCursor)
+                # self.parent().actionSwitchToSelectionTool.setChecked(True)
                 return QGraphicsScene.mousePressEvent(self, event)
 
             elif self.toolType == self.DosyaAraci:
                 self.parent().ekle_dosya_direkt(self.dosyaYolu, event.scenePos())
-                self.toolType = self.NoTool
-                self.parent().setCursor(Qt.ArrowCursor)
-                self.parent().actionSwitchToSelectionTool.setChecked(True)
+                self.no_toola_gec()
+                # self.toolType = self.NoTool
+                # self.parent().setCursor(Qt.ArrowCursor)
+                # self.parent().actionSwitchToSelectionTool.setChecked(True)
                 return QGraphicsScene.mousePressEvent(self, event)
 
             elif self.toolType == self.DrawPathTool:
                 self.views()[0].setDragModeNoDrag()
-                # self.views()[0].setMouseTracking(True)
                 if not self.pathItem:
                     self.pathItem = PathItem(event.scenePos(), self.yaziRengi, self.arkaPlanRengi, QPen(self.scenePen),
                                              self.font())
@@ -769,7 +770,6 @@ class Scene(QGraphicsScene):
 
             elif self.toolType == self.DrawLineTool:
                 self.views()[0].setDragModeNoDrag()
-                # self.views()[0].setMouseTracking(True)
                 if not self.drawLineItem:
                     self.drawLineItem = LineItem(event.scenePos(), QPen(self.scenePen), yaziRengi=self.yaziRengi,
                                                  font=self.font())
@@ -830,21 +830,15 @@ class Scene(QGraphicsScene):
 
                     self.drawLineItem = None
 
-                    self.toolType = self.NoTool
-                    self.views()[0].setMouseTracking(False)
-                    self.parent().setCursor(Qt.ArrowCursor)
-                    # self.parent().setCursor(Qt.ArrowCursor)
-                    self.parent().actionSwitchToSelectionTool.setChecked(True)
-                # return QGraphicsScene.mousePressEvent(self, event)
-                return
+                    self.no_toola_gec()
+                return QGraphicsScene.mousePressEvent(self, event)
+                # super(Scene, self).mousePressEvent(event)
 
             elif self.toolType == self.MirrorX:
-                # self.views()[0].setMouseTracking(False)
-                self.parent().act_mirror_x(event.scenePos())  # bu cancel_mirror_toolsu da cagiriyor.
+                self.parent().act_mirror_x(event.scenePos())  # bu finish_interactive_toolsu da cagiriyor.
 
             elif self.toolType == self.MirrorY:
-                # self.views()[0].setMouseTracking(False)
-                self.parent().act_mirror_y(event.scenePos())  # bu cancel_mirror_toolsu da cagiriyor.
+                self.parent().act_mirror_y(event.scenePos())  # bu finish_interactive_toolsu da cagiriyor.
 
             # if not event.modifiers() & Qt.ShiftModifier:
             # if not event.modifiers() & Qt.AltModifier:
@@ -853,7 +847,6 @@ class Scene(QGraphicsScene):
             #         self.parent().setCursor(Qt.ArrowCursor)
             #
             #     self.pathItem = None
-            #     # self.views()[0].setMouseTracking(False)
         super(Scene, self).mousePressEvent(event)
 
     # ---------------------------------------------------------------------
@@ -875,12 +868,10 @@ class Scene(QGraphicsScene):
                 # or'laniyor -> 0x00000000 = hicbiri , 0x00000001 sol , 0x00000002 sag  0x00000004 orta
                 if event.buttons() == 1:  # mouse sol tus basili
                     # self.pathItem.replace_last(event.scenePos())
-                    self.views()[0].setDragModeNoDrag()
                     self.pathItem.append(event.scenePos())
                     # self.pathItem.check_if_at_start(event.scenePos())
                     # event.accept()
                     # return QGraphicsScene.mouseMoveEvent(self, event)
-                    self.views()[0].setDragModeRubberBandDrag()
                     event.ignore()
 
                 else:
@@ -895,9 +886,7 @@ class Scene(QGraphicsScene):
                         return
 
         if self.drawLineItem and self.toolType == self.DrawLineTool:
-            self.views()[0].setDragModeNoDrag()
             self.drawLineItem.temp_append(event.scenePos())
-            self.views()[0].setDragModeRubberBandDrag()
             # self.drawLineItem.line().setP2(event.scenePos())
             # self.drawLineItem.setLine(QLineF(self.line.line().p1(), mouseEvent.scenePos()))
 
@@ -963,6 +952,7 @@ class Scene(QGraphicsScene):
                 if not event.modifiers() & Qt.ControlModifier:
                     self.finish_interactive_tools(kapat=False)
                 return QGraphicsScene.mouseReleaseEvent(self, event)
+                # return
 
             if self.toolType == self.DrawLineTool:
                 return QGraphicsScene.mouseReleaseEvent(self, event)
@@ -971,10 +961,10 @@ class Scene(QGraphicsScene):
                 self.lastItem.show_resize_handles()
                 # if not event.modifiers() & Qt.AltModifier:
                 if not self.space_tusu_su_an_basili:
-                    self.lastItem.saved_cursor = Qt.ArrowCursor
-                    self.toolType = self.NoTool
+                    # self.toolType = self.NoTool
                     # self.parent().setCursor(Qt.ArrowCursor)
-                    self.parent().actionSwitchToSelectionTool.setChecked(True)
+                    # self.parent().actionSwitchToSelectionTool.setChecked(True)
+                    self.no_toola_gec()
                 self.lastItem = None
                 # return QGraphicsScene.mousePressEvent(self, event)
                 return QGraphicsScene.mouseReleaseEvent(self, event)
@@ -1016,19 +1006,16 @@ class Scene(QGraphicsScene):
                     #     self.finish_interactive_tools()
 
         if event.key() == Qt.Key_Escape:
-            self.cancel_mirror_tools()
             self.finish_interactive_tools(kapat=False)
 
         if event.key() == Qt.Key_Enter \
                 or event.key() == Qt.Key_Return:
 
             if self.toolType == self.MirrorX:
-                # self.views()[0].setMouseTracking(False)
-                self.parent().act_mirror_x(self.parent().get_mouse_scene_pos())  # bu cancel_mirror_toolsu da cagiriyor.
+                self.parent().act_mirror_x(self.parent().get_mouse_scene_pos())  # bu finish_interactive_toolsu da cagiriyor.
 
             elif self.toolType == self.MirrorY:
-                # self.views()[0].setMouseTracking(False)
-                self.parent().act_mirror_y(self.parent().get_mouse_scene_pos())  # bu cancel_mirror_toolsu da cagiriyor.
+                self.parent().act_mirror_y(self.parent().get_mouse_scene_pos())  # bu finish_interactive_toolsu da cagiriyor.
 
         if event.key() == Qt.Key_Enter \
                 or event.key() == Qt.Key_Return:
@@ -1105,7 +1092,6 @@ class Scene(QGraphicsScene):
         if self.toolType == self.DrawPathTool:
             if event.key() == Qt.Key_Shift:
                 if self.fircaBoyutuItem:
-                    # self.views()[0].setMouseTracking(False)
                     self.removeItem(self.fircaBoyutuItem)
                     self.fircaBoyutuItem = None
 
