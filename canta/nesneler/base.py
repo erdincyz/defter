@@ -50,6 +50,8 @@ class BaseItem(QGraphicsItem):
         self._brush = QBrush()
         self._font = font
 
+        self.boundingRectTasmaDegeri = max(self.handleSize, self._pen.widthF() / 2)
+
         self.painterTextOption = QTextOption()
         self.painterTextOption.setAlignment(Qt.AlignCenter)
         self.painterTextOption.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
@@ -66,7 +68,6 @@ class BaseItem(QGraphicsItem):
 
         self.cosmeticSelect = False
         self.isActiveItem = False
-        self.isFrozen = False
         self._isPinned = False
 
         self._text = ""
@@ -289,7 +290,6 @@ class BaseItem(QGraphicsItem):
                       "font": self._font,
                       "text": self.text(),
                       "isPinned": self.isPinned,
-                      "isFrozen": self.isFrozen,
                       "command": self._command,
                       }
         # print(properties["scale"])
@@ -542,6 +542,7 @@ class BaseItem(QGraphicsItem):
     def setCizgiKalinligi(self, width):
         self._pen.setWidthF(width)
         self.textPen.setWidthF(width)
+        self.boundingRectTasmaDegeri = max(self.handleSize, width / 2)
         # self.selectionPenBottom.setWidthF(width)
         # self.selectionPenBottomIfAlsoActiveItem.setWidthF(width)
         # self.selectionPenTop.setWidthF(width)
@@ -581,22 +582,11 @@ class BaseItem(QGraphicsItem):
         return rect
 
     # ---------------------------------------------------------------------
-    def boundingRectt(self):
-        # TODO: burda ince bir durum var ama. neyse .  simdilik asagidaki ile devam.
-        if self._boundingRect.isNull():
-            halfpw = self.pen().widthF() / 2.0
-            self._boundingRect = QRectF(self.rect())
-            if halfpw:
-                return self._boundingRect.adjusted(-halfpw, -halfpw, halfpw, halfpw)
-        return self._boundingRect
-
-    # ---------------------------------------------------------------------
     def boundingRect(self):
-        # TODO: kare gruplandiginda bu padding belli oluyor.
-        # cunku self.rect ile paint ediyoruz. ellipsete yok bu problem.
-        pad = self.pen().widthF() / 2 + self.handleSize
+        # if self._boundingRect.isNull():
         self._boundingRect = QRectF(self.rect())
-        return self._boundingRect.adjusted(-pad, -pad, pad, pad)
+        return self._boundingRect.adjusted(-self.boundingRectTasmaDegeri, -self.boundingRectTasmaDegeri,
+                                           self.boundingRectTasmaDegeri, self.boundingRectTasmaDegeri)
 
         # path = QPainterPath()
         # path.addRect(self.rect())
@@ -662,6 +652,7 @@ class BaseItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def paint(self, painter, option, widget=None):
 
+        # painter.setClipRect(self.boundingRect())
         # painter.setClipRect(option.exposedRect)
         # painter.setClipRegion(QRegion(option.exposedRect.toRect()))
 
@@ -732,7 +723,7 @@ class BaseItem(QGraphicsItem):
             #######################################################################
             # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
             #######################################################################
-            # if not self.isPinned and not self.isFrozen and self.isActiveItem:
+            # if not self.isPinned and self.isActiveItem:
             #     # painter.setPen(self.handlePen)
             #     # painter.drawRect(self.topLeftHandle)
             #     # painter.drawRect(self.topRightHandle)
@@ -761,11 +752,14 @@ class BaseItem(QGraphicsItem):
         # # # # # # debug start - pos() # # # # #
         # p = self.pos()
         # s = self.scenePos()
-        # painter.drawText(self.rect(), "{0:.2f},  {1:.2f}\n{2:.2f},  {3:.2f}".format(p.x(), p.y(), s.x(), s.y()))
-        # # t = self.transformOriginPoint()
-        # # painter.drawRect(t.x()-12, t.y()-12,24,24)
+        # painter.drawText(self.rect(), "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
+        # # # t = self.transformOriginPoint()
+        # # # painter.drawRect(t.x()-12, t.y()-12,24,24)
         # mapped = self.mapToScene(self.rect().topLeft())
-        # painter.drawText(self.rect().x(), self.rect().y(), "{0:.2f}  {1:.2f}".format(mapped.x(), mapped.y()))
+        # painter.drawText(self.rect().x(), self.rect().y(), "{0:.2f}  {1:.2f} map".format(mapped.x(), mapped.y()))
+        # painter.drawEllipse(self.scenePos(), 10, 10)
+        # painter.setPen(Qt.blue)
+        # painter.drawEllipse(self.mapFromScene(self.pos()), 10, 10)
         # r = self.textItem.boundingRect()
         # r = self.mapRectFromItem(self.textItem, r)
         # painter.drawRect(r)
@@ -861,25 +855,23 @@ class BaseItem(QGraphicsItem):
         self._eskiPosBeforeResize = self.pos()
         # self._eskiPosBeforeResize = self.scenePos()
 
-        if not self.isFrozen:
-
-            if self.topLeftHandle.contains(event.pos()):
-                self._resizing = True
-                self._fixedResizePoint = self.rect().bottomRight()
-                self._resizingFrom = 1
-            elif self.topRightHandle.contains(event.pos()):
-                self._resizing = True
-                self._fixedResizePoint = self.rect().bottomLeft()
-                self._resizingFrom = 2
-            elif self.bottomRightHandle.contains(event.pos()):
-                self._resizing = True
-                self._fixedResizePoint = self.rect().topLeft()
-                self._resizingFrom = 3
-            elif self.bottomLeftHandle.contains(event.pos()):
-                self._resizing = True
-                self._fixedResizePoint = self.rect().topRight()
-                self._resizingFrom = 4
-            self._eskiRectBeforeResize = self.rect()
+        if self.topLeftHandle.contains(event.pos()):
+            self._resizing = True
+            self._fixedResizePoint = self.rect().bottomRight()
+            self._resizingFrom = 1
+        elif self.topRightHandle.contains(event.pos()):
+            self._resizing = True
+            self._fixedResizePoint = self.rect().bottomLeft()
+            self._resizingFrom = 2
+        elif self.bottomRightHandle.contains(event.pos()):
+            self._resizing = True
+            self._fixedResizePoint = self.rect().topLeft()
+            self._resizingFrom = 3
+        elif self.bottomLeftHandle.contains(event.pos()):
+            self._resizing = True
+            self._fixedResizePoint = self.rect().topRight()
+            self._resizingFrom = 4
+        self._eskiRectBeforeResize = self.rect()
 
         super(BaseItem, self).mousePressEvent(event)
 
@@ -896,8 +888,8 @@ class BaseItem(QGraphicsItem):
             # sahneye ilk cizim kontrolu,(undoya eklemesin diye)
             if not self._eskiRectBeforeResize.size() == QSizeF(1, 1):
                 rect = self.rect()
-                self.setPos(self.mapToScene(rect.topLeft()))
-                rect.moveTo(0, 0)
+                # self.setPos(self.mapToScene(rect.topLeft()))
+                # rect.moveTo(0, 0)
                 self.scene().undoRedo.undoableResizeBaseItem(self.scene().undoStack,
                                                              "resize",
                                                              self,
@@ -1044,8 +1036,8 @@ class BaseItem(QGraphicsItem):
 
         # cursor = self.scene().parent().cursor()
 
-        # if self.isSelected() and not self.isFrozen and self.scene().toolType == self.scene().NoTool:
-        if not self.isFrozen and self.scene().toolType == self.scene().NoTool:
+        # if self.isSelected() and self.scene().toolType == self.scene().NoTool:
+        if self.scene().toolType == self.scene().NoTool:
             if self.topLeftHandle.contains(event.pos()) or self.bottomRightHandle.contains(event.pos()):
                 self.scene().parent().setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
                 # self.setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
@@ -1059,7 +1051,7 @@ class BaseItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def hoverLeaveEvent(self, event):
-        # if self.isSelected() and not self.isFrozen:
+        # if self.isSelected():
         # self.setCursor(self.saved_cursor)
         self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
 
@@ -1082,20 +1074,13 @@ class BaseItem(QGraphicsItem):
         ctrlAltShift = int(Qt.ControlModifier) + int(Qt.AltModifier) + int(Qt.ShiftModifier)
 
         # if event.modifiers() & Qt.ControlModifier:
-
         if toplam == ctrlShift:
-            if not self.isFrozen:
-                self.scaleItem(event.delta())
-                # self.scaleItem(event.angleDelta().y())
-            else:
-                super(BaseItem, self).wheelEvent(event)
+            self.scaleItem(event.delta())
+            # self.scaleItem(event.angleDelta().y())
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
-            if not self.isFrozen:
-                self.rotateItem(event.delta())
-            else:
-                super(BaseItem, self).wheelEvent(event)
+            self.rotateItem(event.delta())
 
         # elif event.modifiers() & Qt.AltModifier:
         elif toplam == alt:
@@ -1110,12 +1095,9 @@ class BaseItem(QGraphicsItem):
         elif toplam == altShift:
             # self.changeImageItemTextBackgroundColorAlpha(event.delta())
             self.changeLineColorAlpha(event.delta())
-        #
+
         # elif toplam == ctrlAltShift:
-        #     if not self.isFrozen:
-        #         self.scaleItemByResizing(event.delta())
-        #     else:
-        #         super(BaseItem, self).wheelEvent(event)
+        #     self.scaleItemByResizing(event.delta())
 
         else:
             super(BaseItem, self).wheelEvent(event)

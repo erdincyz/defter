@@ -50,6 +50,8 @@ class Scene(QGraphicsScene):
         # gradient.setSpread(QGradient.RepeatSpread)
         # self.setBackgroundBrush(gradient)
 
+        self.setItemIndexMethod(self.NoIndex)
+
         self.tempDirPath = tempDirPath
         self.arkaPlanRengi = arkaPlanRengi
         self.yaziRengi = yaziRengi

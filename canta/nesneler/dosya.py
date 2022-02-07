@@ -71,9 +71,6 @@ class DosyaNesnesi(BaseItem):
                       # "imageOpacity": self.imageOpacity,
                       "text": self.text(),
                       "isPinned": self.isPinned,
-                      "isFrozen": self.isFrozen,
-                      # "isMirrorX": self.isMirrorX,
-                      # "isMirrorY": self.isMirrorY,
                       "command": self._command,
                       }
         return properties
@@ -227,7 +224,7 @@ class DosyaNesnesi(BaseItem):
             ########################################################################
             # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
             ########################################################################
-            # if not self.isPinned and not self.isFrozen and self.isActiveItem:
+            # if not self.isPinned and self.isActiveItem:
             #     # painter.setPen(self.handlePen)
             #     painter.drawRect(self.topLeftHandle)
             #     painter.drawRect(self.topRightHandle)

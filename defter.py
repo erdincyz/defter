@@ -1427,6 +1427,7 @@ class DefterAnaPencere(QMainWindow):
                 self.undoGroup.removeStack(sayfa.scene.undoStack)
                 sayfa.scene.undoStack.setParent(None)
                 sayfa.scene.undoStack.deleteLater()
+                # sayfa.scene.clear()
                 sayfa.scene.setParent(None)
                 sayfa.scene.deleteLater()
                 sayfa.view.setParent(None)
@@ -2411,7 +2412,6 @@ class DefterAnaPencere(QMainWindow):
             lineItem.setScale(itemDict["scale"])
             lineItem.setZValue(itemDict["zValue"])
             lineItem.isPinned = itemDict["isPinned"]
-            lineItem.isFrozen = itemDict["isFrozen"]
             lineItem._command = itemDict["command"]
             lineItem._text = itemDict.get("text", "")
 
@@ -2434,7 +2434,6 @@ class DefterAnaPencere(QMainWindow):
             rectItem.setScale(itemDict["scale"])
             rectItem.setZValue(itemDict["zValue"])
             rectItem.isPinned = itemDict["isPinned"]
-            rectItem.isFrozen = itemDict["isFrozen"]
             rectItem._text = itemDict["text"]
             rectItem._command = itemDict["command"]
 
@@ -2457,7 +2456,6 @@ class DefterAnaPencere(QMainWindow):
             ellipseItem.setScale(itemDict["scale"])
             ellipseItem.setZValue(itemDict["zValue"])
             ellipseItem.isPinned = itemDict["isPinned"]
-            ellipseItem.isFrozen = itemDict["isFrozen"]
             ellipseItem._text = itemDict["text"]
             ellipseItem._command = itemDict["command"]
 
@@ -2480,7 +2478,6 @@ class DefterAnaPencere(QMainWindow):
             pathItem.setScale(itemDict["scale"])
             pathItem.setZValue(itemDict["zValue"])
             pathItem.isPinned = itemDict["isPinned"]
-            pathItem.isFrozen = itemDict["isFrozen"]
             pathItem._text = itemDict["text"]
             pathItem._command = itemDict["command"]
 
@@ -2522,7 +2519,6 @@ class DefterAnaPencere(QMainWindow):
             imageItem.setZValue(itemDict["zValue"])
             imageItem.imageOpacity = itemDict["imageOpacity"]
             imageItem.isPinned = itemDict["isPinned"]
-            imageItem.isFrozen = itemDict["isFrozen"]
             imageItem.isMirrorX = itemDict["isMirrorX"]
             imageItem.isMirrorY = itemDict["isMirrorY"]
             imageItem._text = itemDict["text"]
@@ -2555,7 +2551,6 @@ class DefterAnaPencere(QMainWindow):
             textItem.setScale(itemDict["scale"])
             textItem.setZValue(itemDict["zValue"])
             textItem.isPinned = itemDict["isPinned"]
-            textItem.isFrozen = itemDict["isFrozen"]
             textItem._command = itemDict["command"]
 
             if isPaste:
@@ -2586,7 +2581,6 @@ class DefterAnaPencere(QMainWindow):
             # groupItem.setScale(itemDict["scale"])
             groupItem.setZValue(itemDict["zValue"])
             groupItem.isPinned = itemDict["isPinned"]
-            groupItem.isFrozen = itemDict["isFrozen"]
 
             if isPaste:
                 groupItem._kim = uuid.uuid4().hex
@@ -2621,7 +2615,6 @@ class DefterAnaPencere(QMainWindow):
             videoItem.setZValue(itemDict["zValue"])
             # videoItem.imageOpacity = itemDict["imageOpacity"]
             videoItem.isPinned = itemDict["isPinned"]
-            videoItem.isFrozen = itemDict["isFrozen"]
             # videoItem.isMirrorX = itemDict["isMirrorX"]
             # videoItem.isMirrorY = itemDict["isMirrorY"]
             videoItem._text = itemDict["text"]
@@ -2664,7 +2657,6 @@ class DefterAnaPencere(QMainWindow):
             dosyaNesnesi.setZValue(itemDict["zValue"])
             # dosyaNesnesi.imageOpacity = itemDict["imageOpacity"]
             dosyaNesnesi.isPinned = itemDict["isPinned"]
-            dosyaNesnesi.isFrozen = itemDict["isFrozen"]
             # dosyaNesnesi.isMirrorX = itemDict["isMirrorX"]
             # dosyaNesnesi.isMirrorY = itemDict["isMirrorY"]
             dosyaNesnesi._text = itemDict["text"]
@@ -5550,6 +5542,7 @@ class DefterAnaPencere(QMainWindow):
         self.increase_zvalue(item)
         # self.addItem(item)
         # TODO: macro undo redo
+        item.player.setParent(self.cView)
         undoRedo.undoableAddItem(self.cScene.undoStack, description=self.tr("add video"), scene=self.cScene, item=item)
         self.cScene.unite_with_scene_rect(item.sceneBoundingRect())
         # pixMap = None
@@ -5801,9 +5794,8 @@ class DefterAnaPencere(QMainWindow):
             if parentItem:
                 if parentItem in self.cScene.selectionQueue:
                     continue
-                else:  # hiyearsi icinden kopyalanirsa, paste edildiginde root item olacagi icin isFrozen=False
+                else:
                     itemDict = self.selected_to_dict_for_copy(item)
-                    itemDict["isFrozen"] = False
                     itemDict["pos"] = item.scenePos()
                     # to get actual sceneRotation
                     yeniRot = 0
@@ -5992,7 +5984,7 @@ class DefterAnaPencere(QMainWindow):
 
             if itemDict["type"] == Group.Type:
                 group = self.add_item_to_scene_from_dict(itemDict, isPaste=True)
-                # group.isFrozen = False  # parentItem() == None her zaman. oncesinde parented iseler frozen kaliyorlar.
+                # parentItem() == None her zaman.
                 # self.increase_zvalue(group)
                 self.dict_to_scene_recursive_group(itemDict["group_children"], group)
                 # group.setScale(itemDict["scale"])
@@ -6120,7 +6112,7 @@ class DefterAnaPencere(QMainWindow):
                 # --------------------------------------------------------------------------------------
 
                 item = self.add_item_to_scene_from_dict(itemDict, isPaste=True)
-                # item.isFrozen = False  # parentItem() == None her zaman. oncesinde parented iseler frozen kaliyorlar.
+                # parentItem() == None her zaman.
                 # self.increase_zvalue(item)
                 if "children" in itemDict:
                     self.dict_to_scene_recursive_parent(itemDict["children"], item)

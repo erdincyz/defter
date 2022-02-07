@@ -116,7 +116,6 @@ class Image(BaseItem):
                       "imageOpacity": self.imageOpacity,
                       "text": self.text(),
                       "isPinned": self.isPinned,
-                      "isFrozen": self.isFrozen,
                       "isMirrorX": self.isMirrorX,
                       "isMirrorY": self.isMirrorY,
                       "command": self._command,
@@ -396,19 +395,11 @@ class Image(BaseItem):
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
-            if not self.isFrozen:
-                # if self.isSelected():
-                self.scaleItem(event.delta())
-                # self.scaleItem(event.angleDelta().y())
-            else:
-                super(Image, self).wheelEvent(event)
+            self.scaleItem(event.delta())
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
-            if not self.isFrozen:
-                self.rotateItem(event.delta())
-            else:
-                super(Image, self).wheelEvent(event)
+            self.rotateItem(event.delta())
 
         # elif event.modifiers() & Qt.AltModifier:
         elif toplam == alt:
@@ -426,12 +417,10 @@ class Image(BaseItem):
             # self.changeTextBackgroundColorAlpha(event.delta())
             # self.changeLineColorAlpha(event.delta())
             self.changeImageItemTextBackgroundColorAlpha(event.delta())
-        #
+
         # elif toplam == ctrlAltShift:
-        #     if not self.isFrozen:
-        #         self.scaleItemByResizing(event.delta())
-        #     else:
-        #         super(Image, self).wheelEvent(event)
+        #     self.scaleItemByResizing(event.delta())
+
         else:
             super(Image, self).wheelEvent(event)
 
@@ -551,7 +540,7 @@ class Image(BaseItem):
             ########################################################################
             # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
             ########################################################################
-            # if not self.isPinned and not self.isFrozen and self.isActiveItem:
+            # if not self.isPinned and self.isActiveItem:
             #     # painter.setPen(self.handlePen)
             #     painter.drawRect(self.topLeftHandle)
             #     painter.drawRect(self.topRightHandle)

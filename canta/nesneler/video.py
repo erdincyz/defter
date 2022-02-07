@@ -8,7 +8,7 @@ __date__ = '04/Sep/2016'
 import os
 
 from PySide6.QtCore import Qt, QUrl, QSizeF, QRectF, QPointF, QPoint, QLine
-from PySide6.QtGui import QPen, QPixmap, QPixmapCache, QPainterPath
+from PySide6.QtGui import QPen, QPixmap, QPixmapCache, QPainterPath, QBrush, QColor
 from PySide6.QtWidgets import QStyle
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PySide6.QtMultimediaWidgets import QGraphicsVideoItem
@@ -50,6 +50,9 @@ class VideoItem(BaseItem):
         self.video_hazir_mi = False
 
         self.videoItem.setParentItem(self)
+        # self.player parenti defter.py ekle_video_direkt icinde (scene.py cagiriyor) ekliyoruz,
+        # yoksa tab silinince self.player kaliyor,
+        # ve video oyamakta iken tab kapanirsa self.player.playbackStateChanged sinyali vermeye devam ediyor
         self.player = QMediaPlayer()
         self.player.setVideoOutput(self.videoItem)
 
@@ -86,14 +89,15 @@ class VideoItem(BaseItem):
             # self.playControlsY = self._rect.bottom() - 50
             self.playControlsY = self.videoItem.size().height() / 2
             self.ikonBoyutu = 20
+            self.yariIkonBoyutu = self.ikonBoyutu / 2
+            self.boundingRectTasmaDegeri = max(self.handleSize, self._pen.widthF() / 2, self.yariIkonBoyutu)
             # print(self.playControlsY)
 
-            self.sliderLine = QLine(0,
+            self.sliderLine = QLine(self.videoItem.pos().x() + 0,
                                     self.playControlsY,
                                     self.videoItem.size().width(),
                                     self.playControlsY)
 
-            self.videoDuration = self.player.duration()
             self.player.positionChanged.connect(self.act_player_position_changed)
 
             self.videoSliderEllipseRect = QRectF(0, self.playControlsY,
@@ -105,11 +109,12 @@ class VideoItem(BaseItem):
 
             self.videoSliderEllipseFirstClickPos = QPointF()
             self.videoSliderEllipseStartDrag = False
-
             self.audioSliderEllipseRect = QRectF(self._rect.center().x(),
-                                                 self.playControlsY,
+                                                 # (100 / self._rect.height() / self.audioOutput.volume()),
+                                                 self._rect.height() - self._rect.height() * self.audioOutput.volume(),
                                                  self.ikonBoyutu,
                                                  self.ikonBoyutu)
+
             self.audioSliderEllipseStartDrag = False
 
             self.isVideoSliderHovered = False
@@ -131,6 +136,20 @@ class VideoItem(BaseItem):
             self.mouseMoveEvent = super(VideoItem, self).mouseMoveEvent
             self.mouseReleaseEvent = super(VideoItem, self).mouseReleaseEvent
             self.hoverMoveEvent = super(VideoItem, self).hoverMoveEvent
+
+    # ---------------------------------------------------------------------
+    def boundingRect(self):
+        # if self._boundingRect.isNull():
+        self._boundingRect = QRectF(self.rect())
+        return self._boundingRect.adjusted(-self.boundingRectTasmaDegeri, -self.boundingRectTasmaDegeri,
+                                           self.boundingRectTasmaDegeri, self.boundingRectTasmaDegeri)
+
+    # ---------------------------------------------------------------------
+    def setCizgiKalinligi(self, width):
+        self._pen.setWidthF(width)
+        self.textPen.setWidthF(width)
+        self.boundingRectTasmaDegeri = max(self.handleSize, self._pen.widthF() / 2, self.yariIkonBoyutu)
+        self.update()
 
     # ---------------------------------------------------------------------
     def daire_ici_ikonlari_olustur(self):
@@ -194,31 +213,28 @@ class VideoItem(BaseItem):
 
         self.update_painter_text_rect()
 
+        self.playControlsY = self.videoItem.size().height() / 2
+
         self.videoItem.setPos(self._rect.topLeft())
         self.videoItem.setSize(self._rect.size())
         # self.sliderLine.setLength()
         # self.playControlsY = self._rect.bottom() - 50
         # self.playControlsY = self.videoItem.boundingRect().center().y()
         # self.playControlsY = 100
-        self.sliderLine.setPoints(QPoint(0, self.playControlsY), QPoint(self._rect.right(), self.playControlsY))
+        self.sliderLine.setPoints(QPoint(self.videoItem.pos().x(), self.playControlsY),
+                                  QPoint(self._rect.right() + self.videoItem.pos().x(), self.playControlsY))
 
         # TODO: hmm kirmiz da asagilara falan da tasinabilsin ,,
         #  ama tabi x ekseni gecerli olsun mavi de oyle ters eksende.
         # self.videoSliderEllipseRect.moveCenter(QPointF(event.pos().x(), self.playControlsY))
         # TODO: aynı zamanda y oranını tekrar hesaplamak lazım.
-        self.audioSliderEllipseRect.moveCenter(
-            QPointF(self.videoItem.boundingRect().center().x(), self.audioSliderEllipseRect.center().y()))
-
-        self.audioSliderEllipseRect.moveCenter(
-            QPointF(self.audioSliderEllipseRect.x() / self.videoItem.size().width() * 100,
-                    self.audioSliderEllipseRect.center().y()))
-
-        # self.videoSliderEllipseRect.moveCenter(
-        #     QPointF(self.videoSliderEllipseRect.x(), self.playControlsY))
+        self.audioSliderEllipseRect.moveCenter(QPointF(self._rect.center().x(),
+                                                       self._rect.height() - self._rect.height() * self.audioOutput.volume()))
 
         if self.player.duration():  # olasi bir sifira bolmek durumu olmasin diye
             self.videoSliderEllipseRect.moveCenter(
-                QPointF(self.videoItem.size().width() * self.player.position() / self.player.duration(),
+                QPointF(self.videoItem.pos().x() + (
+                        self.videoItem.size().width() * self.player.position() / self.player.duration()),
                         self.playControlsY))
 
     # ---------------------------------------------------------------------
@@ -253,7 +269,8 @@ class VideoItem(BaseItem):
         # return
         if self.player.duration():
             self.videoSliderEllipseRect.moveCenter(
-                QPointF(self.videoItem.size().width() * pos / self.player.duration(), self.playControlsY))
+                QPointF(self.videoItem.pos().x() + (self.videoItem.size().width() * pos / self.player.duration()),
+                        self.playControlsY))
             # print(self.playControlsY)
 
     # ---------------------------------------------------------------------
@@ -275,7 +292,6 @@ class VideoItem(BaseItem):
                       # "imageOpacity": self.imageOpacity,
                       "text": self.text(),
                       "isPinned": self.isPinned,
-                      "isFrozen": self.isFrozen,
                       "command": self._command,
                       }
         return properties
@@ -330,15 +346,16 @@ class VideoItem(BaseItem):
             return
 
         if self.audioSliderEllipseStartDrag:
-            yuzde = event.pos().y() / self.videoItem.size().height() * 100
-            self.audioOutput.setVolume(100 - yuzde)
-            # print(self.player.volume())
-            # self.audioSliderEllipseRect.moveCenter(QPointF(self._rect.center().x(), event.pos().y()))
-            self.audioSliderEllipseRect.moveCenter(event.pos())
-            # self.playControlsY = event.pos().y()
+            yuzde = event.pos().y() / self._rect.height()
+            self.audioOutput.setVolume(1 - yuzde)
+            # if self.yariIkonBoyutu < event.pos().y() < self._rect.size().height() - self.yariIkonBoyutu:
+            if 0 < event.pos().y() < self._rect.size().height():
+                self.audioSliderEllipseRect.moveCenter(QPointF(self._rect.center().x(), event.pos().y()))
 
             return
 
+        # burda super(VideoItem, self).mouseMoveEvent(event) cagirmiyoruz
+        # shift + resize durumu videoda yok mesela o yuzden.
         if self._resizing:
             # cunku px=1 , py=1 olarak basliyor cizmeye. burda sifirliyoruz eger ilk sahneye ekleme cizimi ise.
             if not self._eskiRectBeforeResize.size() == QSizeF(1, 1):
@@ -411,12 +428,11 @@ class VideoItem(BaseItem):
         else:
             super(BaseItem, self).mouseMoveEvent(event)
 
-            # super(BaseItem, self).mouseMoveEvent(event)
-
     # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
         super(VideoItem, self).mouseReleaseEvent(event)
-        self.videoItem.setPos(0, 0)
+        # self.videoItem.setPos(0, 0)
+        self.videoItem.setPos(self._rect.topLeft())
         # if self.videoSliderEllipseRect.contains(event.pos()):
         if self.videoSliderEllipseStartDrag:
             self.videoSliderEllipseStartDrag = False
@@ -440,7 +456,7 @@ class VideoItem(BaseItem):
 
         # cursor = self.scene().parent().cursor()
 
-        if self.isSelected() and not self.isFrozen:
+        if self.isSelected():
             if self.videoSliderEllipseRect.contains(event.pos()):
                 self.isVideoSliderHovered = True
             else:
@@ -463,6 +479,64 @@ class VideoItem(BaseItem):
         super(VideoItem, self).hoverLeaveEvent(event)
 
     # ---------------------------------------------------------------------
+    def ses_ayarla(self, delta):
+
+        if delta > 0:
+            self.audioOutput.setVolume(self.audioOutput.volume() + 0.025)
+
+        else:
+            self.audioOutput.setVolume(self.audioOutput.volume() - 0.025)
+
+        self.audioSliderEllipseRect.moveCenter(QPointF(self._rect.center().x(),
+                                                       self._rect.size().height() - self._rect.size().height() * self.audioOutput.volume()))
+
+    # ---------------------------------------------------------------------
+    def wheelEvent(self, event):
+        # factor = 1.41 ** (event.delta() / 240.0)
+        # self.scale(factor, factor)
+
+        toplam = int(event.modifiers())
+
+        # ctrl = int(Qt.ControlModifier)
+        shift = int(Qt.ShiftModifier)
+        alt = int(Qt.AltModifier)
+
+        ctrlAlt = int(Qt.ControlModifier) + int(Qt.AltModifier)
+        ctrlShift = int(Qt.ControlModifier) + int(Qt.ShiftModifier)
+        altShift = int(Qt.AltModifier) + int(Qt.ShiftModifier)
+        ctrlAltShift = int(Qt.ControlModifier) + int(Qt.AltModifier) + int(Qt.ShiftModifier)
+
+        # if event.modifiers() & Qt.ControlModifier:
+        if toplam == ctrlShift:
+            self.scaleItem(event.delta())
+            # self.scaleItem(event.angleDelta().y())
+
+        # elif event.modifiers() & Qt.ShiftModifier:
+        elif toplam == shift:
+            self.rotateItem(event.delta())
+
+        # elif event.modifiers() & Qt.AltModifier:
+        elif toplam == alt:
+            self.changeBackgroundColorAlpha(event.delta())
+
+        elif toplam == ctrlAlt:
+            self.changeTextColorAlpha(event.delta())
+
+        elif toplam == ctrlAltShift:
+            self.changeFontSize(event.delta())
+        #
+        elif toplam == altShift:
+            # self.changeImageItemTextBackgroundColorAlpha(event.delta())
+            self.changeLineColorAlpha(event.delta())
+
+        # elif toplam == ctrlAltShift:
+        #     self.scaleItemByResizing(event.delta())
+
+        else:
+            self.ses_ayarla(event.delta())
+            # super(VideoItem, self).wheelEvent(event)
+
+    # ---------------------------------------------------------------------
     def paint_warning_image(self, painter, option, widget=None):
         painter.setClipRect(option.exposedRect)
         painter.drawPixmap(self._rect.toRect(), self.pixmap)
@@ -475,6 +549,7 @@ class VideoItem(BaseItem):
         # painter.drawEllipse(self.sliderEllipse)
 
         # painter.drawEllipse(self.videoSliderEllipseRect)
+        # painter.drawRect(self.boundingRect())
 
         if option.state & QStyle.State_MouseOver:
             painter.setOpacity(0.7)
@@ -482,7 +557,7 @@ class VideoItem(BaseItem):
             # if self.isSelected():
             # if option.state & QStyle.State_Selected:
             #     painter.setBrush(QBrush(QColor(255, 50, 50)))
-            # painter.drawLine(self.sliderLine)
+            painter.drawLine(self.sliderLine)
             if self.isVideoSliderHovered:
                 painter.setOpacity(1)
             painter.drawEllipse(self.videoSliderEllipseRect)

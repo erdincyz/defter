@@ -381,11 +381,8 @@ class UndoableParent(QUndoCommand):
         self.item.setRotation(self.item.rotation() - self.parentRot)
         self.item.setScale(self.itemInitialScale / self.parentScale)
         if self.parentItem:
-            self.item.isFrozen = True
             if self.parentItem.type() == shared.GROUP_ITEM_TYPE:
                 self.parentItem.parentedWithParentOperation.append(self.item)
-        else:
-            self.item.isFrozen = False
         self.item.scene().unGroupedRootItems.discard(self.item)
 
     # ---------------------------------------------------------------------
@@ -401,7 +398,6 @@ class UndoableParent(QUndoCommand):
         self.item.setPos(self.eskiPos)
         self.item.setRotation(self.eskiRot)
         self.item.setScale(self.itemInitialScale)
-        self.item.isFrozen = False
 
 
 ########################################################################
@@ -434,7 +430,6 @@ class UndoableUnParent(QUndoCommand):
         self.item.setRotation(self.item.rotation() + self.eskiParentRot)
         self.item.setScale(self.eskiParentScale * self.item.scale())
         self.item.setParentItem(self.yeniParentItem)
-        self.item.isFrozen = False
         # eger self.eskiParentItem grupsa, parentedWithParentOperation dan silmeye gerek yok cunku
         # onu grupta hallediyoruz.
 
@@ -445,11 +440,8 @@ class UndoableUnParent(QUndoCommand):
         self.item.setRotation(self.item.rotation() - self.eskiParentRot)
         self.item.setScale(self.item.scale() / self.eskiParentScale)
         if self.eskiParentItem:
-            self.item.isFrozen = True
             if self.eskiParentItem.type() == shared.GROUP_ITEM_TYPE:
                 self.eskiParentItem.parentedWithParentOperation.append(self.item)
-        else:
-            self.item.isFrozen = False
         self.item.scene().unGroupedRootItems.discard(self.item)
 
 

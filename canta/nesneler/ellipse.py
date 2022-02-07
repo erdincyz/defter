@@ -117,7 +117,7 @@ class Ellipse(BaseItem):
             # painter.setPen(self.selectionPenTop)
             # painter.drawEllipse(self.rect())
 
-            if not self.isPinned and not self.isFrozen:
+            if not self.isPinned:
                 painter.setPen(selectionPenBottom)
                 # painter.drawRect(self.boundingRect())
                 painter.drawRect(self.rect())

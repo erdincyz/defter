@@ -74,7 +74,6 @@ class LineItem(QGraphicsItem):
 
         self.cosmeticSelect = False
         self.isActiveItem = False
-        self.isFrozen = False
         self._isPinned = False
 
         self._text = ""
@@ -103,7 +102,6 @@ class LineItem(QGraphicsItem):
                       "font": self._font,
                       "text": self.text(),
                       "isPinned": self.isPinned,
-                      "isFrozen": self.isFrozen,
                       "command": self._command,
                       "baglanmis_nesneler": self.baglanmis_nesneler,
                       }
@@ -278,17 +276,15 @@ class LineItem(QGraphicsItem):
 
         self._eskiPosBeforeResize = self.pos()
 
-        if not self.isFrozen:
-
-            if self.p1Handle.contains(event.pos()):
-                self._resizing = True
-                self._fixedResizePoint = self._line.p2()
-                self._resizingFrom = 1
-            elif self.p2Handle.contains(event.pos()):
-                self._resizing = True
-                self._fixedResizePoint = self._line.p1()
-                self._resizingFrom = 2
-            self._eskiLineBeforeResize = self.line()
+        if self.p1Handle.contains(event.pos()):
+            self._resizing = True
+            self._fixedResizePoint = self._line.p2()
+            self._resizingFrom = 1
+        elif self.p2Handle.contains(event.pos()):
+            self._resizing = True
+            self._fixedResizePoint = self._line.p1()
+            self._resizingFrom = 2
+        self._eskiLineBeforeResize = self.line()
 
         super(LineItem, self).mousePressEvent(event)
 
@@ -426,8 +422,8 @@ class LineItem(QGraphicsItem):
 
         # cursor = self.scene().parent().cursor()
 
-        # if self.isSelected() and not self.isFrozen:
-        if not self.isFrozen and self.scene().toolType == self.scene().NoTool:
+        # if self.isSelected():
+        if self.scene().toolType == self.scene().NoTool:
             if self.p1Handle.contains(event.pos()) or self.p2Handle.contains(event.pos()):
                 self.scene().parent().setCursor(Qt.SizeAllCursor, gecici_mi=True)
             else:
@@ -973,7 +969,7 @@ class LineItem(QGraphicsItem):
             ########################################################################
             # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
             ########################################################################
-            if not self.isPinned and not self.isFrozen and self.isActiveItem:
+            if not self.isPinned and self.isActiveItem:
                 # painter.setPen(self.handlePen)
                 painter.drawEllipse(self.p1Handle)
                 painter.drawEllipse(self.p2Handle)
@@ -1020,18 +1016,11 @@ class LineItem(QGraphicsItem):
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
-            if not self.isFrozen:
-                self.scaleItem(event.delta())
-            # self.scaleItem(event.angleDelta().y())
-            else:
-                super(LineItem, self).wheelEvent(event)
+            self.scaleItem(event.delta())
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
-            if not self.isFrozen:
-                self.rotateItem(event.delta())
-            else:
-                super(LineItem, self).wheelEvent(event)
+            self.rotateItem(event.delta())
 
         # elif event.modifiers() & Qt.AltModifier:
         elif toplam == alt:
@@ -1054,10 +1043,8 @@ class LineItem(QGraphicsItem):
             self.scene().tekerlek_ile_firca_boyu_degistir(event.delta())
 
         # elif toplam == ctrlAltShift:
-        #     if not self.isFrozen:
-        #         self.scaleItemByScalingPath(event.delta())
-        #     else:
-        #         super(LineItem, self).wheelEvent(event)
+        #     self.scaleItemByScalingPath(event.delta())
+
         else:
             super(LineItem, self).wheelEvent(event)
 

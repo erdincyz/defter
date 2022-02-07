@@ -72,7 +72,6 @@ class PathItem(QGraphicsItem):
 
         self.cosmeticSelect = False
         self.isActiveItem = False
-        self.isFrozen = False
         self._isPinned = False
 
         self._text = ""
@@ -174,7 +173,6 @@ class PathItem(QGraphicsItem):
                       "arkaPlanRengi": self.arkaPlanRengi,
                       "text": self.text(),
                       "isPinned": self.isPinned,
-                      "isFrozen": self.isFrozen,
                       "command": self._command,
                       }
         return properties
@@ -931,18 +929,11 @@ class PathItem(QGraphicsItem):
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
-            if not self.isFrozen:
-                self.scaleItem(event.delta())
-            # self.scaleItem(event.angleDelta().y())
-            else:
-                super(PathItem, self).wheelEvent(event)
+            self.scaleItem(event.delta())
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
-            if not self.isFrozen:
-                self.rotateItem(event.delta())
-            else:
-                super(PathItem, self).wheelEvent(event)
+            self.rotateItem(event.delta())
 
         # elif event.modifiers() & Qt.AltModifier:
         elif toplam == alt:
@@ -959,10 +950,8 @@ class PathItem(QGraphicsItem):
             self.changeLineColorAlpha(event.delta())
 
         # elif toplam == ctrlAltShift:
-        #     if not self.isFrozen:
-        #         self.scaleItemByScalingPath(event.delta())
-        #     else:
-        #         super(PathItem, self).wheelEvent(event)
+        #     self.scaleItemByScalingPath(event.delta())
+
         else:
             super(PathItem, self).wheelEvent(event)
 

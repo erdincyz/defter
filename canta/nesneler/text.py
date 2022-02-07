@@ -106,7 +106,6 @@ class Text(QGraphicsTextItem):
 
         self.cosmeticSelect = False
         self.isActiveItem = False
-        self.isFrozen = False
         self._isPinned = False
         self._command = {}
 
@@ -400,7 +399,6 @@ class Text(QGraphicsTextItem):
                       "arkaPlanRengi": self.arkaPlanRengi,
                       "isPlainText": self.isPlainText,
                       "isPinned": self.isPinned,
-                      "isFrozen": self.isFrozen,
                       "command": self._command,
                       }
         if self.isPlainText:
@@ -647,8 +645,8 @@ class Text(QGraphicsTextItem):
 
         # cursor = self.scene().parent().cursor()
 
-        # if self.isSelected() and not self.isFrozen and self.scene().toolType == self.scene().NoTool:
-        if not self.isFrozen and self.scene().toolType == self.scene().NoTool:
+        # if self.isSelected() and self.scene().toolType == self.scene().NoTool:
+        if self.scene().toolType == self.scene().NoTool:
             if self.topLeftHandle.contains(event.pos()) or self.bottomRightHandle.contains(event.pos()):
                 self.scene().parent().setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
                 # self.setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
@@ -662,7 +660,7 @@ class Text(QGraphicsTextItem):
 
     # ---------------------------------------------------------------------
     def hoverLeaveEvent(self, event):
-        # if self.isSelected() and not self.isFrozen:
+        # if self.isSelected():
         # self.setCursor(self.saved_cursor)
         self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
 
@@ -684,18 +682,12 @@ class Text(QGraphicsTextItem):
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
-            if not self.isFrozen:
-                self.scaleItem(event.delta())
+            self.scaleItem(event.delta())
                 # self.scaleItem(event.angleDelta().y())
-            else:
-                super(Text, self).wheelEvent(event)
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
-            if not self.isFrozen:
-                self.rotateItem(event.delta())
-            else:
-                super(Text, self).wheelEvent(event)
+            self.rotateItem(event.delta())
 
         # elif event.modifiers() & Qt.AltModifier:
         elif toplam == alt:
@@ -712,10 +704,8 @@ class Text(QGraphicsTextItem):
             self.changeLineColorAlpha(event.delta())
 
         # elif toplam == ctrlAltShift:
-        #     if not self.isFrozen:
-        #         self.scaleItemWithFontSize(event.delta())
-        #     else:
-        #         super(Text, self).wheelEvent(event)
+        #     self.scaleItemWithFontSize(event.delta())
+
         else:
             super(Text, self).wheelEvent(event)
 
@@ -888,7 +878,7 @@ class Text(QGraphicsTextItem):
             ########################################################################
             # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
             ########################################################################
-            # if not self.isPinned and not self.isFrozen and self.isActiveItem:
+            # if not self.isPinned and self.isActiveItem:
             #     # painter.setPen(self.handlePen)
             #     painter.drawRect(self.topLeftHandle)
             #     painter.drawRect(self.topRightHandle)
@@ -939,28 +929,26 @@ class Text(QGraphicsTextItem):
         self._eskiPosBeforeResize = self.pos()
         # self._eskiPosBeforeResize = self.scenePos()
 
-        if not self.isFrozen:
-
-            if self.topLeftHandle.contains(event.pos()):
-                self._resizing = True
-                self._fixedResizePoint = self._rect.bottomRight()
-                self._resizingFrom = 1
-                self._eskiRectBeforeResize = QRectF(self._rect)
-            elif self.topRightHandle.contains(event.pos()):
-                self._resizing = True
-                self._fixedResizePoint = self._rect.bottomLeft()
-                self._resizingFrom = 2
-                self._eskiRectBeforeResize = QRectF(self._rect)
-            elif self.bottomRightHandle.contains(event.pos()):
-                self._resizing = True
-                self._fixedResizePoint = self._rect.topLeft()
-                self._resizingFrom = 3
-                self._eskiRectBeforeResize = QRectF(self._rect)
-            elif self.bottomLeftHandle.contains(event.pos()):
-                self._resizing = True
-                self._fixedResizePoint = self._rect.topRight()
-                self._resizingFrom = 4
-                self._eskiRectBeforeResize = QRectF(self._rect)
+        if self.topLeftHandle.contains(event.pos()):
+            self._resizing = True
+            self._fixedResizePoint = self._rect.bottomRight()
+            self._resizingFrom = 1
+            self._eskiRectBeforeResize = QRectF(self._rect)
+        elif self.topRightHandle.contains(event.pos()):
+            self._resizing = True
+            self._fixedResizePoint = self._rect.bottomLeft()
+            self._resizingFrom = 2
+            self._eskiRectBeforeResize = QRectF(self._rect)
+        elif self.bottomRightHandle.contains(event.pos()):
+            self._resizing = True
+            self._fixedResizePoint = self._rect.topLeft()
+            self._resizingFrom = 3
+            self._eskiRectBeforeResize = QRectF(self._rect)
+        elif self.bottomLeftHandle.contains(event.pos()):
+            self._resizing = True
+            self._fixedResizePoint = self._rect.topRight()
+            self._resizingFrom = 4
+            self._eskiRectBeforeResize = QRectF(self._rect)
 
         super(Text, self).mousePressEvent(event)
 
@@ -993,8 +981,8 @@ class Text(QGraphicsTextItem):
 
             # rect = self.boundingRect()
             rect = self.rect()
-            self.setPos(self.mapToScene(rect.topLeft()))
-            rect.moveTo(0, 0)
+            # self.setPos(self.mapToScene(rect.topLeft()))
+            # rect.moveTo(0, 0)
             # self.doc.setTextWidth(rect.width())
 
             # undo icinde

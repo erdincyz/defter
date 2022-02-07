@@ -41,9 +41,6 @@ class Group(QGraphicsItem):
 
         self.cosmeticSelect = False
         self.isActiveItem = False
-        # TODO: grup frozen kullanilmiyor simdilik. ama bir cok yerde set ediyoruz
-        # itemlari gruplarken falan, mecburen buna da ekleniyor hem belki kullanilir.
-        self.isFrozen = False
         self._isPinned = False
 
         self.allNonGroupGroupChildren = []
@@ -126,7 +123,6 @@ class Group(QGraphicsItem):
                       "arkaPlanRengi": self.arkaPlanRengi,
                       "pen": self._pen,
                       "isPinned": self.isPinned,
-                      "isFrozen": self.isFrozen
                       }
         return properties
 
@@ -337,7 +333,6 @@ class Group(QGraphicsItem):
         item.setParentItem(self)
         item.rotateWithOffset(eskiItemRot - self.rotation())
         item.scaleWithOffset(eskiScale / self.scale())
-        item.isFrozen = True
         item.isPinned = True  # !! bunun yeri onemli , asagidaki flagleri set edisimizin altında bunu set edersek,
         # isPinned bir property oldugundan, set kisminda her halukarda  "ItemIsSelectable ,True"oldugundan override
         # ediyor ve gruplanmis item secilebilir oluyor.
@@ -417,7 +412,6 @@ class Group(QGraphicsItem):
                 if parent.type() == self.type():
                     parent.parentedWithParentOperation.append(item)
 
-            item.isFrozen = False
             item.isPinned = False
             if not item.type() == shared.LINE_ITEM_TYPE:
                 item.rotateWithOffset(self.rotation() + item.rotation())
@@ -432,13 +426,10 @@ class Group(QGraphicsItem):
             if not item.type() == self.type():  # grubun iceriginin secilemezligi korunsun diye
                 for c in item.childItems():
                     c.setFlags(self.ItemIsSelectable | self.ItemIsMovable | self.ItemIsFocusable)
-                    c.isFrozen = False
                     c.setSelected(True)
             else:
                 for c in item.parentedWithParentOperation:
                     c.setFlags(self.ItemIsSelectable | self.ItemIsMovable | self.ItemIsFocusable)
-                    c.isFrozen = False  # eger c item bir grup ise bu gereksiz ama
-                    # ekledik gruba da kullnmasak da is frozeni
                     c.setSelected(True)
             item.setSelected(True)
         self.scene().unGroupedRootItems.update(unGroupedRootItems)
@@ -615,30 +606,23 @@ class Group(QGraphicsItem):
 
         toplam = int(event.modifiers())
 
-        ctrl = int(Qt.ControlModifier)
+        # ctrl = int(Qt.ControlModifier)
         shift = int(Qt.ShiftModifier)
         alt = int(Qt.AltModifier)
 
         ctrlAlt = int(Qt.ControlModifier) + int(Qt.AltModifier)
         ctrlShift = int(Qt.ControlModifier) + int(Qt.ShiftModifier)
         altShift = int(Qt.AltModifier) + int(Qt.ShiftModifier)
-        # ctrlAltShift = int(Qt.ControlModifier) + int(Qt.AltModifier) + int(Qt.ShiftModifier)
+        ctrlAltShift = int(Qt.ControlModifier) + int(Qt.AltModifier) + int(Qt.ShiftModifier)
 
         # if event.modifiers() & Qt.ControlModifier:
 
-        if toplam == ctrl:
-            if not self.isFrozen:
-                self.scaleItem(event.delta())
-                # self.scaleItem(event.angleDelta().y())
-            else:
-                super(Group, self).wheelEvent(event)
+        if toplam == ctrlShift:
+            self.scaleItem(event.delta())
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
-            if not self.isFrozen:
-                self.rotateItem(event.delta())
-            else:
-                super(Group, self).wheelEvent(event)
+            self.rotateItem(event.delta())
 
         elif toplam == alt:
             self.changeBackgroundColorAlpha(event.delta())
@@ -646,7 +630,7 @@ class Group(QGraphicsItem):
         elif toplam == ctrlAlt:
             self.changeLineColorAlpha(event.delta())
 
-        elif toplam == ctrlShift:
+        elif toplam == ctrlAltShift:
             self.changeFontSize(event.delta())
 
         elif toplam == altShift:
