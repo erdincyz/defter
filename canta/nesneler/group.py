@@ -23,6 +23,7 @@ class Group(QGraphicsItem):
 
         self._itemsBoundingRect = QRectF()
 
+        self.setHandlesChildEvents(True)
         self.setFlags(self.ItemIsSelectable
                       | self.ItemIsMovable
                       # | self.ItemIsFocusable

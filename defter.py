@@ -288,6 +288,7 @@ class DefterAnaPencere(QMainWindow):
         # self.fontCBox_yazidw.activated[str].connect(self.act_set_current_font)
         # self.fontCBox_yazidw.currentFontChanged.connect(self.set_text_family)
         # self.fontCBox_yazidw.currentIndexChanged.connect(self.act_change_font)
+        self.fontCBox_yazidw.setMaximumWidth(203)
         self.fontCBox_yazidw.setCurrentFont(self.currentFont)
         self.fontCBox_yazidw.valueChangedFromFontComboBoxGuiNotByCode.connect(self.act_set_current_font)
         self.fontCBox_yazidw.currentFontChanged.connect(self.fontCBox_tbar.setCurrentFont)
@@ -298,6 +299,7 @@ class DefterAnaPencere(QMainWindow):
         self.textSizeSBox_yazidw = SpinBox(self.yaziOzellikleriDWBaseWidget)
         self.textSizeSBox_yazidw.setSuffix(" pt")
         self.textSizeSBox_yazidw.setValue(self.textSize)
+        self.textSizeSBox_yazidw.setMaximumWidth(85)
         self.textSizeSBox_yazidw.setMinimum(7)
         self.textSizeSBox_yazidw.setMaximum(999)
         self.textSizeSBox_yazidw.setSingleStep(1)
@@ -310,7 +312,7 @@ class DefterAnaPencere(QMainWindow):
         self.textSizeSBox_yazidw.setToolTip(self.tr("Text Size"))
 
         self.yaziListeBicimiCBox = QComboBox(self.yaziOzellikleriDWBaseWidget)
-        self.yaziListeBicimiCBox.setMaximumWidth(130)
+        self.yaziListeBicimiCBox.setMaximumWidth(135)
         self.yaziListeBicimiCBox.addItem(self.tr("Standard"))
         self.yaziListeBicimiCBox.addItem(self.tr("Bullet List (Disc)"))
         self.yaziListeBicimiCBox.addItem(self.tr("Bullet List (Circle)"))
@@ -448,12 +450,14 @@ class DefterAnaPencere(QMainWindow):
 
         btnBicimlerLay = QHBoxLayout()
         btnBicimlerLay.addLayout(btnKaratkerBicimleriLay)
+        btnBicimlerLay.addSpacing(10)
         btnBicimlerLay.addLayout(btnHizalaLay)
-        # btnBicimlerLay.addLayout(addStretch)
+        btnBicimlerLay.addStretch(1)
 
         lay = QHBoxLayout()
         lay.addWidget(self.textSizeSBox_yazidw)
         lay.addWidget(self.yaziListeBicimiCBox)
+        lay.addStretch()
 
         anaWidgetLayout.addLayout(renklerDisLay)
         anaWidgetLayout.addSpacing(5)

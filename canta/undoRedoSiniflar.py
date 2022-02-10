@@ -13,6 +13,13 @@ from canta.nesneler.base import BaseItem
 from canta import shared
 
 
+# # ---------------------------------------------------------------------
+# def tum_parentitemleri_tara_ve_grup_tipinde_olanlarin_boundingrectini_guncelle(nesne):
+#     if nesne.parentItem():
+#         if nesne.parentItem().type() == shared.GROUP_ITEM_TYPE:
+#             nesne.parentItem().updateBoundingRect()
+#         tum_parentitemleri_tara_ve_grup_tipinde_olanlarin_boundingrectini_guncelle(nesne.parentItem())
+
 ########################################################################
 class UndoableSayfaAdiDegistir(QUndoCommand):
     """ """
@@ -252,6 +259,7 @@ class UndoableGroup(QUndoCommand):
         self.items = items
         self.scene = scene
 
+    # ---------------------------------------------------------------------
     def redo(self):
         self.scene.addItem(self.group)
         self.scene.parent().increase_zvalue(self.group)
@@ -283,6 +291,7 @@ class UndoableGroup(QUndoCommand):
         self.group.updateBoundingRect()
         self.group.setSelected(True)
 
+    # ---------------------------------------------------------------------
     def undo(self):
         self.group.destroyGroup()
         self.scene.removeItem(self.group)
