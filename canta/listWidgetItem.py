@@ -2,7 +2,7 @@
 # .
 
 __project_name__ = 'Defter'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
 __date__ = '27/Aug/2016'
 
 from PySide6.QtWidgets import QListWidgetItem, QStyledItemDelegate

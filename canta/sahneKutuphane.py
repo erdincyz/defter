@@ -3,7 +3,7 @@
 
 __project_name__ = 'Defter'
 __date__ = '25/Oct/2018'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
 
 import os
 from PySide6.QtCore import QPoint, Qt

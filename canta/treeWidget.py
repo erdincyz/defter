@@ -3,7 +3,7 @@
 
 __project_name__ = 'Defter'
 __date__ = '04/Sep/2017'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
 
 from PySide6.QtCore import QSize, Qt, Signal
 from PySide6.QtWidgets import QTreeWidget, QSizePolicy

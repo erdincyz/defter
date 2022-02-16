@@ -3,7 +3,7 @@
 
 __project_name__ = 'Defter'
 __date__ = '2/14/21'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
 
 # from PySide6.QtGui import
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout

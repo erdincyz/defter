@@ -2,7 +2,7 @@
 # .
 
 __project_name__ = 'Defter'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
 __date__ = '3/27/16'
 
 import os
@@ -44,6 +44,7 @@ class View(QGraphicsView):
         self.setCacheMode(QGraphicsView.CacheBackground)
 
         self.setTransformationAnchor(self.AnchorUnderMouse)
+        self.baskiRectler = []
 
         # self.debug_rect=QRectF()
 
@@ -96,6 +97,9 @@ class View(QGraphicsView):
     def drawBackground(self, painter, rectf):
         painter.setBrushOrigin(0, 0)
         painter.fillRect(rectf, self.backgroundBrush())
+
+        for rect in self.baskiRectler:
+            painter.drawRect(rect)
 
         # # ---  pos debug start   ---
         # painter.drawRect(self.sceneRect())

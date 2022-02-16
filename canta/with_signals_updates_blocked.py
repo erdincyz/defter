@@ -3,7 +3,7 @@
 
 __project_name__ = 'Defter'
 __date__ = '07/Sep/2017'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
 
 from contextlib import contextmanager
 

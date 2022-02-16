@@ -2,5 +2,5 @@
 # .
 
 __project_name__ = 'Defter'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'

@@ -2,7 +2,7 @@
 # .
 
 __project_name__ = 'Defter'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
 __date__ = '2/16/15'
 
 from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QSizePolicy

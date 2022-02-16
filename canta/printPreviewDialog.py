@@ -3,12 +3,12 @@
 
 __project_name__ = 'Defter'
 __date__ = '21/Oct/2017'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
 
 import os
 
-from PySide6.QtCore import Qt, Slot, Signal, QCoreApplication, QSettings, QSize, QLocale, QPoint
-from PySide6.QtGui import QIcon, QKeySequence, QDoubleValidator, QIntValidator, QImage, QPainter, QActionGroup, QAction, \
+from PySide6.QtCore import Qt, Slot, Signal, QCoreApplication, QSettings, QSize, QLocale
+from PySide6.QtGui import QIcon, QKeySequence, QDoubleValidator, QIntValidator, QActionGroup, QAction,\
     QPageLayout
 from PySide6.QtPrintSupport import QPrintPreviewWidget, QPrinter, QPrintDialog, QPageSetupDialog
 from PySide6.QtWidgets import QVBoxLayout, QToolBar, QMainWindow, QLineEdit, QLabel, \
@@ -271,6 +271,7 @@ class PrintPreviewDialog(QMainWindow):
 
         self.addDockWidget(Qt.LeftDockWidgetArea, self.optionsDW)
 
+    # ---------------------------------------------------------------------
     def act_as_viewed_cbox_toggled(self, secili_mi):
         # if secili_mi:
         #     pass
@@ -727,7 +728,7 @@ class PrintPreviewDialog(QMainWindow):
     def act_page_setup(self):
         pageSetupDialog = QPageSetupDialog(self.printer, self)
         if pageSetupDialog.exec() == QPageSetupDialog.Accepted:
-            if self.preview.orientation() == QPrinter.Portrait:
+            if self.preview.orientation() == QPageLayout.Portrait:
                 self.actionPortrait.setChecked(True)
                 self.preview.setPortraitOrientation()
             else:

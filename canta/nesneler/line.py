@@ -3,7 +3,7 @@
 
 __project_name__ = 'Defter'
 __date__ = '02/Nov/2018'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
 
 import math
 import uuid

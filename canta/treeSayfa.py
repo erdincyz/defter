@@ -3,7 +3,7 @@
 
 __project_name__ = 'Defter'
 __date__ = '01/Jun/2018'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor

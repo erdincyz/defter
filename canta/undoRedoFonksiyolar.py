@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-
 # .
 
 __project_name__ = 'Defter'
 __date__ = '05/Nov/2018'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
 
 from canta.undoRedoSiniflar import UndoableSayfaAdiDegistir, UndoableAddItem, UndoableRemoveItem, UndoableGroup, \
     UndoableUnGroup, UndoableParent, UndoableUnParent, UndoableResizeBaseItem, UndoableScaleBaseItemByResizing, \

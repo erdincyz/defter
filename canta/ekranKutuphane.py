@@ -3,7 +3,8 @@
 
 __project_name__ = 'Defter'
 __date__ = '25/Oct/2018'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
+__license__ = 'GPLv3'
 
 import os
 from PySide6.QtGui import QPainter, QPixmap

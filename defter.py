@@ -2,7 +2,7 @@
 # .
 
 __project_name__ = 'Defter'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
 __date__ = '25/03/16'
 __license__ = 'GPLv3'
 
@@ -31,7 +31,7 @@ from PySide6.QtWidgets import (QMainWindow, QWidget, QDockWidget, QVBoxLayout, Q
                                QFileDialog, QToolBar, QMenuBar, QMenu, QColorDialog, QMessageBox,
                                QStatusBar, QSizePolicy, QLabel, QPushButton, QScrollArea,
                                QDialog, QTextEdit, QInputDialog, QListWidget, QListWidgetItem,
-                               QLineEdit, QToolButton, QComboBox, QButtonGroup, QSizeGrip)
+                               QLineEdit, QToolButton, QComboBox, QButtonGroup, QGroupBox, QRadioButton)
 
 from PySide6.QtCore import (Qt, QRectF, QCoreApplication, QSettings, QPoint, Slot, QSizeF, QSize, QFile, QSaveFile,
                             QIODevice, QDataStream, QMimeData, QByteArray, QPointF, qCompress, qUncompress, QLocale,
@@ -39,7 +39,7 @@ from PySide6.QtCore import (Qt, QRectF, QCoreApplication, QSettings, QPoint, Slo
 
 from PySide6.QtWebEngineWidgets import QWebEngineView  # QWebEnginePage, #QWebEngineProfile, QWebEngineSettings
 
-from PySide6.QtPrintSupport import QPrinter
+from PySide6.QtPrintSupport import QPrinter, QPrinterInfo
 from canta import shared
 from canta.printPreviewDialog import PrintPreviewDialog
 from canta.scene import Scene
@@ -158,6 +158,9 @@ class DefterAnaPencere(QMainWindow):
 
         self.yazi_hizasi = Qt.AlignLeft
 
+        self.printer = None
+        self._get_printer()
+
         self.undoGroup = QUndoGroup(self)
 
         # clean_mode icin
@@ -191,6 +194,7 @@ class DefterAnaPencere(QMainWindow):
         self.olustur_cizgi_ozellikleriDW()
         self.olustur_stillerDW()
         self.olustur_yuzen_stillerDW()
+        self.olustur_sahneye_baski_siniri_cizim_ayarlari()
 
         self.read_gui_settings()
         # self.actionAlwaysOnTopToggle u , read_gui_settingste sinyalleri block ederek set ediyoruz.
@@ -936,6 +940,228 @@ class DefterAnaPencere(QMainWindow):
         btnLayout.addWidget(self.removeStylePresetBtn)
         btnLayout.addWidget(stylePrestesMenuBtn)
         anaWidgetLayout.addLayout(btnLayout)
+
+    # ---------------------------------------------------------------------
+    def olustur_sahneye_baski_siniri_cizim_ayarlari(self):
+        self.baskiSiniriCizimAyarlariDW = QDockWidget(self)
+        self.baskiSiniriCizimAyarlariBaslik = QLabel(self.tr("Draw Print Borders"), self.baskiSiniriCizimAyarlariDW)
+        self.baskiSiniriCizimAyarlariBaslik.setStyleSheet("QLabel {"
+                                                          "font-size:1.2em; "
+                                                          "font-weight:bold;"
+                                                          # "margin-right:10px;"
+                                                          # "margin-left:10px;"
+                                                          # "margin-top:1px;"
+                                                          "padding-top:1px;"
+                                                          "padding-bottom:1px;"
+                                                          "color:#fff; "
+                                                          "background-color:#9ab;}")
+        self.baskiSiniriCizimAyarlariBaslik.setAlignment(Qt.AlignCenter)
+        self.baskiSiniriCizimAyarlariDW.setTitleBarWidget(self.baskiSiniriCizimAyarlariBaslik)
+        self.baskiSiniriCizimAyarlariDW.setWindowTitle(self.tr("Draw Print Borders"))
+        self.baskiSiniriCizimAyarlariDW.setObjectName("baskiSiniriCizimAyarlariDockWidget")
+        self.baskiSiniriCizimAyarlariDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.baskiSiniriCizimAyarlariDW.setFeatures(QDockWidget.DockWidgetMovable |
+                                                    QDockWidget.DockWidgetClosable |
+                                                    # QDockWidget.DockWidgetVerticalTitleBar|
+                                                    QDockWidget.DockWidgetFloatable
+                                                    )
+        self.addDockWidget(Qt.LeftDockWidgetArea, self.baskiSiniriCizimAyarlariDW)
+        # self.baskiSiniriCizimAyarlariDW.setVisible(False)
+
+        # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
+
+        scroll = QScrollArea()
+        # scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        # scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setWidgetResizable(True)
+        # scroll.setBackgroundRole(QPalette.Dark)
+        self.baskiSiniriCizimAyarlariDW.setWidget(scroll)
+        # scrollLayout = QVBoxLayout(scroll)
+
+        self.baskiSiniriCizimAyarlariDWBW = QWidget(scroll)
+        # self.baskiSiniriCizimAyarlariDW.setWidget(self.baskiSiniriCizimAyarlariDWBW)
+        anaWidgetLayout = QVBoxLayout(self.baskiSiniriCizimAyarlariDWBW)
+        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetFixedSize)
+        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
+        anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
+        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetMaximumSize)
+        # anaWidgetLayout.setContentsMargins(10,15,0,0)
+        # self.baskiSiniriCizimAyarlariDW.setContentsMargins(0, 0, 0, 0)
+        # self.baskiSiniriCizimAyarlariDWBW.setContentsMargins(0,0,0,0)
+        # scrollLayout.addWidget(self.baskiSiniriCizimAyarlariDWBW)
+        scroll.setWidget(self.baskiSiniriCizimAyarlariDWBW)
+        # scroll.setLayout(layout)
+
+        self.baskiSinirGBox = QGroupBox(self.baskiSiniriCizimAyarlariDWBW)
+        self.baskiSinirGBox.setFlat(True)
+        self.baskiSinirGBox.setCheckable(True)
+        self.baskiSinirGBox.setChecked(False)
+        self.baskiSinirGBox.setTitle(self.tr("Draw print borders"))
+        self.baskiSinirGBox.clicked.connect(self.act_yazici_sayfa_kenar_cizdir)
+        self.baskiSinirGBoxLay = QVBoxLayout(self.baskiSinirGBox)
+
+        self.baskiBirimCBox = QComboBox(self.baskiSiniriCizimAyarlariDWBW)
+
+        self.baskiBirimCBox.addItem(self.tr("Millimeter"))
+        self.baskiBirimCBox.addItem(self.tr("Point"))
+        self.baskiBirimCBox.addItem(self.tr("Inch"))
+        self.baskiBirimCBox.addItems(["Pica",
+                                      "Didot",
+                                      "Cicero"])
+
+        kagitLay = QHBoxLayout()
+        self.baskiKagitBoyutuCBox = QComboBox(self.baskiSiniriCizimAyarlariDWBW)
+        self.baskiKagitBoyutuCBox.setMaximumWidth(135)
+        printerInfo = QPrinterInfo(self.printer)
+        desteklenenSayfaBoyutlari = printerInfo.supportedPageSizes()
+        simdikiId = self.printer.pageLayout().pageSize().id()
+        for i in range(int(QPageSize.LastPageSize)):
+            psize = QPageSize((QPageSize.PageSizeId(i)))
+            if psize.isValid():
+                desteklenenSayfaBoyutlari.append(psize)
+                self.baskiKagitBoyutuCBox.addItem(psize.name())
+
+        widthLbl = QLabel(self.tr("Width"), self.baskiSiniriCizimAyarlariDWBW)
+        heightLbl = QLabel(self.tr("Height"), self.baskiSiniriCizimAyarlariDWBW)
+        self.kagitGenislikLE = QLineEdit(self.baskiSiniriCizimAyarlariDWBW)
+        self.kagitGenislikLE.setMaximumWidth(75)
+        self.kagitGenislikLE.setEnabled(False)
+        self.kagitYukseklikLE = QLineEdit(self.baskiSiniriCizimAyarlariDWBW)
+        self.kagitYukseklikLE.setMaximumWidth(75)
+        self.kagitYukseklikLE.setEnabled(False)
+
+        self.baskiBirimCBox.currentIndexChanged.connect(self.act_baski_birim_changed)
+        self.baskiKagitBoyutuCBox.currentIndexChanged.connect(self.act_baski_kagit_boyutu_degisti)
+        self.baskiKagitBoyutuCBox.setCurrentIndex(simdikiId)
+
+        kagitLay.addWidget(self.baskiBirimCBox)
+        kagitLay.addWidget(self.baskiKagitBoyutuCBox)
+        kagitLay.addStretch(1)
+        boyutLay = QHBoxLayout()
+        boyutLay.addWidget(widthLbl)
+        boyutLay.addWidget(self.kagitGenislikLE)
+        boyutLay.addWidget(heightLbl)
+        boyutLay.addWidget(self.kagitYukseklikLE)
+        boyutLay.addStretch(1)
+
+        fitRadioBtnGrp = QButtonGroup(self.baskiSinirGBox)
+
+        self.radioSayfaSigdir = QRadioButton(self.tr("Fit page"), self.baskiSinirGBox)
+        self.radioSayfaSigdir.setIcon(QIcon(":icons/sayfa-sigdir.png"))
+        self.radioSayfaSigdir.setChecked(True)
+        self.radioGenislikSigdir = QRadioButton(self.tr("Fit width"), self.baskiSinirGBox)
+        self.radioGenislikSigdir.setIcon(QIcon(":icons/genislik-sigdir.png"))
+
+        fitRadioBtnGrp.addButton(self.radioSayfaSigdir)
+        fitRadioBtnGrp.addButton(self.radioGenislikSigdir)
+
+        fitRadioBtnGrp.buttonClicked.connect(self.act_yazici_sayfa_kenar_cizdir)
+
+        sigdirUstLay = QHBoxLayout()
+        sigdirLay = QVBoxLayout()
+        sigdirLay.addWidget(self.radioSayfaSigdir)
+        sigdirLay.addWidget(self.radioGenislikSigdir)
+        sigdirLay.addStretch(1)
+
+        kagitYonLay = QVBoxLayout()
+
+        kagitYonBtnGrp = QButtonGroup(self.baskiSiniriCizimAyarlariDWBW)
+
+        self.radioBaskiDikey = QRadioButton(self.tr("Portrait"), self.baskiSiniriCizimAyarlariDWBW)
+        self.radioBaskiDikey.setIcon(QIcon(':icons/dikey-sayfa.png'))
+        self.radioBaskiDikey.setChecked(True)
+
+        self.radioBaskiYatay = QRadioButton(self.tr("Landscape"), self.baskiSiniriCizimAyarlariDWBW)
+        self.radioBaskiYatay.setIcon(QIcon(':icons/yatay-sayfa.png'))
+
+        kagitYonBtnGrp.buttonClicked.connect(self.act_yazici_kagit_yonu_degisti)
+
+        kagitYonBtnGrp.addButton(self.radioBaskiDikey)
+        kagitYonBtnGrp.addButton(self.radioBaskiYatay)
+
+        kagitYonLay.addWidget(self.radioBaskiDikey)
+        kagitYonLay.addWidget(self.radioBaskiYatay)
+        kagitYonLay.addStretch(1)
+
+        sigdirUstLay.addLayout(kagitYonLay)
+        sigdirUstLay.addLayout(sigdirLay)
+
+        self.baskiSinirGBoxLay.addLayout(kagitLay)
+        self.baskiSinirGBoxLay.addLayout(boyutLay)
+        self.baskiSinirGBoxLay.addLayout(sigdirUstLay)
+
+        anaWidgetLayout.addWidget(self.baskiSinirGBox)
+
+    # ---------------------------------------------------------------------
+    def act_baski_birim_changed(self, idx):
+        psize = QPageSize((QPageSize.PageSizeId(self.baskiKagitBoyutuCBox.currentIndex())))
+        birim = psize.Unit(idx)
+        birim2 = self.printer.pageLayout().Unit(idx)
+
+        birim_yazi = ""
+        # print(birim.values)
+        if birim == psize.Unit.Millimeter:
+            birim_yazi = "mm"
+        elif birim == psize.Unit.Inch:
+            birim_yazi = "in"
+        elif birim == psize.Unit.Point:
+            birim_yazi = "pt"
+        elif birim == psize.Unit.Pica:
+            birim_yazi = "P/"
+        elif birim == psize.Unit.Didot:
+            birim_yazi = "DD"
+        elif birim == psize.Unit.Cicero:
+            birim_yazi = "CC"
+        self.kagitGenislikLE.setText("{}{}".format(psize.size(birim).width(), birim_yazi))
+        self.kagitYukseklikLE.setText("{}{}".format(psize.size(birim).height(), birim_yazi))
+
+        pLayout = self.printer.pageLayout()
+        pLayout.setUnits(birim2)
+        self.printer.setPageLayout(pLayout)
+
+    # ---------------------------------------------------------------------
+    def act_baski_kagit_boyutu_degisti(self, idx):
+        psize = QPageSize((QPageSize.PageSizeId(idx)))
+        # birim = self.printer.pageLayout().Unit(self.baskiBirimCBox.currentIndex())
+        birim = psize.Unit(self.baskiBirimCBox.currentIndex())
+
+        if birim == psize.Unit.Millimeter:
+            birim_yazi = "mm"
+        elif birim == psize.Unit.Inch:
+            birim_yazi = "in"
+        elif birim == psize.Unit.Point:
+            birim_yazi = "pt"
+        elif birim == psize.Unit.Pica:
+            birim_yazi = "P/"
+        elif birim == psize.Unit.Didot:
+            birim_yazi = "DD"
+        elif birim == psize.Unit.Cicero:
+            birim_yazi = "CC"
+
+        self.kagitGenislikLE.setText("{}{}".format(psize.size(birim).width(), birim_yazi))
+        self.kagitYukseklikLE.setText("{}{}".format(psize.size(birim).height(), birim_yazi))
+        # self.printer.pageLayout().setPageSize(psize)
+
+        pLayout = self.printer.pageLayout()
+        pLayout.setPageSize(psize)
+        self.printer.setPageLayout(pLayout)
+
+    # ---------------------------------------------------------------------
+    def act_yazici_kagit_yonu_degisti(self, btn):
+        # printer = QPrinter(QPrinter.HighResolution)
+        # printer = QPrinter(QPrinter.PrinterResolution)
+        # printer = QPrinter(QPrinter.ScreenResolution)
+        # self.printer = QPrinter()
+        # self.printer.setPageSize(QPageSize(QPageSize.A4))
+        if btn == self.radioBaskiYatay:
+            self.printer.setPageOrientation(QPageLayout.Landscape)
+            # self.printer.pageLayout().setOrientation(QPageLayout.Landscape)
+        else:
+            self.printer.setPageOrientation(QPageLayout.Portrait)
+            # self.printer.pageLayout().setOrientation(QPageLayout.Portrait)
+        # printer.setOutputFormat(QPrinter.PdfFormat)
+        # printer.setOutputFileName("deneme.pdf")
+        self.act_yazici_sayfa_kenar_cizdir()
 
     # ---------------------------------------------------------------------
     def olustur_sayfalarDW(self):
@@ -3629,7 +3855,7 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleNesneOzellikleriDW.triggered.connect(
             lambda: self.nesneOzellikleriDW.setVisible(not self.nesneOzellikleriDW.isVisible()))
 
-        self.actionToggleCizgiOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Line&Pen Properties'),
+        self.actionToggleCizgiOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Line&&Pen Properties'),
                                                       dockWidgetsMenu)
         self.actionToggleCizgiOzellikleriDW.setShortcut(QKeySequence("Ctrl+Alt+5"))
         self.actionToggleCizgiOzellikleriDW.setCheckable(True)
@@ -3642,13 +3868,20 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleStillerDW.triggered.connect(
             lambda: self.stillerDW.setVisible(not self.stillerDW.isVisible()))
 
+        self.actionToggleBaskiSiniriCizimAyarlariDW = QAction(QIcon(':icons/properties.png'), self.tr('Draw Print Borders'), dockWidgetsMenu)
+        self.actionToggleBaskiSiniriCizimAyarlariDW.setShortcut(QKeySequence("Ctrl+Alt+7"))
+        self.actionToggleBaskiSiniriCizimAyarlariDW.setCheckable(True)
+        self.actionToggleBaskiSiniriCizimAyarlariDW.triggered.connect(
+            lambda: self.baskiSiniriCizimAyarlariDW.setVisible(not self.baskiSiniriCizimAyarlariDW.isVisible()))
+
         dockWidgetsMenu.addActions((self.actionTumPanelleriGoster,
                                     self.actionToggleSayfalarDW,
                                     self.actionToggleKutuphaneDW,
                                     self.actionToggleYaziOzellikleriDW,
                                     self.actionToggleNesneOzellikleriDW,
                                     self.actionToggleCizgiOzellikleriDW,
-                                    self.actionToggleStillerDW))
+                                    self.actionToggleStillerDW,
+                                    self.actionToggleBaskiSiniriCizimAyarlariDW))
 
         self.zoomMenu = QMenu(self.tr("Zoom"), self.viewMenu)
         self.zoomMenu.setIcon(QIcon(":/icons/zoom.png"))
@@ -4175,6 +4408,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionToggleNesneOzellikleriDW,
                                           self.actionToggleCizgiOzellikleriDW,
                                           self.actionToggleStillerDW,
+                                          self.actionToggleBaskiSiniriCizimAyarlariDW,
                                           # view menu actions
                                           self.actionToggleStatusBar,
                                           self.actionToggleMenuBar,
@@ -5037,6 +5271,7 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleNesneOzellikleriDW.setChecked(self.nesneOzellikleriDW.isVisible())
         self.actionToggleCizgiOzellikleriDW.setChecked(self.cizgiOzellikleriDW.isVisible())
         self.actionToggleStillerDW.setChecked(self.stillerDW.isVisible())
+        self.actionToggleBaskiSiniriCizimAyarlariDW.setChecked(self.baskiSiniriCizimAyarlariDW.isVisible())
 
     # ---------------------------------------------------------------------
     def act_tum_panelleri_goster(self):
@@ -5046,6 +5281,7 @@ class DefterAnaPencere(QMainWindow):
         self.nesneOzellikleriDW.setVisible(True)
         self.cizgiOzellikleriDW.setVisible(True)
         self.stillerDW.setVisible(True)
+        self.baskiSiniriCizimAyarlariDW.setVisible(True)
 
     # ---------------------------------------------------------------------
     # @Slot() # this is called directly from base's overriden contextMenuEvent
@@ -6731,7 +6967,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_about(self):
         QMessageBox.about(self, self.tr('About Defter {}'.format(VERSION)),
-                          self.tr('"Defter" is developed by argekod. Copyright (C) 2016 '))
+                          self.tr('"Defter" is developed by Erdinc Yilmaz. Copyright (C) 2022 '))
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -7828,6 +8064,7 @@ class DefterAnaPencere(QMainWindow):
             self.nesneOzellikleriDW.hide()
             self.cizgiOzellikleriDW.hide()
             self.stillerDW.hide()
+            self.baskiSiniriCizimAyarlariDW.hide()
             self.sayfalarDW.hide()
             self.kutuphaneDW.hide()
         else:
@@ -8943,15 +9180,49 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def _get_printer(self):
-        # printer = QPrinter(QPrinter.HighResolution)
-        # printer = QPrinter(QPrinter.PrinterResolution)
-        # printer = QPrinter(QPrinter.ScreenResolution)
-        printer = QPrinter()
-        printer.setPageSize(QPageSize(QPageSize.A4))
-        printer.setPageOrientation(QPageLayout.Portrait)
-        # printer.setOutputFormat(QPrinter.PdfFormat)
-        # printer.setOutputFileName("deneme.pdf")
-        return printer
+        if not self.printer:
+            # printer = QPrinter(QPrinter.HighResolution)
+            # printer = QPrinter(QPrinter.PrinterResolution)
+            # printer = QPrinter(QPrinter.ScreenResolution)
+            self.printer = QPrinter()
+            self.printer.setPageSize(QPageSize(QPageSize.A4))
+            pLayout = self.printer.pageLayout()
+            pLayout.setUnits(pLayout.Millimeter)
+            pLayout.setPageSize(QPageSize(QPageSize.A4))
+            # self.printer.setPageLayout(QPageSize(QPageSize.A4))
+            self.printer.setPageLayout(pLayout)
+            self.printer.setPageOrientation(QPageLayout.Portrait)
+            # printer.setOutputFormat(QPrinter.PdfFormat)
+            # printer.setOutputFileName("deneme.pdf")
+            # return printer
+
+    # ---------------------------------------------------------------------
+    def act_yazici_sayfa_kenar_cizdir(self):
+        self.cView.baskiRectler = []
+        
+        if self.baskiSinirGBox.isChecked():
+            if self.radioSayfaSigdir.isChecked():
+
+                basilacakRect = self.cScene.itemsBoundingRect()
+                self.cView.baskiRectler.append(basilacakRect)
+
+            else:  # genislik
+                kagitPozisyonBoyutRect = self.printer.pageLayout().paintRectPixels(self.printer.resolution())
+                basilacakRect = self.cScene.itemsBoundingRect()
+                toplamBaskiYuksekligi = basilacakRect.height()
+                baski_kagit_genislik_orani = basilacakRect.width() / kagitPozisyonBoyutRect.width()
+                oranlanmis_basilacakRect_yukseklik = kagitPozisyonBoyutRect.height() * baski_kagit_genislik_orani
+                basilacakRect.setHeight(oranlanmis_basilacakRect_yukseklik)
+                # print(kagitPozisyonBoyutRect)
+
+                self.cView.baskiRectler.append(basilacakRect)
+                while toplamBaskiYuksekligi > 0:
+                    toplamBaskiYuksekligi -= oranlanmis_basilacakRect_yukseklik
+                    if toplamBaskiYuksekligi > 0:
+                        sonrakiRect = QRectF(basilacakRect)
+                        sonrakiRect.moveTop(basilacakRect.top() + oranlanmis_basilacakRect_yukseklik)
+                        self.cView.baskiRectler.append(sonrakiRect)
+        self.cView.update()
 
     # ---------------------------------------------------------------------
     def _paint_fit_page(self, painter, printer, sahne, basilacakRect):
@@ -9281,14 +9552,18 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def act_print_document(self):
-        printer = self._get_printer()
+        # printer = self._get_printer()
 
         # printer.setResolution(QPrinter.ScreenResolution)
-        printer.setOutputFormat(QPrinter.NativeFormat)
+        self.printer.setOutputFormat(QPrinter.NativeFormat)
         # "document" "page" "view" "selection" "content"
-        self.pDialog = PrintPreviewDialog(printer, "document", self)
+        self.pDialog = PrintPreviewDialog(self.printer, "document", self)
         self.pDialog.paintRequested.connect(self._paint_document)
         self.pDialog.paintRequestTypeChanged.connect(self._change_preview_mode)
+        if self.radioSayfaSigdir.isChecked():
+            self.pDialog.radioFitPage.setChecked(True)
+        else:
+            self.pDialog.radioFitWidth.setChecked(True)
         # pDialog.exec()
         self.pDialog.show()
 
@@ -9303,24 +9578,32 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def act_export_selected_text_item_content_as_pdf(self):
 
-        printer = self._get_printer()
-        printer.setOutputFormat(QPrinter.PdfFormat)
-        self.pDialog = PrintPreviewDialog(printer, "content", self)
+        # printer = self._get_printer()
+        self.printer.setOutputFormat(QPrinter.PdfFormat)
+        self.pDialog = PrintPreviewDialog(self.printer, "content", self)
         self.pDialog.paintRequested.connect(self._paint_text_item_content)
         self.pDialog.paintRequestTypeChanged.connect(self._change_preview_mode)
+        if self.radioSayfaSigdir.isChecked():
+            self.pDialog.radioFitPage.setChecked(True)
+        else:
+            self.pDialog.radioFitWidth.setChecked(True)
         # pDialog.exec()
         self.pDialog.show()
 
     # ---------------------------------------------------------------------
     def act_print_selected_text_item_content(self):
-        printer = self._get_printer()
+        # printer = self._get_printer()
 
         # printer.setResolution(QPrinter.ScreenResolution)
-        printer.setOutputFormat(QPrinter.NativeFormat)
+        self.printer.setOutputFormat(QPrinter.NativeFormat)
         # "document"  "page" "view" "selection" "content"
-        self.pDialog = PrintPreviewDialog(printer, "content", self)
+        self.pDialog = PrintPreviewDialog(self.printer, "content", self)
         self.pDialog.paintRequested.connect(self._paint_text_item_content)
         self.pDialog.paintRequestTypeChanged.connect(self._change_preview_mode)
+        if self.radioSayfaSigdir.isChecked():
+            self.pDialog.radioFitPage.setChecked(True)
+        else:
+            self.pDialog.radioFitWidth.setChecked(True)
         # pDialog.exec()
         self.pDialog.show()
 

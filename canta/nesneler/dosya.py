@@ -4,7 +4,8 @@
 
 __project_name__ = 'Defter'
 __date__ = '06/Nov/2018'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
+__license__ = 'GPLv3'
 
 import os
 import subprocess

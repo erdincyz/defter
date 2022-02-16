@@ -3,7 +3,7 @@
 
 __project_name__ = 'Defter'
 __date__ = '01/Jun/2018'
-__author__ = 'argekod'
+__author__ = 'Erdinç Yılmaz'
 
 import tempfile
 from typing import Any
