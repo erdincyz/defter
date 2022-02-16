@@ -1,4 +1,4 @@
-![ScreenShot](https://raw.githubusercontent.com/argekod/gorseller/master/_defter/defter_ekran_goruntusu.jpg)
+![ScreenShot](https://raw.githubusercontent.com/erdincyz/gorseller/master/_defter/defter_ekran_goruntusu.jpg)
 
 
 ### Hoşgeldiniz
@@ -17,7 +17,7 @@
 
 **Birçok Bug (Hata)** ve **tam olarak eklenmemiş özellikler** içerir. İyice kurcalayıp denemeden **önemli işler** için kullanma**MA**nız tavsiye edilir.
 
-**Bilinen hataları ve eklenmek niyetinde olunan özellikleri (şu an güncel olmamakla beraber)** bu sayfadaki **[Issues](https://github.com/argekod/defter/issues)** kısmından takip edebilirsiniz.
+**Bilinen hataları ve eklenmek niyetinde olunan özellikleri (şu an güncel olmamakla beraber)** bu sayfadaki **[Issues](https://github.com/erdincyz/defter/issues)** kısmından takip edebilirsiniz.
 
 ### KURULUM
 Sisteminizde Python 3 ve PySide6 yüklü olması gerekiyor.
@@ -59,7 +59,7 @@ It can bu used for;
 
 * Contains many Bugs and incomplete features. It is recommended that you do not use it for important work, (without trying it thoroughly.)
 
-* You can follow the known bugs and features that are intended to be added (although not up-to-date at the moment) from the [Issues](https://github.com/argekod/defter/issues) section on this page.
+* You can follow the known bugs and features that are intended to be added (although not up-to-date at the moment) from the [Issues](https://github.com/erdincyz/defter/issues) section on this page.
 
 ### INSTALLING
 It works on Python3 and needs PySide6 module.
