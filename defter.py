@@ -138,6 +138,7 @@ class DefterAnaPencere(QMainWindow):
         self.arkaPlanRengi = QColor(71, 177, 213)
         self.cizgiRengi = QColor(Qt.black)
         self.yaziRengi = QColor(Qt.black)
+        self.baskiCerceveRengi = QColor(Qt.black)
         self._pen = QPen(self.cizgiRengi,
                          0,
                          Qt.SolidLine,
@@ -180,8 +181,8 @@ class DefterAnaPencere(QMainWindow):
         self.olustur_font_toolbar()
         self.olustur_renk_toolbar()
         self.olustur_align_toolbar()
-        self.olustur_utilities_toolbar()
         self.olustur_menu_bar()
+        self.olustur_utilities_toolbar()
         self.olustur_status_bar()
         self.olustur_item_context_menus_and_actions()
         self.olustur_dummy_widget_for_actions()
@@ -965,8 +966,8 @@ class DefterAnaPencere(QMainWindow):
                                                     # QDockWidget.DockWidgetVerticalTitleBar|
                                                     QDockWidget.DockWidgetFloatable
                                                     )
+        self.baskiSiniriCizimAyarlariDW.setVisible(False)
         self.addDockWidget(Qt.LeftDockWidgetArea, self.baskiSiniriCizimAyarlariDW)
-        # self.baskiSiniriCizimAyarlariDW.setVisible(False)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
 
@@ -999,6 +1000,15 @@ class DefterAnaPencere(QMainWindow):
         self.baskiSinirGBox.setTitle(self.tr("Draw print borders"))
         self.baskiSinirGBox.clicked.connect(self.act_yazici_sayfa_kenar_cizdir)
         self.baskiSinirGBoxLay = QVBoxLayout(self.baskiSinirGBox)
+
+        renkLbl = QLabel(self.tr("Color"), self.baskiSiniriCizimAyarlariDWBW)
+        self.baskiCerceveRengiBtn = PushButton("", 36, 16, self.baskiCerceveRengi, self.baskiSiniriCizimAyarlariDWBW)
+        self.baskiCerceveRengiBtn.clicked.connect(self.act_baski_cerceve_rengi_kur)
+
+        renkLay = QHBoxLayout()
+        renkLay.addWidget(renkLbl)
+        renkLay.addWidget(self.baskiCerceveRengiBtn)
+        renkLay.addStretch(1)
 
         self.baskiBirimCBox = QComboBox(self.baskiSiniriCizimAyarlariDWBW)
 
@@ -1086,11 +1096,25 @@ class DefterAnaPencere(QMainWindow):
         sigdirUstLay.addLayout(kagitYonLay)
         sigdirUstLay.addLayout(sigdirLay)
 
+        self.baskiSinirGBoxLay.addLayout(renkLay)
         self.baskiSinirGBoxLay.addLayout(kagitLay)
         self.baskiSinirGBoxLay.addLayout(boyutLay)
         self.baskiSinirGBoxLay.addLayout(sigdirUstLay)
 
         anaWidgetLayout.addWidget(self.baskiSinirGBox)
+
+    # ---------------------------------------------------------------------
+    def act_baski_cerceve_rengi_kur(self):
+
+        col = self.renk_sec(eskiRenk=self.baskiCerceveRengi,
+                            baslik=self.tr("Print Border Color"))
+        if not col.isValid():
+            return
+
+        self.baskiCerceveRengiBtn.arkaplan_rengi_degistir(col)
+        self.baskiCerceveRengi = col
+
+        self.cView.baski_cerceve_rengi_kur(col)
 
     # ---------------------------------------------------------------------
     def act_baski_birim_changed(self, idx):
@@ -1787,6 +1811,7 @@ class DefterAnaPencere(QMainWindow):
             self.textSize = int(self.settings.value("textSize", 10))
             self.arkaPlanRengi = self.settings.value("arkaPlanRengi", QColor(71, 177, 213))
             self.cizgiRengi = self.settings.value("cizgiRengi", QColor(Qt.black))
+            self.baskiCerceveRengi = self.settings.value("baskiCerceveRengi", QColor(Qt.black))
             self.yaziRengi = self.settings.value("yaziRengi", QColor(Qt.black))
 
             self._pen = self.settings.value("kalem", QPen(self.cizgiRengi, 0, Qt.SolidLine, Qt.FlatCap, Qt.RoundJoin))
@@ -1886,6 +1911,7 @@ class DefterAnaPencere(QMainWindow):
         self.settings.setValue("itemSize", self.itemSize)
         self.settings.setValue("textSize", self.textSize)
         self.settings.setValue("cizgiRengi", self.cizgiRengi)
+        self.settings.setValue("baskiCerceveRengi", self.baskiCerceveRengi)
         self.settings.setValue("yaziRengi", self.yaziRengi)
         self.settings.setValue("arkaPlanRengi", self.arkaPlanRengi)
         self.settings.setValue("kalem", self._pen)
@@ -2176,6 +2202,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.cScene = scene
         self.cView = view
+        self.cView.baski_cerceve_rengi_kur(self.baskiCerceveRengi)
         # view.setViewport(QGLWidget())
         # view.show()
 
@@ -5225,6 +5252,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.utilitiesToolBar.addWidget(spacerWidget)
         # self.utilitiesToolBar.addWidget(self.actionAlwaysOnTopToggle)
+        self.utilitiesToolBar.addAction(self.actionToggleBaskiSiniriCizimAyarlariDW)
         self.utilitiesToolBar.addAction(self.actionAlwaysOnTopToggle)
 
         self.addToolBar(self.utilitiesToolBar)
@@ -7035,11 +7063,11 @@ class DefterAnaPencere(QMainWindow):
         # bir de belki sag tiklayinca bg colora transparent secengi olsun.
 
         if tip == "yazi":
-            yeni_renk = self.act_set_item_text_color(col=None)
+            yeni_renk = self.act_set_item_text_color(col=None, eskiRenk=btn.renkArkaplan)
         elif tip == "arka":
-            yeni_renk = self.act_set_item_background_color(col=None)
+            yeni_renk = self.act_set_item_background_color(col=None, eskiRenk=btn.renkArkaplan)
         elif tip == "cizgi":
-            yeni_renk = self.act_set_item_line_color(col=None)
+            yeni_renk = self.act_set_item_line_color(col=None, eskiRenk=btn.renkArkaplan)
 
         if not yeni_renk.isValid():
             return
@@ -7077,7 +7105,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_set_item_text_color_with_pallete_button(self, btn):
         if btn.renkArkaplan:
-            self.act_set_item_text_color(col=btn.renkArkaplan)
+            self.act_set_item_text_color(col=btn.renkArkaplan, eskiRenk=self.yaziRengiBtn.renkArkaplan)
         else:
             self.act_sag_tiklanan_butona_renk_secip_ata(btn, "yazi")
 
@@ -7101,16 +7129,19 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_set_item_text_color(self, col=None):
+    def act_set_item_text_color(self, col=None, eskiRenk=None):
+
+        if not eskiRenk:
+            eskiRenk = self.yaziRengiBtn.renkArkaplan
 
         if not col:
             #  # eskiRenk=self.yaziRengi, olamiyor cunku dokuman yazi rengi o an secili nesneden farkli olabilir.
-            col = self.renk_sec(eskiRenk=self.yaziRengiBtn.renkArkaplan,
+            col = self.renk_sec(eskiRenk=eskiRenk,
                                 baslik=self.tr("Text Color"),
                                 anlikRenkGonderilecekFonksiyon=self.onizle_set_item_text_color)
             if not col.isValid():
-                return
-            self.onizle_set_item_text_color(col=None, ilkHaleDondur=True)
+                self.onizle_set_item_text_color(col=None, ilkHaleDondur=True)
+                return QColor()
 
         # nesne(ler) icin degistir
         if self.cScene.selectionQueue:
@@ -7131,8 +7162,9 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_set_item_line_color_with_pallete_button(self, btn):
+
         if btn.renkArkaplan:
-            self.act_set_item_line_color(col=btn.renkArkaplan)
+            self.act_set_item_line_color(col=btn.renkArkaplan, eskiRenk=self.cizgiRengiBtn.renkArkaplan)
         else:
             self.act_sag_tiklanan_butona_renk_secip_ata(btn, "cizgi")
 
@@ -7155,16 +7187,18 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_set_item_line_color(self, col=None):
+    def act_set_item_line_color(self, col=None, eskiRenk=None):
+
+        if not eskiRenk:
+            eskiRenk = self.cizgiRengi
 
         if not col:
-
-            col = self.renk_sec(eskiRenk=self.cizgiRengi,
+            col = self.renk_sec(eskiRenk=eskiRenk,
                                 baslik=self.tr("Line Color"),
                                 anlikRenkGonderilecekFonksiyon=self.onizle_set_item_line_color)
             if not col.isValid():
-                return
-            self.onizle_set_item_line_color(col=None, ilkHaleDondur=True)
+                self.onizle_set_item_line_color(col=None, ilkHaleDondur=True)
+                return QColor()
 
         # nesne(ler) icin degistir
         if self.cScene.selectionQueue:
@@ -7188,7 +7222,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_set_item_background_color_with_pallete_button(self, btn):
         if btn.renkArkaplan:
-            self.act_set_item_background_color(col=btn.renkArkaplan)
+            self.act_set_item_background_color(col=btn.renkArkaplan, eskiRenk=self.nesneArkaplanRengiBtn.renkArkaplan)
         else:
             self.act_sag_tiklanan_butona_renk_secip_ata(btn, "arka")
 
@@ -7211,18 +7245,21 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_set_item_background_color(self, col=None):
+    def act_set_item_background_color(self, col=None, eskiRenk=None):
+
+        if not eskiRenk:
+            eskiRenk = self.arkaPlanRengi
 
         if not col:
-            col = self.renk_sec(eskiRenk=self.arkaPlanRengi,
+            col = self.renk_sec(eskiRenk=eskiRenk,
                                 baslik=self.tr("Background Color"),
                                 anlikRenkGonderilecekFonksiyon=self.onizle_set_item_background_color)
 
             if not col.isValid():
-                return
-            # eger diyalog acildiysa itemin son rengi dialog acilmadan onceki renkten farkli olacak
-            # unduRedo lu bir sekilde secilen rengi gondermeden once, dilagotan onceki haline donduruyoruz
-            self.onizle_set_item_background_color(col=None, ilkHaleDondur=True)
+                # eger diyalog acildiysa itemin son rengi dialog acilmadan onceki renkten farkli olacak
+                # unduRedo lu bir sekilde secilen rengi gondermeden once, dilagotan onceki haline donduruyoruz
+                self.onizle_set_item_background_color(col=None, ilkHaleDondur=True)
+                return QColor()
 
         # nesne(ler) icin degistir
         if self.cScene.selectionQueue:

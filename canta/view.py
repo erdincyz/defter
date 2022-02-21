@@ -6,7 +6,7 @@ __author__ = 'Erdinç Yılmaz'
 __date__ = '3/27/16'
 
 import os
-from PySide6.QtGui import QPainter, QPixmap
+from PySide6.QtGui import QPainter, QPixmap, QPen
 from PySide6.QtWidgets import QGraphicsView, QApplication
 from PySide6.QtCore import Qt, QRectF, Slot
 
@@ -44,6 +44,7 @@ class View(QGraphicsView):
         self.setCacheMode(QGraphicsView.CacheBackground)
 
         self.setTransformationAnchor(self.AnchorUnderMouse)
+        self.baski_cerceve_kalemi = QPen(Qt.black)
         self.baskiRectler = []
 
         # self.debug_rect=QRectF()
@@ -56,6 +57,13 @@ class View(QGraphicsView):
     #     self.setSceneRect(self.get_visible_rect())
     #
     #     super(View, self).resizeEvent(QResizeEvent)
+
+    # ---------------------------------------------------------------------
+    def baski_cerceve_rengi_kur(self, renk):
+        self.baski_cerceve_kalemi = QPen(renk,
+                                         0,
+                                         Qt.DashLine,
+                                         Qt.RoundCap, Qt.RoundJoin)
 
     # ---------------------------------------------------------------------
     def setDragModeRubberBandDrag(self):
@@ -98,8 +106,6 @@ class View(QGraphicsView):
         painter.setBrushOrigin(0, 0)
         painter.fillRect(rectf, self.backgroundBrush())
 
-        for rect in self.baskiRectler:
-            painter.drawRect(rect)
 
         # # ---  pos debug start   ---
         # painter.drawRect(self.sceneRect())
@@ -122,6 +128,10 @@ class View(QGraphicsView):
             painter.drawPixmap(0, 0, self.backgroundImagePixmap)
 
         # painter.drawRect(QRectF(self.sceneRect().x(), self.sceneRect().y(), 10, 10))
+
+        for rect in self.baskiRectler:
+            painter.setPen(self.baski_cerceve_kalemi)
+            painter.drawRect(rect)
 
     # ---------------------------------------------------------------------
     def set_background_image(self, imagePath):
