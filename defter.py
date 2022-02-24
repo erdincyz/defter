@@ -305,7 +305,7 @@ class DefterAnaPencere(QMainWindow):
         self.textSizeSBox_yazidw.setSuffix(" pt")
         self.textSizeSBox_yazidw.setValue(self.textSize)
         self.textSizeSBox_yazidw.setMaximumWidth(85)
-        self.textSizeSBox_yazidw.setMinimum(7)
+        self.textSizeSBox_yazidw.setMinimum(5)
         self.textSizeSBox_yazidw.setMaximum(999)
         self.textSizeSBox_yazidw.setSingleStep(1)
         # self.textSizeSBox_yazidw.valueChanged[int].connect(self.act_change_item_size)
@@ -4678,7 +4678,7 @@ class DefterAnaPencere(QMainWindow):
         self.textSizeSBox_tbar = SpinBox(self.fontToolBar)
         self.textSizeSBox_tbar.setSuffix(" pt")
         self.textSizeSBox_tbar.setValue(self.textSize)
-        self.textSizeSBox_tbar.setMinimum(7)
+        self.textSizeSBox_tbar.setMinimum(5)
         self.textSizeSBox_tbar.setMaximum(999)
         self.textSizeSBox_tbar.setSingleStep(1)
         # self.textSizeSBox_tbar.valueChanged[int].connect(self.act_change_item_size)
@@ -7567,13 +7567,13 @@ class DefterAnaPencere(QMainWindow):
                         if not width:
                             width = 0.1
                         yeniLine.setLength(width)
-                        self.cScene.undoRedo.undoableResizeLineItem(self.cScene.undoStack,
-                                                                    "change length",
-                                                                    item,
-                                                                    # yeniRect=self.rect(),
-                                                                    yeniLine=yeniLine,
-                                                                    eskiLine=eskiLine,
-                                                                    eskiPos=item.pos())
+                        undoRedo.undoableResizeLineItem(self.cScene.undoStack,
+                                                        "change length",
+                                                        item,
+                                                        # yeniRect=self.rect(),
+                                                        yeniLine=yeniLine,
+                                                        eskiLine=eskiLine,
+                                                        eskiPos=item.pos())
 
             if startedMacro:
                 self.cScene.undoStack.endMacro()
@@ -7658,13 +7658,13 @@ class DefterAnaPencere(QMainWindow):
                 eskiLine = item._line
                 yeniLine = QLineF(eskiLine)
                 yeniLine.setAngle(rotation)
-                self.cScene.undoRedo.undoableResizeLineItem(self.cScene.undoStack,
-                                                            self.tr("rotate"),
-                                                            item,
-                                                            # yeniRect=self.rect(),
-                                                            yeniLine=yeniLine,
-                                                            eskiLine=eskiLine,
-                                                            eskiPos=item.pos())
+                undoRedo.undoableResizeLineItem(self.cScene.undoStack,
+                                                self.tr("rotate"),
+                                                item,
+                                                # yeniRect=self.rect(),
+                                                yeniLine=yeniLine,
+                                                eskiLine=eskiLine,
+                                                eskiPos=item.pos())
             else:
                 undoRedo.undoableRotateBaseItem(self.cScene.undoStack, self.tr("rotate"), item, rotation)
 

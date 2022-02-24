@@ -15,8 +15,13 @@ from canta.undoRedoSiniflar import UndoableSayfaAdiDegistir, UndoableAddItem, Un
     UndoableSetImageOpacity, UndoableSetSceneBackgroundBrush, UndoableSetPinStatus, UndoableItemSetText, \
     UndoableItemCustomCommand, UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, \
     UndoableResizeLineItem, UndoableMovePathPoint, UndoableSetTextAlignment, UndoableSetCharacterFormat, \
-    UndoableSetLineWidthF, UndoableConvertToPlainText
+    UndoableSetLineWidthF, UndoableConvertToPlainText, UndoRedoBaglantisiYaziNesnesiDocuna
 
+
+# ---------------------------------------------------------------------
+def undoRedoBaglantisiYaziNesnesiDocuna(undoStack, description, doc):
+    command = UndoRedoBaglantisiYaziNesnesiDocuna(description, doc)
+    undoStack.push(command)
 
 # ---------------------------------------------------------------------
 def undoableSayfaAdiDegistir(undoStack, description, sayfa, sayfa_eski_adi):

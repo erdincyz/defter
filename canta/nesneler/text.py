@@ -37,6 +37,8 @@ class Text(QGraphicsTextItem):
 
         # self.doc.setUndoRedoEnabled(True)
 
+        self.doc.undoCommandAdded.connect(self.act_undo_eklendi)
+
         self.setFont(font)
 
         self.isTextOverflowed = False
@@ -111,6 +113,13 @@ class Text(QGraphicsTextItem):
 
         self.isPlainText = True
         self.oklar_dxdy_nokta = {}
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def act_undo_eklendi(self):
+        self.scene().undoRedo.undoRedoBaglantisiYaziNesnesiDocuna(self.scene().undoStack,
+                                                                  self.scene().tr("change text"),
+                                                                  self.doc)
 
     # ---------------------------------------------------------------------
     def ok_ekle(self, ok, scenepPos, okunHangiNoktasi):
@@ -683,7 +692,7 @@ class Text(QGraphicsTextItem):
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
             self.scaleItem(event.delta())
-                # self.scaleItem(event.angleDelta().y())
+            # self.scaleItem(event.angleDelta().y())
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
@@ -723,7 +732,7 @@ class Text(QGraphicsTextItem):
             size += 1
 
         else:
-            if size > 10:
+            if size > 5:
                 # font.setPointSize(size - 1)
                 size -= 1
             else:

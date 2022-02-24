@@ -12,7 +12,6 @@ from PySide6.QtWidgets import QStyle
 from canta.nesneler.base import BaseItem
 from canta import shared
 from canta.nesneler.text import Text
-from canta.undoRedoFonksiyolar import undoableAddItem, undoableParent
 
 
 ########################################################################
@@ -131,11 +130,11 @@ class Image(BaseItem):
             self.scene().parent().increase_zvalue(textItem)
             # textItem.textItemSelectedChanged.connect(self.textItemSelected)
             # self.addItem(textItem)
-            undoableAddItem(self.scene().undoStack, description=self.scene().tr("add text"), scene=self.scene(),
+            self.scene().undoRedo.undoableAddItem(self.scene().undoStack, description=self.scene().tr("add text"), scene=self.scene(),
                             item=textItem)
             textItem.setFocus()
             yeniPos = self.mapFromScene(textItem.scenePos())
-            undoableParent(self.scene().undoStack, self.scene().tr("_parent"), textItem, self, yeniPos)
+            self.scene().undoRedo.undoableParent(self.scene().undoStack, self.scene().tr("_parent"), textItem, self, yeniPos)
 
         # super(Image, self).mouseDoubleClickEvent(event)
 

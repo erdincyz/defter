@@ -20,6 +20,23 @@ from canta import shared
 #             nesne.parentItem().updateBoundingRect()
 #         tum_parentitemleri_tara_ve_grup_tipinde_olanlarin_boundingrectini_guncelle(nesne.parentItem())
 
+
+#######################################################################
+class UndoRedoBaglantisiYaziNesnesiDocuna(QUndoCommand):
+    # ---------------------------------------------------------------------
+    def __init__(self, description, doc, parent=None):
+        self.doc = doc
+        super(UndoRedoBaglantisiYaziNesnesiDocuna, self).__init__(description, parent)
+
+    # ---------------------------------------------------------------------
+    def undo(self) -> None:
+        self.doc.undo()
+
+    # ---------------------------------------------------------------------
+    def redo(self) -> None:
+        self.doc.redo()
+
+
 ########################################################################
 class UndoableSayfaAdiDegistir(QUndoCommand):
     """ """
