@@ -106,6 +106,8 @@ class DefterAnaPencere(QMainWindow):
         super(DefterAnaPencere, self).__init__(parent)
 
         self.setWindowTitle("Defter")
+        # self.ekran_cozunurluk = QApplication.primaryScreen().availableGeometry()
+        # self.resize(self.ekran_cozunurluk.size().width(), self.ekran_cozunurluk.size().height()-50)
         self.resize(1024, 740)
 
         self.setAttribute(Qt.WA_DeleteOnClose)
@@ -5390,17 +5392,16 @@ class DefterAnaPencere(QMainWindow):
             self.actionUnPinItem.setEnabled(False)
 
         if item.type() == DosyaNesnesi.Type:
+            # self.actionConvertToWebItem.setVisible(True)
             # self.actionShowAsWebPage.setVisible(True)
-
             self.actionExportDosya.setVisible(True)
             self.actionShowDosyaInfo.setVisible(True)
             if item.isEmbeded:
-                # self.actionEmbedImage.setEnabled(False)
                 self.actionEmbedDosya.setVisible(False)
             else:
-                # self.actionEmbedImage.setEnabled(True)
                 self.actionEmbedDosya.setVisible(True)
         else:
+            # self.actionConvertToWebItem.setVisible(True)
             # self.actionShowAsWebPage.setVisible(False)
             self.actionExportDosya.setVisible(False)
             self.actionShowDosyaInfo.setVisible(False)
@@ -8412,62 +8413,49 @@ class DefterAnaPencere(QMainWindow):
         layout = QVBoxLayout()
         widget.setLayout(layout)
 
-        webWiew = QWebEngineView(widget)
-        webWiew.setObjectName("webview")
-        # webWiew.settings().setAttribute(QWebEngineSettings.ScreenCaptureEnabled, True)
-        webWiew.settings().setAttribute(QWebEngineSettings.PluginsEnabled, True)
-
-        wProfile = QWebEngineProfile(self)
-        # wProfile.setPersistentStoragePath("")
-        # wProfile.setPersistentCookiesPolicy(QWebEngineProfile.NoPersistentCookies)
-        # print(wProfile.persistentStoragePath())
-        # print(wProfile.httpCacheType())
-        # print(wProfile.isOffTheRecord())
-        webPage = QWebEnginePage(wProfile, webWiew)
-        # webPage = QWebEnginePage(wView)
-        # webPage.setHtml(self.cScene.activeItem.toHtml())
-        # profile = webPage.profile()
-        # print(profile.persistentStoragePath())
-        # print(profile.httpCacheType())
-        # print(profile.isOffTheRecord())
+        webView = QWebEngineView(widget)
+        webView.setObjectName("webview")
+        webView.settings().setAttribute(QWebEngineSettings.PluginsEnabled, False)
 
         if not url_as_string:
             url = QUrl("https://google.com")
         else:
             print(url_as_string)
             url = QUrl.fromUserInput(url_as_string)
-        webPage.setUrl(url)
-
-        webWiew.setPage(webPage)
+        if url.isValid():
+            webView.load(url)
 
         adressLay = QHBoxLayout()
         backButton = QToolButton(widget)
         backButton.setText("Back")
         backButton.setIcon(QIcon(':icons/undo.png'))
-        backButton.clicked.connect(webWiew.back)
+        backButton.clicked.connect(webView.back)
 
         forwardButton = QToolButton(widget)
         forwardButton.setText("Forward")
         forwardButton.setIcon(QIcon(':icons/redo.png'))
-        forwardButton.clicked.connect(webWiew.forward)
+        # forwardButton.clicked.connect(webView.page().triggerAction(QWebEnginePage.Forward))
+        forwardButton.clicked.connect(webView.forward)
 
         refreshButton = QToolButton(widget)
         refreshButton.setText("Refresh")
         refreshButton.setIcon(QIcon(':icons/refresh.png'))
-        refreshButton.clicked.connect(webWiew.reload)
+        refreshButton.clicked.connect(webView.reload)
 
         lineEdit = QLineEdit(widget)
         lineEdit.setClearButtonEnabled(True)
         # lineEdit.returnPressed.connect(lambda: webPage.load(QUrl(lineEdit.text())))
-        lineEdit.returnPressed.connect(lambda: webPage.setUrl(QUrl.fromUserInput(lineEdit.text())))
-        webWiew.urlChanged.connect(lambda changed_url: lineEdit.setText(changed_url.toDisplayString()))
+        lineEdit.returnPressed.connect(lambda: webView.load(QUrl.fromUserInput(lineEdit.text())))
+        # webView.page().urlChanged.connect(lambda changed_url: lineEdit.setText(changed_url.toDisplayString()))
+        webView.page().urlChanged.connect(lambda changed_url: lineEdit.setText(changed_url.toString()))
+        webView.page().titleChanged.connect(widget.setWindowTitle)
 
         adressLay.addWidget(backButton)
         adressLay.addWidget(forwardButton)
         adressLay.addWidget(refreshButton)
         adressLay.addWidget(lineEdit)
         layout.addLayout(adressLay)
-        layout.addWidget(webWiew)
+        layout.addWidget(webView)
         widget.show()
 
     # ---------------------------------------------------------------------
@@ -8475,40 +8463,28 @@ class DefterAnaPencere(QMainWindow):
     def act_show_as_web_page(self):
 
         widget = QDialog(self)
-        widget.resize(300, 500)
+        w1 = self.cScene.activeItem.rect().size().toSize().width()
+        w2 = self.cView.size().width()
+        h1 = self.cScene.activeItem.rect().size().toSize().height()
+        h2 = self.cView.size().height()
+
         widget.setAttribute(Qt.WA_DeleteOnClose)
         widget.setWindowTitle(self.tr("Defter: Show As Web Page"))
         layout = QVBoxLayout()
         widget.setLayout(layout)
 
-        webWiew = QWebEngineView(widget)
-        webWiew.setObjectName("webview")
-        # webWiew.settings().setAttribute(QWebEngineSettings.ScreenCaptureEnabled, True)
-        webWiew.settings().setAttribute(QWebEngineSettings.PluginsEnabled, True)
-        wProfile = QWebEngineProfile(self)
-        # wProfile.setPersistentStoragePath("")
-        # wProfile.setPersistentCookiesPolicy(QWebEngineProfile.NoPersistentCookies)
-        # print(wProfile.persistentStoragePath())
-        # print(wProfile.httpCacheType())
-        # print(wProfile.isOffTheRecord())
-        webPage = QWebEnginePage(wProfile, webWiew)
-        # webPage = QWebEnginePage(wView)
-        # webPage.setHtml(self.cScene.activeItem.toHtml())
-        # profile = webPage.profile()
-        # print(profile.persistentStoragePath())
-        # print(profile.httpCacheType())
-        # print(profile.isOffTheRecord())
-
-        # dosya nesnesinde de web sayfasi olarak goster vardi, neden eklenmisti hatirlanamadi
-        # html dosyalari icin miydi?
-        # if self.cScene.activeItem.type() == DosyaNesnesi.Type:
-        #     # wView.load(QUrl.fromLocalFile(self.cScene.activeItem.filePathForSave))
-        #     webPage.setUrl(QUrl.fromLocalFile(self.cScene.activeItem.filePathForSave))
+        webView = QWebEngineView(widget)
+        webView.setObjectName("webview")
+        webView.settings().setAttribute(QWebEngineSettings.PluginsEnabled, False)
+        # if self.cScene.activeItem.type() == shared.DOSYA_ITEM_TYPE:
+        #     webView.load(QUrl.fromLocalFile(self.cScene.activeItem.filePathForSave))
+        #     widget.resize(self.cView.size())
         # else:
-        #     webPage.setHtml(self.cScene.activeItem.toHtml())
-
-        webWiew.setPage(webPage)
-        layout.addWidget(webWiew)
+        #     webView.setHtml(self.cScene.activeItem.toHtml())
+        #     widget.resize(min(w1, w2), min(h1, h2))
+        webView.setHtml(self.cScene.activeItem.toHtml())
+        widget.resize(min(w1, w2), min(h1, h2))
+        layout.addWidget(webView)
         widget.show()
 
     # ---------------------------------------------------------------------
@@ -8524,14 +8500,19 @@ class DefterAnaPencere(QMainWindow):
 
         item = self.cScene.activeItem
 
-        if item.type() == DosyaNesnesi.Type:
-            webItem = Web(None, item.filePathForSave, item.scenePos(), item.rect(), self.yaziRengi, self.arkaPlanRengi,
-                          self._pen,
-                          self.currentFont)
-        else:
-            webItem = Web(item.toHtml(), None, item.scenePos(), item.rect(), self.yaziRengi, self.arkaPlanRengi,
-                          self._pen,
-                          self.currentFont)
+        # if item.type() == DosyaNesnesi.Type:
+        #     webItem = Web(None, item.filePathForSave, item.scenePos(), item.rect(), self.yaziRengi, self.arkaPlanRengi,
+        #                   self._pen,
+        #                   self.currentFont)
+        # else:
+        #     webItem = Web(item.toHtml(), None, item.scenePos(), item.rect(), self.yaziRengi, self.arkaPlanRengi,
+        #                   self._pen,
+        #                   self.currentFont)
+
+        webItem = Web(item.toHtml(), None, item.scenePos(), item.rect(), self.yaziRengi, self.arkaPlanRengi,
+                      self._pen,
+                      self.currentFont)
+
         undoRedo.undoableAddItem(self.cScene.undoStack, self.tr("convert to web item"), self.cScene, webItem)
 
     # ---------------------------------------------------------------------

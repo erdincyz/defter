@@ -34,22 +34,9 @@ class Web(BaseItem):
 
         self.wView = QWebEngineView()
         # self.wView.setAttribute(Qt.WA_DontShowOnScreen)
-        # self.wView.settings().setAttribute(QWebEngineSettings.ScreenCaptureEnabled, True)
-        self.wView.settings().setAttribute(QWebEngineSettings.PluginsEnabled, True)
-        wProfile = QWebEngineProfile(self.proxy)
-        # wProfile.setPersistentStoragePath("")
-        # wProfile.setPersistentCookiesPolicy(QWebEngineProfile.NoPersistentCookies)
-        print(wProfile.persistentStoragePath())
-        print(wProfile.httpCacheType())
-        print(wProfile.isOffTheRecord())
-        wPage = QWebEnginePage(wProfile, self.wView)
+        self.wView.settings().setAttribute(QWebEngineSettings.PluginsEnabled, False)
         if html:
-            wPage.setHtml(html)
-            profile = wPage.profile()
-            print(profile.persistentStoragePath())
-            print(profile.httpCacheType())
-            print(profile.isOffTheRecord())
-            self.wView.setPage(wPage)
+            self.wView.setHtml(html)
         else:
             self.wView.load(QUrl.fromLocalFile(dosyaAdresi))
 
