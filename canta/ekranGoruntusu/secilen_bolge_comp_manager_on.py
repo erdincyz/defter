@@ -4,6 +4,7 @@ __author__ = 'Erdinç Yılmaz'
 __date__ = '8/1/15'
 
 from PySide6.QtCore import Qt, QRect, Signal, QSize
+from PySide6.QtGui import QPainter, QPen
 from PySide6.QtWidgets import QRubberBand, QWidget
 
 
@@ -14,11 +15,19 @@ class MyRubberBand(QRubberBand):
     def __init__(self, shape=QRubberBand.Rectangle, parent=None):
         super(MyRubberBand, self).__init__(shape, parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
-
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         # defaultFlags = self.windowFlags()
         # self.setWindowFlags(defaultFlags | Qt.ToolTip)
         # self.setWindowFlags(Qt.ToolTip)
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        # self.setStyleSheet("selection-background-color: transparent")
+        self._pen = QPen(Qt.blue, 3, Qt.DotLine)
+
+    # ---------------------------------------------------------------------
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setPen(self._pen)
+        painter.setBrush(Qt.NoBrush)
+        painter.drawRect(event.rect().adjusted(0, 0, -1, -1))
 
 
 #######################################################################
@@ -39,7 +48,7 @@ class TamEkranWidget_CM_On(QWidget):
 
         # self.setPalette(Qt.transparent)
         # self.setAttribute(Qt.WA_TransparentForMouseEvents)
-
+        self.istek_mouse_releaseden_mi_geliyor = False
         self.rubberBand = None
 
         # self.setWindowOpacity(0.01)
@@ -47,6 +56,13 @@ class TamEkranWidget_CM_On(QWidget):
         # self.setStyleSheet("QWidget{background:transparent;}")
         # self.setStyleSheet("QWidget{background-color:none;}")
         self.showFullScreen()
+
+    # ---------------------------------------------------------------------
+    def closeEvent(self, event):
+        if self.istek_mouse_releaseden_mi_geliyor:
+            self.rubberBandReleased.emit(QRect(self.rubberBand.geometry()))
+        event.accept()
+        # super(TamEkranWidget_CM_Off, self).closeEvent(event)
 
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):
@@ -80,13 +96,14 @@ class TamEkranWidget_CM_On(QWidget):
 
     # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
-        # self.rubberBand.hide()
+        self.rubberBand.hide()
         # self.rubberBand.close()
         # self.hide()
         # self.close()
         # self.setAttribute(Qt.WA_PaintOnScreen, False)
-        self.rubberBandReleased.emit(self.rubberBand.geometry())
-        super(TamEkranWidget_CM_On, self).mouseReleaseEvent(event)
+        # self.rubberBandReleased.emit(self.rubberBand.geometry())
+        # super(TamEkranWidget_CM_On, self).mouseReleaseEvent(event)
+        self.istek_mouse_releaseden_mi_geliyor = True
         self.close()
         self.deleteLater()
 

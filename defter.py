@@ -9692,14 +9692,19 @@ class DefterAnaPencere(QMainWindow):
 
             # if self.printer.outputFileName():
             #     self.preview.print()
+    # ---------------------------------------------------------------------
+    @Slot()
+    def act_ekran_goruntusu_tam_ekran(self):
+        self.hide()
+        self.bekle_ekran_goruntusu_cek(QApplication.primaryScreen().geometry())
+        self.show()
 
     # ---------------------------------------------------------------------
     @Slot()
     def act_ekran_goruntusu_secim_cm_on(self):
-        QApplication.setOverrideCursor(Qt.CrossCursor)
         self.hide()
-
         self.shot_selection = TamEkranWidget_CM_On()
+        QApplication.setOverrideCursor(Qt.CrossCursor)
         self.shot_selection.rubberBandReleased.connect(self.bekle_ekran_goruntusu_cek)
         self.shot_selection.esc_key_pressed.connect(self.kapat_ekran_goruntusu)
         # self.shot_selection.activateWindow()
@@ -9709,10 +9714,9 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_ekran_goruntusu_secim_cm_off(self):
-
-        QApplication.setOverrideCursor(Qt.CrossCursor)
         self.hide()
         self.shot_selection = TamEkranWidget_CM_Off()
+        QApplication.setOverrideCursor(Qt.CrossCursor)
         self.shot_selection.rubberBandReleased.connect(self.bekle_ekran_goruntusu_cek)
         self.shot_selection.esc_key_pressed.connect(self.kapat_ekran_goruntusu)
         # self.shot_selection.activateWindow()
@@ -9720,20 +9724,12 @@ class DefterAnaPencere(QMainWindow):
         # self.shot_selection.showFullScreen()
 
     # ---------------------------------------------------------------------
-    @Slot()
-    def act_ekran_goruntusu_tam_ekran(self):
-        self.hide()
-        self.bekle_ekran_goruntusu_cek(QApplication.primaryScreen().geometry())
-        self.show()
-
-
-    # ---------------------------------------------------------------------
     @Slot(QRect)
     def bekle_ekran_goruntusu_cek(self, geo):
         # time.sleep(0.2)
+        # QTimer.singleShot(300, lambda: self.ekran_goruntusu_cek(geo))
         if not geo.isEmpty():
-            QTimer.singleShot(500, lambda: self.ekran_goruntusu_cek(geo))
-            # self.ekran_goruntusu_cek(geo)
+            self.ekran_goruntusu_cek(geo)
 
         # QTimer.singleShot(10, lambda geo=geo: self.ekran_goruntusu_cek(geo))
         self.kapat_ekran_goruntusu()
@@ -9748,6 +9744,8 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def ekran_goruntusu_cek(self, geo):
+
+        geo = geo.adjusted(2, 2, -2, -2)
 
         x, y, w, h = geo.x(), geo.y(), geo.width(), geo.height()
 
