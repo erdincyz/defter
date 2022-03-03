@@ -9696,7 +9696,9 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_ekran_goruntusu_tam_ekran(self):
         self.hide()
-        self.bekle_ekran_goruntusu_cek(QApplication.primaryScreen().geometry())
+        QApplication.processEvents()
+        QTimer.singleShot(10, lambda: self.ekran_goruntusu_cek(QApplication.primaryScreen().geometry()))
+        # self.ekran_goruntusu_cek(QApplication.primaryScreen().geometry())
         self.show()
 
     # ---------------------------------------------------------------------
@@ -9737,6 +9739,8 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def kapat_ekran_goruntusu(self):
+        self.shot_selection.close()
+        self.shot_selection.deleteLater()
         self.shot_selection = None
         # del self.shot_selection
         QApplication.restoreOverrideCursor()

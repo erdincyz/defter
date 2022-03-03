@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-__project_name__ = 'Defter3'
+#.
+
+__project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '8/1/15'
 
-from PySide6.QtCore import (Qt, QRect, Signal, QSize)
-from PySide6.QtGui import QPen, QPainter
-from PySide6.QtWidgets import (QRubberBand, QWidget)
+from PySide6.QtCore import (Qt, QRect, Signal, QSize, QTimer)
+from PySide6.QtGui import QPainter
+from PySide6.QtWidgets import (QRubberBand, QApplication, QLabel)
 
 
 #######################################################################
 class MyRubberBand(QRubberBand):
+    rubberBandHidden = Signal()
 
     # ---------------------------------------------------------------------
     def __init__(self, shape=QRubberBand.Rectangle, parent=None):
@@ -20,22 +23,16 @@ class MyRubberBand(QRubberBand):
         # self.setWindowFlags(defaultFlags | Qt.ToolTip)
         # self.setWindowFlags(Qt.ToolTip)
         # self.setStyleSheet("selection-background-color: transparent")
-        self._pen = QPen(Qt.blue, 3, Qt.DotLine)
-
-        # self.setAttribute(Qt.WA_PaintOnScreen, True)
 
     # ---------------------------------------------------------------------
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setPen(self._pen)
-        painter.setOpacity(0.1)
-        painter.setBrush(Qt.NoBrush)
-        painter.drawRect(event.rect().adjusted(0, 0, -1, -1))
+    def hideEvent(self, event):
+        super(MyRubberBand, self).hideEvent(event)
+        QApplication.processEvents()
+        QTimer.singleShot(50, self.rubberBandHidden.emit)
 
 
 #######################################################################
-class TamEkranWidget_CM_Off(QWidget):
-
+class TamEkranWidget_CM_Off(QLabel):
     rubberBandReleased = Signal(QRect)
     esc_key_pressed = Signal()
 
@@ -49,36 +46,44 @@ class TamEkranWidget_CM_Off(QWidget):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
 
         self.setAttribute(Qt.WA_TranslucentBackground, True)
-        # self.setAttribute(Qt.WA_NoSystemBackground, True)
-        self.setAttribute(Qt.WA_PaintOnScreen, True)
-
+        # self.setAttribute(Qt.WA_PaintOnScreen, True)
+        self.setAutoFillBackground(True)
         # self.setStyleSheet("background-color:none;")
         # self.setAutoFillBackground(True)
 
-        self.istek_mouse_releaseden_mi_geliyor = False
-        self.rubberBand = None
+        # self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
+        # self.rubberBand = MyRubberBand(QRubberBand.Rectangle, self)
+        self.rubberBand = MyRubberBand(QRubberBand.Rectangle)
+        self.rubberBand.rubberBandHidden.connect(self.act_rubberband_hidden)
+
+        self.alan = QRect()
+
+        self.screen = QApplication.primaryScreen()
+
+        self.setAutoFillBackground(True)
 
         # self.setWindowOpacity(0.01)
-        self.setWindowOpacity(0)
+        # self.setWindowOpacity(0)
         # self.setStyleSheet("QWidget{background:transparent;}")
         # self.setStyleSheet("QWidget{background-color:none;}")
+
         self.showFullScreen()
 
     # ---------------------------------------------------------------------
-    def closeEvent(self, event):
-        if self.istek_mouse_releaseden_mi_geliyor:
-            self.rubberBandReleased.emit(QRect(self.rubberBand.geometry()))
-        event.accept()
-        # super(TamEkranWidget_CM_Off, self).closeEvent(event)
+    def act_rubberband_hidden(self):
+        # QApplication.processEvents()
+        QTimer.singleShot(0, lambda: self.rubberBandReleased.emit(self.alan))
+
+    # ---------------------------------------------------------------------
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.drawPixmap(self.rect(), self.screen.grabWindow(0))
+        # super(TamEkranWidget_CM_Off, self).paintEvent(event)
 
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):
         self.origin = event.pos()
 
-        if not self.rubberBand:
-            # self.rubberBand = QRubberBand(QRubberBand.Rectangle)
-            # self.rubberBand = MyRubberBand(QRubberBand.Rectangle, self)
-            self.rubberBand = MyRubberBand(QRubberBand.Rectangle)
         self.rubberBand.setGeometry(QRect(self.origin, QSize()))
         self.rubberBand.show()
 
@@ -86,29 +91,19 @@ class TamEkranWidget_CM_Off(QWidget):
 
     # ---------------------------------------------------------------------
     def mouseMoveEvent(self, event):
-        # self.rubberBand.setGeometry(QRect(self.origin, event.pos()).normalized())
 
-        # self.rubberBand.setGeometry(QRect(self.mapToGlobal(self.origin),
-        #                                   self.mapToGlobal(event.pos())).normalized())
+        self.rubberBand.setGeometry(QRect(self.origin, event.pos()).normalized())
 
-        self.rubberBand.setGeometry(QRect(self.mapToGlobal(self.origin),
-                                          self.mapToGlobal(event.pos())).normalized())
-
-        # self.rubberBand.setGeometry(QRect(self.mapToGlobal(QCursor.pos()),
-        #                                   self.mapToGlobal(event.pos())).normalized())
-
+        # self.repaint()
         super(TamEkranWidget_CM_Off, self).mouseMoveEvent(event)
 
     # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
+        self.alan = self.rubberBand.geometry()
         self.rubberBand.hide()
-        # self.rubberBandReleased.emit(QRect(self.rubberBand.geometry()))
 
         # super(TamEkranWidget_CM_Off, self).mouseReleaseEvent(event)
         # return QWidget.mouseReleaseEvent(event)
-        self.istek_mouse_releaseden_mi_geliyor = True
-        self.close()
-        self.deleteLater()
 
     # ---------------------------------------------------------------------
     def keyPressEvent(self, event):

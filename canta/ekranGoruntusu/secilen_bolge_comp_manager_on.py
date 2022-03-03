@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-__project_name__ = 'Defter3'
+#.
+
+__project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '8/1/15'
 
@@ -86,8 +88,7 @@ class TamEkranWidget_CM_On(QWidget):
         # self.rubberBand.setGeometry(QRect(self.mapToGlobal(self.origin),
         #                                   self.mapToGlobal(event.pos())).normalized())
 
-        self.rubberBand.setGeometry(QRect(self.mapToGlobal(self.origin),
-                                          self.mapToGlobal(event.pos())).normalized())
+        self.rubberBand.setGeometry(QRect(self.origin, event.pos()).normalized())
 
         # self.rubberBand.setGeometry(QRect(self.mapToGlobal(QCursor.pos()),
         #                                   self.mapToGlobal(event.pos())).normalized())
@@ -98,7 +99,6 @@ class TamEkranWidget_CM_On(QWidget):
     def mouseReleaseEvent(self, event):
         self.rubberBand.hide()
         # self.rubberBand.close()
-        # self.hide()
         # self.close()
         # self.setAttribute(Qt.WA_PaintOnScreen, False)
         # self.rubberBandReleased.emit(self.rubberBand.geometry())
