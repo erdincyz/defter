@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-#.
+# .
 
 __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '8/1/15'
 
-from PySide6.QtCore import Qt, QRect, Signal, QSize
-from PySide6.QtGui import QPainter, QPen
-from PySide6.QtWidgets import QRubberBand, QWidget
+from PySide6.QtCore import (Qt, QRect, Signal, QSize)
+from PySide6.QtGui import (QPainter, QPen)
+from PySide6.QtWidgets import (QRubberBand, QWidget)
 
 
 #######################################################################

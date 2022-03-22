@@ -1056,15 +1056,10 @@ class Scene(QGraphicsScene):
                     if not self.fircaBoyutuItem:
                         self._fircaBoyutuItem_olustur()
 
-        # elif event.modifiers() & Qt.ShiftModifier:
-        #     if event.key() == Qt.Key_Up:
-        #         self.rotateItem(-1)
-        #     if event.key() == Qt.Key_Down:
-        #         self.rotateItem(1)
-        #     if event.key() == Qt.Key_Right:
-        #         self.rotateItem(1)
-        #     if event.key() == Qt.Key_Left:
-        #         self.rotateItem(-1)
+        elif event.modifiers() & Qt.ControlModifier:
+            # ctrl ok ve ctrl + shift oklar kisa yol olarak ana pencerede atanmis durumda
+            # burda tum ctrl hareketlerini iptal ediyoruz
+            return QGraphicsScene.keyPressEvent(self, event)
 
         else:
             if event.key() == Qt.Key_Up:

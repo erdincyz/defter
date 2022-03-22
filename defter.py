@@ -5271,7 +5271,7 @@ class DefterAnaPencere(QMainWindow):
         self.actionSecimEkranGoruntusuAlCmOn.setShortcut(QKeySequence(Qt.Key_Print))
         self.actionSecimEkranGoruntusuAlCmOn.triggered.connect(self.act_ekran_goruntusu_secim_cm_on)
 
-        self.actionSecimEkranGoruntusuAlCmOff = QAction(self.tr("Selected Area (Comp Of)"), self.utilitiesToolBar)
+        self.actionSecimEkranGoruntusuAlCmOff = QAction(self.tr("Selected Area (Comp Off)"), self.utilitiesToolBar)
         # self.actionSecimEkranGoruntusuAlCmOff.setShortcut(QKeySequence(Qt.Key_Print))
         self.actionSecimEkranGoruntusuAlCmOff.triggered.connect(self.act_ekran_goruntusu_secim_cm_off)
 
@@ -5281,7 +5281,6 @@ class DefterAnaPencere(QMainWindow):
         ekranGoruntusuMenu.addActions((self.actionSecimEkranGoruntusuAlCmOn,
                                        self.actionSecimEkranGoruntusuAlCmOff,
                                        self.actionScreenshotFullscreen))
-
 
         self.utilitiesToolBar.addWidget(spacerWidget)
         # self.utilitiesToolBar.addWidget(self.actionAlwaysOnTopToggle)
@@ -8613,7 +8612,7 @@ class DefterAnaPencere(QMainWindow):
                     if not item.isEmbeded:
                         if os.path.exists(item.filePathForSave):
                             itemsToEmbed.append(item)
-                            undoRedo.undoableEmbedImage(self.cScene.undoStack, self.tr("_embed image"), item)
+                            # undoRedo.undoableEmbedImage(self.cScene.undoStack, self.tr("_embed image"), item)
                         else:
                             self.log(self.tr("Could not embeded! "
                                              "Image's original source path does not exist! : {}")
@@ -8743,13 +8742,13 @@ class DefterAnaPencere(QMainWindow):
         if len(self.cScene.selectionQueue) > 1:
             itemsToEmbed = []
 
-            self.cScene.undoStack.beginMacro(self.tr("Embed video(s)"))
+            # self.cScene.undoStack.beginMacro(self.tr("Embed video(s)"))
             for item in self.cScene.selectionQueue:
                 if item.type() == VideoItem.Type:
                     if not item.isEmbeded:
                         if os.path.exists(item.filePathForSave):
                             itemsToEmbed.append(item)
-                            undoRedo.undoableEmbedVideo(self.cScene.undoStack, self.tr("_embed video"), item)
+                            # undoRedo.undoableEmbedVideo(self.cScene.undoStack, self.tr("_embed video"), item)
                     else:
                         self.log(self.tr("Could not embeded! "
                                          "Video's original source path does not exist! : {}")
@@ -8860,13 +8859,13 @@ class DefterAnaPencere(QMainWindow):
         if len(self.cScene.selectionQueue) > 1:
             itemsToEmbed = []
 
-            self.cScene.undoStack.beginMacro(self.tr("Embed file(s)"))
+            # self.cScene.undoStack.beginMacro(self.tr("Embed file(s)"))
             for item in self.cScene.selectionQueue:
                 if item.type() == DosyaNesnesi.Type:
                     if not item.isEmbeded:
                         if os.path.exists(item.filePathForSave):
                             itemsToEmbed.append(item)
-                            undoRedo.undoableEmbedFile(self.cScene.undoStack, self.tr("_embed file"), item)
+                            # undoRedo.undoableEmbedFile(self.cScene.undoStack, self.tr("_embed file"), item)
                     else:
                         self.log(self.tr("Could not embeded! "
                                          "File's original source path does not exist! : {}")

@@ -33,8 +33,8 @@ class DoubleSliderWithDoubleSpinBox(QWidget):
         self.slider.setOrientation(yerlesim)
         self.dSpinBox = DoubleSpinBox(self)
 
-        anaLay.addWidget(self.dSpinBox)
         anaLay.addWidget(self.slider)
+        anaLay.addWidget(self.dSpinBox)
         # anaLay.addStretch()
 
         self.slider.valueChangedFromSliderGuiNotBySetValue.connect(lambda x: self.degerDegisti.emit(x / 10))
