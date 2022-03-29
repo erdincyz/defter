@@ -41,6 +41,7 @@ from PySide6.QtWebEngineWidgets import QWebEngineView  # QWebEnginePage, #QWebEn
 
 from PySide6.QtPrintSupport import QPrinter, QPrinterInfo
 from canta import shared
+from canta.dockWidget import DockWidget
 from canta.printPreviewDialog import PrintPreviewDialog
 from canta.scene import Scene
 from canta.view import View
@@ -246,28 +247,9 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def olustur_yazi_ozellikleriDW(self):
 
-        self.yaziOzellikleriDW = QDockWidget(self)
-        self.yaziOzellikleriBaslik = QLabel(self.tr("- Text Properties -"), self.yaziOzellikleriDW)
-        self.yaziOzellikleriBaslik.setStyleSheet("QLabel {"
-                                                 "font-size:1.2em; "
-                                                 "font-weight:bold;"
-                                                 # "margin-right:10px;"
-                                                 # "margin-left:10px;"
-                                                 # "margin-top:1px;"
-                                                 "padding-top:1px;"
-                                                 "padding-bottom:1px;"
-                                                 "color:#fff; "
-                                                 "background-color:#9ab;}")
-        self.yaziOzellikleriBaslik.setAlignment(Qt.AlignCenter)
-        self.yaziOzellikleriDW.setTitleBarWidget(self.yaziOzellikleriBaslik)
-        self.yaziOzellikleriDW.setWindowTitle(self.tr("Text Properties"))
+        self.yaziOzellikleriDW = DockWidget(self.tr("Text Properties"), self)
         self.yaziOzellikleriDW.setObjectName("yaziOzellikleriDW")
         self.yaziOzellikleriDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.yaziOzellikleriDW.setFeatures(QDockWidget.DockWidgetMovable |
-                                           QDockWidget.DockWidgetClosable |
-                                           # QDockWidget.DockWidgetVerticalTitleBar|
-                                           QDockWidget.DockWidgetFloatable
-                                           )
         self.addDockWidget(Qt.RightDockWidgetArea, self.yaziOzellikleriDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
@@ -482,28 +464,9 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def olustur_nesne_ozellikleriDW(self):
 
-        self.nesneOzellikleriDW = QDockWidget(self)
-        self.nesneOzellikleriBaslik = QLabel(self.tr("- Item Properties -"), self.nesneOzellikleriDW)
-        self.nesneOzellikleriBaslik.setStyleSheet("QLabel {"
-                                                  "font-size:1.2em; "
-                                                  "font-weight:bold;"
-                                                  # "margin-right:10px;"
-                                                  # "margin-left:10px;"
-                                                  # "margin-top:1px;"
-                                                  "padding-top:1px;"
-                                                  "padding-bottom:1px;"
-                                                  "color:#fff; "
-                                                  "background-color:#9ab;}")
-        self.nesneOzellikleriBaslik.setAlignment(Qt.AlignCenter)
-        self.nesneOzellikleriDW.setTitleBarWidget(self.nesneOzellikleriBaslik)
-        self.nesneOzellikleriDW.setWindowTitle(self.tr("Item Properties"))
+        self.nesneOzellikleriDW = DockWidget(self.tr("Item Properties"), self)
         self.nesneOzellikleriDW.setObjectName("nesneOzellikleriDW")
         self.nesneOzellikleriDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.nesneOzellikleriDW.setFeatures(QDockWidget.DockWidgetMovable |
-                                            QDockWidget.DockWidgetClosable |
-                                            # QDockWidget.DockWidgetVerticalTitleBar|
-                                            QDockWidget.DockWidgetFloatable
-                                            )
         self.addDockWidget(Qt.RightDockWidgetArea, self.nesneOzellikleriDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
@@ -630,28 +593,9 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def olustur_cizgi_ozellikleriDW(self):
 
-        self.cizgiOzellikleriDW = QDockWidget(self)
-        self.cizgiOzellikleriBaslik = QLabel(self.tr("- Line & Pen Properties -"), self.cizgiOzellikleriDW)
-        self.cizgiOzellikleriBaslik.setStyleSheet("QLabel {"
-                                                  "font-size:1.2em; "
-                                                  "font-weight:bold;"
-                                                  # "margin-right:10px;"
-                                                  # "margin-left:10px;"
-                                                  # "margin-top:1px;"
-                                                  "padding-top:1px;"
-                                                  "padding-bottom:1px;"
-                                                  "color:#fff; "
-                                                  "background-color:#9ab;}")
-        self.cizgiOzellikleriBaslik.setAlignment(Qt.AlignCenter)
-        self.cizgiOzellikleriDW.setTitleBarWidget(self.cizgiOzellikleriBaslik)
-        self.cizgiOzellikleriDW.setWindowTitle(self.tr("Line Properties"))
+        self.cizgiOzellikleriDW = DockWidget(self.tr("Line && Pen Properties"), self)
         self.cizgiOzellikleriDW.setObjectName("cizgiOzellikleriDW")
         self.cizgiOzellikleriDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.cizgiOzellikleriDW.setFeatures(QDockWidget.DockWidgetMovable |
-                                            QDockWidget.DockWidgetClosable |
-                                            # QDockWidget.DockWidgetVerticalTitleBar|
-                                            QDockWidget.DockWidgetFloatable
-                                            )
         self.addDockWidget(Qt.RightDockWidgetArea, self.cizgiOzellikleriDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
@@ -831,28 +775,9 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def olustur_stillerDW(self):
-        self.stillerDW = QDockWidget(self)
-        self.stillerBaslik = QLabel(self.tr("- Style Presets -"), self.stillerDW)
-        self.stillerBaslik.setStyleSheet("QLabel {"
-                                         "font-size:1.2em; "
-                                         "font-weight:bold;"
-                                         # "margin-right:10px;"
-                                         # "margin-left:10px;"
-                                         # "margin-top:1px;"
-                                         "padding-top:1px;"
-                                         "padding-bottom:1px;"
-                                         "color:#fff; "
-                                         "background-color:#9ab;}")
-        self.stillerBaslik.setAlignment(Qt.AlignCenter)
-        self.stillerDW.setTitleBarWidget(self.stillerBaslik)
-        self.stillerDW.setWindowTitle(self.tr("Style Presets"))
+        self.stillerDW = DockWidget(self.tr("Style Presets"), self)
         self.stillerDW.setObjectName("stillerDockWidget")
         self.stillerDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.stillerDW.setFeatures(QDockWidget.DockWidgetMovable |
-                                   QDockWidget.DockWidgetClosable |
-                                   # QDockWidget.DockWidgetVerticalTitleBar|
-                                   QDockWidget.DockWidgetFloatable
-                                   )
         self.addDockWidget(Qt.RightDockWidgetArea, self.stillerDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
@@ -949,28 +874,9 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def olustur_sahneye_baski_siniri_cizim_ayarlari(self):
-        self.baskiSiniriCizimAyarlariDW = QDockWidget(self)
-        self.baskiSiniriCizimAyarlariBaslik = QLabel(self.tr("Draw Print Borders"), self.baskiSiniriCizimAyarlariDW)
-        self.baskiSiniriCizimAyarlariBaslik.setStyleSheet("QLabel {"
-                                                          "font-size:1.2em; "
-                                                          "font-weight:bold;"
-                                                          # "margin-right:10px;"
-                                                          # "margin-left:10px;"
-                                                          # "margin-top:1px;"
-                                                          "padding-top:1px;"
-                                                          "padding-bottom:1px;"
-                                                          "color:#fff; "
-                                                          "background-color:#9ab;}")
-        self.baskiSiniriCizimAyarlariBaslik.setAlignment(Qt.AlignCenter)
-        self.baskiSiniriCizimAyarlariDW.setTitleBarWidget(self.baskiSiniriCizimAyarlariBaslik)
-        self.baskiSiniriCizimAyarlariDW.setWindowTitle(self.tr("Draw Print Borders"))
+        self.baskiSiniriCizimAyarlariDW = DockWidget(self.tr("Draw Print Borders"), self)
         self.baskiSiniriCizimAyarlariDW.setObjectName("baskiSiniriCizimAyarlariDockWidget")
         self.baskiSiniriCizimAyarlariDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.baskiSiniriCizimAyarlariDW.setFeatures(QDockWidget.DockWidgetMovable |
-                                                    QDockWidget.DockWidgetClosable |
-                                                    # QDockWidget.DockWidgetVerticalTitleBar|
-                                                    QDockWidget.DockWidgetFloatable
-                                                    )
         self.baskiSiniriCizimAyarlariDW.setVisible(False)
         self.addDockWidget(Qt.LeftDockWidgetArea, self.baskiSiniriCizimAyarlariDW)
 
@@ -1194,28 +1100,9 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def olustur_sayfalarDW(self):
-        self.sayfalarDW = QDockWidget(self)
-        self.sayfalarBaslik = QLabel(self.tr("- Pages -"), self.sayfalarDW)
-        self.sayfalarBaslik.setStyleSheet("QLabel {"
-                                          "font-size:1.2em; "
-                                          "font-weight:bold;"
-                                          # "margin-right:10px;"
-                                          # "margin-left:10px;"
-                                          # "margin-top:1px;"
-                                          "padding-top:1px;"
-                                          "padding-bottom:1px;"
-                                          "color:#fff; "
-                                          "background-color:#9ab;}")
-        self.sayfalarBaslik.setAlignment(Qt.AlignCenter)
-        self.sayfalarDW.setTitleBarWidget(self.sayfalarBaslik)
-        self.sayfalarDW.setWindowTitle(self.tr("Pages"))
+        self.sayfalarDW = DockWidget(self.tr("Pages"), self)
         self.sayfalarDW.setObjectName("sayfalarDockWidget")
         self.sayfalarDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.sayfalarDW.setFeatures(QDockWidget.DockWidgetMovable |
-                                    QDockWidget.DockWidgetClosable |
-                                    # QDockWidget.DockWidgetVerticalTitleBar|
-                                    QDockWidget.DockWidgetFloatable
-                                    )
         self.addDockWidget(Qt.LeftDockWidgetArea, self.sayfalarDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
@@ -1295,28 +1182,9 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def olustur_kutuphaneDW(self):
-        self.kutuphaneDW = QDockWidget(self)
-        self.kutuphaneBaslik = QLabel(self.tr("- Library -"), self.kutuphaneDW)
-        self.kutuphaneBaslik.setStyleSheet("QLabel {"
-                                           "font-size:1.2em; "
-                                           "font-weight:bold;"
-                                           # "margin-right:10px;"
-                                           # "margin-left:10px;"
-                                           # "margin-top:1px;"
-                                           "padding-top:1px;"
-                                           "padding-bottom:1px;"
-                                           "color:#fff; "
-                                           "background-color:#9ab;}")
-        self.kutuphaneBaslik.setAlignment(Qt.AlignCenter)
-        self.kutuphaneDW.setTitleBarWidget(self.kutuphaneBaslik)
-        self.kutuphaneDW.setWindowTitle(self.tr("Library"))
+        self.kutuphaneDW = DockWidget(self.tr("Library"), self)
         self.kutuphaneDW.setObjectName("kutuphaneDockWidget")
         self.kutuphaneDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea | Qt.BottomDockWidgetArea)
-        self.kutuphaneDW.setFeatures(QDockWidget.DockWidgetMovable |
-                                     QDockWidget.DockWidgetClosable |
-                                     # QDockWidget.DockWidgetVerticalTitleBar|
-                                     QDockWidget.DockWidgetFloatable
-                                     )
         self.addDockWidget(Qt.LeftDockWidgetArea, self.kutuphaneDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
@@ -3889,7 +3757,7 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleNesneOzellikleriDW.triggered.connect(
             lambda: self.nesneOzellikleriDW.setVisible(not self.nesneOzellikleriDW.isVisible()))
 
-        self.actionToggleCizgiOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Line&&Pen Properties'),
+        self.actionToggleCizgiOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Line && Pen Properties'),
                                                       dockWidgetsMenu)
         self.actionToggleCizgiOzellikleriDW.setShortcut(QKeySequence("Ctrl+Alt+5"))
         self.actionToggleCizgiOzellikleriDW.setCheckable(True)
@@ -3902,7 +3770,8 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleStillerDW.triggered.connect(
             lambda: self.stillerDW.setVisible(not self.stillerDW.isVisible()))
 
-        self.actionToggleBaskiSiniriCizimAyarlariDW = QAction(QIcon(':icons/properties.png'), self.tr('Draw Print Borders'), dockWidgetsMenu)
+        self.actionToggleBaskiSiniriCizimAyarlariDW = QAction(QIcon(':icons/properties.png'),
+                                                              self.tr('Draw Print Borders'), dockWidgetsMenu)
         self.actionToggleBaskiSiniriCizimAyarlariDW.setShortcut(QKeySequence("Ctrl+Alt+7"))
         self.actionToggleBaskiSiniriCizimAyarlariDW.setCheckable(True)
         self.actionToggleBaskiSiniriCizimAyarlariDW.triggered.connect(
@@ -4477,7 +4346,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionEqualizeVerticalGaps,
                                           self.actionDistributeItemsVertically,
                                           self.actionDistributeItemsHorizontally,
-                                           # utilities menu
+                                          # utilities menu
                                           self.actionSecimEkranGoruntusuAlCmOn
                                           ))
 
@@ -4584,7 +4453,7 @@ class DefterAnaPencere(QMainWindow):
         self.actionEkleDosyaNesnesi.triggered.connect(self.act_ekle_dosya_nesnesi)
         self.actionEkleDosyaNesnesi.setCheckable(True)
 
-        self.actionWebBrowserAc = QAction(QIcon(':icons/web-browser.png'), self.tr("Mini Web Browser"), actionGroup)
+        self.actionWebBrowserAc = QAction(QIcon(':icons/web-browser.png'), self.tr("Web Browser"), actionGroup)
         self.actionWebBrowserAc.setShortcut(QKeySequence("W"))
         self.actionWebBrowserAc.triggered.connect(self.act_web_browser_ac)
         # self.actionWebBrowserAc.setCheckable(True)
@@ -5258,7 +5127,7 @@ class DefterAnaPencere(QMainWindow):
 
         spacerWidget = QWidget(self.utilitiesToolBar)
         spacerWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        
+
         ekranGoruntusuMenuPB = QPushButton(self.utilitiesToolBar)
         ekranGoruntusuMenuPB.setFlat(True)
         ekranGoruntusuMenuPB.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
@@ -5266,7 +5135,7 @@ class DefterAnaPencere(QMainWindow):
         ekranGoruntusuMenu = QMenu(self.utilitiesToolBar)
         ekranGoruntusuMenu.aboutToShow.connect(self.on_ekranGoruntusuMenu_about_to_show)
         ekranGoruntusuMenuPB.setMenu(ekranGoruntusuMenu)
-        
+
         self.actionSecimEkranGoruntusuAlCmOn = QAction(self.tr("Selected Area (Comp On)"), self.utilitiesToolBar)
         self.actionSecimEkranGoruntusuAlCmOn.setShortcut(QKeySequence(Qt.Key_Print))
         self.actionSecimEkranGoruntusuAlCmOn.triggered.connect(self.act_ekran_goruntusu_secim_cm_on)
@@ -8442,12 +8311,36 @@ class DefterAnaPencere(QMainWindow):
         """
         sahneden cagriliyor, mousedoubleclickevent icinden
         """
-        widget = QDialog(self)
-        widget.resize(800, 600)
-        widget.setAttribute(Qt.WA_DeleteOnClose)
-        widget.setWindowTitle(self.tr("Defter: Mini Web Browser"))
+
+        self.webBrowserDW = DockWidget(self.tr("Web Browser"), self)
+        self.webBrowserDW.setAttribute(Qt.WA_DeleteOnClose)
+        self.webBrowserDW.setObjectName("webBrowserDockWidget")
+        self.addDockWidget(Qt.RightDockWidgetArea, self.webBrowserDW)
+
+        # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
+
+        base = QWidget(self.webBrowserDW)
+        base.setContentsMargins(0, 0, 0, 0)
+        self.webBrowserDW.setWidget(base)
+        layBase = QVBoxLayout(base)
+
+        scroll = QScrollArea()
+        # scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        # scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setWidgetResizable(True)
+        # scroll.setBackgroundRole(QPalette.Dark)
+        self.webBrowserDW.setWidget(scroll)
+        # scrollLayout = QVBoxLayout(scroll)
+
+        widget = QDialog(scroll)
+        # widget.resize(800, 600)
+        # widget.setAttribute(Qt.WA_DeleteOnClose)
+        # widget.setWindowTitle(self.tr("Defter: Web Browser"))
         layout = QVBoxLayout()
+        layout.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
         widget.setLayout(layout)
+
+        scroll.setWidget(widget)
 
         webView = QWebEngineView(widget)
         webView.setObjectName("webview")
@@ -8492,7 +8385,7 @@ class DefterAnaPencere(QMainWindow):
         adressLay.addWidget(lineEdit)
         layout.addLayout(adressLay)
         layout.addWidget(webView)
-        widget.show()
+        # widget.show()
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -9253,7 +9146,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def act_yazici_sayfa_kenar_cizdir(self):
         self.cView.baskiRectler = []
-        
+
         if self.baskiSinirGBox.isChecked():
             if self.radioSayfaSigdir.isChecked():
 
@@ -9691,6 +9584,7 @@ class DefterAnaPencere(QMainWindow):
 
             # if self.printer.outputFileName():
             #     self.preview.print()
+
     # ---------------------------------------------------------------------
     @Slot()
     def act_ekran_goruntusu_tam_ekran(self):
@@ -9734,7 +9628,7 @@ class DefterAnaPencere(QMainWindow):
 
         # QTimer.singleShot(10, lambda geo=geo: self.ekran_goruntusu_cek(geo))
         self.kapat_ekran_goruntusu()
-    
+
     # ---------------------------------------------------------------------
     @Slot()
     def kapat_ekran_goruntusu(self):
@@ -9828,6 +9722,7 @@ class DefterAnaPencere(QMainWindow):
         #                      "to be able to use disabled options in screenshot menu!"))
         #     except AttributeError:
         #         pass
+
 
 # ---------------------------------------------------------------------
 def calistir():
