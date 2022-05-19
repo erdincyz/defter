@@ -1923,7 +1923,7 @@ class DefterAnaPencere(QMainWindow):
                     if not path:
                         path = self._get_def_file_save_path()
                     if path:
-                        if self.save_file(zippedFolderSavePath=path, cModel=x_dugmesine_tiklanan_model, isSaveAs=False):
+                        if self.save_file(zipDosyaTamAdres=path, cModel=x_dugmesine_tiklanan_model, isSaveAs=False):
                             self._remove_tab(index)
                             self.move_or_append_left_in_recent_files_queue(path)
 
@@ -3103,7 +3103,7 @@ class DefterAnaPencere(QMainWindow):
         return sceneDict
 
     # ---------------------------------------------------------------------
-    def save_file(self, zippedFolderSavePath, cModel, isSaveAs=False):
+    def save_file(self, zipDosyaTamAdres, cModel, isSaveAs=False):
         QApplication.setOverrideCursor(Qt.WaitCursor)
 
         # mesela imaj paste edildiginde veya embed edildiginde
@@ -3135,13 +3135,13 @@ class DefterAnaPencere(QMainWindow):
                 QMessageBox.warning(self,
                                     'Defter',
                                     self.tr('Could not save file as '
-                                            '"{}" : "{}"').format(os.path.basename(zippedFolderSavePath), str(e)))
+                                            '"{}" : "{}"').format(zipDosyaTamAdres, str(e)))
                 return False
 
         else:
             # self.cModel kullanmiyoruz. aktif olmayan tabin x dugmesine tiklanip kaydet secilebilme ihtimali var.
             tempDirPath = cModel.tempDirPath
-        # fileName = os.path.basename(zippedFolderSavePath)
+        # fileName = os.path.basename(zipDosyaTamAdres)
         fileName = "sayfa"
         filePathInTempDir = os.path.join(tempDirPath, fileName)
 
@@ -3155,7 +3155,7 @@ class DefterAnaPencere(QMainWindow):
             QMessageBox.warning(self,
                                 'Defter',
                                 self.tr('Could not save file as '
-                                        '"{0:s}" : "{1:s}"').format(os.path.basename(zippedFolderSavePath),
+                                        '"{0:s}" : "{1:s}"').format(zipDosyaTamAdres,
                                                                     _file.errorString()))
             return False
 
@@ -3166,8 +3166,8 @@ class DefterAnaPencere(QMainWindow):
             tempStream.setVersion(QDataStream.Qt_5_7)
 
             # self.cModel kullanmiyoruz. aktif olmayan tabin x dugmesine tiklanip kaydet secilebilme ihtimali var.
-            cModel.saveFilePath = zippedFolderSavePath
-            cModel.fileName = os.path.basename(zippedFolderSavePath)
+            cModel.saveFilePath = zipDosyaTamAdres
+            cModel.fileName = os.path.basename(zipDosyaTamAdres)
             cModel.kaydedince_butun_yildizlari_sil()
             tempStream.writeQVariant(self.dokuman_to_dokumanDict())
 
@@ -3189,38 +3189,30 @@ class DefterAnaPencere(QMainWindow):
             # _file.close()
             _file.commit()
             try:
-                shutil.make_archive(base_name=zippedFolderSavePath, format="zip", root_dir=tempDirPath)
-                # shutil.rmtree(tempDirPath)  # bunu tabi kapatirken siliyoruz.
-                # os.rename("{}.zip".format(zippedFolderSavePath), zippedFolderSavePath)
-                os.rename("{}.zip".format(zippedFolderSavePath), zippedFolderSavePath)
+                shared.ziple(zipDosyaTamAdres, tempDirPath)
             except Exception as e:
                 try:
-                    os.remove(zippedFolderSavePath)
+                    os.remove(zipDosyaTamAdres)
                 except Exception as e:
-                    # shutil.move(zippedFolderSavePath)
+                    # shutil.move(zipDosyaTamAdres)
                     QApplication.restoreOverrideCursor()
-                    # TODO: bu asagida olasi kayit edilemeyen dosyanin full Pathini mi yazdirsak.
                     QMessageBox.warning(self,
                                         'Defter',
                                         self.tr('Could not save file as '
-                                                '"{0:s}" : "{1:s}" ').format(os.path.basename(zippedFolderSavePath),
+                                                '"{0:s}" : "{1:s}" ').format(zipDosyaTamAdres,
                                                                              str(e)))
                     return False
-                else:
-                    os.rename("{}.zip".format(zippedFolderSavePath), zippedFolderSavePath)
-            # # restoreZip = zipfile.ZipFile("test.zip", "w")
-            # restoreZip = zipfile.ZipFile("test.zip", "w", zipfile.ZIP_DEFLATED)
-            # restoreZip.write(physicalPathOfFile, logicalPathOfFileInZip)
-            # restoreZip.close()
+                # else:
+                #     os.rename("{}.zip".format(zipDosyaTamAdres), zipDosyaTamAdres)
 
             if isSaveAs:
-                # TODO:
+                # TODO: bu niye asagida?
                 try:
                     shutil.rmtree(tempDirPath)
                 except Exception as e:
                     pass
 
-            self.log(self.tr('{0:s} succesfully saved!').format(os.path.basename(zippedFolderSavePath)), 5000, 1)
+            self.log(self.tr('{0:s} succesfully saved!').format(zipDosyaTamAdres), 5000, 1)
 
             QApplication.restoreOverrideCursor()
             return True
@@ -3230,7 +3222,7 @@ class DefterAnaPencere(QMainWindow):
             QMessageBox.warning(self,
                                 'Defter',
                                 self.tr('Could not save file as "{0:s}" : "{1:s}" ').format(
-                                    os.path.basename(zippedFolderSavePath), str(e)))
+                                    zipDosyaTamAdres, str(e)))
 
             # buna ihtiyacımız yok aslında commit cagrilmaz ise zaten QSave in olusturdugu temp dosya siliniyor
             # eger bu noktadan sonra bir commit cagrilcak olsaydi ve cancelWriting deseydik
@@ -3245,7 +3237,7 @@ class DefterAnaPencere(QMainWindow):
         if not path:
             path = self._get_def_file_save_path()
         if path:
-            self.save_file(zippedFolderSavePath=path, cModel=self.cModel, isSaveAs=False)
+            self.save_file(zipDosyaTamAdres=path, cModel=self.cModel, isSaveAs=False)
             self.move_or_append_left_in_recent_files_queue(path)
 
     # ---------------------------------------------------------------------
@@ -3253,7 +3245,7 @@ class DefterAnaPencere(QMainWindow):
     def act_save_as_def_file(self):
         path = self._get_def_file_save_path()
         if path:
-            self.save_file(zippedFolderSavePath=path, cModel=self.cModel, isSaveAs=True)
+            self.save_file(zipDosyaTamAdres=path, cModel=self.cModel, isSaveAs=True)
             self.move_or_append_left_in_recent_files_queue(path)
 
     # ---------------------------------------------------------------------
