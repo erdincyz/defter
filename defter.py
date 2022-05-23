@@ -24,20 +24,20 @@ import tempfile
 from PySide6.QtGui import (QCursor, QKeySequence, QIcon, QPixmap, QColor, QPen, QFont, QPainter, QPainterPath,
                            QImageReader, QImage, QPixmapCache, QTextCharFormat, QTextCursor, QPalette, QTextListFormat,
                            QTextBlockFormat, QPageSize, QPageLayout, QAction, QActionGroup, QUndoGroup, QUndoStack,
-                           QShortcut, QScreen)
-from PySide6.QtWebEngineCore import QWebEngineSettings, QWebEngineProfile, QWebEnginePage
+                           QShortcut)
+from PySide6.QtWebEngineCore import QWebEngineSettings  #, QWebEngineProfile, QWebEnginePage
 
-from PySide6.QtWidgets import (QMainWindow, QWidget, QDockWidget, QVBoxLayout, QHBoxLayout, QApplication,
+from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QApplication,
                                QFileDialog, QToolBar, QMenuBar, QMenu, QColorDialog, QMessageBox,
                                QStatusBar, QSizePolicy, QLabel, QPushButton, QScrollArea,
                                QDialog, QTextEdit, QInputDialog, QListWidget, QListWidgetItem,
-                               QLineEdit, QToolButton, QComboBox, QButtonGroup, QGroupBox, QRadioButton)
+                               QLineEdit, QToolButton, QComboBox, QButtonGroup, QGroupBox, QRadioButton, QProgressBar)
 
 from PySide6.QtCore import (Qt, QRectF, QCoreApplication, QSettings, QPoint, Slot, QSizeF, QSize, QFile, QSaveFile,
                             QIODevice, QDataStream, QMimeData, QByteArray, QPointF, qCompress, qUncompress, QLocale,
                             QThread, QUrl, QLineF, QObject, QRect, QTimer, QBuffer)
 
-from PySide6.QtWebEngineWidgets import QWebEngineView  # QWebEnginePage, #QWebEngineProfile, QWebEngineSettings
+from PySide6.QtWebEngineWidgets import QWebEngineView
 
 from PySide6.QtPrintSupport import QPrinter, QPrinterInfo
 from canta import shared
@@ -2284,7 +2284,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def import_def_files_into_current_def_file(self, filePathList):
         """bir cok def dosyasini açıp belgeye eklemek için"""
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         self.cScene._acceptDrops = False
         self.tabBar.setAcceptDrops(False)
 
@@ -2413,7 +2413,7 @@ class DefterAnaPencere(QMainWindow):
             except Exception as e:
                 pass
 
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
         # self.log("%s succesfully loaded!" % os.path.basename(filePath), 5000, toStatusBarOnly=True)
         # self.cView.zoomToFit()
         self.cScene._acceptDrops = True
@@ -2442,13 +2442,13 @@ class DefterAnaPencere(QMainWindow):
                 return
 
         if not self.tabWidget.set_current_widget_with_path(zipFilePath):
-            QApplication.setOverrideCursor(Qt.WaitCursor)
+            self.lutfen_bekleyin_goster()
 
             tempDirPath = tempfile.mkdtemp(prefix="defter-tmp")
             try:
                 shutil.unpack_archive(zipFilePath, tempDirPath, "zip")
             except Exception as e:
-                QApplication.restoreOverrideCursor()
+                self.lutfen_bekleyin_gizle()
                 hata = self.tr('Could not import file  --   "{0:s}"\n{1:s}').format(zipFilePath, str(e))
                 self.log(hata, 5000, 3, dialog=True)
                 return False
@@ -2459,7 +2459,7 @@ class DefterAnaPencere(QMainWindow):
             _file = QFile(filePath)
             # if not _file.open(QIODevice.ReadOnly | QIODevice.Text): # QIODevice.Text - eger json load edersek diye.
             if not _file.open(QIODevice.ReadOnly):
-                QApplication.restoreOverrideCursor()
+                self.lutfen_bekleyin_gizle()
                 hata = self.tr('Could not open file  --   "{0:s}"\n{1:s}').format(filePath, _file.errorString())
                 self.log(hata, 5000, 3, dialog=True)
                 return False
@@ -2471,7 +2471,7 @@ class DefterAnaPencere(QMainWindow):
             if magic != DEF_MAGIC_NUMBER:
                 # raise IOError("unrecognized file type")
                 self.log(self.tr('{0:s} : Unrecognized file type!').format(os.path.basename(filePath)), 6000, 3)
-                QApplication.restoreOverrideCursor()
+                self.lutfen_bekleyin_gizle()
                 hata = self.tr('Could not open file  --   "{0:s}"'
                                '\nUnrecognized file type!').format(os.path.basename(filePath))
                 self.log(hata, 6000, 3, dialog=True)
@@ -2503,7 +2503,7 @@ class DefterAnaPencere(QMainWindow):
 
             # TODO: hata mesaji guzellestir.
             if not dokumanDict:
-                QApplication.restoreOverrideCursor()
+                self.lutfen_bekleyin_gizle()
                 hata = self.tr('Could not open file  --   "{0:s}"\nFile could not be parsed!').format(
                     os.path.basename(zipFilePath))
                 self.log(hata, 6000, 3, dialog=True)
@@ -2519,7 +2519,7 @@ class DefterAnaPencere(QMainWindow):
 
             self.move_or_append_left_in_recent_files_queue(zipFilePath)
 
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
             # self._statusBar.showMessage("%s succesfully loaded!" % os.path.basename(filePath), 5000)
             self.log(self.tr('{0:s} succesfully loaded!').format(self.cModel.fileName), 5000, 1)
 
@@ -3103,9 +3103,26 @@ class DefterAnaPencere(QMainWindow):
         return sceneDict
 
     # ---------------------------------------------------------------------
-    def save_file(self, zipDosyaTamAdres, cModel, isSaveAs=False):
+    def lutfen_bekleyin_goster(self):
         QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfenBekleyinWidget.show()
+        # Ozellikle QThread kullanmiyoruz.
+        # Bunlar kullanıcının arayuze bu islemler boyunca etki etmemesinin
+        # daha iyi olacagi durumlarda cagriliyor. 
+        # Belki bazi islemler icin, o islem QThreade taşınıp
+        # yuzde gosteren ve de işlemi iptal edebilecek QProgressBarDialog() eklenebilir. 
+        # self.setEnabled(False)
+        QApplication.processEvents()
 
+    # ---------------------------------------------------------------------
+    def lutfen_bekleyin_gizle(self):
+        self.lutfenBekleyinWidget.hide()
+        # self.setEnabled(True)
+        QApplication.restoreOverrideCursor()
+
+    # ---------------------------------------------------------------------
+    def save_file(self, zipDosyaTamAdres, cModel, isSaveAs=False):
+        self.lutfen_bekleyin_goster()
         # mesela imaj paste edildiginde veya embed edildiginde
         # if not os path exists directory olustur sonra da oraya kaydet.async ve de sonra da zip et.
         # şimdi bu methodun sonunda da zip etmek lazim.
@@ -3131,7 +3148,7 @@ class DefterAnaPencere(QMainWindow):
                     os.remove(copiedSceneDefFile)
             # except Exception as e:
             except Exception as e:
-                QApplication.restoreOverrideCursor()
+                self.lutfen_bekleyin_gizle()
                 QMessageBox.warning(self,
                                     'Defter',
                                     self.tr('Could not save file as '
@@ -3151,7 +3168,7 @@ class DefterAnaPencere(QMainWindow):
         # if not _file.open( QFile.WriteOnly):
         # if not _file.open(QIODevice.WriteOnly | QIODevice.Text): # QIODevice.Text - eger json save edersek diye.
         if not _file.open(QIODevice.WriteOnly):
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
             QMessageBox.warning(self,
                                 'Defter',
                                 self.tr('Could not save file as '
@@ -3195,7 +3212,7 @@ class DefterAnaPencere(QMainWindow):
                     os.remove(zipDosyaTamAdres)
                 except Exception as e:
                     # shutil.move(zipDosyaTamAdres)
-                    QApplication.restoreOverrideCursor()
+                    self.lutfen_bekleyin_gizle()
                     QMessageBox.warning(self,
                                         'Defter',
                                         self.tr('Could not save file as '
@@ -3214,11 +3231,11 @@ class DefterAnaPencere(QMainWindow):
 
             self.log(self.tr('{0:s} succesfully saved!').format(zipDosyaTamAdres), 5000, 1)
 
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
             return True
 
         except Exception as e:
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
             QMessageBox.warning(self,
                                 'Defter',
                                 self.tr('Could not save file as "{0:s}" : "{1:s}" ').format(
@@ -3346,6 +3363,28 @@ class DefterAnaPencere(QMainWindow):
         self._statusBar = QStatusBar(self)
         self.setStatusBar(self._statusBar)
         # self._statusBar.mouseDoubleClickEvent()
+
+        self.lutfenBekleyinWidget = QWidget(self._statusBar)
+        lay = QHBoxLayout()
+        lay.setContentsMargins(0, 0, 0, 0)
+        layCubuk = QVBoxLayout()
+        layCubuk.setContentsMargins(0, 4, 0, 0)
+        self.lutfenBekleyinWidget.setLayout(lay)
+        cubuk = QProgressBar(self._statusBar)
+        cubuk.setMaximumWidth(200)
+        cubuk.setMaximumHeight(7)
+        cubuk.setMinimum(0)
+        cubuk.setMaximum(0)
+
+        etiket = QLabel(self.tr("Please wait"), self.lutfenBekleyinWidget)
+        # etiket.move(30, 0)
+        lay.addStretch()
+        lay.addWidget(etiket)
+        layCubuk.addWidget(cubuk)
+        lay.addLayout(layCubuk)
+
+        self.lutfenBekleyinWidget.hide()
+        self._statusBar.addPermanentWidget(self.lutfenBekleyinWidget)
 
         zoomOutBtn = QPushButton(self._statusBar)  # "🔍"
         # zoomOutBtn.setIcon(QIcon(":/icons/zoom-out.png"))
@@ -5410,20 +5449,20 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_redo(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         self.log(self.actionRedo.text(), 5000, toStatusBarOnly=True)
         self.undoGroup.redo()
         # self.cScene.undoStack.redo()
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     @Slot()
     def act_undo(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         self.log(self.actionUndo.text(), 5000, toStatusBarOnly=True)
         self.undoGroup.undo()
         # self.cScene.undoStack.undo()
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5583,7 +5622,7 @@ class DefterAnaPencere(QMainWindow):
         # TODO: bu macro biraz sallantıda begin dedikten sonra loop bi sekilde
         #   bitmez ise, acik kalacak..
         # !!!!!!! try except ekleyebiliriz, except: end macro gibisinden
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         self.cScene.undoStack.beginMacro(self.tr("Add {} image(s)").format(len(imgPaths)))
         for filePath in imgPaths:
             self.ekle_resim_direkt(filePath, pos, isEmbeded)
@@ -5616,7 +5655,7 @@ class DefterAnaPencere(QMainWindow):
                 self.recentImagesMenu.addAction(action)
         self.cScene.undoStack.endMacro()
 
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     def ekle_resim_direkt(self, dosyaYolu, pos, isEmbeded=False):
@@ -5681,14 +5720,14 @@ class DefterAnaPencere(QMainWindow):
         # TODO: bu macro biraz sallantıda begin dedikten sonra loop bi sekilde
         #   bitmez ise, acik kalacak..
         # !!!!!!! try except ekleyebiliriz, except: end macro gibisinden
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         self.cScene.undoStack.beginMacro(self.tr("Add {} video(s)").format(len(videoPaths)))
         for filePath in videoPaths:
             self.ekle_video_direkt(filePath, pos)
             pos += QPoint(20, 20)
         self.cScene.undoStack.endMacro()
 
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     def ekle_video_direkt(self, dosyaYolu, pos):
@@ -5751,14 +5790,14 @@ class DefterAnaPencere(QMainWindow):
         # TODO: bu macro biraz sallantıda begin dedikten sonra loop bi sekilde
         #   bitmez ise, acik kalacak..
         # !!!!!!! try except ekleyebiliriz, except: end macro gibisinden
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         self.cScene.undoStack.beginMacro(self.tr("Add {} file(s)").format(len(dosyaAdresleri)))
         for dosyaAdresi in dosyaAdresleri:
             self.ekle_dosya_direkt(dosyaAdresi, pos)
             pos += QPoint(20, 20)
         self.cScene.undoStack.endMacro()
 
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
         print(dosyaAdresleri)
 
@@ -5822,7 +5861,7 @@ class DefterAnaPencere(QMainWindow):
         # (i.e., PySide.QtGui.QGraphicsScene will no longer delete item when destroyed).
         tempItems = self.cScene.selectedItems()
         if tempItems:
-            QApplication.setOverrideCursor(Qt.WaitCursor)
+            self.lutfen_bekleyin_goster()
             self.cScene.undoStack.beginMacro(self.tr("Delete"))
             # items = [x for x in tempItems if not x.parentItem() in tempItems]  #slower
             # items = []
@@ -5851,7 +5890,7 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.undoStack.endMacro()
             if not self.cScene.items():
                 self.cScene.setSceneRect(self.cView.get_visible_rect())
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
 
             self.tw_sayfa_guncelle()
 
@@ -5860,7 +5899,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_select_all(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         # for item in self.cScene.items():
         #     # if not item.isSelected():
         #     item.setSelected(True)
@@ -5869,7 +5908,7 @@ class DefterAnaPencere(QMainWindow):
         path = QPainterPath()
         path.addRect(self.cScene.itemsBoundingRect())
         self.cScene.setSelectionArea(path)
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5902,7 +5941,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_copy(self, isMirroring=False):
-
+        self.lutfen_bekleyin_goster()
         eskiMimeData = self.clipboard.mimeData()
         eskiClipboardText = eskiMimeData.text()
         eskiClipboardHtml = eskiMimeData.html()
@@ -5999,10 +6038,12 @@ class DefterAnaPencere(QMainWindow):
             mimeData.setImageData(eskiClipboardImageData)
         self.clipboard.setMimeData(mimeData)
         # self.actionPaste.setEnabled(True)
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     @Slot()
     def act_paste_as_plain_text(self):
+        self.lutfen_bekleyin_goster()
 
         textItem = Text(self.get_mouse_scene_pos(), self.yaziRengi, self.arkaPlanRengi, self._pen, self.currentFont)
         textItem.set_document_url(self.cScene.tempDirPath)
@@ -6030,10 +6071,12 @@ class DefterAnaPencere(QMainWindow):
             cursor = textItem.textCursor()
             cursor.clearSelection()
             textItem.setTextCursor(cursor)
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     @Slot()
     def act_paste(self):
+        self.lutfen_bekleyin_goster()
         mimeData = self.clipboard.mimeData()
         # eskiTempDir = None
         # if mimeData.hasFormat('sceneCopiedFrom/tempFolder'):
@@ -6140,7 +6183,6 @@ class DefterAnaPencere(QMainWindow):
                              # | group.ItemIsFocusable
                              )
         self.cScene.addItem(paste_group)
-        QApplication.setOverrideCursor(Qt.WaitCursor)
         # TODO: try icine mi alsak, cursor olurda bir hata olursa WaitCursor halde kalmasin.
         self.cScene.undoStack.beginMacro(self.tr("paste"))
         while not stream.atEnd():
@@ -6296,7 +6338,7 @@ class DefterAnaPencere(QMainWindow):
         self.cScene.undoStack.endMacro()
         self.cScene.removeItem(paste_group)
         del paste_group
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
         # if mimeData.hasImage():
         #     setPixmap(mimeData.imageData())
@@ -6338,6 +6380,8 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_mirror_x(self, mPos):
+        # bu sahneden cagriliyor
+        self.lutfen_bekleyin_goster()
         self.cScene.set_tool(toolType=Scene.NoTool)  # bu finish_interactive_toolsu da cagiriyor.
 
         mposx = mPos.x()
@@ -6350,7 +6394,6 @@ class DefterAnaPencere(QMainWindow):
 
         self.cScene.clearSelection()
 
-        QApplication.setOverrideCursor(Qt.WaitCursor)
         # TODO: try icine mi alsak, cursor olurda bir hata olursa WaitCursor halde kalmasin.
         self.cScene.undoStack.beginMacro(self.tr("mirror x"))
         mirroredItemsBoundingRect = QRectF()  # sceneRect adaptation
@@ -6385,11 +6428,13 @@ class DefterAnaPencere(QMainWindow):
         # restore old copy mimedata
         self.clipboard.setMimeData(self.beforeMirrorCopyMimeData)
         self.beforeMirrorCopyMimeData = None
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     @Slot()
     def act_mirror_y(self, mPos):
+        # bu sahneden cagriliyor
+        self.lutfen_bekleyin_goster()
         self.cScene.set_tool(toolType=Scene.NoTool)  # bu finish_interactive_toolsu da cagiriyor.
 
         mposy = mPos.y()
@@ -6402,7 +6447,6 @@ class DefterAnaPencere(QMainWindow):
 
         self.cScene.clearSelection()
 
-        QApplication.setOverrideCursor(Qt.WaitCursor)
         # TODO: try icine mi alsak, cursor olurda bir hata olursa WaitCursor halde kalmasin.
         self.cScene.undoStack.beginMacro(self.tr("mirror y"))
         mirroredItemsBoundingRect = QRectF()  # sceneRect adaptation
@@ -6436,15 +6480,15 @@ class DefterAnaPencere(QMainWindow):
         # restore old copy mimedata
         self.clipboard.setMimeData(self.beforeMirrorCopyMimeData)
         self.beforeMirrorCopyMimeData = None
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     @Slot()
     # ---------------------------------------------------------------------
     def act_align_left(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         items = self.cScene.get_selected_top_level_items()
         if not len(items) > 1:
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
             if len(self.cScene.selectionQueue) > 1:
                 self.log(self.tr("Please select at least 2 (non-parented) items!"), 5000, toStatusBarOnly=True)
             else:
@@ -6458,16 +6502,16 @@ class DefterAnaPencere(QMainWindow):
             item.setSceneLeft(yeniLeft)
             self.cScene.when_item_moved(item, eskiPos)
         self.cScene.undoStack.endMacro()
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     @Slot()
     # ---------------------------------------------------------------------
     def act_align_right(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         items = self.cScene.get_selected_top_level_items()
 
         if not len(items) > 1:
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
             if len(self.cScene.selectionQueue) > 1:
                 self.log(self.tr("Please select at least 2 (non-parented) items!"), 5000, toStatusBarOnly=True)
             else:
@@ -6481,16 +6525,16 @@ class DefterAnaPencere(QMainWindow):
             item.setSceneRight(yeniRight)
             self.cScene.when_item_moved(item, eskiPos)
         self.cScene.undoStack.endMacro()
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     @Slot()
     # ---------------------------------------------------------------------
     def act_align_top(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         items = self.cScene.get_selected_top_level_items()
 
         if not len(items) > 1:
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
             if len(self.cScene.selectionQueue) > 1:
                 self.log(self.tr("Please select at least 2 (non-parented) items!"), 5000, toStatusBarOnly=True)
             else:
@@ -6504,16 +6548,16 @@ class DefterAnaPencere(QMainWindow):
             item.setSceneTop(yeniTop)
             self.cScene.when_item_moved(item, eskiPos)
         self.cScene.undoStack.endMacro()
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     @Slot()
     # ---------------------------------------------------------------------
     def act_align_bottom(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         items = self.cScene.get_selected_top_level_items()
 
         if not len(items) > 1:
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
             if len(self.cScene.selectionQueue) > 1:
                 self.log(self.tr("Please select at least 2 (non-parented) items!"), 5000, toStatusBarOnly=True)
             else:
@@ -6527,16 +6571,16 @@ class DefterAnaPencere(QMainWindow):
             item.setSceneBottom(yeniBottom)
             self.cScene.when_item_moved(item, eskiPos)
         self.cScene.undoStack.endMacro()
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     @Slot()
     # ---------------------------------------------------------------------
     def act_align_horizontal_center(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         items = self.cScene.get_selected_top_level_items()
 
         if not len(items) > 1:
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
             if len(self.cScene.selectionQueue) > 1:
                 self.log(self.tr("Please select at least 2 (non-parented) items!"), 5000, toStatusBarOnly=True)
             else:
@@ -6550,16 +6594,16 @@ class DefterAnaPencere(QMainWindow):
             item.setHorizontalCenter(hcenter)
             self.cScene.when_item_moved(item, eskiPos)
         self.cScene.undoStack.endMacro()
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     @Slot()
     # ---------------------------------------------------------------------
     def act_align_vertical_center(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         items = self.cScene.get_selected_top_level_items()
 
         if not len(items) > 1:
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
             if len(self.cScene.selectionQueue) > 1:
                 self.log(self.tr("Please select at least 2 (non-parented) items!"), 5000, toStatusBarOnly=True)
             else:
@@ -6573,17 +6617,17 @@ class DefterAnaPencere(QMainWindow):
             item.setVerticalCenter(vcenter)
             self.cScene.when_item_moved(item, eskiPos)
         self.cScene.undoStack.endMacro()
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     @Slot()
     # ---------------------------------------------------------------------
     def act_equalize_horizontal_gaps(self):
 
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         items = self.cScene.get_selected_top_level_items()
 
         if not len(items) > 2:
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
             if len(self.cScene.selectionQueue) > 2:
                 self.log(self.tr("Please select at least 3 (non-parented) items!"), 5000, toStatusBarOnly=True)
             else:
@@ -6619,16 +6663,16 @@ class DefterAnaPencere(QMainWindow):
             prevItemRightX = item.sceneRight()
             self.cScene.when_item_moved(item, eskiPos)
         self.cScene.undoStack.endMacro()
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     @Slot()
     # ---------------------------------------------------------------------
     def act_equalize_vertical_gaps(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         items = self.cScene.get_selected_top_level_items()
 
         if not len(items) > 2:
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
             if len(self.cScene.selectionQueue) > 2:
                 self.log(self.tr("Please select at least 3 (non-parented) items!"), 5000, toStatusBarOnly=True)
             else:
@@ -6654,15 +6698,15 @@ class DefterAnaPencere(QMainWindow):
             prevItemBottomY = item.sceneBottom()
             self.cScene.when_item_moved(item, eskiPos)
         self.cScene.undoStack.endMacro()
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     def act_distribute_items_vertically(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         items = self.cScene.get_selected_top_level_items()
 
         if not len(items) > 1:
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
             if len(self.cScene.selectionQueue) > 1:
                 self.log(self.tr("Please select at least 2 (non-parented) items!"), 5000, toStatusBarOnly=True)
             else:
@@ -6680,15 +6724,15 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.when_item_moved(item, eskiPos)
             self.cScene.unite_with_scene_rect(item.sceneBoundingRect())
         self.cScene.undoStack.endMacro()
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     def act_distribute_items_horizontally(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         items = self.cScene.get_selected_top_level_items()
 
         if not len(items) > 1:
-            QApplication.restoreOverrideCursor()
+            self.lutfen_bekleyin_gizle()
             if len(self.cScene.selectionQueue) > 1:
                 self.log(self.tr("Please select at least 2 (non-parented) items!"), 5000, toStatusBarOnly=True)
             else:
@@ -6706,7 +6750,7 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.when_item_moved(item, eskiPos)
             self.cScene.unite_with_scene_rect(item.sceneBoundingRect())
         self.cScene.undoStack.endMacro()
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     def get_all_childitems_in_hierarchy(self, tempList, i):
@@ -6719,7 +6763,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_parent_items(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         items = self.cScene.selectedItems()
         yeniParent = self.cScene.activeItem
         items.remove(yeniParent)
@@ -6755,12 +6799,12 @@ class DefterAnaPencere(QMainWindow):
 
         yeniParent.setSelected(True)
         self.log(self.tr("Parented"), 5000, toStatusBarOnly=True)
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     @Slot()
     def act_unparent_items(self, item=None):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         items = set()
         if item:
             items.add(item)
@@ -6795,7 +6839,7 @@ class DefterAnaPencere(QMainWindow):
                         undoRedo.undoableUnParent(self.cScene.undoStack, self.tr("_unparent"), c, None, c.scenePos())
         self.cScene.undoStack.endMacro()
         self.log(self.tr("Unparented"), 5000, toStatusBarOnly=True)
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
         # for i in self.cScene.selectedItems():
         #     i.setSelected(False)
@@ -6804,13 +6848,13 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_group_items(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         self.cScene.undoStack.beginMacro(self.tr("group"))
         items = self.cScene.selectedItems()
         undoRedo.undoableGroup(self.cScene.undoStack, self.tr("add single item to group"), items, self.cScene)
         self.cScene.undoStack.endMacro()
         self.log(self.tr("Grouped"), 5000, toStatusBarOnly=True)
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     # # ---------------------------------------------------------------------
     # @Slot()
@@ -6868,7 +6912,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_ungroup_items(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
         group = self.cScene.activeItem
         if group.type() == Group.Type:
             # gRot = group.rotation()
@@ -6887,7 +6931,7 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.undoStack.endMacro()
 
             self.log(self.tr("Ungrouped"), 5000, toStatusBarOnly=True)
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -7741,6 +7785,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot(QListWidgetItem)
     def act_apply_selected_style(self, style):
         if self.cScene.selectionQueue:
+            self.lutfen_bekleyin_goster()
             self.cScene.undoStack.beginMacro(self.tr("apply style preset to the selected item(s)"))
             for item in self.cScene.selectionQueue:
                 # undoableApplyStylePreset(self, description, item, pen, brush, font):
@@ -7770,6 +7815,7 @@ class DefterAnaPencere(QMainWindow):
                                                             cizgiRengi=style.cizgiRengi()
                                                             )
             self.cScene.undoStack.endMacro()
+            self.lutfen_bekleyin_gizle()
 
         else:
 
@@ -7802,9 +7848,10 @@ class DefterAnaPencere(QMainWindow):
                 filePath = '{}.defstyles'.format(filePath)
             self.lastDir = os.path.dirname(filePath)
 
+            self.lutfen_bekleyin_goster()
             _file = QSaveFile(filePath)
             if not _file.open(QIODevice.WriteOnly):
-                QApplication.restoreOverrideCursor()
+                self.lutfen_bekleyin_gizle()
                 QMessageBox.warning(self,
                                     'Defter',
                                     self.tr('Could not save file as '
@@ -7821,7 +7868,7 @@ class DefterAnaPencere(QMainWindow):
                 _file.commit()
 
             except Exception as e:
-                QApplication.restoreOverrideCursor()
+                self.lutfen_bekleyin_gizle()
                 QMessageBox.warning(self,
                                     'Defter',
                                     self.tr('Could not save file as '
@@ -7843,11 +7890,11 @@ class DefterAnaPencere(QMainWindow):
                                          filtre)
         if fn[0]:
             filePath = fn[0]
-
+            self.lutfen_bekleyin_goster()
             _file = QFile(filePath)
             # if not _file.open(QIODevice.ReadOnly | QIODevice.Text): # QIODevice.Text - eger json load edersek diye.
             if not _file.open(QIODevice.ReadOnly):
-                QApplication.restoreOverrideCursor()
+                self.lutfen_bekleyin_gizle()
                 QMessageBox.warning(self,
                                     'Defter',
                                     self.tr('Could not open file  --   "{0:s}"\n{1:s}').format(filePath,
@@ -7861,7 +7908,7 @@ class DefterAnaPencere(QMainWindow):
             if magic != DEFSTYLES_MAGIC_NUMBER:
                 # raise IOError("unrecognized file type")
                 self.log(self.tr('{0:s} : Unrecognized file type!').format(os.path.basename(filePath)), 6000, 3)
-                QApplication.restoreOverrideCursor()
+                self.lutfen_bekleyin_gizle()
                 QMessageBox.warning(self,
                                     'Defter',
                                     self.tr('Could not open file  --   "{0:s}"\n '
@@ -8489,6 +8536,7 @@ class DefterAnaPencere(QMainWindow):
         # gerceklesmeyebilir gibi dursa da, self.actionEmbedImage , embeded imaj secili degilse, gozukmediginden dolayi.
         # bu arada diyelim ki bir sekilde hic undoableEmbedImage cagrilmadi o zaman makro yine gozukuyor undo stackta!!
 
+        self.lutfen_bekleyin_goster()
         if len(self.cScene.selectionQueue) > 1:
             itemsToEmbed = []
 
@@ -8526,6 +8574,8 @@ class DefterAnaPencere(QMainWindow):
                     self.log(self.tr("Could not embeded! Image's original source path does not exist! {}")
                              .format(item.filePathForSave), 7000, 3)
 
+        self.lutfen_bekleyin_gizle()
+
     # ---------------------------------------------------------------------
     @Slot()
     def act_export_image(self):
@@ -8543,7 +8593,7 @@ class DefterAnaPencere(QMainWindow):
 
             userPath = fn[0]
             if userPath:
-
+                self.lutfen_bekleyin_goster()
                 fileName = os.path.basename(userPath)
                 dirToCopy = os.path.dirname(userPath)
 
@@ -8577,6 +8627,7 @@ class DefterAnaPencere(QMainWindow):
                                              filtre)
             userPath = fn[0]
             if userPath:
+                self.lutfen_bekleyin_goster()
                 if not userPath.endswith(ext):
                     userPath = '{}{}'.format(userPath, ext)
                 # if self.cScene.activeItem.type() == Image.Type:
@@ -8587,6 +8638,7 @@ class DefterAnaPencere(QMainWindow):
         self.lastDir = os.path.dirname(userPath)
         if succesfulExportCount:
             self.log(self.tr("{} image(s) exported.").format(succesfulExportCount), 5000, 1)
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -8623,7 +8675,7 @@ class DefterAnaPencere(QMainWindow):
         # bu arada diyelim ki bir sekilde hic undoableEmbedImage cagrilmadi o zaman makro yine gozukuyor undo stackta!!
 
         # bu embed image ile baya baya ayni, bir ara ortak noktalar ayri bir methodta toplanabilir.
-
+        self.lutfen_bekleyin_goster()
         if len(self.cScene.selectionQueue) > 1:
             itemsToEmbed = []
 
@@ -8665,16 +8717,15 @@ class DefterAnaPencere(QMainWindow):
             # self.cScene.undoStack.endMacro()
             # self.log("Video(s) embeded.", 5000, 1)
 
+        self.lutfen_bekleyin_gizle()
+
     # ---------------------------------------------------------------------
     @Slot()
     def act_export_video(self):
         # direkt fileDialog cagiriyoruz cunku bu methodu cagiran action,
         succesfulExportCount = 0
-        # sadece image itema sag tiklaninca gozukuyor.
+        # sadece video itema sag tiklaninca gozukuyor.
 
-        # seciliElemanSayisi = len(self.cScene.selectionQueue)
-
-        # if seciliElemanSayisi > 1:
         if len(self.cScene.selectionQueue) > 1:
             filtre = self.tr("All Files (*)")
             fn = QFileDialog.getSaveFileName(self,
@@ -8684,6 +8735,7 @@ class DefterAnaPencere(QMainWindow):
 
             userPath = fn[0]
             if userPath:
+                self.lutfen_bekleyin_goster()
                 # fileName = os.path.splitext(os.path.basename(userPath))[0]
                 fileName = os.path.basename(userPath)
                 dirToCopy = os.path.dirname(userPath)
@@ -8721,6 +8773,7 @@ class DefterAnaPencere(QMainWindow):
 
             userPath = fn[0]
             if userPath:
+                self.lutfen_bekleyin_goster()
                 if not userPath.endswith(ext):
                     userPath = '{}{}'.format(userPath, ext)
                 # if self.cScene.activeItem.type() == VideoItem.Type:
@@ -8732,6 +8785,8 @@ class DefterAnaPencere(QMainWindow):
         if succesfulExportCount:
             self.log(self.tr("{} Video(s) exported.").format(succesfulExportCount), 5000, 1)
 
+        self.lutfen_bekleyin_gizle()
+
     # ---------------------------------------------------------------------
     @Slot()
     def act_embed_dosya(self):
@@ -8740,7 +8795,7 @@ class DefterAnaPencere(QMainWindow):
         # bu arada diyelim ki bir sekilde hic undoableEmbedImage cagrilmadi o zaman makro yine gozukuyor undo stackta!!
 
         # bu embed image ile baya baya ayni, bir ara ortak noktalar ayri bir methodta toplanabilir.
-
+        self.lutfen_bekleyin_goster()
         if len(self.cScene.selectionQueue) > 1:
             itemsToEmbed = []
 
@@ -8782,16 +8837,14 @@ class DefterAnaPencere(QMainWindow):
             # self.cScene.undoStack.endMacro()
             # self.log("Video(s) embeded.", 5000, 1)
 
+        self.lutfen_bekleyin_gizle()
+
     # ---------------------------------------------------------------------
     @Slot()
     def act_export_dosya(self):
         # direkt fileDialog cagiriyoruz cunku bu methodu cagiran action,
         succesfulExportCount = 0
-        # sadece image itema sag tiklaninca gozukuyor.
-
-        # seciliElemanSayisi = len(self.cScene.selectionQueue)
-
-        # if seciliElemanSayisi > 1:
+        # sadece file itema sag tiklaninca gozukuyor.
         if len(self.cScene.selectionQueue) > 1:
             filtre = self.tr("All Files (*)")
             fn = QFileDialog.getSaveFileName(self,
@@ -8801,6 +8854,7 @@ class DefterAnaPencere(QMainWindow):
 
             userPath = fn[0]
             if userPath:
+                self.lutfen_bekleyin_goster()
                 # fileName = os.path.splitext(os.path.basename(userPath))[0]
                 fileName = os.path.basename(userPath)
                 dirToCopy = os.path.dirname(userPath)
@@ -8838,6 +8892,7 @@ class DefterAnaPencere(QMainWindow):
 
             userPath = fn[0]
             if userPath:
+                self.lutfen_bekleyin_goster()
                 if not userPath.endswith(ext):
                     userPath = '{}{}'.format(userPath, ext)
                 # if self.cScene.activeItem.type() == VideoItem.Type:
@@ -8848,6 +8903,8 @@ class DefterAnaPencere(QMainWindow):
         self.lastDir = os.path.dirname(userPath)
         if succesfulExportCount:
             self.log(self.tr("{} File(s) exported.").format(succesfulExportCount), 5000, 1)
+
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -9233,7 +9290,7 @@ class DefterAnaPencere(QMainWindow):
             print("hata")
         p.setRenderHint(QPainter.Antialiasing)
         # TODO: bu baya yavaş olabiliyor,
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.lutfen_bekleyin_goster()
 
         if self.pDialog.subOptionsRadioBtnGroup.checkedButton() == self.pDialog.radioFitPage:
             for sayfa in self.cModel.sayfalar():
@@ -9246,7 +9303,7 @@ class DefterAnaPencere(QMainWindow):
 
         p.end()
 
-        QApplication.restoreOverrideCursor()
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     def _paint_page(self, printer):
