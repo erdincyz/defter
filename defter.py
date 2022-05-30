@@ -14,10 +14,12 @@ import locale
 import operator
 import time
 import filecmp
-from collections import deque
+import zipfile
 # import time
 import shutil
 import tempfile
+import platform
+from collections import deque
 
 # from PySide6.QtOpenGL import QGLWidget
 
@@ -202,6 +204,7 @@ class DefterAnaPencere(QMainWindow):
         self.olustur_stillerDW()
         self.olustur_yuzen_stillerDW()
         self.olustur_sahneye_baski_siniri_cizim_ayarlari()
+        self.arsivleme_programi_adres_belirle()
 
         self.read_gui_settings()
         # self.actionAlwaysOnTopToggle u , read_gui_settingste sinyalleri block ederek set ediyoruz.
@@ -3206,7 +3209,7 @@ class DefterAnaPencere(QMainWindow):
             # _file.close()
             _file.commit()
             try:
-                shared.ziple(zipDosyaTamAdres, tempDirPath)
+                self.ziple(self.arsivleme_programi_adres, zipDosyaTamAdres, tempDirPath)
             except Exception as e:
                 try:
                     os.remove(zipDosyaTamAdres)
@@ -8144,13 +8147,14 @@ class DefterAnaPencere(QMainWindow):
         url = self.sahneKutuphane.selectedItems()[0].dosya_adresi
         norm = os.path.normpath(url)
 
-        if sys.platform == 'darwin':
+        sistem = platform.system()
+        if sistem == "Darwin":
 
             # norm = os.path.normpath(unicode(self.fsModel.rootPath()))
             # subprocess.Popen(('open %s' % norm))
             os.system(u'open -R "%s"' % norm)
 
-        elif sys.platform == 'win32':
+        elif sistem == 'Windows':
             cmd = (r'explorer /select,"%s"' % norm)
             # subprocess.Popen(unicode (cmd ,"utf-8"))
             try:
@@ -8158,10 +8162,7 @@ class DefterAnaPencere(QMainWindow):
             except UnicodeEncodeError:
                 language, output_encoding = locale.getdefaultlocale()
                 subprocess.call(cmd.encode(output_encoding))
-        # elif sys.platform == 'posix':
-        #     subprocess.call('xdg-open', norm)
-        # else:
-        elif sys.platform.startswith('linux'):
+        elif sistem == "Linux":
             try:
                 # subprocess.call(['xdg-open', os.path.dirname(norm)])
                 subprocess.Popen(['xdg-open', os.path.dirname(norm)])
@@ -8189,13 +8190,14 @@ class DefterAnaPencere(QMainWindow):
 
         norm = os.path.normpath(url)
 
-        if sys.platform == 'darwin':
+        sistem = platform.system()
+        if sistem == "Darwin":
 
             # norm = os.path.normpath(unicode(self.fsModel.rootPath()))
             # subprocess.Popen(('open %s' % norm))
             os.system(u'open -R "%s"' % norm)
 
-        elif sys.platform == 'win32':
+        elif sistem == 'Windows':
             cmd = (r'explorer /select,"%s"' % norm)
             # subprocess.Popen(unicode (cmd ,"utf-8"))
             try:
@@ -8203,10 +8205,8 @@ class DefterAnaPencere(QMainWindow):
             except UnicodeEncodeError:
                 language, output_encoding = locale.getdefaultlocale()
                 subprocess.call(cmd.encode(output_encoding))
-        # elif sys.platform == 'posix':
-        #     subprocess.call('xdg-open', norm)
-        # else:
-        elif sys.platform.startswith('linux'):
+
+        elif sistem == "Linux":
             try:
                 # subprocess.call(['xdg-open', os.path.dirname(norm)])
                 subprocess.Popen(['xdg-open', os.path.dirname(norm)])
@@ -9755,7 +9755,7 @@ class DefterAnaPencere(QMainWindow):
     def on_ekranGoruntusuMenu_about_to_show(self):
         pass
 
-        # if sys.platform.startswith('linux'):
+        # if platform.system() == "Linux":
         #     from PySide2.QtX11Extras import QX11Info
         # 
         #     try:
@@ -9771,6 +9771,73 @@ class DefterAnaPencere(QMainWindow):
         #                      "to be able to use disabled options in screenshot menu!"))
         #     except AttributeError:
         #         pass
+
+    # ---------------------------------------------------------------------
+    def arsivleme_programi_adres_belirle(self):
+
+        self.arsivleme_programi_adres = "_python_zipfile"
+
+        sistem = platform.system()
+        if sistem in ["Linux", "Darwin"]:
+            if shutil.which("7z"):
+                self.arsivleme_programi_adres = "7z"
+            elif shutil.which("zip"):
+                self.arsivleme_programi_adres = "zip"
+        elif sistem == "Windows":
+            if shutil.which("7z.exe"):
+                self.arsivleme_programi_adres = "7z.exe"
+            elif shutil.which("7z.exe", path=os.path.join(os.environ["ProgramW6432"], "7-Zip")):
+                self.arsivleme_programi_adres = os.path.join(os.environ["ProgramW6432"], "7-Zip", "7z.exe")
+            elif shutil.which("7z.exe", path=os.path.join(os.environ["ProgramFiles(x86)"], "7-Zip")):
+                self.arsivleme_programi_adres = os.path.join(os.environ["ProgramFiles(x86)"], "7-Zip", "7z.exe")
+            elif shutil.which("zip.exe"):
+                self.arsivleme_programi_adres = "zip.exe"
+        # else:  # baska bir os ise
+        #     # belki "zip" denenebilir.
+        #     self.arsivleme_programi_adres = "_python_zipfile"
+        #     return
+
+    # ---------------------------------------------------------------------
+    def ziple(self, program_adres, zip_dosya_tam_adres, kaynak_klasor_tam_adres):
+        eski_dir = os.getcwd()
+        try:
+            if program_adres.startswith("7"):
+                subprocess.call(
+                    [program_adres, "u", zip_dosya_tam_adres, kaynak_klasor_tam_adres + os.sep + "*", "-mx0", "-tzip"],
+                    stdout=subprocess.DEVNULL)  # stderr=subprocess.DEVNULL
+
+            elif program_adres.startswith("z"):
+                # subprocess.call([program_adres, "-FS0ryo", zip_dosya_tam_adres, "./*"])
+                subprocess.call([program_adres, "-FS0ryoq", zip_dosya_tam_adres, "." + os.sep + "*"])
+                os.chdir(eski_dir)
+
+            elif program_adres.startswith("_"):
+                self._python_zipfile_ile_ziple(zip_dosya_tam_adres, kaynak_klasor_tam_adres)
+
+        except Exception as e:
+            print(e)
+            self._python_zipfile_ile_ziple(zip_dosya_tam_adres, kaynak_klasor_tam_adres)
+            # if not os.getcwd() == eski_dir:
+            os.chdir(eski_dir)
+
+    # ---------------------------------------------------------------------
+    def _python_zipfile_ile_ziple(self, zip_dosya_tam_adres, kaynak_klasor_tam_adres):
+        # bunun yerine asagidaki zipfile tercih edildi.
+        # cunku sıkıstırma oranı secebiliyoruz
+        # shutil.make_archive(base_name=zippedFolderSavePath, format="zip", root_dir=tempDirPath)
+        # shutil.make_archive ziplenmis dosya sonuna .zip ekliyor, ####.def.zip oluyor
+        # os.rename("{}.zip".format(zippedFolderSavePath), zippedFolderSavePath)
+
+        # kaynak_klasor kendisi haric sadece icini kaydediyoruz.
+        len_kaynak_klasor = len(kaynak_klasor_tam_adres)
+        with zipfile.ZipFile(zip_dosya_tam_adres, "w", zipfile.ZIP_STORED) as zipf:
+            for root, dirs, files in os.walk(kaynak_klasor_tam_adres):
+                # !! Olasi bos klasorleri eklememeyi tercih ettik !!
+                #
+                for dosya_adi in files:
+                    kaynak_dosya_tam_adres = os.path.join(root, dosya_adi)
+                    dosya_zip_icindeki_adres = kaynak_dosya_tam_adres[len_kaynak_klasor:]
+                    zipf.write(kaynak_dosya_tam_adres, dosya_zip_icindeki_adres)
 
 
 # ---------------------------------------------------------------------

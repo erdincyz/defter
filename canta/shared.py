@@ -6,7 +6,6 @@ __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
 import os
-import zipfile
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
@@ -71,23 +70,3 @@ def calculate_alpha(delta, col):
     return col
 
     # return QColor().fromRgb(col.red(), col.green(),col.blue(),col.alpha())
-
-
-# ---------------------------------------------------------------------
-def ziple(zip_dosya_tam_adres, kaynak_klasor):
-    # bunun yerine asagidaki zipfile tercih edildi.
-    # cunku sıkıstırma oranı secebiliyoruz
-    # shutil.make_archive(base_name=zippedFolderSavePath, format="zip", root_dir=tempDirPath)
-    # shutil.make_archive ziplenmis dosya sonuna .zip ekliyor, ####.def.zip oluyor
-    # os.rename("{}.zip".format(zippedFolderSavePath), zippedFolderSavePath)
-
-    # kaynak_klasor kendisi haric sadece icini kaydediyoruz.
-    len_kaynak_klasor = len(kaynak_klasor)
-    with zipfile.ZipFile(zip_dosya_tam_adres, "w", zipfile.ZIP_STORED) as zipf:
-        for root, dirs, files in os.walk(kaynak_klasor):
-            # !! Olasi bos klasorleri eklememeyi tercih ettik !!
-            #
-            for dosya_adi in files:
-                kaynak_dosya_tam_adres = os.path.join(root, dosya_adi)
-                dosya_zip_icindeki_adres = kaynak_dosya_tam_adres[len_kaynak_klasor:]
-                zipf.write(kaynak_dosya_tam_adres, dosya_zip_icindeki_adres)

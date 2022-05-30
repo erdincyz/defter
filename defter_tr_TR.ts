@@ -2095,7 +2095,7 @@ Dosya okunup anlamlandırılamadı!</translation>
     <message>
         <location filename="defter.py" line="3385"/>
         <source>Please wait</source>
-        <translation>Lütefen bekleyiniz</translation>
+        <translation>Lütfen bekleyiniz</translation>
     </message>
 </context>
 <context>
