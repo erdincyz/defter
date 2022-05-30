@@ -5328,6 +5328,7 @@ class DefterAnaPencere(QMainWindow):
         if item.type() == DosyaNesnesi.Type:
             # self.actionConvertToWebItem.setVisible(True)
             # self.actionShowAsWebPage.setVisible(True)
+            self.actionShowInFileManager.setVisible(True)
             self.actionExportDosya.setVisible(True)
             self.actionShowDosyaInfo.setVisible(True)
             if item.isEmbeded:
@@ -8183,7 +8184,7 @@ class DefterAnaPencere(QMainWindow):
         if self.cScene.activeItem.type() == Text.Type:
             url = self.cScene.activeItem.get_document_url()
             url = url.toLocalFile()
-        elif self.cScene.activeItem.type() == Image.Type or self.cScene.activeItem.type() == VideoItem.Type:
+        elif self.cScene.activeItem.type() in [Image.Type, VideoItem.Type, DosyaNesnesi.Type]:
             url = self.cScene.activeItem.filePathForSave
         else:
             return
@@ -8192,7 +8193,6 @@ class DefterAnaPencere(QMainWindow):
 
         sistem = platform.system()
         if sistem == "Darwin":
-
             # norm = os.path.normpath(unicode(self.fsModel.rootPath()))
             # subprocess.Popen(('open %s' % norm))
             os.system(u'open -R "%s"' % norm)

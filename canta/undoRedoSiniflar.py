@@ -111,6 +111,8 @@ class UndoableRemoveItem(QUndoCommand):
     # ---------------------------------------------------------------------
     def redo(self):
         self.scene.clearSelection()
+        if self.item.type() == shared.VIDEO_ITEM_TYPE:
+            self.item.nesne_sahneden_silinmek_uzere()
         self.scene.removeItem(self.item)
         # # ilk silerken, itemlar secili ve selectionQueue icindeler,
         # # ama undo edip sahneye geri aldik ve de her seyi secisiz halde getirip

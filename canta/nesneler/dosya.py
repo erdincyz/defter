@@ -8,8 +8,8 @@ __author__ = 'Erdinç Yılmaz'
 __license__ = 'GPLv3'
 
 import os
+import platform
 import subprocess
-import sys
 
 from PySide6.QtCore import Qt, QSize, QFileInfo
 from PySide6.QtGui import QPixmap, QColor
@@ -29,12 +29,18 @@ class DosyaNesnesi(BaseItem):
                  parent=None):
         super(DosyaNesnesi, self).__init__(pos, rect, yaziRengi, arkaPlanRengi, pen, font, parent)
 
-        iconProvider = QFileIconProvider()
-        self.ikon = iconProvider.icon(QFileInfo(dosyaAdresi))
+        if os.path.isfile(dosyaAdresi):
+            iconProvider = QFileIconProvider()
+            self.ikon = iconProvider.icon(QFileInfo(dosyaAdresi))
+            self.ikonPixmap = self.ikon.pixmap(self._rect.toRect().size())
+        else:
+            self.ikonPixmap = QPixmap(':icons/warning.png')
+
         self.ikonBoyutu = QSize(32, 32)
 
         self.renk_yazi_alti_kutusu = QColor(255, 255, 255, 155)
 
+        # ikon altinda bir pixmap daha cizmisiz ama niye? iptal edilme adayi...
         if not pixmap:
             self.pixmap = QPixmap()
         else:
@@ -77,17 +83,25 @@ class DosyaNesnesi(BaseItem):
         return properties
 
     # ---------------------------------------------------------------------
+    def setRect(self, rect):
+        super(DosyaNesnesi, self).setRect(rect)
+        if os.path.isfile(self.filePathForSave):
+            self.ikonPixmap = self.ikon.pixmap(self._rect.toRect().size())
+        else:
+            self.ikonPixmap = QPixmap(':icons/warning.png')
+
+    # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
-        if sys.platform == 'darwin':
+        sistem = platform.system()
+        if sistem == "Darwin":
             subprocess.call(('open', self.filePathForSave))
-        elif sys.platform == 'nt' or sys.platform == "win32":
+        elif sistem == 'Windows':
             try:
                 os.startfile(self.filePathForSave)
             except AttributeError:
                 subprocess.call(['open', self.filePathForSave])
 
-        # elif sys.platform == 'posix' or 'linux2':
-        elif sys.platform.startswith('linux'):
+        elif sistem == "Linux":
             # subprocess.call(('xdg-open', norm))
             try:
                 subprocess.Popen(('xdg-open', self.filePathForSave))
@@ -155,7 +169,7 @@ class DosyaNesnesi(BaseItem):
         #   ve bu yeni kopya renk ile pen olusturunca calısıyor. self.setCizgRengi nde bu islem,
         painter.drawRect(self._rect)
         painter.drawPixmap(self._rect.toRect(), self.pixmap)
-        painter.drawPixmap(self._rect.toRect(), self.ikon.pixmap(self._rect.toRect().size()))
+        painter.drawPixmap(self._rect.toRect(), self.ikonPixmap)
         # painter.drawPixmap(0,0,self.ikonBoyutu.width(), self.ikonBoyutu.height(), self.ikon.pixmap(self.ikonBoyutu))
 
         # painter.setWorldMatrixEnabled(False)

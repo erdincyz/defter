@@ -138,6 +138,11 @@ class VideoItem(BaseItem):
             self.hoverMoveEvent = super(VideoItem, self).hoverMoveEvent
 
     # ---------------------------------------------------------------------
+    def nesne_sahneden_silinmek_uzere(self):
+        # playerPositionChanged sinyali gitmeye devam ediyor ve nesne "already deleted" hatası.
+        self.player.stop()
+
+    # ---------------------------------------------------------------------
     def boundingRect(self):
         # if self._boundingRect.isNull():
         self._boundingRect = QRectF(self.rect())
