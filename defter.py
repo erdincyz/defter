@@ -1923,10 +1923,14 @@ class DefterAnaPencere(QMainWindow):
 
                 elif cvp == "s":
                     self.clean_download_threads()
+                    varsa_ayni_adresteki_dosya_silinsin_mi = False
                     if not path:
-                        path = self._get_def_file_save_path()
+                        path, varsa_ayni_adresteki_dosya_silinsin_mi = self._get_def_file_save_path()
                     if path:
-                        if self.save_file(zipDosyaTamAdres=path, cModel=x_dugmesine_tiklanan_model, isSaveAs=False):
+                        if self.save_file(zipDosyaTamAdres=path,
+                                          cModel=x_dugmesine_tiklanan_model,
+                                          varsa_ayni_adresteki_dosya_silinsin_mi=varsa_ayni_adresteki_dosya_silinsin_mi,
+                                          isSaveAs=False):
                             self._remove_tab(index)
                             self.move_or_append_left_in_recent_files_queue(path)
 
@@ -3124,7 +3128,7 @@ class DefterAnaPencere(QMainWindow):
         QApplication.restoreOverrideCursor()
 
     # ---------------------------------------------------------------------
-    def save_file(self, zipDosyaTamAdres, cModel, isSaveAs=False):
+    def save_file(self, zipDosyaTamAdres, cModel, varsa_ayni_adresteki_dosya_silinsin_mi, isSaveAs=False):
         self.lutfen_bekleyin_goster()
         # mesela imaj paste edildiginde veya embed edildiginde
         # if not os path exists directory olustur sonra da oraya kaydet.async ve de sonra da zip et.
@@ -3209,21 +3213,27 @@ class DefterAnaPencere(QMainWindow):
             # _file.close()
             _file.commit()
             try:
+                # arsivleme programlarında -u update kullanmaya baslayınca
+                # kaydederken var olan bir dosya adresi secilirse, eskisini silmek lazım artik.
+                # yoksa eski belgenin gomulu dosyaları yeni def dosyasında kalıyor.
+                if varsa_ayni_adresteki_dosya_silinsin_mi:
+                    os.remove(zipDosyaTamAdres)
                 self.ziple(self.arsivleme_programi_adres, zipDosyaTamAdres, tempDirPath)
             except Exception as e:
                 try:
+                    # burdaki remove, zipte hata olur da yarım dosya oluşursa diye
                     os.remove(zipDosyaTamAdres)
-                except Exception as e:
-                    # shutil.move(zipDosyaTamAdres)
-                    self.lutfen_bekleyin_gizle()
-                    QMessageBox.warning(self,
-                                        'Defter',
-                                        self.tr('Could not save file as '
-                                                '"{0:s}" : "{1:s}" ').format(zipDosyaTamAdres,
-                                                                             str(e)))
-                    return False
-                # else:
-                #     os.rename("{}.zip".format(zipDosyaTamAdres), zipDosyaTamAdres)
+                except Exception as ee:
+                    pass
+
+                # shutil.move(zipDosyaTamAdres)
+                self.lutfen_bekleyin_gizle()
+                QMessageBox.warning(self,
+                                    'Defter',
+                                    self.tr('Could not save file as '
+                                            '"{0:s}" : "{1:s}" ').format(zipDosyaTamAdres,
+                                                                         str(e)))
+                return False
 
             if isSaveAs:
                 # TODO: bu niye asagida?
@@ -3253,19 +3263,27 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_save_def_file(self):
+        varsa_ayni_adresteki_dosya_silinsin_mi = False
         path = self.cModel.saveFilePath
         if not path:
-            path = self._get_def_file_save_path()
+            path, varsa_ayni_adresteki_dosya_silinsin_mi = self._get_def_file_save_path()
         if path:
-            self.save_file(zipDosyaTamAdres=path, cModel=self.cModel, isSaveAs=False)
+            self.save_file(zipDosyaTamAdres=path,
+                           cModel=self.cModel,
+                           varsa_ayni_adresteki_dosya_silinsin_mi=varsa_ayni_adresteki_dosya_silinsin_mi,
+                           isSaveAs=False)
             self.move_or_append_left_in_recent_files_queue(path)
 
     # ---------------------------------------------------------------------
     @Slot()
     def act_save_as_def_file(self):
-        path = self._get_def_file_save_path()
+        varsa_ayni_adresteki_dosya_silinsin_mi = False
+        path, varsa_ayni_adresteki_dosya_silinsin_mi = self._get_def_file_save_path()
         if path:
-            self.save_file(zipDosyaTamAdres=path, cModel=self.cModel, isSaveAs=True)
+            self.save_file(zipDosyaTamAdres=path,
+                           cModel=self.cModel,
+                           varsa_ayni_adresteki_dosya_silinsin_mi=varsa_ayni_adresteki_dosya_silinsin_mi,
+                           isSaveAs=True)
             self.move_or_append_left_in_recent_files_queue(path)
 
     # ---------------------------------------------------------------------
@@ -3278,12 +3296,18 @@ class DefterAnaPencere(QMainWindow):
                                          filtre)
 
         path = fn[0]
+        varsa_ayni_adresteki_dosya_silinsin_mi = False
         if path:
             # TODO: uzanti kontrolu yap
             if not path.endswith(".def"):
                 path = '%s.def' % path
+            # arsivleme programlarında -u update kullanmaya baslayınca
+            # kaydederken var olan bir dosya adresi secilirse, eskisini silmek lazım artik.
+            # yoksa eski belgenin gomulu dosyaları yeni def dosyasında kalıyor.
+            if os.path.isfile(path):  # getSaveFileName kullanildigi icin ayni isimde klasor durumu yok.
+                varsa_ayni_adresteki_dosya_silinsin_mi = True
             self.lastDir = os.path.dirname(path)
-        return path
+        return path, varsa_ayni_adresteki_dosya_silinsin_mi
 
     # ---------------------------------------------------------------------
     def do_you_want_to_save(self):
