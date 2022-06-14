@@ -5,9 +5,12 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
+import filecmp
 import os
 import shutil
-from PySide6.QtGui import QUndoCommand
+
+from PySide6.QtCore import QRectF
+from PySide6.QtGui import QUndoCommand, QPixmap
 from canta.nesneler.group import Group
 from canta.nesneler.base import BaseItem
 from canta import shared
@@ -928,41 +931,6 @@ class UndoableScale(QUndoCommand):
 
 
 ########################################################################
-class UndoableRotateBaseItem(QUndoCommand):
-    """ """
-
-    # ---------------------------------------------------------------------
-    def __init__(self, description, item, rotation, parent=None):
-        super(UndoableRotateBaseItem, self).__init__(description, parent)
-        self.item = item
-        self.rotation = rotation % 360
-        self.eskiRotation = item.rotation() % 360
-
-    # ---------------------------------------------------------------------
-    def id(self):
-        return 10
-
-    # ---------------------------------------------------------------------
-    def mergeWith(self, enSonUndo):
-        if not enSonUndo.id() == self.id() or self.item is not enSonUndo.item:
-            return False
-        self.rotation = enSonUndo.rotation
-        return True
-
-    # ---------------------------------------------------------------------
-    def redo(self):
-        self.item.rotateWithOffset(self.rotation)
-        self.item.scene().parent().itemRotationSBox_tbar.setValue(self.rotation)
-        self.item.scene().parent().itemRotationSBox_nesnedw.setValue(self.rotation)
-
-    # ---------------------------------------------------------------------
-    def undo(self):
-        self.item.rotateWithOffset(self.eskiRotation)
-        self.item.scene().parent().itemRotationSBox_tbar.setValue(self.eskiRotation)
-        self.item.scene().parent().itemRotationSBox_nesnedw.setValue(self.eskiRotation)
-
-
-########################################################################
 class UndoableRotate(QUndoCommand):
     """ """
 
@@ -975,7 +943,7 @@ class UndoableRotate(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 11
+        return 10
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -995,6 +963,41 @@ class UndoableRotate(QUndoCommand):
     # ---------------------------------------------------------------------
     def undo(self):
         self.item.setRotation(self.eskiRotation)
+        self.item.scene().parent().itemRotationSBox_tbar.setValue(self.eskiRotation)
+        self.item.scene().parent().itemRotationSBox_nesnedw.setValue(self.eskiRotation)
+
+
+########################################################################
+class UndoableRotateWithOffset(QUndoCommand):
+    """ """
+
+    # ---------------------------------------------------------------------
+    def __init__(self, description, item, rotation, parent=None):
+        super(UndoableRotateWithOffset, self).__init__(description, parent)
+        self.item = item
+        self.rotation = rotation % 360
+        self.eskiRotation = item.rotation() % 360
+
+    # ---------------------------------------------------------------------
+    def id(self):
+        return 11
+
+    # ---------------------------------------------------------------------
+    def mergeWith(self, enSonUndo):
+        if not enSonUndo.id() == self.id() or self.item is not enSonUndo.item:
+            return False
+        self.rotation = enSonUndo.rotation
+        return True
+
+    # ---------------------------------------------------------------------
+    def redo(self):
+        self.item.rotateWithOffset(self.rotation)
+        self.item.scene().parent().itemRotationSBox_tbar.setValue(self.rotation)
+        self.item.scene().parent().itemRotationSBox_nesnedw.setValue(self.rotation)
+
+    # ---------------------------------------------------------------------
+    def undo(self):
+        self.item.rotateWithOffset(self.eskiRotation)
         self.item.scene().parent().itemRotationSBox_tbar.setValue(self.eskiRotation)
         self.item.scene().parent().itemRotationSBox_nesnedw.setValue(self.eskiRotation)
 
@@ -1588,26 +1591,6 @@ class UndoableSetImageOpacity(QUndoCommand):
 
 
 ########################################################################
-class UndoableSetSceneBackgroundBrush(QUndoCommand):
-    """ """
-
-    # ---------------------------------------------------------------------
-    def __init__(self, description, view, color, parent=None):
-        super(UndoableSetSceneBackgroundBrush, self).__init__(description, parent)
-        self.view = view
-        self.color = color
-        self.eskiColor = self.view.backgroundBrush().color()
-
-    # ---------------------------------------------------------------------
-    def redo(self):
-        self.view.setBackgroundBrush(self.color)
-
-    # ---------------------------------------------------------------------
-    def undo(self):
-        self.view.setBackgroundBrush(self.eskiColor)
-
-
-########################################################################
 class UndoableSetPinStatus(QUndoCommand):
     """ """
 
@@ -1851,50 +1834,103 @@ class UndoableEmbedFile(QUndoCommand):
         self.item.isEmbeded = False
         self.item.filePathForSave = self.eskiFilePath
 
-# ########################################################################
-# it works but for now we dont need this.
-# class UndoableSetSceneBackgroundImage(QUndoCommand):
-#     """ """
-#
-#     # ---------------------------------------------------------------------
-#     def __init__(self, description, scene, imagePath, parent=None):
-#         super(UndoableSetSceneBackgroundImage, self).__init__(description, parent)
-#         self.scene = scene
-#         self.imagePath = imagePath
-#         self.eskiImagePath = imagePath
-#
-#     # ---------------------------------------------------------------------
-#     def redo(self):
-#         if not self.imagePath:
-#             self.scene.backgroundImagePixmap = None
-#             self.scene.backgroundImagePath = None
-#         else:
-#             if not os.path.exists(self.imagePath):
-#                 self.scene.parent().log("Can not undo, %s does not exist or could not be read "
-#                                                            % self.imagePath, 5000, 2)
-#             else:
-#                 # TODO: belki: ekelenen imajin ortalama rengine cevir scene bgcolor
-#                 self.scene.backgroundImagePixmap = QPixmap(self.imagePath)
-#                 self.scene.setSceneRect(QRectF(self.scene.backgroundImagePixmap.rect()))
-#                 # TODO: alttakine gerek var mi?
-#                 # self.views()[0].fitInView(self.sceneRect(), Qt.KeepAspectRatio)
-#                 self.scene.backgroundImagePath = self.imagePath
-#         self.scene.update()
-#
-#     # ---------------------------------------------------------------------
-#     def undo(self):
-#         if not self.imagePath:
-#             self.scene.backgroundImagePixmap = None
-#             self.scene.backgroundImagePath = None
-#         else:
-#             if not os.path.exists(self.imagePath):
-#                 self.scene.parent().log("Can not undo, %s does not exist or could not be read "
-#                                                            % self.eskiImagePath, 5000, 2)
-#             else:
-#                 # TODO: belki: ekelenen imajin ortalama rengine cevir scene bgcolor
-#                 self.scene.backgroundImagePixmap = QPixmap(self.eskiImagePath)
-#                 self.scene.setSceneRect(QRectF(self.scene.backgroundImagePixmap.rect()))
-#                 # TODO: alttakine gerek var mi?
-#                 # self.views()[0].fitInView(self.sceneRect(), Qt.KeepAspectRatio)
-#                 self.scene.backgroundImagePath = self.eskiImagePath
-#         self.scene.update()
+
+########################################################################
+class UndoableSetSceneBackgroundBrush(QUndoCommand):
+    """ """
+
+    # ---------------------------------------------------------------------
+    def __init__(self, description, view, color, parent=None):
+        super(UndoableSetSceneBackgroundBrush, self).__init__(description, parent)
+        self.view = view
+        self.color = color
+        self.eskiColor = self.view.backgroundBrush().color()
+
+    # ---------------------------------------------------------------------
+    def redo(self):
+        self.view.setBackgroundBrush(self.color)
+
+    # ---------------------------------------------------------------------
+    def undo(self):
+        self.view.setBackgroundBrush(self.eskiColor)
+
+
+########################################################################
+class UndoableSetSceneBackgroundImage(QUndoCommand):
+    """ """
+
+    # ---------------------------------------------------------------------
+    def __init__(self, description, view, imagePath, parent=None):
+        super(UndoableSetSceneBackgroundImage, self).__init__(description, parent)
+        self.view = view
+        self.imagePath = imagePath
+        self.eskiImagePath = view.backgroundImagePath
+        self.eskiEmbedDurumu = view.backgroundImagePathIsEmbeded
+
+    # ---------------------------------------------------------------------
+    def redo(self):
+        self.view.set_background_image(self.imagePath)
+        self.view.backgroundImagePathIsEmbeded = False
+
+        # if not os.path.exists(self.imagePath):
+        #     self.view.parent().log("Can not undo, %s does not exist or could not be read "
+        #                             % self.imagePath, 5000, 2)
+
+    # ---------------------------------------------------------------------
+    def undo(self):
+        self.view.set_background_image(self.eskiImagePath)
+        self.view.backgroundImagePathIsEmbeded = self.eskiEmbedDurumu
+
+        # if not os.path.exists(self.imagePath):
+        #     self.view.parent().log("Can not undo, %s does not exist or could not be read "
+        #                             % self.eskiImagePath, 5000, 2)
+
+
+########################################################################
+class UndoableEmbedSceneBackgroundImage(QUndoCommand):
+    """ """
+
+    # ---------------------------------------------------------------------
+    def __init__(self, description, view, parent=None):
+        """ """
+        super(UndoableEmbedSceneBackgroundImage, self).__init__(description, parent)
+
+        self.view = view
+        self.eskiImagePath = view.backgroundImagePath
+
+        self.kopya_var = False
+        if os.path.exists(self.eskiImagePath):
+            resim_klasor = os.path.join(self.view.scene().tempDirPath, "images")
+            for resimAdi in os.listdir(resim_klasor):
+                resimAdres = os.path.join(resim_klasor,resimAdi)
+                if filecmp.cmp(view.backgroundImagePath, resimAdres, shallow=True):
+                   self.kopya_var = True
+                   break
+
+        if self.kopya_var:
+            self.yeniImagePath = resimAdres
+        else:
+            self.yeniImagePath = view.scene().get_unique_path_for_embeded_image(
+                os.path.basename(view.backgroundImagePath))
+
+    # ---------------------------------------------------------------------
+    def redo(self):
+        if not self.kopya_var:
+            shutil.copy2(self.view.backgroundImagePath, self.yeniImagePath)
+        self.view.set_background_image(self.yeniImagePath)
+        self.view.backgroundImagePathIsEmbeded = True
+
+    # ---------------------------------------------------------------------
+    def undo(self):
+
+        self.view.set_background_image(self.eskiImagePath)
+        self.view.backgroundImagePathIsEmbeded = False
+        if not self.kopya_var:
+            try:
+                os.remove(self.yeniImagePath)
+            except OSError as e:
+                self.view.parent().log(
+                    'Warning! could not delete embeded background image file, '
+                    'but scene\'s background image file path succesfully reverted to original path. ( {} )'.format(
+                        os.strerror(e.errno)),
+                    20000, 3)

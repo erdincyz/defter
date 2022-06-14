@@ -45,6 +45,12 @@ class YuvarlakFircaBoyutu(QGraphicsItem):
         return YuvarlakFircaBoyutu.Type
 
     # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
+        # Ola ki bu nesne aktif iken HTML olarak kaydet cagrilirsa diye
+        # None dondurmeyelim stringe ekleniyor bu
+        return ""
+
+    # ---------------------------------------------------------------------
     def wheelEvent(self, event):
         # shift ile firca boyutu degistirirken, altta cizilen nesneyi dondurebiliyordu
         if event.modifiers() & Qt.ShiftModifier:

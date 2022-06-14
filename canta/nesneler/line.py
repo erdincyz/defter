@@ -7,8 +7,10 @@ __author__ = 'Erdinç Yılmaz'
 
 import math
 import uuid
-from PySide6.QtCore import (Qt, QRectF, QSizeF, QPointF, QLineF)
-from PySide6.QtGui import (QPainterPath, QPainterPathStroker, QPen, QColor, QTransform, QPolygonF, QTextOption, QBrush)
+from PySide6.QtCore import (Qt, QRectF, QSizeF, QPointF, QLineF, QBuffer, QIODevice, QSize)
+from PySide6.QtGui import (QPainterPath, QPainterPathStroker, QPen, QColor, QTransform, QPolygonF, QTextOption, QBrush,
+                           QPainter)
+from PySide6.QtSvg import QSvgGenerator
 from PySide6.QtWidgets import (QGraphicsItem, QStyle)
 from canta import shared
 from canta.nesneler.tempTextItem import TempTextItem
@@ -87,6 +89,91 @@ class LineItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def type(self):
         return LineItem.Type
+        
+    # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
+
+        # rect = self.mapRectToScene(self.boundingRect())
+        rect = self.sceneBoundingRect()
+        xr = rect.left()
+        yr = rect.top()
+        xs = self.scene().sceneRect().x()
+        ys = self.scene().sceneRect().y()
+        x = xr - xs
+        y = yr - ys
+
+        w = rect.width()
+        h = rect.height()
+
+        buffer = QBuffer()
+        buffer.open(QIODevice.WriteOnly)
+
+        generator = QSvgGenerator()
+        # generator.setFileName("dosya.svg")
+        generator.setOutputDevice(buffer)
+        # generator.setResolution(72)
+
+        generator.setSize(QSize(w, h))
+        generator.setViewBox(QRectF(-w / 2, -h / 2, w, h))
+        generator.setTitle(self._kim)
+        generator.setDescription("")
+        # painter = QPainter(generator)
+        painter = QPainter()
+        painter.begin(generator)
+        painter.save()
+        
+        diff = self.scenePos() - rect.center()
+        cizilecekLine = QLineF(self._line)
+        cizilecekTextRect = QRectF(self.painterTextRect)
+        cizilecekOkPolygon = QPolygonF(self.ok_polygon)
+        
+        cizilecekLine.translate(diff)
+        cizilecekOkPolygon.translate(diff)
+        painter.setPen(self._pen)
+
+        painter.translate(diff)
+        painter.rotate(self.rotation())
+        painter.translate(-diff)
+        painter.drawLine(cizilecekLine)
+        painter.setBrush(self._pen.color())
+        painter.setPen(Qt.NoPen)
+        painter.drawConvexPolygon(cizilecekOkPolygon)
+        #painter.drawRect(cizilecekTextRect)
+        #painter.drawText(cizilecekTextRect, self._text, self.painterTextOption)
+        painter.restore()   
+        if self._text:
+            painter.save()
+            painter.setFont(self._font)
+            # painter.setPen(self.textPen)
+            painter.setPen(self.yaziRengi)
+            diff= (-cizilecekLine.p1())
+            
+            cizilecekTextRect.moveBottomLeft(cizilecekLine.p1())
+
+            painter.translate(-diff)
+            painter.rotate((self.rotation() - self._line.angle())%360)    
+            painter.translate(diff)    
+            painter.scale(self.painterTextScale, self.painterTextScale)
+            #painter.drawText(cizilecekLine.p1(), self._text)
+            painter.drawText(cizilecekTextRect, self._text, self.painterTextOption)
+
+            painter.restore()   
+        painter.end()
+
+        svg_string = buffer.data().data().decode("utf-8")
+
+        # background: rgba{self.arkaPlanRengi.toTuple()};\n
+        div_str = f"""
+                    <div style="
+                     position:absolute;
+                     z-index:{int(self.zValue()*10)if self.zValue() else 0};
+                     width:{w}px;
+                     height:{h}px;
+                     top:{y}px;
+                     left:{x}px;" id="{self._kim}">{svg_string}</div>\n
+            """
+        # return svg_string
+        return div_str
 
     # ---------------------------------------------------------------------
     def get_properties_for_save_binary(self):
@@ -129,6 +216,8 @@ class LineItem(QGraphicsItem):
         line.setP2(point)
         self.setLine(line)
         self.update_resize_handles()
+        sahne_acisi = f"\u2220  {((self._line.angle()-self.rotation())%360):.1f}\N{DEGREE SIGN}"
+        self.scene().parent().log(txt=sahne_acisi, toStatusBarOnly=True)
 
     # ---------------------------------------------------------------------
     def ok_ekle(self, ok, scenepPos, okunHangiNoktasi):
@@ -399,6 +488,12 @@ class LineItem(QGraphicsItem):
             self.update_resize_handles()
             self.update_painter_text_rect()
             self.scene().parent().change_transform_box_values(self)
+
+            # TODO: self.rotation() degeri, self._line.angle() ile degissin, yani setPos ile
+            # pozisyonu da ayarlamak lazım.
+
+            sahne_acisi = f"\u2220  {((self._line.angle()-self.rotation())%360):.1f}\N{DEGREE SIGN}"
+            self.scene().parent().log(txt=sahne_acisi, toStatusBarOnly=True)
             # self.setPos(x, y)
             # return QGraphicsItem.mouseMoveEvent(self, event)
 
@@ -407,6 +502,7 @@ class LineItem(QGraphicsItem):
             super(LineItem, self).mouseMoveEvent(event)
 
         # super(BaseItem, self).mouseMoveEvent(event)
+
     # ---------------------------------------------------------------------
     def hoverEnterEvent(self, event):
         # event propagationdan dolayi bos da olsa burda implement etmek lazim
@@ -505,28 +601,44 @@ class LineItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def sceneRight(self):
 
-        p1 = self.mapToScene(self._line.p1())
-        p2 = self.mapToScene(self._line.p2())
-        return max(p1.x(), p2.x())
+        # p1 = self.mapToScene(self._line.p1())
+        # p2 = self.mapToScene(self._line.p2())
+        # return max(p1.x(), p2.x())
+
+        # kalem ve ok ucu kalingligi dahil edildi
+        rect = self.mapRectToScene(self.shape().controlPointRect())
+        return rect.right()
 
     # ---------------------------------------------------------------------
     def sceneLeft(self):
 
-        p1 = self.mapToScene(self._line.p1())
-        p2 = self.mapToScene(self._line.p2())
-        return min(p1.x(), p2.x())
+        # p1 = self.mapToScene(self._line.p1())
+        # p2 = self.mapToScene(self._line.p2())
+        # return min(p1.x(), p2.x())
+
+        # kalem ve ok ucu kalingligi dahil edildi
+        rect = self.mapRectToScene(self.shape().controlPointRect())
+        return rect.left()
 
     # ---------------------------------------------------------------------
     def sceneTop(self):
-        p1 = self.mapToScene(self._line.p1())
-        p2 = self.mapToScene(self._line.p2())
-        return min(p1.y(), p2.y())
+        # p1 = self.mapToScene(self._line.p1())
+        # p2 = self.mapToScene(self._line.p2())
+        # return min(p1.y(), p2.y())
+
+        # kalem ve ok ucu kalingligi dahil edildi
+        rect = self.mapRectToScene(self.shape().controlPointRect())
+        return rect.top()
 
     # ---------------------------------------------------------------------
     def sceneBottom(self):
-        p1 = self.mapToScene(self._line.p1())
-        p2 = self.mapToScene(self._line.p2())
-        return max(p1.y(), p2.y())
+        # p1 = self.mapToScene(self._line.p1())
+        # p2 = self.mapToScene(self._line.p2())
+        # return max(p1.y(), p2.y())
+
+        # kalem ve ok ucu kalingligi dahil edildi
+        rect = self.mapRectToScene(self.shape().controlPointRect())
+        return rect.bottom()
 
     # ---------------------------------------------------------------------
     def setSceneLeft(self, left):
@@ -593,12 +705,12 @@ class LineItem(QGraphicsItem):
             return
         self._line = line
         self._boundingRect = QRectF()
-        self.update_arrow()
+        self.ok_ucu_guncelle()
         self.prepareGeometryChange()
         self.update()
 
     # ---------------------------------------------------------------------
-    def update_arrow(self):
+    def ok_ucu_guncelle(self):
         # line = self._line
         line = QLineF(self._line)
         try:
@@ -651,7 +763,7 @@ class LineItem(QGraphicsItem):
     def setCizgiKalinligi(self, width):
         self._pen.setWidthF(width)
         self.okBoyutu = width * 3
-        self.update_arrow()
+        self.ok_ucu_guncelle()
         # self.textPen.setWidthF(width)
 
         # self.selectionPenBottom.setWidthF(width)
@@ -673,6 +785,7 @@ class LineItem(QGraphicsItem):
     def setText(self, text):
         self._text = text
         # self.update()
+        self.update_painter_text_rect()
 
     # ---------------------------------------------------------------------
     def text(self):
@@ -746,12 +859,16 @@ class LineItem(QGraphicsItem):
     def update_painter_text_rect(self):
         r = QRectF()
         r.setWidth(self._line.length())
+        # r.setWidth(max(self._line.length(), self.fontPointSize()))
         # r.setHeight(self.fontPointSize()- self.textPadding)
+        # r.setHeight(self.fontPointSize() + 30)
+        # fontPixelSize = self.fontPointSize() / 72 * self.scene().parent().dpi
         r.setHeight(self.fontPointSize())
         # r.setSize(size / self.painterTextScale)
         # r.moveCenter(self.boundingRect().center())
         yeniOrtaNokta = self._line.center()
         yeniOrtaNokta.setY(yeniOrtaNokta.y() - self._pen.widthF())
+        # yeniOrtaNokta.setY(yeniOrtaNokta.y() - r.height())
         r.moveCenter(yeniOrtaNokta)
         self.painterTextRect = r
 
@@ -893,8 +1010,6 @@ class LineItem(QGraphicsItem):
 
         """
         rect = self.shape().controlPointRect()
-        if self._text:
-            rect.setHeight(max(rect.height(), self.fontPointSize()))
         return rect
 
     # ---------------------------------------------------------------------
@@ -906,8 +1021,20 @@ class LineItem(QGraphicsItem):
         path.moveTo(self._line.p1())
         path.lineTo(self._line.p2())
         path.addPolygon(self.ok_polygon)
-        path.addEllipse(self.p1Handle)
-        path.addEllipse(self.p2Handle)
+        path.addRect(self.p1Handle)
+        path.addRect(self.p2Handle)
+
+
+        if self._text:
+            # path addText kullanmadik, ok uzunlugu kısalınca yazının hepsini gostermese de kareye ekliyor.
+            # painterTextRecti okla beraber dondurup donmus dortgenin boundinRectini alip ekliyoruz
+            # c = self._line.center()
+            # t = QTransform().translate(c.x(), c.y()).rotate(- self._line.angle()).translate(-c.x(), -c.y())
+            # self.rpoly = t.mapToPolygon(self.painterTextRect.toRect())
+            # path.addRect(self.rpoly.boundingRect())
+
+            path.addRect(self.painterTextRect)
+
         # kalem kalinligini da ekliyoruz
         path = self.qt_graphicsItem_shapeFromPath(path, self.pen())
         return path
@@ -985,18 +1112,24 @@ class LineItem(QGraphicsItem):
             #     for i in range(path.elementCount()):
             #         painter.drawPoint(QPointF(path.elementAt(i).x, path.elementAt(i).y))
 
-        # # # # # # debug start - pos() # # # # #
+        # # # # # # # debug start - pos() # # # # #
         # painter.setBrush(Qt.NoBrush)
         # p = self.pos()
         # s = self.scenePos()
         # painter.drawText(self.boundingRect(), "{},  {}\n{},  {}".format(p.x(),p.y(),s.x(), s.y()))
-        # painter.drawRect(self.boundingRect())
-        # # painter.drawRect(p.x(),p.y(),100,100)
-        # # painter.drawRect(s.x(),s.y(),100,100)
-        # painter.drawRect(0,0,15,15)
+        # # # painter.drawRect(self.boundingRect())
+        # painter.setPen(Qt.green)
+        # painter.drawRect(self.painterTextRect)
+        # painter.setPen(Qt.yellow)
+        # # painter.drawPolygon(self.rpoly)
+        # painter.drawRect(p.x(),p.y(),100,100)
+        # painter.setPen(Qt.red)
+        # painter.drawRect(s.x(),s.y(),100,100)
+        # # painter.drawRect(0,0,15,15)
         # # painter.drawRect(self.path().controlPointRect())
-        # # painter.drawRect(self.boundingRect())
-        # # # # # # debug end - pos() # # # # #
+        # painter.setPen(Qt.blue)
+        # painter.drawRect(self.boundingRect())
+        # # # # # # # debug end - pos() # # # # #
 
     # ---------------------------------------------------------------------
     def wheelEvent(self, event):
@@ -1037,7 +1170,7 @@ class LineItem(QGraphicsItem):
             if self.isDrawingFinished:
                 self._cizgi_kalinligi_degistir_undo_ile(event.delta())
             # else:
-                # self.scene().tekerlek_ile_firca_boyu_degistir(event.delta())
+            # self.scene().tekerlek_ile_firca_boyu_degistir(event.delta())
 
         if not self.isDrawingFinished:
             self.scene().tekerlek_ile_firca_boyu_degistir(event.delta())
@@ -1171,13 +1304,14 @@ class LineItem(QGraphicsItem):
             # self.setRotation(self.rotation() + 5)
             # bu p1 den rotate ediyor
             # self.scene().undoableRotate("Rotate", self, self.rotation() + 5)
-            self.scene().undoRedo.undoableRotateBaseItem(self.scene().undoStack, "rotate", self, self.rotation() + 5)
+            self.scene().undoRedo.undoableRotateWithOffset(self.scene().undoStack, "rotate", self, self.rotation() + 5)
         else:
             # self.setRotation(self.rotation() - 5)
             # bu p1 den rotate ediyor
             # self.scene().undoableRotate("Rotate", self, self.rotation() - 5)
-            self.scene().undoRedo.undoableRotateBaseItem(self.scene().undoStack, "rotate", self, self.rotation() - 5)
+            self.scene().undoRedo.undoableRotateWithOffset(self.scene().undoStack, "rotate", self, self.rotation() - 5)
         # self.update()
+        self.update_painter_text_rect()
 
     # # ---------------------------------------------------------------------
     # def changeBackgroundColorAlpha(self, delta):

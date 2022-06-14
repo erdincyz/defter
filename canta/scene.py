@@ -111,6 +111,7 @@ class Scene(QGraphicsScene):
                       # "embededImageCounter": self.embededImageCounter,
                       "backgroundBrush": view.backgroundBrush(),
                       "backgroundImagePath": view.backgroundImagePath,
+                      "backgroundImagePathIsEmbeded": view.backgroundImagePathIsEmbeded,
                       # "viewMatrix": self.views()[0].matrix()
                       "viewTransform": view.transform(),
                       "viewHorizontalScrollBarValue": view.horizontalScrollBar().value(),

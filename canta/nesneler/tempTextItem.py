@@ -48,6 +48,12 @@ class TempTextItem(QGraphicsTextItem):
         return TempTextItem.Type
 
     # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
+        # Ola ki bu nesne aktif iken HTML olarak kaydet cagrilirsa diye
+        # None dondurmeyelim stringe ekleniyor bu
+        return ""
+
+    # ---------------------------------------------------------------------
     def scaleWithOffset(self, scale):
         cEski = self.sceneCenter()
         self.setScale(scale)

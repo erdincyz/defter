@@ -8,20 +8,22 @@ __author__ = 'Erdinç Yılmaz'
 from canta.undoRedoSiniflar import UndoableSayfaAdiDegistir, UndoableAddItem, UndoableRemoveItem, UndoableGroup, \
     UndoableUnGroup, UndoableParent, UndoableUnParent, UndoableResizeBaseItem, UndoableScaleBaseItemByResizing, \
     UndoableScalePathItemByScalingPath, UndoableScale, UndoableSetFont, UndoableSetFontSize, UndoableRotate, \
-    UndoableRotateBaseItem, UndoableSetZValue, UndoableSetLineStyle, UndoableSetLineJoinStyle, \
+    UndoableRotateWithOffset, UndoableSetZValue, UndoableSetLineStyle, UndoableSetLineJoinStyle, \
     UndoableSetLineCapStyle, UndoableSetLineColor, UndoableSetTextColor, \
     UndoableSetLineColorAlpha, UndoableSetTextColorAlpha, UndoableSetItemBackgroundColor, \
     UndoableSetItemBackgroundColorAlpha, UndoableApplyStylePresetToItem, UndoableApplyStylePreset, \
-    UndoableSetImageOpacity, UndoableSetSceneBackgroundBrush, UndoableSetPinStatus, UndoableItemSetText, \
-    UndoableItemCustomCommand, UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, \
-    UndoableResizeLineItem, UndoableMovePathPoint, UndoableSetTextAlignment, UndoableSetCharacterFormat, \
-    UndoableSetLineWidthF, UndoableConvertToPlainText, UndoRedoBaglantisiYaziNesnesiDocuna
+    UndoableSetImageOpacity, UndoableSetSceneBackgroundBrush, UndoableSetSceneBackgroundImage, \
+    UndoableEmbedSceneBackgroundImage, UndoableSetPinStatus, UndoableItemSetText, UndoableItemCustomCommand,\
+    UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, UndoableResizeLineItem,\
+    UndoableMovePathPoint, UndoableSetTextAlignment, UndoableSetCharacterFormat, UndoableSetLineWidthF, \
+    UndoableConvertToPlainText, UndoRedoBaglantisiYaziNesnesiDocuna
 
 
 # ---------------------------------------------------------------------
 def undoRedoBaglantisiYaziNesnesiDocuna(undoStack, description, doc):
     command = UndoRedoBaglantisiYaziNesnesiDocuna(description, doc)
     undoStack.push(command)
+
 
 # ---------------------------------------------------------------------
 def undoableSayfaAdiDegistir(undoStack, description, sayfa, sayfa_eski_adi):
@@ -126,8 +128,8 @@ def undoableRotate(undoStack, description, item, rotation):
 
 
 # ---------------------------------------------------------------------
-def undoableRotateBaseItem(undoStack, description, item, rotation):
-    command = UndoableRotateBaseItem(description, item, rotation)
+def undoableRotateWithOffset(undoStack, description, item, rotation):
+    command = UndoableRotateWithOffset(description, item, rotation)
     undoStack.push(command)
 
 
@@ -227,6 +229,18 @@ def undoableSetSceneBackgroundBrush(undoStack, description, view, color):
 
 
 # ---------------------------------------------------------------------
+def undoableSetSceneBackgroundImage(undoStack, description, view, imagePath):
+    command = UndoableSetSceneBackgroundImage(description, view, imagePath)
+    undoStack.push(command)
+
+
+# ---------------------------------------------------------------------
+def undoableEmbedSceneBackgroundImage(undoStack, description, view,):
+    command = UndoableEmbedSceneBackgroundImage(description, view)
+    undoStack.push(command)
+
+
+# ---------------------------------------------------------------------
 def undoableSetPinStatus(undoStack, description, item, value):
     command = UndoableSetPinStatus(description, item, value)
     undoStack.push(command)
@@ -236,6 +250,7 @@ def undoableSetPinStatus(undoStack, description, item, value):
 def undoableItemSetText(undoStack, description, item, eskiText, text):
     command = UndoableItemSetText(description, item, eskiText, text)
     undoStack.push(command)
+
 
 # ---------------------------------------------------------------------
 def undoableConvertToPlainText(undoStack, description, item):
@@ -277,8 +292,3 @@ def undoableMove(undoStack, description, movedItem, eskiPosition):
 def undoableMovePathPoint(undoStack, description, item, movedPointIndex, eskiPosTuple, yeniPosTuple):
     command = UndoableMovePathPoint(description, item, movedPointIndex, eskiPosTuple, yeniPosTuple)
     undoStack.push(command)
-
-# # ---------------------------------------------------------------------
-# def undoableSetSceneBackgroundImage(undoStack, description, imagePath):
-#     command = UndoableSetSceneBackgroundImage(description, self, imagePath)
-#     undoStack.push(command)

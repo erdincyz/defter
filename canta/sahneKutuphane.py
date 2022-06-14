@@ -89,6 +89,8 @@ class SahneKutuphane(QGraphicsScene):
             for item in sayfa.scene.items():
                 if item.type() == shared.IMAGE_ITEM_TYPE and item.isEmbeded:
                     kume.add(item.filePathForSave)
+            if sayfa.view.backgroundImagePathIsEmbeded:
+                kume.add(sayfa.view.backgroundImagePath)
         return kume
 
     # ---------------------------------------------------------------------

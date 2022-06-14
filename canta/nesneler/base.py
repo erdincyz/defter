@@ -764,6 +764,13 @@ class BaseItem(QGraphicsItem):
         # r = self.mapRectFromItem(self.textItem, r)
         # painter.drawRect(r)
         # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
+        # painter.setPen(QPen(Qt.red,17))
+        # painter.drawPoint(self.rect().center())
+        # painter.setPen(QPen(Qt.green,12))
+        # painter.drawPoint(self.boundingRect().center())
+        # painter.setPen(QPen(Qt.blue,8))
+        # painter.drawPoint(self.sceneBoundingRect().center())
+        # painter.drawRect(self.sceneBoundingRect())
         # # # # # # debug end - pos() # # # # #
 
     # ---------------------------------------------------------------------
@@ -1232,13 +1239,13 @@ class BaseItem(QGraphicsItem):
         # self.setTransformOriginPoint(self.rect().center())
         if delta > 0:
             # self.setRotation(self.rotation() + 5)
-            self.scene().undoRedo.undoableRotateBaseItem(self.scene().undoStack, "rotate", self,
+            self.scene().undoRedo.undoableRotateWithOffset(self.scene().undoStack, "rotate", self,
                                                          self.rotation() + 5)
             # self.rotateWithOffset(self.rotation() + 5, self)
 
         else:
             # self.setRotation(self.rotation() - 5)
-            self.scene().undoRedo.undoableRotateBaseItem(self.scene().undoStack, "rotate", self,
+            self.scene().undoRedo.undoableRotateWithOffset(self.scene().undoStack, "rotate", self,
                                                          self.rotation() - 5)
             # self.rotateWithOffset(self.rotation() - 5, self)
         self.update_painter_text_rect()

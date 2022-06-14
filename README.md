@@ -11,7 +11,7 @@
 * Görsellik ön plandadır. Belgeye fotoğraf, video, (herhangi)dosya ekleyebilme ve browserdan (ve diğer yazılımlardan) kopyala yapıştır, sürükle bırak yazı(HMTL destekler),ekleyebilme desteği vardır.
 * HTML içeren yazi nesnelerini, nesneye sağ tıklayınca açılan menüdeki **Web Sayfası Olarak** göster özelliğini kullanarak tekrar içerdiği linklere tıklanabilir hale getirebilirsiniz.
 * Mesela sahneye taşıyacağınız, **veya** izlemekte olduğunuz bir videodan ekran görüntüsü alıp, sahneye yapıştıracağınız o resmin üzerine çift tıklayınca, resmin tıkladığınız noktasında bir metin kutusu oluşur. Böylece resmin üzerine de dilediğiniz kadar not alabilirsiniz. 
-* Sahneyi PDF dosyası olarak kaydedebilirsiniz.
+* Sahneyi veya tüm belgeyi PDF veya HTML dosyası olarak kaydedebilirsiniz.
 
 **GPLv3** lisanslıdır.
 
@@ -53,7 +53,7 @@ It can bu used for;
 * You can make HTML-containing text objects clickable again by using the "Show as Web Page" feature in the menu that opens when you right-click on the object.
 * If you double-click on an image that you have added to the scene, a text box will appear at the point you clicked on the image. You can take as many notes as you want on the image.
 
-* You can export the scene as a PDF file.
+* You can export the scene as a PDF or HTML file.
 
 * It is licensed under GPLv3.
 

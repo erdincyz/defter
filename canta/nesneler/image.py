@@ -97,6 +97,67 @@ class Image(BaseItem):
         super(Image, self).flipVertical(mposy)
 
     # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, resim_kopyalaniyor_mu):
+        # resim_adres= f'<img src="{item.filePathForSave}" style="object-fit: fill;"></img>'
+        resim_adi = os.path.basename(self.filePathForSave)
+        resim_adres = self.filePathForSave
+        if not html_klasor_kayit_adres:  # def dosyasi icine kaydediliyor
+            if self.isEmbeded:
+                resim_adres = os.path.join("images", resim_adi)
+        else:  # dosya html olarak baska bir yere kaydediliyor
+            # kopyalanmazsa da, zaten embed olmayan resim normal hddeki adresten yuklenecektir.
+            if resim_kopyalaniyor_mu:
+                if not self.isEmbeded:  # embed ise zaten tmp klasorden hedef klasore baska metodta kopylanıyor hepsi.
+                    resim_adres = os.path.join(html_klasor_kayit_adres, "images", resim_adi)
+
+        img_str = f'<img src="{resim_adres}" style="width:100%; height:100%;"></img>'
+
+        rect = self.sceneBoundingRect()
+        xr = rect.left()
+        yr = rect.top()
+        xs = self.scene().sceneRect().x()
+        ys = self.scene().sceneRect().y()
+        x = xr - xs
+        y = yr - ys
+
+        bicimSozluk = self.ver_karakter_bicimi()
+        bold = "font-weight:bold;" if bicimSozluk["b"] else ""
+        italic = "font-style:bold;" if bicimSozluk["i"] else ""
+        underline = "underline" if bicimSozluk["u"] else ""
+        strikeOut = "line-through" if bicimSozluk["s"] else ""
+        overline = "overline" if bicimSozluk["o"] else ""
+        bicimler1 = bold + italic
+        if any((underline, strikeOut, overline)):
+            bicimler2 = f"text-decoration: {underline} {strikeOut} {overline};"
+        else:
+            bicimler2 = ""
+
+        renk_arkaPlan = f"({self.arkaPlanRengi.red()},{self.arkaPlanRengi.green()},{self.arkaPlanRengi.blue()},{self.arkaPlanRengi.alpha() / 255})"
+        renk_yazi = f"({self.yaziRengi.red()},{self.yaziRengi.green()},{self.yaziRengi.blue()},{self.yaziRengi.alpha() / 255})"
+
+        div_str = f"""
+                    <div style="
+                     background:rgba{renk_arkaPlan};
+                     color:rgba{renk_yazi};
+                     font-size:{self.fontPointSize()}pt; 
+                     font-family:{self.font().family()};
+                     {bicimler1}
+                     {bicimler2}
+                     position:absolute;
+                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
+                     width:{self._rect.width() * self.scale()}px;
+                     height:{self._rect.height() * self.scale()}px;
+                     top:{y}px;
+                     left:{x}px;
+                     transform-box: fill-box;
+                     transform-origin: center;
+                     transform: rotate({self.rotation()}deg);
+                     " id="{self._kim}">{img_str}</div>\n"""
+
+        # /*background-image:url('{resim_adres}');*/
+        return div_str
+
+    # ---------------------------------------------------------------------
     def get_properties_for_save_binary(self):
         properties = {"type": self.type(),
                       "kim": self._kim,
@@ -130,11 +191,13 @@ class Image(BaseItem):
             self.scene().parent().increase_zvalue(textItem)
             # textItem.textItemSelectedChanged.connect(self.textItemSelected)
             # self.addItem(textItem)
-            self.scene().undoRedo.undoableAddItem(self.scene().undoStack, description=self.scene().tr("add text"), scene=self.scene(),
-                            item=textItem)
+            self.scene().undoRedo.undoableAddItem(self.scene().undoStack, description=self.scene().tr("add text"),
+                                                  scene=self.scene(),
+                                                  item=textItem)
             textItem.setFocus()
             yeniPos = self.mapFromScene(textItem.scenePos())
-            self.scene().undoRedo.undoableParent(self.scene().undoStack, self.scene().tr("_parent"), textItem, self, yeniPos)
+            self.scene().undoRedo.undoableParent(self.scene().undoStack, self.scene().tr("_parent"), textItem, self,
+                                                 yeniPos)
 
         # super(Image, self).mouseDoubleClickEvent(event)
 

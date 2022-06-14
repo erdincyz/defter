@@ -38,6 +38,12 @@ class MirrorLine(QGraphicsLineItem):
     #     super(MirrorLine, self).paint(painter, option, widget)
 
     # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
+        # Ola ki bu nesne aktif iken HTML olarak kaydet cagrilirsa diye
+        # None dondurmeyelim stringe ekleniyor bu
+        return ""
+
+    # ---------------------------------------------------------------------
     def updateScale(self):
         yeniOran = 1 / self.scene().views()[0].viewportTransform().m11()
         # init te pen kalinligi 1 dolayisi ile 1 / viewscale den gelen degeri direkt

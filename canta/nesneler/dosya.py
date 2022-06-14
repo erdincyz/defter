@@ -11,7 +11,7 @@ import os
 import platform
 import subprocess
 
-from PySide6.QtCore import Qt, QSize, QFileInfo
+from PySide6.QtCore import Qt, QSize, QFileInfo, QBuffer, QIODevice, QByteArray
 from PySide6.QtGui import QPixmap, QColor
 from PySide6.QtWidgets import QStyle, QFileIconProvider
 
@@ -58,6 +58,77 @@ class DosyaNesnesi(BaseItem):
     def type(self):
         # Enable the use of qgraphicsitem_cast with this item.
         return DosyaNesnesi.Type
+
+    # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
+
+        buffer = QBuffer()
+        buffer.open(QIODevice.WriteOnly)
+        self.ikonPixmap.save(buffer, "PNG")
+
+        ikon_base64_buffer = buffer.data().toBase64()
+        # ikon_base64_buffer = buffer.data().toBase64(QByteArray.Base64UrlEncoding)
+        ikon_str = ikon_base64_buffer.data().decode("ascii")  # "utf-8" olmaz burda, binary.
+        # print(ikon_str)
+
+        # resim_adres= f'<img src="{item.filePathForSave}" style="object-fit: fill;"></img>'
+        # img_str = f'<img src="{self.filePathForSave}" style="width:100%; height:100%;"></img>'
+
+        dosya_adi = os.path.basename(self.filePathForSave)
+        dosya_adres = self.filePathForSave
+        if not html_klasor_kayit_adres:  # def dosyasi icine kaydet
+            if self.isEmbeded:
+                dosya_adres = os.path.join("files", dosya_adi)
+        else:  # dosya html olarak baska bir yere kaydediliyor
+            # kopyalanmazsa da, zaten embed olmayan dosya normal hddeki adresten yuklenecektir.
+            if dosya_kopyalaniyor_mu:
+                if not self.isEmbeded:  # embed ise zaten tmp klasorden hedef klasore baska metodta kopylanıyor hepsi.
+                    dosya_adres = os.path.join(html_klasor_kayit_adres, "files", dosya_adi)
+
+        a_str = f'<a href="{dosya_adres}">{dosya_adi}</a>'
+
+        x = self.scenePos().x()
+        y = self.scenePos().y()
+        xs = self.scene().sceneRect().x()
+        ys = self.scene().sceneRect().y()
+        x = x - xs
+        y = y - ys
+
+        bicimSozluk = self.ver_karakter_bicimi()
+        bold = "font-weight:bold;" if bicimSozluk["b"] else ""
+        italic = "font-style:bold;" if bicimSozluk["i"] else ""
+        underline = "underline" if bicimSozluk["u"] else ""
+        strikeOut = "line-through" if bicimSozluk["s"] else ""
+        overline = "overline" if bicimSozluk["o"] else ""
+        bicimler1 = bold + italic
+        if any((underline, strikeOut, overline)):
+            bicimler2 = f"text-decoration: {underline} {strikeOut} {overline};"
+        else:
+            bicimler2 = ""
+
+        renk_arkaPlan = f"({self.arkaPlanRengi.red()},{self.arkaPlanRengi.green()},{self.arkaPlanRengi.blue()},{self.arkaPlanRengi.alpha() / 255})"
+        renk_yazi = f"({self.yaziRengi.red()},{self.yaziRengi.green()},{self.yaziRengi.blue()},{self.yaziRengi.alpha() / 255})"
+
+        div_str = f"""
+                    <div style="
+                     background:rgba{renk_arkaPlan};
+                     background-image:url('data:image/png;base64,{ikon_str}');
+                     background-repeat:no-repeat;
+                     background-position:center;
+                     color:rgba{renk_yazi};
+                     font-size:{self.fontPointSize()}pt; 
+                     font-family:{self.font().family()};
+                     {bicimler1}
+                     {bicimler2}
+                     position:absolute;
+                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
+                     width:{self.sceneWidth()}px;
+                     height:{self.sceneHeight()}px;
+                     top:{y}px;
+                     left:{x}px;" id="{self._kim}">{a_str}</div>\n"""
+
+        # /*background-image:url('{resim_adres}');*/
+        return div_str
 
     # ---------------------------------------------------------------------
     def get_properties_for_save_binary(self):

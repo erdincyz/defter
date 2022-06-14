@@ -6,8 +6,9 @@ __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
 import uuid
-from PySide6.QtCore import (Qt, QRectF, QSizeF, QPointF, Slot)
-from PySide6.QtGui import (QPainterPath, QPainterPathStroker, QPen, QBrush, QColor, QTransform, QTextOption)
+from PySide6.QtCore import (Qt, QRectF,QRect, QSizeF, QSize, QPointF, Slot, QBuffer, QIODevice)
+from PySide6.QtGui import (QPainterPath, QPainterPathStroker, QPen, QBrush, QColor, QTransform, QTextOption, QPainter)
+from PySide6.QtSvg import QSvgGenerator
 from PySide6.QtWidgets import (QGraphicsItem, QStyle)
 from canta import shared
 from canta.nesneler.tempTextItem import TempTextItem
@@ -155,6 +156,75 @@ class PathItem(QGraphicsItem):
         # we may add resize functions to the PathItem object in the future.
         # so ...
         pass
+
+    # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
+        # bu nesnenin pozisyon hesaplari digerlerinden farkli
+        # divdeki w,h icin de maplemek lazim rotation degerine gore w,h degismesi icin, hatta scale icin de
+        rect = self.mapRectToScene(self.boundingRect())
+        x = rect.left()
+        y = rect.top()
+        xs = self.scene().sceneRect().x()
+        ys = self.scene().sceneRect().y()
+        x = x - xs
+        y = y - ys
+
+        w = rect.width()
+        h = rect.height()
+
+        buffer = QBuffer()
+        buffer.open(QIODevice.WriteOnly)
+
+        generator = QSvgGenerator()
+        # generator.setFileName("dosya.svg")
+        generator.setOutputDevice(buffer)
+        # generator.setResolution(72)
+
+        generator.setSize(QSize(w, h))
+        generator.setViewBox(QRectF(-w/2, -h/2, w, h))
+        generator.setTitle(self._kim)
+        generator.setDescription("")
+        # painter = QPainter(generator)
+        painter = QPainter()
+        painter.begin(generator)
+        painter.setPen(self._pen)
+        painter.setBrush(self._brush)
+        painter.rotate(self.rotation())
+        painter.drawPath(self._path)
+        painter.rotate(-self.rotation())
+
+        if self._text:
+            # painter.setWorldMatrixEnabled(False)
+            painter.save()
+            painter.setFont(self._font)
+            # painter.setPen(self.textPen)
+            painter.setPen(self.yaziRengi)
+            painter.translate(self.boundingRect().center())
+            painter.rotate(-self.rotation())
+            painter.scale(self.painterTextScale, self.painterTextScale)
+            painter.translate(-self.boundingRect().center())
+            painter.drawText(self.painterTextRect, self._text, self.painterTextOption)
+            painter.restore()
+            # painter.setWorldMatrixEnabled(True)
+
+        painter.end()
+
+        svg_string = buffer.data().data().decode("utf-8")
+
+        # background: rgba{self.arkaPlanRengi.toTuple()};\n
+        div_str = f"""
+                    <div style="
+                     position:absolute;
+                     z-index:{int(self.zValue()*10)if self.zValue() else 0};
+                     width:{w}px;
+                     height:{h}px;
+                     top:{y}px;
+                     left:{x}px;" id="{self._kim}">{svg_string}</div>\n
+                     
+            """
+
+        # return svg_string
+        return div_str
 
     # ---------------------------------------------------------------------
     def get_properties_for_save_binary(self):
@@ -416,6 +486,7 @@ class PathItem(QGraphicsItem):
     def setText(self, text):
         self._text = text
         # self.update()
+        self.update_painter_text_rect()
 
     # ---------------------------------------------------------------------
     def text(self):

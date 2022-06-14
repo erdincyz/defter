@@ -114,6 +114,10 @@ class Group(QGraphicsItem):
         return Group.Type
 
     # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
+        return ""
+
+    # ---------------------------------------------------------------------
     def get_properties_for_save_binary(self):
         properties = {"type": self.type(),
                       "kim": self._kim,
@@ -417,8 +421,9 @@ class Group(QGraphicsItem):
             if not item.type() == shared.LINE_ITEM_TYPE:
                 item.rotateWithOffset(self.rotation() + item.rotation())
             else:
-                item._line.setAngle(item._line.angle() - self.rotation())
-                item.update_arrow()
+                item.rotateWithOffset(self.rotation() - item.rotation())
+                # item._line.setAngle(item._line.angle() - self.rotation())
+                # item.update_arrow()
             item.scaleWithOffset(self.scale() * item.scale())
             item.setPos(pos)
             item.setFlags(self.ItemIsSelectable | self.ItemIsMovable | self.ItemIsFocusable)
@@ -681,11 +686,11 @@ class Group(QGraphicsItem):
         if delta > 0:
             # self.setRotation(self.rotation() + 5)
             # self.rotateWithOffset(self.rotation() + 5)
-            self.scene().undoRedo.undoableRotateBaseItem(self.scene().undoStack, "rotate", self, self.rotation() + 5)
+            self.scene().undoRedo.undoableRotateWithOffset(self.scene().undoStack, "rotate", self, self.rotation() + 5)
         else:
             # self.setRotation(self.rotation() - 5)
             # self.rotateWithOffset(self.rotation() - 5)
-            self.scene().undoRedo.undoableRotateBaseItem(self.scene().undoStack, "rotate", self, self.rotation() - 5)
+            self.scene().undoRedo.undoableRotateWithOffset(self.scene().undoStack, "rotate", self, self.rotation() - 5)
 
     # ---------------------------------------------------------------------
     def changeBackgroundColorAlpha(self, delta):

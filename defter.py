@@ -33,11 +33,12 @@ from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, Q
                                QFileDialog, QToolBar, QMenuBar, QMenu, QColorDialog, QMessageBox,
                                QStatusBar, QSizePolicy, QLabel, QPushButton, QScrollArea,
                                QDialog, QTextEdit, QInputDialog, QListWidget, QListWidgetItem,
-                               QLineEdit, QToolButton, QComboBox, QButtonGroup, QGroupBox, QRadioButton, QProgressBar)
+                               QLineEdit, QToolButton, QComboBox, QButtonGroup, QGroupBox, QRadioButton, QProgressBar,
+                               QCheckBox)
 
 from PySide6.QtCore import (Qt, QRectF, QCoreApplication, QSettings, QPoint, Slot, QSizeF, QSize, QFile, QSaveFile,
                             QIODevice, QDataStream, QMimeData, QByteArray, QPointF, qCompress, qUncompress, QLocale,
-                            QThread, QUrl, QLineF, QObject, QRect, QTimer, QBuffer)
+                            QThread, QUrl, QLineF, QObject, QRect, QTimer, QBuffer, QDir)
 
 from PySide6.QtWebEngineWidgets import QWebEngineView
 
@@ -115,6 +116,8 @@ class DefterAnaPencere(QMainWindow):
         # self.ekran_cozunurluk = QApplication.primaryScreen().availableGeometry()
         # self.resize(self.ekran_cozunurluk.size().width(), self.ekran_cozunurluk.size().height()-50)
         self.resize(1024, 740)
+
+        self.dpi = QApplication.primaryScreen().physicalDotsPerInch()
 
         self.setAttribute(Qt.WA_DeleteOnClose)
 
@@ -2548,11 +2551,11 @@ class DefterAnaPencere(QMainWindow):
                                 font=itemDict.get("font", self.font()))
             # TODO: renkler bir sekilde sistem rengine donuyor.
             lineItem.setRotation(itemDict["rotation"])
+            lineItem.setText(itemDict.get("text", ""))
             lineItem.setScale(itemDict["scale"])
             lineItem.setZValue(itemDict["zValue"])
             lineItem.isPinned = itemDict["isPinned"]
             lineItem._command = itemDict["command"]
-            lineItem._text = itemDict.get("text", "")
 
             if isPaste:
                 lineItem._kim = uuid.uuid4().hex
@@ -2614,10 +2617,10 @@ class DefterAnaPencere(QMainWindow):
             pathItem.fromList(pathElementsList=itemDict["painterPathAsList"],
                               closePath=itemDict.get("isPathClosed", True))
             pathItem.setRotation(itemDict["rotation"])
+            pathItem.setText(itemDict["text"])
             pathItem.setScale(itemDict["scale"])
             pathItem.setZValue(itemDict["zValue"])
             pathItem.isPinned = itemDict["isPinned"]
-            pathItem._text = itemDict["text"]
             pathItem._command = itemDict["command"]
 
             if isPaste:
@@ -2901,7 +2904,10 @@ class DefterAnaPencere(QMainWindow):
         self.cScene.setSceneRect(sceneDict["sceneRect"])
         self.cView.setBackgroundBrush(sceneDict["backgroundBrush"])
         if sceneDict["backgroundImagePath"]:
-            self.cView.set_background_image(sceneDict["backgroundImagePath"])
+            self.cView.set_background_image(os.path.join(self.cScene.tempDirPath, "images",
+                                                         os.path.basename(
+                                                             sceneDict["backgroundImagePath"].replace("\\", os.sep))))
+        self.cView.backgroundImagePathIsEmbeded = sceneDict.get("backgroundImagePathIsEmbeded", False)
         # self.cView.setMatrix(sceneDict["viewMatrix"])
         self.cView.setTransform(sceneDict["viewTransform"])
         self.cView.horizontalScrollBar().setValue(sceneDict["viewHorizontalScrollBarValue"])
@@ -3168,6 +3174,11 @@ class DefterAnaPencere(QMainWindow):
         # fileName = os.path.basename(zipDosyaTamAdres)
         fileName = "sayfa"
         filePathInTempDir = os.path.join(tempDirPath, fileName)
+        # HTMLFilePathInTempDir = os.path.join(tempDirPath, "index.html")
+        HTMLFilePathInTempDir = tempDirPath
+
+        # for sayfa in self.cModel.degismis_sayfalarin_listesi():
+        #     print(sayfa._kayit_adi)
 
         # _file = QFile(filePath)
         # _file = QSaveFile(filePath)
@@ -3212,6 +3223,7 @@ class DefterAnaPencere(QMainWindow):
             # _file.flush()
             # _file.close()
             _file.commit()
+            self.act_export_document_as_html(HTMLFilePathInTempDir)
             try:
                 # arsivleme programlarında -u update kullanmaya baslayınca
                 # kaydederken var olan bir dosya adresi secilirse, eskisini silmek lazım artik.
@@ -3511,6 +3523,11 @@ class DefterAnaPencere(QMainWindow):
         self.actionSaveAsFile.triggered.connect(self.act_save_as_def_file)
         self.actionSaveAsFile.setEnabled(False)
 
+        self.actionExportPageAsHTML = QAction(QIcon(':icons/file-save-as.png'), self.tr("Export Page as HTML"),
+                                              self.mBar)
+        # self.actionExportPageAsHTML.setShortcut(QKeySequence("Ctrl+E"))
+        self.actionExportPageAsHTML.triggered.connect(self.act_export_page_as_html)
+
         self.actionExportDocumentAsHTML = QAction(QIcon(':icons/file-save-as.png'), self.tr("Export Document as HTML"),
                                                   self.mBar)
         # self.actionExportDocumentAsHTML.setShortcut(QKeySequence("Ctrl+E"))
@@ -3550,6 +3567,11 @@ class DefterAnaPencere(QMainWindow):
         self.actionClearBackgroundImage.triggered.connect(self.act_clear_background_image)
         self.addAction(self.actionClearBackgroundImage)
 
+        self.actionEmbedBackgroundImage = QAction(QIcon(':icons/background-set.png'), self.tr("Embed Background Image"),
+                                                self.mBar)
+        self.actionEmbedBackgroundImage.triggered.connect(self.act_embed_background_image)
+        self.actionEmbedBackgroundImage.setVisible(False)
+
         self.actionChangeBackgroundColor = QAction(QIcon(':icons/color-wheel.png'), self.tr("Change Background Color"),
                                                    self.mBar)
         self.actionChangeBackgroundColor.setShortcut(QKeySequence("Shift+Alt+C"))
@@ -3588,6 +3610,7 @@ class DefterAnaPencere(QMainWindow):
                                   self.actionSaveFile,
                                   self.actionSaveAsFile,
                                   self.fileMenu.addSeparator(),
+                                  self.actionExportPageAsHTML,
                                   self.actionExportDocumentAsHTML,
                                   self.fileMenu.addSeparator(),
                                   self.actionPrintOrExportAsPdf,
@@ -3920,6 +3943,7 @@ class DefterAnaPencere(QMainWindow):
                                   self.viewMenu.addSeparator(),
                                   self.actionSetBackgroundImage,
                                   self.actionClearBackgroundImage,
+                                  self.actionEmbedBackgroundImage,
                                   self.actionChangeBackgroundColor,
                                   self.viewMenu.addSeparator(),
                                   self.actionReopenLastClosedTab
@@ -4328,6 +4352,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionReopenLastClosedTab,
                                           self.actionSaveFile,
                                           self.actionSaveAsFile,
+                                          self.actionExportPageAsHTML,
                                           self.actionExportDocumentAsHTML,
                                           self.actionPrintOrExportAsPdf,
                                           self.actionExportPageAsImage,
@@ -4412,11 +4437,18 @@ class DefterAnaPencere(QMainWindow):
     def view_context_menu_goster(self, pos):
         menu = QMenu()
 
+        if self.cView.backgroundImagePath and not self.cView.backgroundImagePathIsEmbeded:
+            self.actionEmbedBackgroundImage.setVisible(True)
+        else:
+            self.actionEmbedBackgroundImage.setVisible(False)
+
+
         menu.addActions((self.actionPaste,
                          self.actionPasteAsPlainText,
                          menu.addSeparator(),
                          self.actionSetBackgroundImage,
                          self.actionClearBackgroundImage,
+                         self.actionEmbedBackgroundImage,
                          menu.addSeparator(),
                          self.actionChangeBackgroundColor,
                          menu.addSeparator(),
@@ -4807,7 +4839,7 @@ class DefterAnaPencere(QMainWindow):
         if self.cScene.selectionQueue:
             startedMacro = False
             for item in self.cScene.selectionQueue:
-                if item.type() == Group.Type or item.type() == LineItem.Type:
+                if item.type() == Group.Type:
                     continue
                 if not startedMacro:
                     self.cScene.undoStack.beginMacro(aciklama)
@@ -5044,7 +5076,7 @@ class DefterAnaPencere(QMainWindow):
         else:
             startedMacro = False
             for item in self.cScene.selectionQueue:
-                if item.type() == Group.Type or item.type() == LineItem.Type:
+                if item.type() == Group.Type:
                     continue
                 if not startedMacro:
                     self.cScene.undoStack.beginMacro(aciklama)
@@ -5765,8 +5797,11 @@ class DefterAnaPencere(QMainWindow):
         # rectf = QRectF(pixMap.rect())
         # rectf.moveTo(pos)
 
-        item = VideoItem(dosyaYolu, pos, QRectF(0, 0, 320, 240), self.yaziRengi, Qt.transparent,
-                         self._pen, self.font())
+        item = VideoItem(dosyaYolu, pos, QRectF(0, 0, 320, 240),
+                         self.yaziRengi,
+                         QColor(0, 0, 0, 0),
+                         self._pen,
+                         self.font())
         self.increase_zvalue(item)
         # self.addItem(item)
         # TODO: macro undo redo
@@ -6859,8 +6894,8 @@ class DefterAnaPencere(QMainWindow):
 
             else:
                 if item.type() == Group.Type:
-                    for c in item.parentedWithParentOperation[
-                             :]:  # group.itemChange de ItemChildRemovedChange var. dolayısıyla kopyada iter ediyoruz
+                    # group.itemChange de ItemChildRemovedChange var. dolayısıyla kopyada iter ediyoruz
+                    for c in item.parentedWithParentOperation[:]:
                         undoRedo.undoableUnParent(self.cScene.undoStack, self.tr("_unparent"), c, None, c.scenePos())
                 else:
                     for c in item.childItems():
@@ -6887,23 +6922,26 @@ class DefterAnaPencere(QMainWindow):
     # # ---------------------------------------------------------------------
     # @Slot()
     # def act_group_items_ilk(self):
-    #
+    # 
     #     group = Group()
     #     # group = QGraphicsItemGroup(None)
     #     group.setFlags(group.ItemIsSelectable
     #                    | group.ItemIsMovable
     #                    # | group.ItemIsFocusable
     #                    )
-    #
+    # 
     #     self.cScene.undoStack.beginMacro(self.tr("group"))
-    #
-    #     undoRedo.undoableAddItem(self.cScene.undoStack, description=self.tr("add group"), scene=self.cScene, item=group)
+    # 
+    #     undoRedo.undoableAddItem(self.cScene.undoStack, 
+    #                              description=self.tr("add group"), 
+    #                              scene=self.cScene, item=group)
     #     self.increase_zvalue(group)
     #     items = self.cScene.selectedItems()
-    #
-    #     # TODO: muhtemelen duzeldi, ama İnşaAllah yine bi bakalim sonra : self.unGroupedRootItems a ekleniyor ve silin-
-    #     # miyordu itemlar. ama bu tabi eski sistemde. child ve parent secili ise şimdi sadece parentlar ekleniyor gruba.
-    #
+    # 
+    #     # TODO: muhtemelen duzeldi, ama İnşaAllah yine bi bakalim sonra : 
+    #     #  self.unGroupedRootItems a ekleniyor ve silinmiyordu itemlar. 
+    #     #  ama bu tabi eski sistemde. child ve parent secili ise şimdi sadece parentlar ekleniyor gruba.
+
     #     for item in items:
     #         if item.parentItem():
     #             if item.parentItem() in items:  # o zaman bunu gruplamaya gerek yok cunku parenti gruplanacak zaten.
@@ -6954,7 +6992,7 @@ class DefterAnaPencere(QMainWindow):
             #         if item.type() == PathItem.Type:
             #             undoRedo.undoableRotate(self.cScene.undoStack, "rotate", item, gRot)
             #         else:
-            #             undoRedo.undoableRotateBaseItem(self.cScene.undoStack, "rotate", item, gRot)
+            #             undoRedo.undoableRotateWithOffset(self.cScene.undoStack, "rotate", item, gRot)
 
             self.cScene.undoStack.endMacro()
 
@@ -6978,17 +7016,28 @@ class DefterAnaPencere(QMainWindow):
 
         if fn[0]:
             filePath = fn[0]
-            self.cView.set_background_image(filePath)
-            # self.cView.update()
+            undoRedo.undoableSetSceneBackgroundImage(self.cScene.undoStack,
+                                                     self.tr("change scene's background image"),
+                                                     view=self.cView, imagePath=filePath)
             self.lastDirForImages = os.path.dirname(filePath)
 
     # ---------------------------------------------------------------------
     @Slot()
     def act_clear_background_image(self):
-        self.cView.set_background_image(None)
-        # if hasattr(self.cScene, "backgroundImageItem"):
-        #     self.cScene.removeItem(self.cScene.backgroundImageItem)
-        #     del self.cScene.backgroundImageItem
+        # self.cView.set_background_image(None)
+        undoRedo.undoableSetSceneBackgroundImage(self.cScene.undoStack,
+                                                 self.tr("clear scene's background image"),
+                                                 view=self.cView, imagePath=None)
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def act_embed_background_image(self):
+        # self.cView.set_background_image(None)
+        undoRedo.undoableEmbedSceneBackgroundImage(self.cScene.undoStack,
+                                                   self.tr("embed scene's background image"),
+                                                   view=self.cView)
+
+        self.log(self.tr("Scene's background image is embeded."), 5000, 1)
 
     # ---------------------------------------------------------------------
     def renk_sec(self, eskiRenk, baslik, anlikRenkGonderilecekFonksiyon=None):
@@ -7622,21 +7671,8 @@ class DefterAnaPencere(QMainWindow):
                 continue
             if item.type() == PathItem.Type:
                 undoRedo.undoableRotate(self.cScene.undoStack, self.tr("rotate"), item, rotation)
-            elif item.type() == LineItem.Type:
-                # rotation kullanmiyoruzi onu yerine açı değiştirme kodunu kullanıyoruz,
-                # çizginin açısını değiştirince de bunu rotation kutusunda gosteriyoruz.
-                eskiLine = item._line
-                yeniLine = QLineF(eskiLine)
-                yeniLine.setAngle(rotation)
-                undoRedo.undoableResizeLineItem(self.cScene.undoStack,
-                                                self.tr("rotate"),
-                                                item,
-                                                # yeniRect=self.rect(),
-                                                yeniLine=yeniLine,
-                                                eskiLine=eskiLine,
-                                                eskiPos=item.pos())
             else:
-                undoRedo.undoableRotateBaseItem(self.cScene.undoStack, self.tr("rotate"), item, rotation)
+                undoRedo.undoableRotateWithOffset(self.cScene.undoStack, self.tr("rotate"), item, rotation)
 
         self.cScene.undoStack.endMacro()
 
@@ -7646,8 +7682,8 @@ class DefterAnaPencere(QMainWindow):
             self.itemWidthSBox_tbar.setValue(item._line.length() * item.scale())
             self.itemWidthSBox_nesnedw.setValue(item._line.length() * item.scale())
 
-            self.itemRotationSBox_tbar.setValue(item._line.angle())
-            self.itemRotationSBox_nesnedw.setValue(item._line.angle())
+            self.itemRotationSBox_tbar.setValue(item.rotation())
+            self.itemRotationSBox_nesnedw.setValue(item.rotation())
         else:
             self.itemWidthSBox_tbar.setValue(item.rect().width() * item.scale())
             self.itemWidthSBox_nesnedw.setValue(item.rect().width() * item.scale())
@@ -8493,7 +8529,8 @@ class DefterAnaPencere(QMainWindow):
         item = self.cScene.activeItem
 
         # if item.type() == DosyaNesnesi.Type:
-        #     webItem = Web(None, item.filePathForSave, item.scenePos(), item.rect(), self.yaziRengi, self.arkaPlanRengi,
+        #     webItem = Web(None, item.filePathForSave, item.scenePos(), 
+        #                   item.rect(), self.yaziRengi, self.arkaPlanRengi,
         #                   self._pen,
         #                   self.currentFont)
         # else:
@@ -9142,62 +9179,362 @@ class DefterAnaPencere(QMainWindow):
             QMessageBox.warning(self, 'Defter', txt)
 
     # ---------------------------------------------------------------------
-    @Slot()
-    def act_export_document_as_html(self):
+    def html_kayit_klasor_adresi_sec(self, tekSayfaMi):
 
-        vrect = self.cView.get_visible_rect()
+        fDialog = QFileDialog()
+        # fDialog.setFileMode(QFileDialog.Directory)
+        fDialog.setFileMode(QFileDialog.AnyFile)
+        fDialog.setOption(QFileDialog.ShowDirsOnly, True)
+        fDialog.setOption(QFileDialog.DontUseNativeDialog, True)
+        fDialog.setOption(QFileDialog.DontUseCustomDirectoryIcons, True)
 
-        enfazla = [0, None]
-        for item in self.cScene.items():
-            item_bounding_rect = item.boundingRect()
-            item_w = item_bounding_rect.width()
-            item_h = item_bounding_rect.height()
-            alan = item_w * item_h
-            if alan > enfazla[0]:
-                enfazla[0] = alan
-                enfazla[1] = item
+        fDialog.setFilter(fDialog.filter() | QDir.Hidden)
+        # fDialog.setAcceptMode(QFileDialog.AcceptOpen)
+        fDialog.setAcceptMode(QFileDialog.AcceptSave)
 
-        item = enfazla[1]
-        item_bounding_rect = item.boundingRect()
-        item_w = item_bounding_rect.width()
-        item_h = item_bounding_rect.height()
-        item.setSelected(True)
+        # uzanti eklendi mi kontrolune ihtiyac kalmiyor
+        # fDialog.setDefaultSuffix('html')
+        # filtre = ([self.tr("HTML Files (*.html)")])
+        # fDialog.setNameFilters(filtre)
+        # fDialog.selectNameFilter(filtre)
 
-        # srect = self.cScene.activeItem._rect
-        # print(srect)
+        fDialog.setDirectory(self.lastDir)
+        if tekSayfaMi:
+            fDialog.setWindowTitle(self.tr("Export Page as HTML"))
+        else:
+            fDialog.setWindowTitle(self.tr("Export Document as HTML"))
 
-        en_dis_div = self.div_olustur(w=item_w,
-                                      h=item_h,
-                                      div_id="en_dis_div",
-                                      bgcolor=""
-                                      )
+        lay = fDialog.layout()
 
-        # divlerin sırası ici icelgi, sahnede gozukme sıraları belki y gore sıralanırla
-        #
+        aciklama = self.tr("Copy all the linked end embeded files with the HTML file")
+        dosyalarKopyalansinMiCBox = QCheckBox(aciklama, fDialog)
+        dosyalarKopyalansinMiCBox.setStyleSheet("QCheckBox{ background: #ee5;}")
+        dosyalarKopyalansinMiCBox.setChecked(True)
+        wAd0 = lay.itemAtPosition(2, 0).widget()
+        wAd1 = lay.itemAtPosition(2, 1).widget()
+        wAd2 = lay.itemAtPosition(2, 2).widget()
 
-        html = f"""<html>
-        <head></head>
-        <body>{en_dis_div}</body>
-        </html>"""
+        wTip0 = lay.itemAtPosition(3, 0).widget()
+        wTip1 = lay.itemAtPosition(3, 1).widget()
+        wTip2 = lay.itemAtPosition(3, 2).widget()
+        # wTip2.hide()
+        lay.addWidget(dosyalarKopyalansinMiCBox,2,1)
+        lay.replaceWidget(wAd1, dosyalarKopyalansinMiCBox)
+        lay.addWidget(wAd0, 3, 0)
+        lay.addWidget(wAd1, 3, 1)
+        lay.addWidget(wAd2, 3, 2)
+        lay.addWidget(wTip0, 4, 0)
+        lay.addWidget(wTip1, 4, 1)
+        lay.addWidget(wTip2, 3, 2, 2, 1)
 
-        print(vrect)
-        print(self.div_olustur(4, 4))
+        # fView = fDialog.findChild(QListView, 'listView')
+        # # to make it possible to select multiple directories:
+        # if fView:
+        #     fView.setSelectionMode(QAbstractItemView.MultiSelection)
+        # fTreeView = fDialog.findChild(QTreeView)
+        # if fTreeView:
+        #     fTreeView.setSelectionMode(QAbstractItemView.MultiSelection)
 
-        print(html)
+        if fDialog.exec() == QDialog.Accepted:
+            # liste icinde tek adres, files desek de
+            paths = fDialog.selectedFiles()
+            return paths, dosyalarKopyalansinMiCBox.isChecked()
+        else:
+            return None, dosyalarKopyalansinMiCBox.isChecked()
 
     # ---------------------------------------------------------------------
-    def div_olustur(self, w, h, icerik="selam", div_id="yeni", bgcolor=None, fgcolor=None, resim_adres=None):
+    def _icerik_div_olustur(self, sayfa, def_dosyasi_icine_kaydet, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
+        sayfa_icerik_div = ""
+        if def_dosyasi_icine_kaydet:
+            # nesnelerde, if None kontrolu ile def dosyasi icine kaydettigimizi anliyoruz
+            html_klasor_kayit_adres = None
+        for item in sayfa.scene.items():
+            div = item.html_dive_cevir(html_klasor_kayit_adres, dosya_kopyalaniyor_mu)
+            if not div:
+                # print(item)
+                continue
+            sayfa_icerik_div += div
+        return sayfa_icerik_div
 
-        icerik = "selam"
-        div_id = "selam"
+    # ---------------------------------------------------------------------
+    def sayfa_html_olustur(self, sayfa, html_klasor_kayit_adres, tekSayfaMi, def_dosyasi_icine_kaydet,
+                           dosya_kopyalaniyor_mu):
 
-        div = f'<div id="{div_id}">{icerik}</div>'
+        if tekSayfaMi:
+            nav_style = ""
+            nav_html = ""
+            margin_left = ""
+        else:
+            nav_style = f"""
+            nav{{
+              height: 100%;
+              width: 100px;
+              position: fixed;
+              z-index: 1;
+              top: 0;
+              left: 0;
+              background-color: #f5f5f5;
+              overflow-x: hidden;
+              padding-top: 16px;
+              border-right: 1px solid rgba(82,82,82,0.5);
+            }}
+            nav a {{
+                margin-bottom:0.7em;
+                height:auto;
+                background-color: #fff;
+                padding: 4px 4px 4px 6px;
+                text-decoration: none;
+                font-size: 0.9em;
+                color: #2e3a44;
+                display: block;
+            }}
+            nav a:hover {{
+              color: #2a6ea7;
+              background-color: #e1ffdd;
+            }}
+            """
+            nav_html = f"""
+             <nav>
+                {self._nav_sayfa_linkleri}
+            </nav>\n
+            """
+            margin_left = "margin-left:100px;"
 
-        # QPainter painter(&printer);
-        # scene.render(&painter);
+        sayfa.scene.setSceneRect(sayfa.scene.sceneRect().united(sayfa.scene.itemsBoundingRect()))
+        if sayfa.view.backgroundImagePath:
+            if def_dosyasi_icine_kaydet:
+                arkaplan_resim_adres = os.path.join("images", os.path.basename(sayfa.view.backgroundImagePath))
+            else: # disari kayit
+                if sayfa.view.backgroundImagePathIsEmbeded:
+                    arkaplan_resim_adres = os.path.join("images", os.path.basename(sayfa.view.backgroundImagePath))
+                else:
+                    if dosya_kopyalaniyor_mu:
+                        arkaplan_resim_adres = os.path.join(html_klasor_kayit_adres, "images",
+                                                            os.path.basename(sayfa.view.backgroundImagePath))
+                    else:
+                        arkaplan_resim_adres = sayfa.view.backgroundImagePath
 
-        return div
+            arkaplan_resim = f"background-image:url({arkaplan_resim_adres});\n"
+        else:
+            arkaplan_resim = ""
+        arkaplan_renk = f"rgba{sayfa.view.backgroundBrush().color().toTuple()}"
 
+        icerik_div = self._icerik_div_olustur(sayfa, def_dosyasi_icine_kaydet,
+                                              html_klasor_kayit_adres,
+                                              dosya_kopyalaniyor_mu)
+
+        if sayfa.adi[0] == "★":
+            sayfa_adi = sayfa.adi[2:]
+        else:
+            sayfa_adi = sayfa.adi
+
+        html = f"""
+        <html>
+        <head>\n
+            <title>{self.cModel.fileName} - {sayfa_adi}</title>\n
+            <style>\n
+                body {{\n
+                background: {arkaplan_renk};\n
+                margin:0;
+                padding:0;
+                    }}\n
+                div {{\n
+                    display: flex;\n
+                    flex-wrap: wrap;\n
+                    justify-content: center;\n
+                    align-items: center;\n}}
+                    
+                    {nav_style}\n
+    
+                main{{
+                position:absolute;
+                
+                    display:block;
+                    background: {arkaplan_renk};\n
+                    {arkaplan_resim}
+                    background-repeat:no-repeat;
+                    background-position: center center;
+                    width:{sayfa.scene.sceneRect().width()};\n
+                    height:{sayfa.scene.sceneRect().height()};\n
+                    {margin_left}\n
+                }}
+            </style>\n
+        </head>\n
+        <body>\n
+            {nav_html}\n
+            <main>{icerik_div}</main>\n
+        </body>\n
+        </html>
+        """
+
+        return html
+
+    # ---------------------------------------------------------------------
+    def html_sayfa_kaydet(self, html, html_dosya_kayit_adres):
+
+        with open(html_dosya_kayit_adres, mode="w", encoding="utf-8") as f:
+            f.write(html)
+            f.flush()
+
+    # ---------------------------------------------------------------------
+    def _ic_sayfalari_gezin(self, sayfa, kayit_klasor, def_dosyasi_icine_kaydet, oteleme):
+
+        for ic_sayfa in sayfa.ic_sayfalar():
+            if ic_sayfa.adi[0] == "★":
+                sayfa_adi = f"{ic_sayfa.adi[2:]}.html"
+            else:
+                sayfa_adi = f"{ic_sayfa.adi}.html"
+            html_dosya_kayit_adres = os.path.join(kayit_klasor, sayfa_adi)
+
+            if def_dosyasi_icine_kaydet:
+                self._nav_sayfa_linkleri += f'<a style="padding-left:{oteleme}px;"' \
+                                            f' href="{sayfa_adi}"> {sayfa_adi}</a>\n'
+            else:
+                self._nav_sayfa_linkleri += f'<a style="padding-left:{oteleme}px;"'\
+                                            f' href="{html_dosya_kayit_adres}"> {sayfa_adi}</a>\n'
+
+            self._html_sayfa_listesi.append((ic_sayfa, html_dosya_kayit_adres))
+
+            # sayfalarDict[sayfa.adi]["ic_sayfalar"] ={"{}".format(ic_sayfa.adi): ic_sayfa_sceneDict}
+            if ic_sayfa.ic_sayfa_var_mi():
+                self._ic_sayfalari_gezin(ic_sayfa, kayit_klasor, def_dosyasi_icine_kaydet, oteleme + 12)
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def act_export_document_as_html(self, html_klasor_kayit_adres=None):
+        # TODO: bir klasor icine atmak lazım
+        def_dosyasi_icine_kaydet = True
+        dosyalar_kopyalansin_mi = False
+        if not html_klasor_kayit_adres:
+            def_dosyasi_icine_kaydet = False
+            fn, dosyalar_kopyalansin_mi = self.html_kayit_klasor_adresi_sec(tekSayfaMi=False)
+            if not fn:
+                return
+            else:
+                html_klasor_kayit_adres = fn[0]
+                self.lastDir = os.path.dirname(html_klasor_kayit_adres)
+                os.makedirs(html_klasor_kayit_adres, exist_ok=True)
+        self.lutfen_bekleyin_goster()
+        if dosyalar_kopyalansin_mi:
+            for sayfa in self.cModel.sayfalar():
+                self.dosyalari_kopyala(sayfa, html_klasor_kayit_adres)
+
+        oteleme = 0
+        self._nav_sayfa_linkleri = ""
+        self._html_sayfa_listesi = []
+
+        self._ic_sayfalari_gezin(self.cModel.kokSayfa, html_klasor_kayit_adres, def_dosyasi_icine_kaydet, oteleme + 12)
+
+        # TODO: eski ismi degismis sayfalardan veya silinmis sayfalardan kalan html dosyalarini temizle
+        for sayfa, html_dosya_kayit_adres, in self._html_sayfa_listesi:
+            html = self.sayfa_html_olustur(sayfa, html_klasor_kayit_adres, tekSayfaMi=False,
+                                           def_dosyasi_icine_kaydet=def_dosyasi_icine_kaydet,
+                                           dosya_kopyalaniyor_mu=dosyalar_kopyalansin_mi)
+
+            self.html_sayfa_kaydet(html, html_dosya_kayit_adres)
+
+        del self._nav_sayfa_linkleri
+        del self._html_sayfa_listesi
+
+        self.lutfen_bekleyin_gizle()
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def act_export_page_as_html(self):
+        fn, dosyalar_kopyalansin_mi = self.html_kayit_klasor_adresi_sec(tekSayfaMi=True)
+        if fn:
+            self.lutfen_bekleyin_goster()
+            html_klasor_kayit_adres = fn[0]
+            self.lastDir = os.path.dirname(html_klasor_kayit_adres)
+            os.makedirs(html_klasor_kayit_adres, exist_ok=True)
+            if dosyalar_kopyalansin_mi:
+                self.dosyalari_kopyala(self.cModel.enSonAktifSayfa, html_klasor_kayit_adres)
+            sayfa = self.cModel.enSonAktifSayfa
+            html = self.sayfa_html_olustur(sayfa, html_klasor_kayit_adres,
+                                              tekSayfaMi=True, def_dosyasi_icine_kaydet=False,
+                                              dosya_kopyalaniyor_mu=dosyalar_kopyalansin_mi)
+            if sayfa.adi[0] == "★":
+                sayfa_adi = f"{sayfa.adi[2:]}.html"
+            else:
+                sayfa_adi = f"{sayfa.adi}.html"
+            self.html_sayfa_kaydet(html, os.path.join(html_klasor_kayit_adres, sayfa_adi))
+            self.lutfen_bekleyin_gizle()
+
+        else:
+            return
+
+    # ---------------------------------------------------------------------
+    def dosyalari_kopyala(self, sayfa, hedef_klasor):
+
+        try:
+            # !! deprecated distutils.dir_util.copy_tree - python3.10
+            # !! distutils.dir_util.copy_tree(self.cModel.tempDirPath, tempDirPath)
+            # once acik sahne temp klasorunu tamamen kopyaliyoruz yeni bir temp klasore
+            #TODO: dirs_exist_ok python 3.8 gerektiriyor.
+            # shutil.copytree(self.cModel.tempDirPath, hedef_klasor, dirs_exist_ok=True)
+            images_klasoru = os.path.join(self.cModel.tempDirPath, "images")
+            if os.path.exists(images_klasoru):
+                shutil.copytree(images_klasoru, os.path.join(hedef_klasor, "images"), dirs_exist_ok=True)
+            
+            files_klasoru = os.path.join(self.cModel.tempDirPath, "files")
+            if os.path.exists(files_klasoru):
+                shutil.copytree(files_klasoru, os.path.join(hedef_klasor, "files"), dirs_exist_ok=True)
+            
+            videos_klasoru = os.path.join(self.cModel.tempDirPath, "videos")
+            if os.path.exists(videos_klasoru):
+                shutil.copytree(videos_klasoru, os.path.join(hedef_klasor, "videos"), dirs_exist_ok=True)
+
+        except Exception as e:
+            print(e)
+
+        try:
+            if sayfa.view.backgroundImagePath and not sayfa.view.backgroundImagePathIsEmbeded:
+                kopyalanacak_adres = os.path.join(hedef_klasor, "images",
+                                                  os.path.basename(sayfa.view.backgroundImagePath))
+
+                hedef_nesne_tipi_klasoru = os.path.join(hedef_klasor, "images")
+                if not os.path.exists(hedef_nesne_tipi_klasoru):
+                    os.makedirs(hedef_nesne_tipi_klasoru, exist_ok=True)
+
+                shutil.copy2(sayfa.view.backgroundImagePath, kopyalanacak_adres)
+
+            for nesne in sayfa.scene.items():
+                if nesne.type() == Image.Type:
+                    ic_klasor = "images"
+                elif nesne.type() == DosyaNesnesi.Type:
+                    ic_klasor = "files"
+                elif nesne.type() == VideoItem.Type:
+                    ic_klasor = "videos"
+                else:
+                    continue
+
+                if not nesne.isEmbeded:
+                    if os.path.exists(nesne.filePathForSave):
+                        # self.yeniImagePath = nesne.scene().get_unique_path_for_embeded_image(
+                        #     os.path.basename(nesne.filePathForSave))
+                        # klasor yoksa hata veriyor copy2
+                        hedef_nesne_tipi_klasoru = os.path.join(hedef_klasor, ic_klasor)
+                        if not os.path.exists(hedef_nesne_tipi_klasoru):
+                            os.makedirs(hedef_nesne_tipi_klasoru, exist_ok=True)
+                        kopyalanacak_adres = os.path.join(hedef_nesne_tipi_klasoru, os.path.basename(nesne.filePathForSave))
+                        shutil.copy2(nesne.filePathForSave, kopyalanacak_adres)
+                    else:
+                        # if not filecmp.cmp(imgPath, yeniImgPath, shallow=True):
+                        print("nesne yok", nesne.filePathForSave)
+                        pass
+        except Exception as e:
+            print(e)
+
+        # if os.path.exists(yeniImgPath):
+        #     if not filecmp.cmp(imgPath, yeniImgPath, shallow=True):
+        #         # print("ayni isimde dosya var, icerik farkli")
+        #         try:
+        #             shutil.copy2(imgPath, yeniImgPath)
+        #             # print(imgPath)
+        #             # print(yeniImgPath)
+        #         except Exception as e:
+        #             self.log(str(e), level=3)
+        
     # ---------------------------------------------------------------------
     def _get_printer(self):
         if not self.printer:

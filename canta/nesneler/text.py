@@ -7,9 +7,11 @@ __date__ = '3/28/16'
 
 # from math import fabs
 import uuid
-from PySide6.QtCore import Qt, Signal, QSizeF, QRectF, QPointF, Slot, QUrl
-from PySide6.QtGui import QBrush, QPen, QColor, QPainterPath, QPainterPathStroker, QTextBlockFormat
-from PySide6.QtWidgets import QGraphicsTextItem, QStyle
+from PySide6.QtCore import Qt, Signal, QSizeF, QRectF, QPointF, Slot, QUrl, QBuffer, QIODevice, QSize
+from PySide6.QtGui import QBrush, QPen, QColor, QPainterPath, QPainterPathStroker, QTextBlockFormat, QPainter, QPalette, \
+    QAbstractTextDocumentLayout
+from PySide6.QtSvg import QSvgGenerator
+from PySide6.QtWidgets import QGraphicsTextItem, QStyle, QStyleOptionGraphicsItem
 from canta import shared
 
 
@@ -113,6 +115,102 @@ class Text(QGraphicsTextItem):
 
         self.isPlainText = True
         self.oklar_dxdy_nokta = {}
+
+    # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
+
+        # rect = self.mapRectToScene(self.boundingRect())
+        rect = self.sceneBoundingRect()
+
+        x = self.scenePos().x()
+        y = self.scenePos().y()
+        xs = self.scene().sceneRect().x()
+        ys = self.scene().sceneRect().y()
+        x = x - xs
+        y = y - ys
+
+        w = rect.width()
+        h = rect.height()
+
+        buffer = QBuffer()
+        buffer.open(QIODevice.WriteOnly)
+
+        generator = QSvgGenerator()
+        # generator.setFileName("dosya.svg")
+        generator.setOutputDevice(buffer)
+        # generator.setResolution(72)
+
+        # self.doc.drawContents(painter, self.rect())
+
+        generator.setSize(QSize(w, h))
+        generator.setViewBox(QRectF(-w / 2, -h / 2, w, h))
+        generator.setTitle(self._kim)
+        generator.setDescription("")
+        # painter = QPainter(generator)
+        painter = QPainter()
+        painter.begin(generator)
+
+        painter.save()
+        diff = self.scenePos() - rect.center()
+        cizilecekRect = QRectF(self._rect)
+        cizilecekRect.moveTo(diff)
+        painter.translate(diff)
+        painter.rotate(self.rotation())
+        painter.translate(-diff)
+
+        painter.fillRect(cizilecekRect.toRect(), self.brush())
+        painter.restore()
+
+        painter.save()
+
+        painter.translate(diff)
+        painter.rotate(self.rotation())
+        # painter.setFont(self.font())
+        # ~ lay = self.doc.documentLayout(self)
+        ctx = QAbstractTextDocumentLayout.PaintContext()
+        ctx.palette.setColor(QPalette.Text, self.yaziRengi)
+        # ~ self.doc.drawContents(painter)
+        self.doc.documentLayout().draw(painter, ctx)
+        painter.restore()
+        painter.end()
+
+        svg_string = buffer.data().data().decode("utf-8")
+
+        # background: rgba{self.arkaPlanRengi.toTuple()};\n
+        div_str = f"""
+                    <div style="
+                     position:absolute;
+                     z-index:{int(self.zValue()*10)if self.zValue() else 0};
+                     width:{w}px;
+                     height:{h}px;
+                     top:{y}px;
+                     left:{x}px;" id="{self._kim}">{svg_string}</div>\n
+            """
+        # return svg_string
+        return div_str
+
+    # ---------------------------------------------------------------------
+    def get_properties_for_save_binary(self):
+        properties = {"type": self.type(),
+                      "kim": self._kim,
+                      "rect": self.rect(),
+                      "pos": self.pos(),
+                      "rotation": self.rotation(),
+                      "scale": self.scale(),
+                      "zValue": self.zValue(),
+                      "pen": self._pen,
+                      "font": self.font(),
+                      "yaziRengi": self.yaziRengi,
+                      "arkaPlanRengi": self.arkaPlanRengi,
+                      "isPlainText": self.isPlainText,
+                      "isPinned": self.isPinned,
+                      "command": self._command,
+                      }
+        if self.isPlainText:
+            properties["text"] = self.toPlainText()
+        else:
+            properties["html"] = self.toHtml()
+        return properties
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -392,29 +490,6 @@ class Text(QGraphicsTextItem):
             c.flipVertical(self.sceneCenter().y())
         if eskiRot:
             self.rotateWithOffset(eskiRot)
-
-    # ---------------------------------------------------------------------
-    def get_properties_for_save_binary(self):
-        properties = {"type": self.type(),
-                      "kim": self._kim,
-                      "rect": self.rect(),
-                      "pos": self.pos(),
-                      "rotation": self.rotation(),
-                      "scale": self.scale(),
-                      "zValue": self.zValue(),
-                      "pen": self._pen,
-                      "font": self.font(),
-                      "yaziRengi": self.yaziRengi,
-                      "arkaPlanRengi": self.arkaPlanRengi,
-                      "isPlainText": self.isPlainText,
-                      "isPinned": self.isPinned,
-                      "command": self._command,
-                      }
-        if self.isPlainText:
-            properties["text"] = self.toPlainText()
-        else:
-            properties["html"] = self.toHtml()
-        return properties
 
     # ---------------------------------------------------------------------
     def contextMenuEvent(self, event):
@@ -794,10 +869,10 @@ class Text(QGraphicsTextItem):
         # self.setTransformOriginPoint(self.boundingRect().center())
         if delta > 0:
             # self.setRotation(self.rotation() + 5)
-            self.scene().undoRedo.undoableRotateBaseItem(self.scene().undoStack, "rotate", self, self.rotation() + 5)
+            self.scene().undoRedo.undoableRotateWithOffset(self.scene().undoStack, "rotate", self, self.rotation() + 5)
         else:
             # self.setRotation(self.rotation() - 5)
-            self.scene().undoRedo.undoableRotateBaseItem(self.scene().undoStack, "rotate", self, self.rotation() - 5)
+            self.scene().undoRedo.undoableRotateWithOffset(self.scene().undoStack, "rotate", self, self.rotation() - 5)
         # self.update()
 
     # ---------------------------------------------------------------------
@@ -926,6 +1001,31 @@ class Text(QGraphicsTextItem):
         super(Text, self).paint(painter, option, widget)
 
         # self.doc.drawContents(painter, self.rect())
+
+        # # # # # # debug start - pos() # # # # #
+        # p = self.pos()
+        # s = self.scenePos()
+        # painter.drawText(self.rect(),
+        #                  "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
+        # # # t = self.transformOriginPoint()
+        # # # painter.drawRect(t.x()-12, t.y()-12,24,24)
+        # mapped = self.mapToScene(self.rect().topLeft())
+        # painter.drawText(self.rect().x(), self.rect().y(), "{0:.2f}  {1:.2f} map".format(mapped.x(), mapped.y()))
+        # painter.drawEllipse(self.scenePos(), 10, 10)
+        # painter.setPen(Qt.blue)
+        # painter.drawEllipse(self.mapFromScene(self.pos()), 10, 10)
+        # r = self.textItem.boundingRect()
+        # r = self.mapRectFromItem(self.textItem, r)
+        # painter.drawRect(r)
+        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
+        # painter.setPen(QPen(Qt.red,17))
+        # painter.drawPoint(self.rect().center())
+        # painter.setPen(QPen(Qt.green,12))
+        # painter.drawPoint(self.boundingRect().center())
+        # painter.setPen(QPen(Qt.blue,8))
+        # painter.drawPoint(self.sceneBoundingRect().center())
+        # painter.drawRect(self.sceneBoundingRect())
+        # # # # # # debug end - pos() # # # # #
 
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):

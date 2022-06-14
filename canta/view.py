@@ -41,6 +41,7 @@ class View(QGraphicsView):
         self.setBackgroundBrush(Qt.lightGray)
         self.backgroundImagePixmap = None
         self.backgroundImagePath = None
+        self.backgroundImagePathIsEmbeded = False
         self.setCacheMode(QGraphicsView.CacheBackground)
 
         self.setTransformationAnchor(self.AnchorUnderMouse)
@@ -117,6 +118,7 @@ class View(QGraphicsView):
         # painter.setPen(QPen(Qt.green))
         # painter.drawRect(self.scene().itemsBoundingRect())
         # painter.setPen(QPen(Qt.red))
+        # painter.drawRect(QRectF(0,0,20,20))
         # painter.drawRect(self.scene().sceneRect())
         # painter.setPen(QPen(Qt.yellow))
         # # painter.drawRect(self.kagitPozisyonBoyutRect)

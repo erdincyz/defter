@@ -23,6 +23,10 @@ class GraphicsVideoItem(QGraphicsVideoItem):
     def __init__(self, parent=None):
         super(GraphicsVideoItem, self).__init__(parent)
 
+    # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, video_kopyalaniyor_mu):
+        return ""
+
 
 ########################################################################
 class VideoItem(BaseItem):
@@ -136,6 +140,107 @@ class VideoItem(BaseItem):
             self.mouseMoveEvent = super(VideoItem, self).mouseMoveEvent
             self.mouseReleaseEvent = super(VideoItem, self).mouseReleaseEvent
             self.hoverMoveEvent = super(VideoItem, self).hoverMoveEvent
+
+    # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, video_kopyalaniyor_mu):
+        video_adi = os.path.basename(self.filePathForSave)
+        video_adres = self.filePathForSave
+        if not html_klasor_kayit_adres:  # def dosyasi icine kaydet
+            if self.isEmbeded:
+                video_adres = os.path.join("videos", video_adi)
+        else:  # dosya html olarak baska bir yere kaydediliyor
+            # kopyalanmazsa da, zaten embed olmayan video normal hddeki adresten yuklenecektir.
+            if video_kopyalaniyor_mu:
+                if not self.isEmbeded:  # embed ise zaten tmp klasorden hedef klasore baska metodta kopylanıyor hepsi.
+                    video_adres = os.path.join(html_klasor_kayit_adres, "videos", video_adi)
+
+        # video_str = f'<video src="{self.filePathForSave}" width:{self.videoItem.size().width()}; height{self.videoItem.size().height()}"></video>'
+        video_str = f'<video style="width:100%; height:100%;" controls> <source src="{video_adres}"></video>'
+
+        rect = self.sceneBoundingRect()
+        xr = rect.left()
+        yr = rect.top()
+        xs = self.scene().sceneRect().x()
+        ys = self.scene().sceneRect().y()
+        x = xr - xs
+        y = yr - ys
+
+        bicimSozluk = self.ver_karakter_bicimi()
+        bold = "font-weight:bold;" if bicimSozluk["b"] else ""
+        italic = "font-style:bold;" if bicimSozluk["i"] else ""
+        underline = "underline" if bicimSozluk["u"] else ""
+        strikeOut = "line-through" if bicimSozluk["s"] else ""
+        overline = "overline" if bicimSozluk["o"] else ""
+        bicimler1 = bold + italic
+        if any((underline, strikeOut, overline)):
+            bicimler2 = f"text-decoration: {underline} {strikeOut} {overline};"
+        else:
+            bicimler2 = ""
+
+        renk_arkaPlan = f"({self.arkaPlanRengi.red()},{self.arkaPlanRengi.green()},{self.arkaPlanRengi.blue()},{self.arkaPlanRengi.alpha() / 255})"
+        renk_yazi = f"({self.yaziRengi.red()},{self.yaziRengi.green()},{self.yaziRengi.blue()},{self.yaziRengi.alpha() / 255})"
+
+        hiza = self.ver_yazi_hizasi()
+        # if hiza == Qt.AlignLeft or hiza == Qt.AlignLeft | Qt.AlignVCenter:
+        #     yazi_hiza = "left"
+        if hiza == Qt.AlignCenter or hiza == Qt.AlignCenter | Qt.AlignVCenter:
+            yazi_hiza = "center"
+        elif hiza == Qt.AlignRight or hiza == Qt.AlignRight | Qt.AlignVCenter:
+            yazi_hiza = "right"
+        elif hiza == Qt.AlignJustify or hiza == Qt.AlignJustify | Qt.AlignVCenter:
+            yazi_hiza = "justify"
+        else:
+            yazi_hiza = "left"
+
+        div_str = f"""
+                    <div style="
+                     background:rgba{renk_arkaPlan};
+                     color:rgba{renk_yazi};
+                     font-size:{self.fontPointSize()}pt; 
+                     font-family:{self.font().family()};
+                     text-align: {yazi_hiza};
+                     {bicimler1}
+                     {bicimler2}
+                     position:absolute;
+                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
+                     width:{self._rect.width() * self.scale()}px;
+                     height:{self._rect.height() * self.scale()}px;
+                     top:{y}px;
+                     left:{x}px;
+                     transform-box: fill-box;
+                     transform-origin: center;
+                     transform: rotate({self.rotation()}deg);" id="{self._kim}">{video_str}{self.text()}</div>\n"""
+
+        # /*background-image:url('{resim_adres}');*/
+        return div_str
+
+    # ---------------------------------------------------------------------
+    def get_properties_for_save_binary(self):
+        properties = {"type": self.type(),
+                      "kim": self._kim,
+                      "isEmbeded": self.isEmbeded,
+                      "filePath": self.filePathForSave,
+                      "originalSourceFilePath": self.originalSourceFilePath,
+                      "rect": self.rect(),
+                      "pos": self.pos(),
+                      "rotation": self.rotation(),
+                      "scale": self.scale(),
+                      "zValue": self.zValue(),
+                      "yaziRengi": self.yaziRengi,
+                      "arkaPlanRengi": self.arkaPlanRengi,
+                      "pen": self._pen,
+                      "font": self._font,
+                      # "imageOpacity": self.imageOpacity,
+                      "text": self.text(),
+                      "isPinned": self.isPinned,
+                      "command": self._command,
+                      }
+        return properties
+
+    # ---------------------------------------------------------------------
+    def type(self):
+        # Enable the use of qgraphicsitem_cast with this item.
+        return VideoItem.Type
 
     # ---------------------------------------------------------------------
     def nesne_sahneden_silinmek_uzere(self):
@@ -277,34 +382,6 @@ class VideoItem(BaseItem):
                 QPointF(self.videoItem.pos().x() + (self.videoItem.size().width() * pos / self.player.duration()),
                         self.playControlsY))
             # print(self.playControlsY)
-
-    # ---------------------------------------------------------------------
-    def get_properties_for_save_binary(self):
-        properties = {"type": self.type(),
-                      "kim": self._kim,
-                      "isEmbeded": self.isEmbeded,
-                      "filePath": self.filePathForSave,
-                      "originalSourceFilePath": self.originalSourceFilePath,
-                      "rect": self.rect(),
-                      "pos": self.pos(),
-                      "rotation": self.rotation(),
-                      "scale": self.scale(),
-                      "zValue": self.zValue(),
-                      "yaziRengi": self.yaziRengi,
-                      "arkaPlanRengi": self.arkaPlanRengi,
-                      "pen": self._pen,
-                      "font": self._font,
-                      # "imageOpacity": self.imageOpacity,
-                      "text": self.text(),
-                      "isPinned": self.isPinned,
-                      "command": self._command,
-                      }
-        return properties
-
-    # ---------------------------------------------------------------------
-    def type(self):
-        # Enable the use of qgraphicsitem_cast with this item.
-        return VideoItem.Type
 
     # ---------------------------------------------------------------------
     def childItems(self):
