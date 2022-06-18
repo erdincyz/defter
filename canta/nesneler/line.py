@@ -7,11 +7,11 @@ __author__ = 'Erdinç Yılmaz'
 
 import math
 import uuid
-from PySide6.QtCore import (Qt, QRectF, QSizeF, QPointF, QLineF, QBuffer, QIODevice, QSize)
-from PySide6.QtGui import (QPainterPath, QPainterPathStroker, QPen, QColor, QTransform, QPolygonF, QTextOption, QBrush,
-                           QPainter)
+from PySide6.QtCore import Qt, QRectF, QSizeF, QPointF, QLineF, QBuffer, QIODevice, QSize
+from PySide6.QtGui import QPainterPath, QPainterPathStroker, QPen, QColor, QTransform, QPolygonF, QTextOption, QBrush, \
+    QPainter
 from PySide6.QtSvg import QSvgGenerator
-from PySide6.QtWidgets import (QGraphicsItem, QStyle)
+from PySide6.QtWidgets import QGraphicsItem, QStyle
 from canta import shared
 from canta.nesneler.tempTextItem import TempTextItem
 
@@ -89,11 +89,10 @@ class LineItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def type(self):
         return LineItem.Type
-        
+
     # ---------------------------------------------------------------------
     def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
 
-        # rect = self.mapRectToScene(self.boundingRect())
         rect = self.sceneBoundingRect()
         xr = rect.left()
         yr = rect.top()
@@ -113,7 +112,7 @@ class LineItem(QGraphicsItem):
         generator.setOutputDevice(buffer)
         # generator.setResolution(72)
 
-        generator.setSize(QSize(w, h))
+        # generator.setSize(QSize(w, h))  # kaymalara sebep oluyor
         generator.setViewBox(QRectF(-w / 2, -h / 2, w, h))
         generator.setTitle(self._kim)
         generator.setDescription("")
@@ -121,12 +120,12 @@ class LineItem(QGraphicsItem):
         painter = QPainter()
         painter.begin(generator)
         painter.save()
-        
+
         diff = self.scenePos() - rect.center()
         cizilecekLine = QLineF(self._line)
         cizilecekTextRect = QRectF(self.painterTextRect)
         cizilecekOkPolygon = QPolygonF(self.ok_polygon)
-        
+
         cizilecekLine.translate(diff)
         cizilecekOkPolygon.translate(diff)
         painter.setPen(self._pen)
@@ -138,26 +137,26 @@ class LineItem(QGraphicsItem):
         painter.setBrush(self._pen.color())
         painter.setPen(Qt.NoPen)
         painter.drawConvexPolygon(cizilecekOkPolygon)
-        #painter.drawRect(cizilecekTextRect)
-        #painter.drawText(cizilecekTextRect, self._text, self.painterTextOption)
-        painter.restore()   
+        # painter.drawRect(cizilecekTextRect)
+        # painter.drawText(cizilecekTextRect, self._text, self.painterTextOption)
+        painter.restore()
         if self._text:
             painter.save()
             painter.setFont(self._font)
             # painter.setPen(self.textPen)
             painter.setPen(self.yaziRengi)
-            diff= (-cizilecekLine.p1())
-            
+            diff = (-cizilecekLine.p1())
+
             cizilecekTextRect.moveBottomLeft(cizilecekLine.p1())
 
             painter.translate(-diff)
-            painter.rotate((self.rotation() - self._line.angle())%360)    
-            painter.translate(diff)    
+            painter.rotate((self.rotation() - self._line.angle()) % 360)
+            painter.translate(diff)
             painter.scale(self.painterTextScale, self.painterTextScale)
-            #painter.drawText(cizilecekLine.p1(), self._text)
+            # painter.drawText(cizilecekLine.p1(), self._text)
             painter.drawText(cizilecekTextRect, self._text, self.painterTextOption)
 
-            painter.restore()   
+            painter.restore()
         painter.end()
 
         svg_string = buffer.data().data().decode("utf-8")
@@ -166,7 +165,7 @@ class LineItem(QGraphicsItem):
         div_str = f"""
                     <div style="
                      position:absolute;
-                     z-index:{int(self.zValue()*10)if self.zValue() else 0};
+                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
                      width:{w}px;
                      height:{h}px;
                      top:{y}px;
@@ -216,7 +215,7 @@ class LineItem(QGraphicsItem):
         line.setP2(point)
         self.setLine(line)
         self.update_resize_handles()
-        sahne_acisi = f"\u2220  {((self._line.angle()-self.rotation())%360):.1f}\N{DEGREE SIGN}"
+        sahne_acisi = f"\u2220  {((self._line.angle() - self.rotation()) % 360):.1f}\N{DEGREE SIGN}"
         self.scene().parent().log(txt=sahne_acisi, toStatusBarOnly=True)
 
     # ---------------------------------------------------------------------
@@ -492,7 +491,7 @@ class LineItem(QGraphicsItem):
             # TODO: self.rotation() degeri, self._line.angle() ile degissin, yani setPos ile
             # pozisyonu da ayarlamak lazım.
 
-            sahne_acisi = f"\u2220  {((self._line.angle()-self.rotation())%360):.1f}\N{DEGREE SIGN}"
+            sahne_acisi = f"\u2220  {((self._line.angle() - self.rotation()) % 360):.1f}\N{DEGREE SIGN}"
             self.scene().parent().log(txt=sahne_acisi, toStatusBarOnly=True)
             # self.setPos(x, y)
             # return QGraphicsItem.mouseMoveEvent(self, event)
@@ -1024,7 +1023,6 @@ class LineItem(QGraphicsItem):
         path.addRect(self.p1Handle)
         path.addRect(self.p2Handle)
 
-
         if self._text:
             # path addText kullanmadik, ok uzunlugu kısalınca yazının hepsini gostermese de kareye ekliyor.
             # painterTextRecti okla beraber dondurup donmus dortgenin boundinRectini alip ekliyoruz
@@ -1117,8 +1115,11 @@ class LineItem(QGraphicsItem):
         # p = self.pos()
         # s = self.scenePos()
         # painter.drawText(self.boundingRect(), "{},  {}\n{},  {}".format(p.x(),p.y(),s.x(), s.y()))
-        # # # painter.drawRect(self.boundingRect())
+        # painter.setPen(QPen(Qt.green,12))
+        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
+        # # # # painter.drawRect(self.boundingRect())
         # painter.setPen(Qt.green)
+        # painter.drawRect(self.boundingRect())
         # painter.drawRect(self.painterTextRect)
         # painter.setPen(Qt.yellow)
         # # painter.drawPolygon(self.rpoly)

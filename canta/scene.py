@@ -55,6 +55,8 @@ class Scene(QGraphicsScene):
         self.tempDirPath = tempDirPath
         self.arkaPlanRengi = arkaPlanRengi
         self.yaziRengi = yaziRengi
+        
+        self.sonZDeger = 0
 
         self.scenePen = scenePen
 
@@ -108,6 +110,7 @@ class Scene(QGraphicsScene):
                       "arkaPlanRengi": self.arkaPlanRengi,
                       "scenePen": self.scenePen,
                       "sceneRect": self.sceneRect(),
+                      "sonZDeger": self.sonZDeger,
                       # "embededImageCounter": self.embededImageCounter,
                       "backgroundBrush": view.backgroundBrush(),
                       "backgroundImagePath": view.backgroundImagePath,
@@ -274,8 +277,9 @@ class Scene(QGraphicsScene):
             os.makedirs(imageDirectory)
         self.parent().cModel.embededImageCounter += 1
         # return os.path.join(imageFolder, "{}.jpg".format(self.embededImageCounter))
+        # veya str(uuid.uuid4())[:5] yerine uuid.uuid4().hex[:5]
         return os.path.join(imageDirectory,
-                            "defterHtmlImage-{}-{}-{}".format(self.parent().cModel.embededImageCounter,
+                            "defterHtml-{}-{}-{}".format(self.parent().cModel.embededImageCounter,
                                                               str(uuid.uuid4())[:5],
                                                               baseName))
 
@@ -725,24 +729,30 @@ class Scene(QGraphicsScene):
             #     #self.dosyaYolu = None
 
             elif self.toolType == self.ImageTool:
+                self.parent().lutfen_bekleyin_goster()
                 self.parent().ekle_resim_direkt(self.dosyaYolu, event.scenePos())
                 self.no_toola_gec()
+                self.parent().lutfen_bekleyin_gizle()
                 # self.toolType = self.NoTool
                 # self.parent().setCursor(Qt.ArrowCursor)
                 # self.parent().actionSwitchToSelectionTool.setChecked(True)
                 return QGraphicsScene.mousePressEvent(self, event)
 
             elif self.toolType == self.VideoTool:
+                self.parent().lutfen_bekleyin_goster()
                 self.parent().ekle_video_direkt(self.dosyaYolu, event.scenePos())
                 self.no_toola_gec()
+                self.parent().lutfen_bekleyin_gizle()
                 # self.toolType = self.NoTool
                 # self.parent().setCursor(Qt.ArrowCursor)
                 # self.parent().actionSwitchToSelectionTool.setChecked(True)
                 return QGraphicsScene.mousePressEvent(self, event)
 
             elif self.toolType == self.DosyaAraci:
+                self.parent().lutfen_bekleyin_goster()
                 self.parent().ekle_dosya_direkt(self.dosyaYolu, event.scenePos())
                 self.no_toola_gec()
+                self.parent().lutfen_bekleyin_gizle()
                 # self.toolType = self.NoTool
                 # self.parent().setCursor(Qt.ArrowCursor)
                 # self.parent().actionSwitchToSelectionTool.setChecked(True)

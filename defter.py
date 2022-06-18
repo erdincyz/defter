@@ -143,7 +143,6 @@ class DefterAnaPencere(QMainWindow):
         self.recentFilesQueue = deque(maxlen=15)
 
         self.theme = None
-        self.zVal = 0
 
         # read_user_settings icinde tekrar atamalar yapiliyor
         self.arkaPlanRengi = QColor(71, 177, 213)
@@ -1648,8 +1647,8 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def increase_zvalue(self, item):
-        self.zVal += 1
-        item.setZValue(self.zVal)
+        self.cScene.sonZDeger += 1
+        item.setZValue(self.cScene.sonZDeger)
 
     # ---------------------------------------------------------------------
     def get_mouse_scene_pos(self):
@@ -1681,11 +1680,15 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def read_user_settings(self):
+        KULLANICI_KLASORU = os.path.expanduser("~")
         self.settings.beginGroup("UserSettings")
-        if self.settings.contains("lastDir"):
-            self.lastDir = self.settings.value("lastDir", None)
-            self.lastDirForImages = self.settings.value("lastDirForImages", None)
-            self.lastDirForExport = self.settings.value("lastDirForExport", None)
+        if self.settings.contains("sonKlasor"):
+            self.sonKlasor = self.settings.value("sonKlasor", KULLANICI_KLASORU)
+            self.sonKlasorResimler = self.settings.value("sonKlasorResimler", KULLANICI_KLASORU)
+            self.sonKlasorVideolar = self.settings.value("sonKlasorVideolar", KULLANICI_KLASORU)
+            self.sonKlasorDosyalar = self.settings.value("sonKlasorDosyalar", KULLANICI_KLASORU)
+            self.sonKlasorDisaAktar = self.settings.value("sonKlasorDisaAktar", KULLANICI_KLASORU)
+            self.sonKlasorHTML = self.settings.value("sonKlasorHTML", KULLANICI_KLASORU)
             self.itemSize = self.settings.value("itemSize", QSizeF(25, 25))
             self.textSize = int(self.settings.value("textSize", 10))
             self.arkaPlanRengi = self.settings.value("arkaPlanRengi", QColor(71, 177, 213))
@@ -1707,9 +1710,10 @@ class DefterAnaPencere(QMainWindow):
                                            }
 
         else:
-            self.lastDir = self.lastDirForImages = self.lastDirForExport = os.path.expanduser("~")
-            # self.lastDirForImages = os.path.expanduser("~")
-            # self.lastDirForExport = os.path.expanduser("~")
+            self.sonKlasor = self.sonKlasorDisaAktar = self.sonKlasorHTML = KULLANICI_KLASORU
+            self.sonKlasorResimler = self.sonKlasorVideolar = self.sonKlasorDosyalar = KULLANICI_KLASORU
+            # self.sonKlasorResimler = os.path.expanduser("~")
+            # self.sonKlasorDisaAktar = os.path.expanduser("~")
 
             font = QFont(QApplication.font().family())
             font.setPointSize(10)
@@ -1784,9 +1788,12 @@ class DefterAnaPencere(QMainWindow):
         self.settings.endGroup()
 
         self.settings.beginGroup("UserSettings")
-        self.settings.setValue("lastDir", self.lastDir)
-        self.settings.setValue("lastDirForImages", self.lastDirForImages)
-        self.settings.setValue("lastDirForExport", self.lastDirForExport)
+        self.settings.setValue("sonKlasor", self.sonKlasor)
+        self.settings.setValue("sonKlasorResimler", self.sonKlasorResimler)
+        self.settings.setValue("sonKlasorVideolar", self.sonKlasorVideolar)
+        self.settings.setValue("sonKlasorDosyalar", self.sonKlasorDosyalar)
+        self.settings.setValue("sonKlasorDisaAktar", self.sonKlasorDisaAktar)
+        self.settings.setValue("sonKlasorHTML", self.sonKlasorHTML)
         self.settings.setValue("itemSize", self.itemSize)
         self.settings.setValue("textSize", self.textSize)
         self.settings.setValue("cizgiRengi", self.cizgiRengi)
@@ -2277,14 +2284,14 @@ class DefterAnaPencere(QMainWindow):
     def act_import_def_files_into_current_def_file(self):
         fn = QFileDialog.getOpenFileNames(self,
                                           self.tr("Import Def File(s)..."),
-                                          self.lastDir,
+                                          self.sonKlasor,
                                           self.tr('def Files (*.def)'))
 
         # if fn:
         if fn[0]:
             defPaths = fn[0]
 
-            self.lastDir = os.path.dirname(defPaths[0])
+            self.sonKlasor = os.path.dirname(defPaths[0])
 
         else:
             return
@@ -2444,7 +2451,7 @@ class DefterAnaPencere(QMainWindow):
             filtre = self.tr('def Files (*.def);;All Files(*)')
             fn = QFileDialog.getOpenFileName(self,
                                              self.tr('Open File...'),
-                                             self.lastDir,
+                                             self.sonKlasor,
                                              filtre)
             if fn[0]:
                 zipFilePath = fn[0]
@@ -2536,7 +2543,7 @@ class DefterAnaPencere(QMainWindow):
         # else:
         #     self._statusBar.showMessage("%s already opened" % self.cModel.fileName, 5000)
 
-        self.lastDir = os.path.dirname(zipFilePath)
+        self.sonKlasor = os.path.dirname(zipFilePath)
 
     # ---------------------------------------------------------------------
     def add_item_to_scene_from_dict(self, itemDict, isPaste=False):
@@ -2899,6 +2906,7 @@ class DefterAnaPencere(QMainWindow):
 
         # self.tv_sayfa_degistir(self.sayfalarDWTreeView.currentItem(), 0)
 
+        self.cScene.sonZDeger = sceneDict.get("sonZDeger", 0)
         self.cScene.arkaPlanRengi = sceneDict["arkaPlanRengi"]
         self.cScene.scenePen = sceneDict["scenePen"]
         self.cScene.setSceneRect(sceneDict["sceneRect"])
@@ -3304,8 +3312,10 @@ class DefterAnaPencere(QMainWindow):
         filtre = self.tr("*.def files (*.def);;All Files (*)")
         fn = QFileDialog.getSaveFileName(self,
                                          self.tr("Save as"),
-                                         self.lastDir,
-                                         filtre)
+                                         "",  # baseName
+                                         filtre,
+                                         self.sonKlasor
+                                         )
 
         path = fn[0]
         varsa_ayni_adresteki_dosya_silinsin_mi = False
@@ -3318,7 +3328,7 @@ class DefterAnaPencere(QMainWindow):
             # yoksa eski belgenin gomulu dosyaları yeni def dosyasında kalıyor.
             if os.path.isfile(path):  # getSaveFileName kullanildigi icin ayni isimde klasor durumu yok.
                 varsa_ayni_adresteki_dosya_silinsin_mi = True
-            self.lastDir = os.path.dirname(path)
+            self.sonKlasor = os.path.dirname(path)
         return path, varsa_ayni_adresteki_dosya_silinsin_mi
 
     # ---------------------------------------------------------------------
@@ -5629,7 +5639,7 @@ class DefterAnaPencere(QMainWindow):
         # self.textSizeSBox_tbarAction.setVisible(False)
         fn = QFileDialog.getOpenFileName(self,
                                          self.tr("Open Image File..."),
-                                         self.lastDirForImages,
+                                         self.sonKlasorResimler,
                                          self.supportedImageFormats)
 
         # if fn:
@@ -5655,7 +5665,7 @@ class DefterAnaPencere(QMainWindow):
                     action.setShortcut(QKeySequence("Alt+Shift+{}".format(count + 1)))
                 # action.triggered.connect(self.toggle_transforms_for_base)
                 self.recentImagesMenu.addAction(action)
-            self.lastDirForImages = os.path.dirname(filePath)
+            self.sonKlasorResimler = os.path.dirname(filePath)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5666,14 +5676,14 @@ class DefterAnaPencere(QMainWindow):
 
             fn = QFileDialog.getOpenFileNames(self,
                                               self.tr("Open Image Files..."),
-                                              self.lastDirForImages,
+                                              self.sonKlasorResimler,
                                               self.supportedImageFormats)
 
             # if fn:
             if fn[0]:
                 imgPaths = fn[0]
 
-                self.lastDirForImages = os.path.dirname(imgPaths[0])
+                self.sonKlasorResimler = os.path.dirname(imgPaths[0])
 
             else:
                 return
@@ -5742,7 +5752,7 @@ class DefterAnaPencere(QMainWindow):
         filtre = self.tr("All Files (*)")
         fn = QFileDialog.getOpenFileName(self,
                                          self.tr("Open Video File..."),
-                                         self.lastDirForImages,
+                                         self.sonKlasorVideolar,
                                          filtre
                                          )
 
@@ -5752,7 +5762,7 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.set_tool(toolType=Scene.VideoTool, dosyaYolu=filePath)
             self.actionAddVideoItem.setChecked(True)
 
-            self.lastDirForImages = os.path.dirname(filePath)
+            self.sonKlasorVideolar = os.path.dirname(filePath)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5763,7 +5773,7 @@ class DefterAnaPencere(QMainWindow):
             filtre = self.tr("All Files (*)")
             fn = QFileDialog.getOpenFileNames(self,
                                               self.tr("Open Video Files..."),
-                                              self.lastDirForImages,
+                                              self.sonKlasorVideolar,
                                               filtre
                                               )
 
@@ -5771,7 +5781,7 @@ class DefterAnaPencere(QMainWindow):
             if fn[0]:
                 videoPaths = fn[0]
 
-                self.lastDirForImages = os.path.dirname(videoPaths[0])
+                self.sonKlasorVideolar = os.path.dirname(videoPaths[0])
 
             else:
                 return
@@ -5815,7 +5825,7 @@ class DefterAnaPencere(QMainWindow):
         filtre = self.tr("All Files (*)")
         fn = QFileDialog.getOpenFileName(self,
                                          self.tr("Open File..."),
-                                         self.lastDirForImages,
+                                         self.sonKlasorDosyalar,
                                          filtre
                                          )
 
@@ -5825,7 +5835,7 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.set_tool(toolType=Scene.DosyaAraci, dosyaYolu=filePath)
             self.actionEkleDosyaNesnesi.setChecked(True)
 
-            self.lastDirForImages = os.path.dirname(filePath)
+            self.sonKlasorDosyalar = os.path.dirname(filePath)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5836,7 +5846,7 @@ class DefterAnaPencere(QMainWindow):
             filtre = self.tr("All Files (*)")
             fn = QFileDialog.getOpenFileNames(self,
                                               self.tr("Open Files..."),
-                                              self.lastDirForImages,
+                                              self.sonKlasorDosyalar,
                                               filtre
                                               )
 
@@ -5844,7 +5854,7 @@ class DefterAnaPencere(QMainWindow):
             if fn[0]:
                 dosyaAdresleri = fn[0]
 
-                self.lastDirForImages = os.path.dirname(dosyaAdresleri[0])
+                self.sonKlasorDosyalar = os.path.dirname(dosyaAdresleri[0])
 
             else:
                 return
@@ -5862,7 +5872,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.lutfen_bekleyin_gizle()
 
-        print(dosyaAdresleri)
+        # print(dosyaAdresleri)
 
     # ---------------------------------------------------------------------
     def ekle_dosya_direkt(self, dosyaAdresi, pos):
@@ -5905,7 +5915,6 @@ class DefterAnaPencere(QMainWindow):
         # QString imgBase64 = ba.toBase64();
         # bu.close();
         # """
-
         nesne = DosyaNesnesi(dosyaAdresi, pos, QRectF(0, 0, 125, 160), self.yaziRengi, self.arkaPlanRengi,
                              self._pen,
                              self.font(),
@@ -5913,7 +5922,7 @@ class DefterAnaPencere(QMainWindow):
         self.increase_zvalue(nesne)
         # self.addItem(item)
         # TODO: macro undo redo
-        undoRedo.undoableAddItem(self.cScene.undoStack, description=self.tr("add video"), scene=self.cScene, item=nesne)
+        undoRedo.undoableAddItem(self.cScene.undoStack, description=self.tr("add file"), scene=self.cScene, item=nesne)
         self.cScene.unite_with_scene_rect(nesne.sceneBoundingRect())
         # pixMap = None
 
@@ -7011,7 +7020,7 @@ class DefterAnaPencere(QMainWindow):
 
         fn = QFileDialog.getOpenFileName(self,
                                          self.tr("Select Background Image ..."),
-                                         self.lastDirForImages,
+                                         self.sonKlasorResimler,
                                          self.supportedImageFormats)
 
         if fn[0]:
@@ -7019,7 +7028,7 @@ class DefterAnaPencere(QMainWindow):
             undoRedo.undoableSetSceneBackgroundImage(self.cScene.undoStack,
                                                      self.tr("change scene's background image"),
                                                      view=self.cView, imagePath=filePath)
-            self.lastDirForImages = os.path.dirname(filePath)
+            self.sonKlasorResimler = os.path.dirname(filePath)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -7902,15 +7911,17 @@ class DefterAnaPencere(QMainWindow):
         filtre = self.tr('*.defstyles files (*.defstyles)')
         fn = QFileDialog.getSaveFileName(self,
                                          self.tr('Save style presets'),
-                                         self.lastDir,
-                                         filtre)
+                                         "",  # baseName
+                                         filtre,
+                                         self.sonKlasor
+                                         )
 
         filePath = fn[0]
         if filePath:
             # TODO: uzanti kontrolu yap
             if not filePath.endswith(".defstyles"):
                 filePath = '{}.defstyles'.format(filePath)
-            self.lastDir = os.path.dirname(filePath)
+            self.sonKlasor = os.path.dirname(filePath)
 
             self.lutfen_bekleyin_goster()
             _file = QSaveFile(filePath)
@@ -7950,7 +7961,7 @@ class DefterAnaPencere(QMainWindow):
         filtre = self.tr('*.defstyles Files (*.defstyles)')
         fn = QFileDialog.getOpenFileName(self,
                                          self.tr('Load style presets...'),
-                                         self.lastDir,
+                                         self.sonKlasor,
                                          filtre)
         if fn[0]:
             filePath = fn[0]
@@ -8337,9 +8348,9 @@ class DefterAnaPencere(QMainWindow):
         # text = self.cScene.activeItem.toHtml().replace(url, imagePath)
         # text = self.cScene.activeItem.toHtml().replace(url, "file:/images/{}".format(os.path.basename(imagePath)))
 
-        # onemli: text nesnesindeki set_document_url'de de images-html klasoru ekleniyor.
+        # iptal edildi !! -> onemli: text nesnesindeki set_document_url'de de images-html klasoru ekleniyor.
         # img src= direkt adres yazabiliyoruz boylelikle
-        text = self.cScene.activeItem.toHtml().replace(url, "{}".format(os.path.basename(imagePath)))
+        text = self.cScene.activeItem.toHtml().replace(url, "{}".format(os.path.join("images-html", os.path.basename(imagePath))))
         self.cScene.activeItem.setHtml(text)
         self.cScene.activeItem.update()
 
@@ -8649,8 +8660,10 @@ class DefterAnaPencere(QMainWindow):
             filtre = self.tr("All Files (*)")
             fn = QFileDialog.getSaveFileName(self,
                                              self.tr("Save image(s) as"),
-                                             self.lastDir,
-                                             filtre)
+                                             "",  # baseName
+                                             filtre,
+                                             self.sonKlasorDisaAktar
+                                             )
 
             userPath = fn[0]
             if userPath:
@@ -8684,8 +8697,9 @@ class DefterAnaPencere(QMainWindow):
             fn = QFileDialog.getSaveFileName(self,
                                              self.tr("Save image(s) as"),
                                              baseName,
-                                             self.lastDir,
-                                             filtre)
+                                             filtre,
+                                             self.sonKlasorDisaAktar
+                                             )
             userPath = fn[0]
             if userPath:
                 self.lutfen_bekleyin_goster()
@@ -8696,7 +8710,7 @@ class DefterAnaPencere(QMainWindow):
                 succesfulExportCount += 1
                 # path = userPath
 
-        self.lastDir = os.path.dirname(userPath)
+        self.sonKlasorDisaAktar = os.path.dirname(userPath)
         if succesfulExportCount:
             self.log(self.tr("{} image(s) exported.").format(succesfulExportCount), 5000, 1)
         self.lutfen_bekleyin_gizle()
@@ -8791,8 +8805,10 @@ class DefterAnaPencere(QMainWindow):
             filtre = self.tr("All Files (*)")
             fn = QFileDialog.getSaveFileName(self,
                                              self.tr("Save video(s) as"),
-                                             self.lastDir,
-                                             filtre)
+                                             "",  # baseName
+                                             filtre,
+                                             self.sonKlasorDisaAktar
+                                             )
 
             userPath = fn[0]
             if userPath:
@@ -8829,8 +8845,9 @@ class DefterAnaPencere(QMainWindow):
             fn = QFileDialog.getSaveFileName(self,
                                              self.tr("Save video(s) as"),
                                              baseName,
-                                             self.lastDir,
-                                             filtre)
+                                             filtre,
+                                             self.sonKlasorDisaAktar
+                                             )
 
             userPath = fn[0]
             if userPath:
@@ -8842,7 +8859,7 @@ class DefterAnaPencere(QMainWindow):
                 succesfulExportCount += 1
                 # path = userPath
 
-        self.lastDir = os.path.dirname(userPath)
+        self.sonKlasorDisaAktar = os.path.dirname(userPath)
         if succesfulExportCount:
             self.log(self.tr("{} Video(s) exported.").format(succesfulExportCount), 5000, 1)
 
@@ -8910,8 +8927,10 @@ class DefterAnaPencere(QMainWindow):
             filtre = self.tr("All Files (*)")
             fn = QFileDialog.getSaveFileName(self,
                                              self.tr("Save file(s) as"),
-                                             self.lastDir,
-                                             filtre)
+                                             "", # baseName
+                                             filtre,
+                                             self.sonKlasorDisaAktar
+                                             )
 
             userPath = fn[0]
             if userPath:
@@ -8948,8 +8967,9 @@ class DefterAnaPencere(QMainWindow):
             fn = QFileDialog.getSaveFileName(self,
                                              self.tr("Save file(s) as"),
                                              baseName,
-                                             self.lastDir,
-                                             filtre)
+                                             filtre,
+                                             self.sonKlasorDisaAktar
+                                             )
 
             userPath = fn[0]
             if userPath:
@@ -8961,7 +8981,7 @@ class DefterAnaPencere(QMainWindow):
                 succesfulExportCount += 1
                 # path = userPath
 
-        self.lastDir = os.path.dirname(userPath)
+        self.sonKlasorDisaAktar = os.path.dirname(userPath)
         if succesfulExportCount:
             self.log(self.tr("{} File(s) exported.").format(succesfulExportCount), 5000, 1)
 
@@ -9184,7 +9204,7 @@ class DefterAnaPencere(QMainWindow):
         fDialog = QFileDialog()
         # fDialog.setFileMode(QFileDialog.Directory)
         fDialog.setFileMode(QFileDialog.AnyFile)
-        fDialog.setOption(QFileDialog.ShowDirsOnly, True)
+        # fDialog.setOption(QFileDialog.ShowDirsOnly, True)
         fDialog.setOption(QFileDialog.DontUseNativeDialog, True)
         fDialog.setOption(QFileDialog.DontUseCustomDirectoryIcons, True)
 
@@ -9198,7 +9218,7 @@ class DefterAnaPencere(QMainWindow):
         # fDialog.setNameFilters(filtre)
         # fDialog.selectNameFilter(filtre)
 
-        fDialog.setDirectory(self.lastDir)
+        fDialog.setDirectory(self.sonKlasorHTML)
         if tekSayfaMi:
             fDialog.setWindowTitle(self.tr("Export Page as HTML"))
         else:
@@ -9402,7 +9422,6 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_export_document_as_html(self, html_klasor_kayit_adres=None):
-        # TODO: bir klasor icine atmak lazım
         def_dosyasi_icine_kaydet = True
         dosyalar_kopyalansin_mi = False
         if not html_klasor_kayit_adres:
@@ -9412,7 +9431,7 @@ class DefterAnaPencere(QMainWindow):
                 return
             else:
                 html_klasor_kayit_adres = fn[0]
-                self.lastDir = os.path.dirname(html_klasor_kayit_adres)
+                self.sonKlasorHTML = os.path.dirname(html_klasor_kayit_adres)
                 os.makedirs(html_klasor_kayit_adres, exist_ok=True)
         self.lutfen_bekleyin_goster()
         if dosyalar_kopyalansin_mi:
@@ -9445,7 +9464,7 @@ class DefterAnaPencere(QMainWindow):
         if fn:
             self.lutfen_bekleyin_goster()
             html_klasor_kayit_adres = fn[0]
-            self.lastDir = os.path.dirname(html_klasor_kayit_adres)
+            self.sonKlasorHTML = os.path.dirname(html_klasor_kayit_adres)
             os.makedirs(html_klasor_kayit_adres, exist_ok=True)
             if dosyalar_kopyalansin_mi:
                 self.dosyalari_kopyala(self.cModel.enSonAktifSayfa, html_klasor_kayit_adres)
@@ -9475,7 +9494,11 @@ class DefterAnaPencere(QMainWindow):
             images_klasoru = os.path.join(self.cModel.tempDirPath, "images")
             if os.path.exists(images_klasoru):
                 shutil.copytree(images_klasoru, os.path.join(hedef_klasor, "images"), dirs_exist_ok=True)
-            
+
+            images_klasoru = os.path.join(self.cModel.tempDirPath, "images-html")
+            if os.path.exists(images_klasoru):
+                shutil.copytree(images_klasoru, os.path.join(hedef_klasor, "images-html"), dirs_exist_ok=True)
+
             files_klasoru = os.path.join(self.cModel.tempDirPath, "files")
             if os.path.exists(files_klasoru):
                 shutil.copytree(files_klasoru, os.path.join(hedef_klasor, "files"), dirs_exist_ok=True)
@@ -9508,7 +9531,7 @@ class DefterAnaPencere(QMainWindow):
                 else:
                     continue
 
-                if not nesne.isEmbeded:
+                if not nesne.isEmbeded:  # gomulu ise zaten yukarda kopyalanıyor
                     if os.path.exists(nesne.filePathForSave):
                         # self.yeniImagePath = nesne.scene().get_unique_path_for_embeded_image(
                         #     os.path.basename(nesne.filePathForSave))
@@ -9970,8 +9993,9 @@ class DefterAnaPencere(QMainWindow):
         # baseName = sayfa.adi
         fn = QFileDialog.getSaveFileName(self,
                                          self.tr('Save Image as'),
-                                         self.lastDirForExport,
+                                         "", # baseName
                                          self.supportedImageFormats,
+                                         self.sonKlasorDisaAktar
                                          )
         path = fn[0]
         if path:
@@ -9990,7 +10014,7 @@ class DefterAnaPencere(QMainWindow):
 
             self.log(self.tr("Page succesfully exported as image. {}".format(path)), 7000)
 
-            self.lastDirForExport = os.path.dirname(path)
+            self.sonKlasorDisaAktar = os.path.dirname(path)
 
             # if self.printer.outputFileName():
             #     self.preview.print()

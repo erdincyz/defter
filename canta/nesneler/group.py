@@ -569,8 +569,10 @@ class Group(QGraphicsItem):
         # # # # # debug start - pos() # # # # #
         # p = self.pos()
         # s = self.scenePos()
-        # painter.drawText(self.boundingRect(), "{0:.2f},  {1:.2f}\n{2:.2f},  {3:.2f}".
-        #                  format(p.x(), p.y(), s.x(), s.y()))
+        # painter.drawText(self.boundingRect(),
+        #                  "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
+        # painter.setPen(QPen(Qt.green,12))
+        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
         # t = self.transformOriginPoint()
         # painter.drawRect(t.x()-12, t.y()-12,24,24)
         # mapped = self.mapToScene(self.boundingRect().topLeft())

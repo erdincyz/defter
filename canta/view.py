@@ -108,22 +108,31 @@ class View(QGraphicsView):
         painter.fillRect(rectf, self.backgroundBrush())
 
 
-        # # ---  pos debug start   ---
+        # ---  pos debug start   ---
         # painter.drawRect(self.sceneRect())
         # painter.drawRect(self.kopyaRekt)
-        # painter.drawRect(QRectF(0,0,20,20))
-        # painter.drawRect(rectf.center().x(),rectf.center().y(),10,10)
-        # painter.setPen(QPen(Qt.blue))
-        # painter.drawRect(self.get_visible_rect())
+        #
+        # painter.drawEllipse(rectf.center().x(),rectf.center().y(),10,10)
+        # #painter.setPen(QPen(Qt.blue))
+        # #painter.drawRect(self.get_visible_rect())
         # painter.setPen(QPen(Qt.green))
         # painter.drawRect(self.scene().itemsBoundingRect())
         # painter.setPen(QPen(Qt.red))
         # painter.drawRect(QRectF(0,0,20,20))
-        # painter.drawRect(self.scene().sceneRect())
+        # painter.drawRect(self.sceneRect())
         # painter.setPen(QPen(Qt.yellow))
-        # # painter.drawRect(self.kagitPozisyonBoyutRect)
+        # painter.drawRect(QRectF(0, 0, 20, 20))
+        # painter.drawRect(QRectF(100, 0, 20, 20))
+        # painter.drawRect(QRectF(200, 0, 20, 20))
+        # painter.drawRect(QRectF(300, 0, 20, 20))
+        # painter.drawRect(QRectF(400, 0, 20, 20))
+        # painter.drawRect(QRectF(0, 100, 20, 20))
+        # painter.drawRect(QRectF(0, 200, 20, 20))
+        # painter.drawRect(QRectF(0, 300, 20, 20))
+        # painter.drawRect(QRectF(0, 400, 20, 20))
+        # painter.drawRect(self.kagitPozisyonBoyutRect)
         # painter.drawRect(self.debug_rect)
-        # # ---  pos debug end   ---
+        # ---  pos debug end   ---
 
         if self.backgroundImagePixmap:
             # painter.drawPixmap(rectf.toRect(), self.backgroundImagePixmap)

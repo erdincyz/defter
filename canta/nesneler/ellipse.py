@@ -5,10 +5,9 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
-from PySide6.QtCore import Qt, QBuffer, QIODevice, QSize, QRectF
-from PySide6.QtGui import QPainterPath, QPainter
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPainterPath
 from PySide6.QtWidgets import QStyle
-from PySide6.QtSvg import QSvgGenerator
 from canta.nesneler.base import BaseItem
 from canta import shared
 
@@ -28,71 +27,112 @@ class Ellipse(BaseItem):
 
     # ---------------------------------------------------------------------
     def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
-        # rect = self.mapRectToScene(self.boundingRect())
-        rect = self.sceneBoundingRect()
-        xr = rect.left()
-        yr = rect.top()
+        w = self._rect.width() * self.scale()
+        h = self._rect.height() * self.scale()
+
+        c = self.sceneBoundingRect().center()
+
+        xr = c.x() - w / 2
+        yr = c.y() - h / 2
         xs = self.scene().sceneRect().x()
         ys = self.scene().sceneRect().y()
         x = xr - xs
         y = yr - ys
 
-        w = rect.width()
-        h = rect.height()
+        bicimSozluk = self.ver_karakter_bicimi()
+        bold = 'font-weight="bold"' if bicimSozluk["b"] else ''
+        italic = 'font-style="italic"' if bicimSozluk["i"] else ''
+        underline = "underline" if bicimSozluk["u"] else ''
+        strikeOut = "line-through" if bicimSozluk["s"] else ''
+        overline = "overline" if bicimSozluk["o"] else ''
+        bicimler1 = bold + italic
+        if any((underline, strikeOut, overline)):
+            bicimler2 = f'text-decoration= "{underline} {strikeOut} {overline}"'
+        else:
+            bicimler2 = ''
 
-        buffer = QBuffer()
-        buffer.open(QIODevice.WriteOnly)
+        hiza = self.ver_yazi_hizasi()
+        # if hiza == Qt.AlignLeft or hiza == Qt.AlignLeft | Qt.AlignVCenter:
+        #     yazi_hiza = "left"
+        if hiza == Qt.AlignCenter or hiza == Qt.AlignCenter | Qt.AlignVCenter:
+            yazi_hiza = "center"
+        elif hiza == Qt.AlignRight or hiza == Qt.AlignRight | Qt.AlignVCenter:
+            yazi_hiza = "right"
+        elif hiza == Qt.AlignJustify or hiza == Qt.AlignJustify | Qt.AlignVCenter:
+            yazi_hiza = "justify"
+        else:
+            yazi_hiza = "left"
 
-        generator = QSvgGenerator()
-        # generator.setFileName("dosya.svg")
-        generator.setOutputDevice(buffer)
-        # generator.setResolution(72)
+        if self.rotation():
+            dondur_str_eksi = f"""
+                            transform-box: fill-box;
+                              transform-origin: center;
+                              transform: rotate({-self.rotation()}deg);
+            """
+        else:
+            dondur_str_eksi = ''
 
-        generator.setSize(QSize(w, h))
-        generator.setViewBox(QRectF(-w / 2, -h / 2, w, h))
-        generator.setTitle(self._kim)
-        generator.setDescription("")
-        # painter = QPainter(generator)
-        painter = QPainter()
-        painter.begin(generator)
-        painter.save()
+        # x ="{self.painterTextRect.center().x()}" y="{self.painterTextRect.center().y()}"
+        # x ="%50" y="%50" dominant-baseline="middle" text-anchor="middle"
+        if self.text():
+            yazi_str = f"""
+            <text 
+            style="{dondur_str_eksi}"
+            fill="rgba{self.yaziRengi.toTuple()}" 
+            fill-opacity="{self.yaziRengi.alpha() / 255}" 
+            stroke="none" xml:space="preserve" 
+            text-anchor="middle"
+            alignment-baseline="middle"
+            x="{w / 2}"
+            y="{h / 2}"
+            font-family={self.font().family()}
+            font-size="{self.fontPointSize()}pt"
+            {bicimler1}
+            {bicimler2}
+            text-align="{yazi_hiza}"
+             >{self.text()}</text>
+            """
+        else:
+            yazi_str = ""
 
-        diff = self.scenePos() - rect.center()
-        cizilecekRect = QRectF(self._rect)
-        painter.setPen(self._pen)
-        painter.setBrush(self._brush)
-        cizilecekRect.moveTo(diff)
-        painter.translate(diff)
-        painter.rotate(self.rotation())
-        painter.translate(-diff)
-        painter.drawEllipse(cizilecekRect)
-        # painter.rotate(-self.rotation())
-        painter.restore()
-        if self._text:
-            # painter.save()
-            painter.setFont(self._font)
-            # we recreate textPen from same exact color. otherwise, color's alpha is not working.
-            painter.setPen(self.textPen)
-            cizilecekTextRect = QRectF(self.painterTextRect)
-            cizilecekTextRect.moveCenter(diff - cizilecekRect.topLeft())
-            painter.scale(self.painterTextScale, self.painterTextScale)
-            painter.drawText(cizilecekTextRect, self._text, self.painterTextOption)
-            # painter.restore()
-        painter.end()
+        ellipse_str = f"""
+                  <ellipse 
+                    style="fill:rgba{self.arkaPlanRengi.toTuple()};
+                    fill-opacity:{self.arkaPlanRengi.alpha() / 255};
+                    stroke:rgba{self.cizgiRengi.toTuple()};
+                    stroke-opacity:{self.cizgiRengi.alpha() / 255};
+                    stroke-width:{self._pen.widthF() * 2 * self.scale()};
+                    stroke-linecap:round;
+                    stroke-dasharray:none;
+                    stroke-linejoin:round;
+                    paint-order:markers fill stroke;"
+                    cx="{w / 2}" cy="{h / 2}" rx="{w / 2 - self._pen.widthF()}" ry="{h / 2 - self._pen.widthF()}"
+                    />
+        """
 
-        svg_string = buffer.data().data().decode("utf-8")
+        svg_str = f"""
+        <?xml version="1.0"?>
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny" 
+             width="{w}" height="{h}" viewBox="0 0 {w} {h}" >
+                {ellipse_str}
+                {yazi_str}
+              </svg>\n
+        """
 
-        # background: rgba{self.arkaPlanRengi.toTuple()};\n
         div_str = f"""
-                       <div style="
-                        position:absolute;
-                        z-index:{int(self.zValue()*10)if self.zValue() else 0};
-                        width:{w}px;
-                        height:{h}px;
-                        top:{y}px;
-                        left:{x}px;" id="{self._kim}">{svg_string}</div>\n
-               """
-        # return svg_string
+                    <div style="
+                     position:absolute;
+                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
+                     width:{w}px;
+                     height:{h}px;
+                     top:{y}px;
+                     left:{x}px;
+                     transform-box: fill-box;
+                     transform-origin: center;
+                     transform: rotate({self.rotation()}deg);"
+                      id="{self._kim}">{svg_str}</div>\n
+            """
+        # return svg_str
         return div_str
 
     # ---------------------------------------------------------------------
@@ -205,3 +245,28 @@ class Ellipse(BaseItem):
                 painter.drawRect(self.topRightHandle)
                 painter.drawRect(self.bottomRightHandle)
                 painter.drawRect(self.bottomLeftHandle)
+
+        # # # # # # debug start - pos() # # # # #
+        # p = self.pos()
+        # s = self.scenePos()
+        # painter.drawText(self.rect(),
+        #                  "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
+        # # # t = self.transformOriginPoint()
+        # # # painter.drawRect(t.x()-12, t.y()-12,24,24)
+        # mapped = self.mapToScene(self.rect().topLeft())
+        # painter.drawText(self.rect().x(), self.rect().y(), "{0:.2f}  {1:.2f} map".format(mapped.x(), mapped.y()))
+        # painter.drawEllipse(self.scenePos(), 10, 10)
+        # painter.setPen(Qt.blue)
+        # painter.drawEllipse(self.mapFromScene(self.pos()), 10, 10)
+        # r = self.textItem.boundingRect()
+        # r = self.mapRectFromItem(self.textItem, r)
+        # painter.drawRect(r)
+        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
+        # painter.setPen(QPen(Qt.red,17))
+        # painter.drawPoint(self.rect().center())
+        # painter.setPen(QPen(Qt.green,12))
+        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
+        # painter.setPen(QPen(Qt.blue,8))
+        # painter.drawPoint(self.sceneBoundingRect().center())
+        # painter.drawRect(self.sceneBoundingRect())
+        # # # # # # debug end - pos() # # # # #

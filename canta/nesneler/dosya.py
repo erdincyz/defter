@@ -96,7 +96,7 @@ class DosyaNesnesi(BaseItem):
 
         bicimSozluk = self.ver_karakter_bicimi()
         bold = "font-weight:bold;" if bicimSozluk["b"] else ""
-        italic = "font-style:bold;" if bicimSozluk["i"] else ""
+        italic = "font-style:italic;" if bicimSozluk["i"] else ""
         underline = "underline" if bicimSozluk["u"] else ""
         strikeOut = "line-through" if bicimSozluk["s"] else ""
         overline = "overline" if bicimSozluk["o"] else ""

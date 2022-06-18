@@ -752,7 +752,8 @@ class BaseItem(QGraphicsItem):
         # # # # # # debug start - pos() # # # # #
         # p = self.pos()
         # s = self.scenePos()
-        # painter.drawText(self.rect(), "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
+        # painter.drawText(self.rect(),
+        #                  "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
         # # # t = self.transformOriginPoint()
         # # # painter.drawRect(t.x()-12, t.y()-12,24,24)
         # mapped = self.mapToScene(self.rect().topLeft())
@@ -767,10 +768,10 @@ class BaseItem(QGraphicsItem):
         # painter.setPen(QPen(Qt.red,17))
         # painter.drawPoint(self.rect().center())
         # painter.setPen(QPen(Qt.green,12))
-        # painter.drawPoint(self.boundingRect().center())
+        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
         # painter.setPen(QPen(Qt.blue,8))
         # painter.drawPoint(self.sceneBoundingRect().center())
-        # painter.drawRect(self.sceneBoundingRect())
+        # painter.drawRect(self.painterTextRect)
         # # # # # # debug end - pos() # # # # #
 
     # ---------------------------------------------------------------------
@@ -904,10 +905,7 @@ class BaseItem(QGraphicsItem):
                                                              yeniRect=rect,
                                                              eskiRect=self._eskiRectBeforeResize,
                                                              eskiPos=self._eskiPosBeforeResize)
-            # TODO: bu satir eger cizim disari tasarsa, scene recti ona uygun ayarlamak icin
-            # fakat eger cizim disari tasarsa evet uyarliyor ama bazen de çizilen itemin geometrisini degistiriyor.
-            # o yuzden simdilik iptal.
-            # self.scene().unite_with_scene_rect(self.sceneBoundingRect())
+
             self._resizing = False
 
             self.update_painter_text_rect()

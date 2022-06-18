@@ -6,10 +6,10 @@ __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
 import uuid
-from PySide6.QtCore import (Qt, QRectF,QRect, QSizeF, QSize, QPointF, Slot, QBuffer, QIODevice)
-from PySide6.QtGui import (QPainterPath, QPainterPathStroker, QPen, QBrush, QColor, QTransform, QTextOption, QPainter)
+from PySide6.QtCore import Qt, QRectF, QRect, QSizeF, QSize, QPointF, Slot, QBuffer, QIODevice
+from PySide6.QtGui import QPainterPath, QPainterPathStroker, QPen, QBrush, QColor, QTransform, QTextOption, QPainter
 from PySide6.QtSvg import QSvgGenerator
-from PySide6.QtWidgets import (QGraphicsItem, QStyle)
+from PySide6.QtWidgets import QGraphicsItem, QStyle
 from canta import shared
 from canta.nesneler.tempTextItem import TempTextItem
 
@@ -159,18 +159,18 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
-        # bu nesnenin pozisyon hesaplari digerlerinden farkli
-        # divdeki w,h icin de maplemek lazim rotation degerine gore w,h degismesi icin, hatta scale icin de
-        rect = self.mapRectToScene(self.boundingRect())
+
+        rect = self.sceneBoundingRect()
+        w = rect.width()
+        h = rect.height()
+
         x = rect.left()
         y = rect.top()
+
         xs = self.scene().sceneRect().x()
         ys = self.scene().sceneRect().y()
         x = x - xs
         y = y - ys
-
-        w = rect.width()
-        h = rect.height()
 
         buffer = QBuffer()
         buffer.open(QIODevice.WriteOnly)
@@ -180,8 +180,8 @@ class PathItem(QGraphicsItem):
         generator.setOutputDevice(buffer)
         # generator.setResolution(72)
 
-        generator.setSize(QSize(w, h))
-        generator.setViewBox(QRectF(-w/2, -h/2, w, h))
+        # generator.setSize(QSize(w, h))  # kaymalara sebep oluyor
+        generator.setViewBox(QRectF(-w / 2, -h / 2, w, h))
         generator.setTitle(self._kim)
         generator.setDescription("")
         # painter = QPainter(generator)
@@ -189,6 +189,7 @@ class PathItem(QGraphicsItem):
         painter.begin(generator)
         painter.setPen(self._pen)
         painter.setBrush(self._brush)
+
         painter.rotate(self.rotation())
         painter.drawPath(self._path)
         painter.rotate(-self.rotation())
@@ -215,7 +216,7 @@ class PathItem(QGraphicsItem):
         div_str = f"""
                     <div style="
                      position:absolute;
-                     z-index:{int(self.zValue()*10)if self.zValue() else 0};
+                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
                      width:{w}px;
                      height:{h}px;
                      top:{y}px;
@@ -724,6 +725,7 @@ class PathItem(QGraphicsItem):
         # update pos - bu onemli
         crect = self.path().controlPointRect()
         crect = self.mapRectToScene(crect)
+        # cunku pos noktasi merkezde
         diff = self.scenePos() - crect.center()
         self.setPos(crect.center())
         self.path().translate(diff)
@@ -771,15 +773,15 @@ class PathItem(QGraphicsItem):
         self.arama_kutusu.moveCenter(QPointF(liste[0][0], liste[0][1]))
         try:
             for i in range(self.lastPath.elementCount()):
-                if self.arama_kutusu.contains(self.lastPath.elementAt(i).x,self.lastPath.elementAt(i).y):
+                if self.arama_kutusu.contains(self.lastPath.elementAt(i).x, self.lastPath.elementAt(i).y):
                     continue
                 else:
                     liste.append([self.lastPath.elementAt(i).x, self.lastPath.elementAt(i).y])
                     self.arama_kutusu.moveCenter(QPointF(liste[-1][0], liste[-1][1]))
 
             # son noktayi basitlestirilmis cizgiye dahil ediyoruz
-            liste.append([self.lastPath.elementAt(self.lastPath.elementCount()-1).x,
-                          self.lastPath.elementAt(self.lastPath.elementCount()-1).y])
+            liste.append([self.lastPath.elementAt(self.lastPath.elementCount() - 1).x,
+                          self.lastPath.elementAt(self.lastPath.elementCount() - 1).y])
         #
         except Exception as e:
             print(e)
@@ -973,7 +975,9 @@ class PathItem(QGraphicsItem):
         # # # # # debug start - pos() # # # # #
         # p = self.pos()
         # s = self.scenePos()
-        # painter.drawText(self.boundingRect(), "{},  {}\n{},  {}".format(p.x(),p.y(),s.x(), s.y()))
+        # painter.drawText(self.boundingRect(), "{},  {}\n{},  {}".format(p.x(), p.y(), s.x(), s.y()))
+        # painter.setPen(QPen(Qt.green, 12))
+        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
         # painter.drawRect(self.boundingRect())
         # painter.drawRect(p.x(),p.y(),100,100)
         # painter.drawRect(s.x(),s.y(),100,100)

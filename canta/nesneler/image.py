@@ -7,7 +7,7 @@ __date__ = '3/28/16'
 
 import os
 from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF
-from PySide6.QtGui import QColor, QPixmap, QTransform, QPixmapCache, QPainter
+from PySide6.QtGui import QColor, QPixmap, QTransform, QPixmapCache, QPainter, QPen
 from PySide6.QtWidgets import QStyle
 from canta.nesneler.base import BaseItem
 from canta import shared
@@ -112,9 +112,13 @@ class Image(BaseItem):
 
         img_str = f'<img src="{resim_adres}" style="width:100%; height:100%;"></img>'
 
-        rect = self.sceneBoundingRect()
-        xr = rect.left()
-        yr = rect.top()
+        w = self._rect.width() * self.scale()
+        h = self._rect.height() * self.scale()
+        
+        c = self.sceneBoundingRect().center()
+        
+        xr = c.x() - w/2
+        yr = c.y() - h/2
         xs = self.scene().sceneRect().x()
         ys = self.scene().sceneRect().y()
         x = xr - xs
@@ -122,7 +126,7 @@ class Image(BaseItem):
 
         bicimSozluk = self.ver_karakter_bicimi()
         bold = "font-weight:bold;" if bicimSozluk["b"] else ""
-        italic = "font-style:bold;" if bicimSozluk["i"] else ""
+        italic = "font-style:italic;" if bicimSozluk["i"] else ""
         underline = "underline" if bicimSozluk["u"] else ""
         strikeOut = "line-through" if bicimSozluk["s"] else ""
         overline = "overline" if bicimSozluk["o"] else ""
@@ -149,6 +153,7 @@ class Image(BaseItem):
                      height:{self._rect.height() * self.scale()}px;
                      top:{y}px;
                      left:{x}px;
+                     opacity:{self.imageOpacity};
                      transform-box: fill-box;
                      transform-origin: center;
                      transform: rotate({self.rotation()}deg);
@@ -614,3 +619,27 @@ class Image(BaseItem):
             painter.setPen(self.yaziRengi)
             # painter.setOpacity(.35)
             painter.drawRect(self.cropRectF)
+            
+        # # # # # # debug start - pos() # # # # #
+        # p = self.pos()
+        # s = self.scenePos()
+        # painter.drawText(self.rect(), "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
+        # # # t = self.transformOriginPoint()
+        # # # painter.drawRect(t.x()-12, t.y()-12,24,24)
+        # mapped = self.mapToScene(self.rect().topLeft())
+        # painter.drawText(self.rect().x(), self.rect().y(), "{0:.2f}  {1:.2f} map".format(mapped.x(), mapped.y()))
+        # painter.drawEllipse(self.scenePos(), 10, 10)
+        # painter.setPen(Qt.blue)
+        # painter.drawEllipse(self.mapFromScene(self.pos()), 10, 10)
+        # r = self.textItem.boundingRect()
+        # r = self.mapRectFromItem(self.textItem, r)
+        # painter.drawRect(r)
+        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
+        # painter.setPen(QPen(Qt.red,17))
+        # painter.drawPoint(self.rect().center())
+        # painter.setPen(QPen(Qt.green,12))
+        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
+        # painter.setPen(QPen(Qt.blue,8))
+        # painter.drawPoint(self.sceneBoundingRect().center())
+        # painter.drawRect(self.sceneBoundingRect())
+        # # # # # # debug end - pos() # # # # #

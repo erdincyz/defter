@@ -7,11 +7,9 @@ __date__ = '3/28/16'
 
 # from math import fabs
 import uuid
-from PySide6.QtCore import Qt, Signal, QSizeF, QRectF, QPointF, Slot, QUrl, QBuffer, QIODevice, QSize
-from PySide6.QtGui import QBrush, QPen, QColor, QPainterPath, QPainterPathStroker, QTextBlockFormat, QPainter, QPalette, \
-    QAbstractTextDocumentLayout
-from PySide6.QtSvg import QSvgGenerator
-from PySide6.QtWidgets import QGraphicsTextItem, QStyle, QStyleOptionGraphicsItem
+from PySide6.QtCore import Qt, Signal, QSizeF, QRectF, QPointF, Slot, QUrl
+from PySide6.QtGui import QBrush, QPen, QColor, QPainterPath
+from PySide6.QtWidgets import QGraphicsTextItem, QStyle
 from canta import shared
 
 
@@ -118,8 +116,6 @@ class Text(QGraphicsTextItem):
 
     # ---------------------------------------------------------------------
     def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
-
-        # rect = self.mapRectToScene(self.boundingRect())
         rect = self.sceneBoundingRect()
 
         x = self.scenePos().x()
@@ -132,61 +128,64 @@ class Text(QGraphicsTextItem):
         w = rect.width()
         h = rect.height()
 
-        buffer = QBuffer()
-        buffer.open(QIODevice.WriteOnly)
+        bicimSozluk = self.ver_karakter_bicimi()
+        bold = "font-weight:bold;" if bicimSozluk["b"] else ""
+        italic = "font-style:italic;" if bicimSozluk["i"] else ""
+        underline = "underline" if bicimSozluk["u"] else ""
+        strikeOut = "line-through" if bicimSozluk["s"] else ""
+        overline = "overline" if bicimSozluk["o"] else ""
+        bicimler1 = bold + italic
+        if any((underline, strikeOut, overline)):
+            bicimler2 = f"text-decoration: {underline} {strikeOut} {overline};"
+        else:
+            bicimler2 = ""
 
-        generator = QSvgGenerator()
-        # generator.setFileName("dosya.svg")
-        generator.setOutputDevice(buffer)
-        # generator.setResolution(72)
+        renk_arkaPlan = f"({self.arkaPlanRengi.red()},{self.arkaPlanRengi.green()},{self.arkaPlanRengi.blue()},{self.arkaPlanRengi.alpha() / 255})"
+        renk_yazi = f"({self.yaziRengi.red()},{self.yaziRengi.green()},{self.yaziRengi.blue()},{self.yaziRengi.alpha() / 255})"
 
-        # self.doc.drawContents(painter, self.rect())
+        if self.isPlainText:
+            yazi_str = f'<p style=" background:rgba{renk_arkaPlan}; display: inline-block; color:rgba{renk_yazi}; margin:0; padding:7px;">{self.text()}</p>'
+        else:
+            html = self.toHtml()
+            body_baslangic = html.find("<bo")
+            bas = html.find('">', body_baslangic)
+            son = html.find("</bo")
+            # yazi = self.toHtml()
+            yazi_str = self.toHtml()[bas + 2:son]
 
-        generator.setSize(QSize(w, h))
-        generator.setViewBox(QRectF(-w / 2, -h / 2, w, h))
-        generator.setTitle(self._kim)
-        generator.setDescription("")
-        # painter = QPainter(generator)
-        painter = QPainter()
-        painter.begin(generator)
+        hiza = self.ver_yazi_hizasi()
+        # if hiza == Qt.AlignLeft or hiza == Qt.AlignLeft | Qt.AlignVCenter:
+        #     yazi_hiza = "left"
+        if hiza == Qt.AlignCenter or hiza == Qt.AlignCenter | Qt.AlignVCenter:
+            yazi_hiza = "center"
+        elif hiza == Qt.AlignRight or hiza == Qt.AlignRight | Qt.AlignVCenter:
+            yazi_hiza = "right"
+        elif hiza == Qt.AlignJustify or hiza == Qt.AlignJustify | Qt.AlignVCenter:
+            yazi_hiza = "justify"
+        else:
+            yazi_hiza = "left"
 
-        painter.save()
-        diff = self.scenePos() - rect.center()
-        cizilecekRect = QRectF(self._rect)
-        cizilecekRect.moveTo(diff)
-        painter.translate(diff)
-        painter.rotate(self.rotation())
-        painter.translate(-diff)
-
-        painter.fillRect(cizilecekRect.toRect(), self.brush())
-        painter.restore()
-
-        painter.save()
-
-        painter.translate(diff)
-        painter.rotate(self.rotation())
-        # painter.setFont(self.font())
-        # ~ lay = self.doc.documentLayout(self)
-        ctx = QAbstractTextDocumentLayout.PaintContext()
-        ctx.palette.setColor(QPalette.Text, self.yaziRengi)
-        # ~ self.doc.drawContents(painter)
-        self.doc.documentLayout().draw(painter, ctx)
-        painter.restore()
-        painter.end()
-
-        svg_string = buffer.data().data().decode("utf-8")
-
-        # background: rgba{self.arkaPlanRengi.toTuple()};\n
         div_str = f"""
-                    <div style="
+                    <article style="
+                     
+                     font-size:{self.fontPointSize()}pt; 
+                     font-family:{self.font().family()};
+                     text-align: {yazi_hiza};
+                     {bicimler1}
+                     {bicimler2}
                      position:absolute;
-                     z-index:{int(self.zValue()*10)if self.zValue() else 0};
-                     width:{w}px;
-                     height:{h}px;
+                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
                      top:{y}px;
-                     left:{x}px;" id="{self._kim}">{svg_string}</div>\n
+                     left:{x}px;
+                     width:{w};
+                     height:{h};
+                     transform-box: fill-box;
+                     transform-origin: top left;
+                     transform: rotate({self.rotation()}deg);
+                     
+                     " id="{self._kim}">{yazi_str}</article>\n
             """
-        # return svg_string
+
         return div_str
 
     # ---------------------------------------------------------------------
@@ -284,7 +283,8 @@ class Text(QGraphicsTextItem):
 
         # TODO: bu aslinda boyle degil, url sonda / ile gelmiyor
         # url already comes with a "/" suffix so we use double slash "file://{url}"
-        self.doc.setBaseUrl(QUrl("file://{}/images-html/".format(url)))
+        # self.doc.setBaseUrl(QUrl("file://{}/images-html/".format(url)))
+        self.doc.setBaseUrl(QUrl("file://{}/".format(url)))
         # self.doc.setBaseUrl(QUrl(url))
         # print(self.doc.metaInformation(self.doc.DocumentUrl))
 
@@ -1007,6 +1007,8 @@ class Text(QGraphicsTextItem):
         # s = self.scenePos()
         # painter.drawText(self.rect(),
         #                  "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
+        # painter.setPen(QPen(Qt.green, 12))
+        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
         # # # t = self.transformOriginPoint()
         # # # painter.drawRect(t.x()-12, t.y()-12,24,24)
         # mapped = self.mapToScene(self.rect().topLeft())
