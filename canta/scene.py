@@ -11,7 +11,7 @@ import uuid
 import shutil
 
 from PySide6.QtCore import (Qt, QRectF, QPointF, Slot, Signal, QThread, QLineF, QObject)
-from PySide6.QtGui import (QPixmap, QCursor, QPen, QImage, QUndoStack)
+from PySide6.QtGui import (QPixmap, QCursor, QPen, QImage, QUndoStack, QColor)
 from PySide6.QtWidgets import (QApplication, QGraphicsScene)
 # from sub.items.base import BaseItem
 # TODO: bunu sadece dragEnterEvent kaynagi belirlemek icin kullaniyoruz, bi inceleyelim
@@ -480,7 +480,7 @@ class Scene(QGraphicsScene):
         rect = QRectF(-self.scenePen.widthF() / 2, -self.scenePen.widthF() / 2, self.scenePen.widthF(),
                       self.scenePen.widthF())
         pen = QPen(self.scenePen.color(), 2, Qt.DashLine, Qt.RoundCap, Qt.RoundJoin)
-        self.fircaBoyutuItem = YuvarlakFircaBoyutu(self.fircaSonPos, rect, Qt.transparent,
+        self.fircaBoyutuItem = YuvarlakFircaBoyutu(self.fircaSonPos, rect, QColor.fromRgbF(0, 0, 0, 0),
                                                    # self.scenePen,
                                                    pen)
         self.parent().increase_zvalue(self.fircaBoyutuItem)

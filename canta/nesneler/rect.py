@@ -39,8 +39,8 @@ class Rect(BaseItem):
         y = yr - ys
 
         bicimSozluk = self.ver_karakter_bicimi()
-        bold = 'font-weight="bold"' if bicimSozluk["b"] else ''
-        italic = 'font-style="italic"' if bicimSozluk["i"] else ''
+        bold = 'font-weight="bold" ' if bicimSozluk["b"] else ''
+        italic = ' font-style="italic"' if bicimSozluk["i"] else ''
         underline = "underline" if bicimSozluk["u"] else ''
         strikeOut = "line-through" if bicimSozluk["s"] else ''
         overline = "overline" if bicimSozluk["o"] else ''
@@ -64,11 +64,9 @@ class Rect(BaseItem):
 
         if self.rotation():
             # dondur_str = f'transform="rotate({self.rotation()},{x+w/2},{y+h/2})"'
-            dondur_str_eksi = f"""
-                            transform-box: fill-box;
-                              transform-origin: center;
-                              transform: rotate({-self.rotation()}deg);
-            """
+            dondur_str_eksi = f"""transform-box: fill-box;
+                                  transform-origin: center;
+                                  transform: rotate({-self.rotation()}deg);"""
             # dondur_str = f"""
             # transform-box: fill-box;
             # transform-origin: center;
@@ -83,67 +81,45 @@ class Rect(BaseItem):
         # x="%50" y="%50" dominant-baseline="middle" text-anchor="middle" 
         if self.text():
             yazi_str = f"""
-            <text 
-            style="{dondur_str_eksi}"
-            fill="rgba{self.yaziRengi.toTuple()}" 
-            fill-opacity="{self.yaziRengi.alpha() / 255}" 
+            <text style="{dondur_str_eksi}"
+            fill="rgba{self.yaziRengi.toTuple()}" fill-opacity="{self.yaziRengi.alpha() / 255}" 
             stroke="none" xml:space="preserve" 
-            text-anchor="middle"
-            alignment-baseline="middle"
-            x="{w / 2}"
-            y="{h / 2}"
-            font-family={self.font().family()}
-            font-size="{self.fontPointSize()}pt"
-            {bicimler1}
-            {bicimler2}
-            text-align="{yazi_hiza}"
-             >{self.text()}</text>
+            x="{w / 2}" y="{h / 2}" text-anchor="middle" alignment-baseline="middle"
+            font-family={self.font().family()} font-size="{self.fontPointSize()}pt"
+            {bicimler1} {bicimler2} text-align="{yazi_hiza}">{self.text()}</text>
             """
         else:
             yazi_str = ""
 
         rect_str = f"""
-                  <rect 
-                    style="fill:rgba{self.arkaPlanRengi.toTuple()};
-                    fill-opacity:{self.arkaPlanRengi.alpha() / 255};
-                    stroke:rgba{self.cizgiRengi.toTuple()};
-                    stroke-opacity:{self.cizgiRengi.alpha() / 255};
-                    stroke-width:{self._pen.widthF() * 2 * self.scale()};
-                    stroke-linecap:round;
-                    stroke-dasharray:none;
-                    stroke-linejoin:round;
-                    paint-order:markers fill stroke;"
-                    width="{w}" 
-                    height="{h}"
-                    x="0" 
-                    y="0"
-                    
-                    />
-        
+        <rect width="{w}" height="{h}" x="0" y="0"
+            style="fill:rgba{self.arkaPlanRengi.toTuple()}; 
+                   fill-opacity:{self.arkaPlanRengi.alpha() / 255};
+                   stroke:rgba{self.cizgiRengi.toTuple()};
+                   stroke-opacity:{self.cizgiRengi.alpha() / 255};
+                   stroke-width:{self._pen.widthF() * 2 * self.scale()};
+                   stroke-linecap:round; stroke-dasharray:none; stroke-linejoin:round;
+                   paint-order:markers fill stroke;"/>
         """
 
         svg_str = f"""
         <?xml version="1.0"?>
-            <svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny" 
-             width="{w}" height="{h}" viewBox="0 0 {w} {h}" >
-                {rect_str}
-                {yazi_str}
-              </svg>\n
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny" 
+            width="{w}" height="{h}" viewBox="0 0 {w} {h}" >
+        {rect_str}
+        {yazi_str}
+        </svg>\n
         """
 
         div_str = f"""
-                    <div style="
-                     position:absolute;
-                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
-                     width:{w}px;
-                     height:{h}px;
-                     top:{y}px;
-                     left:{x}px;
-                     transform-box: fill-box;
-                     transform-origin: center;
-                     transform: rotate({self.rotation()}deg);"
-                      id="{self._kim}">{svg_str}</div>\n
-            """
+        <div id="{self._kim}"
+            style="position:absolute;
+                   z-index:{int(self.zValue() * 10) if self.zValue() else 0};
+                   width:{w}px; height:{h}px; top:{y}px; left:{x}px; 
+                   transform-box: fill-box; 
+                   transform-origin: center; 
+                   transform: rotate({self.rotation()}deg);">{svg_str}</div>\n
+        """
         # return svg_str
         return div_str
 

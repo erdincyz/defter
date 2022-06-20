@@ -186,6 +186,7 @@ class LineItem(QGraphicsItem):
                       "zValue": self.zValue(),
                       "pen": self._pen,
                       "font": self._font,
+                      "yaziHiza": int(self.painterTextOption.alignment()),
                       "text": self.text(),
                       "isPinned": self.isPinned,
                       "command": self._command,

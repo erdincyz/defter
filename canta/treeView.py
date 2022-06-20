@@ -297,12 +297,12 @@ class TreeView(QTreeView):
         # self.secimDegisti.emit(self.model().itemFromIndex(QItemSelection),
         #                        self.model().itemFromIndex(QItemSelection_1))
         # TODO: burda niye yukardaki selected kullanamadık?
-        item = self.getSelectedItem()
-        if item:
-            self.secimDegisti.emit(item)
+        sayfa = self.getSelectedItem()
+        if sayfa:
+            self.secimDegisti.emit(sayfa)
             # TODO: performans optimize et, direkt inde mi kullanmak ,veya key pressed ile secilince scroll etmeceç
             # bi de gerek ok ztaen
-            self.scrollTo(self.model().index_sayfadan(item),
+            self.scrollTo(self.model().index_sayfadan(sayfa),
                           self.EnsureVisible)  # PositionAtCenter
 
     # # ---------------------------------------------------------------------
@@ -503,30 +503,30 @@ class TreeView(QTreeView):
                     self._sayfa_bul_ve_sec(s, sayfa)
 
     # ---------------------------------------------------------------------
-    def itemi_sec_ve_current_index_yap(self, item):
+    def itemi_sec_ve_current_index_yap(self, sayfa):
 
         # TODO: bu alttaki methodlarda cok biribiri arası zıplama var
         # optimize edemez miyiz acaba.. İnş. sonra tabi. ..
 
-        # print("item", item)
-        self.model().enSonAktifSayfa = item
-        idx = self.model().index_sayfadan(item)
+        # print("sayfa", sayfa)
+        self.model().enSonAktifSayfa = sayfa
+        idx = self.model().index_sayfadan(sayfa)
         # self.setCurrentIndex(idx) # bu ayni isi yapiyor alt iki satirin.
         self.selectionModel().select(idx, self.selectionModel().ClearAndSelect)
         self.selectionModel().setCurrentIndex(idx, QItemSelectionModel.ClearAndSelect)
-        self.scrollTo(self.model().index_sayfadan(item), self.EnsureVisible)  # PositionAtCenter
+        self.scrollTo(self.model().index_sayfadan(sayfa), self.EnsureVisible)  # PositionAtCenter
 
         # print(self.model().enSonAktifSayfa.adi)
 
     # ---------------------------------------------------------------------
-    def current_index_yap(self, item):
-        # self.setCurrentIndex(self.model().indexFromItem(item))
-        idx = self.model().index_sayfadan(item)
+    def current_index_yap(self, sayfa):
+        # self.setCurrentIndex(self.model().indexFromItem(sayfa))
+        idx = self.model().index_sayfadan(sayfa)
         self.selectionModel().setCurrentIndex(idx, QItemSelectionModel.ClearAndSelect)
 
     # ---------------------------------------------------------------------
-    def itemi_secme(self, item):
-        self.selectionModel().select(self.model().sayfada_index(item),
+    def itemi_secme(self, sayfa):
+        self.selectionModel().select(self.model().sayfada_index(sayfa),
                                      self.selectionModel().Deselect)
 
     # ---------------------------------------------------------------------
@@ -544,7 +544,7 @@ class TreeView(QTreeView):
         # bi standartlastiralim bunu.
         if self.selectedIndexes():
             sayfa = self.model().sayfa_indexten(self.selectedIndexes()[0])
-            # print(item, "burda")
+            # print(sayfa, "burda")
             return sayfa
 
         # else:
@@ -554,15 +554,15 @@ class TreeView(QTreeView):
 
     # ------------------------------------------------------------------------------
     def getCurrentItem(self):
-        item = self.model().sayfa_indexten(self.currentIndex())
-        return item
+        sayfa = self.model().sayfa_indexten(self.currentIndex())
+        return sayfa
 
     # ------------------------------------------------------------------------------
     def getSelectedItemsParentItem(self):
-        item = self.getSelectedItem()
-        if item:
-            if item.parent():
-                return item.parent()
+        sayfa = self.getSelectedItem()
+        if sayfa:
+            if sayfa.parent():
+                return sayfa.parent()
 
         return self.model().kokSayfa
         # return None

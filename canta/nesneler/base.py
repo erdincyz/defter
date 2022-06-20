@@ -53,8 +53,8 @@ class BaseItem(QGraphicsItem):
         self.boundingRectTasmaDegeri = max(self.handleSize, self._pen.widthF() / 2)
 
         self.painterTextOption = QTextOption()
-        self.painterTextOption.setAlignment(Qt.AlignCenter)
         self.painterTextOption.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
+        self.painterTextOption.setAlignment(Qt.AlignCenter)
 
         self.painterTextScale = 1
         self.painterTextRect = QRectF(self._rect)
@@ -155,31 +155,36 @@ class BaseItem(QGraphicsItem):
     def sceneRight(self):
         # 4 koseyi de dikkate aliyoruz, mesela sadece sagdakileri degil,
         # cunku nesneyi saga veya sola dogru cizebiliyoruz. Ya da saga veya sola dogru boyutunu degistirebiliyoruz.
-        return max(self.mapToScene(self.rect().topLeft()).x(),
-                   self.mapToScene(self.rect().topRight()).x(),
-                   self.mapToScene(self.rect().bottomRight()).x(),
-                   self.mapToScene(self.rect().bottomLeft()).x())
+
+        r = self.mapRectToScene(self.rect())
+        return max(r.topLeft().x(),
+                   r.topRight().x(),
+                   r.bottomRight().x(),
+                   r.bottomLeft().x())
 
     # ---------------------------------------------------------------------
     def sceneLeft(self):
-        return min(self.mapToScene(self.rect().topLeft()).x(),
-                   self.mapToScene(self.rect().topRight()).x(),
-                   self.mapToScene(self.rect().bottomRight()).x(),
-                   self.mapToScene(self.rect().bottomLeft()).x())
+        r = self.mapRectToScene(self.rect())
+        return min(r.topLeft().x(),
+                   r.topRight().x(),
+                   r.bottomRight().x(),
+                   r.bottomLeft().x())
 
     # ---------------------------------------------------------------------
     def sceneTop(self):
-        return min(self.mapToScene(self.rect().topLeft()).y(),
-                   self.mapToScene(self.rect().topRight()).y(),
-                   self.mapToScene(self.rect().bottomRight()).y(),
-                   self.mapToScene(self.rect().bottomLeft()).y())
+        r = self.mapRectToScene(self.rect())
+        return min(r.topLeft().y(),
+                   r.topRight().y(),
+                   r.bottomRight().y(),
+                   r.bottomLeft().y())
 
     # ---------------------------------------------------------------------
     def sceneBottom(self):
-        return max(self.mapToScene(self.rect().topLeft()).y(),
-                   self.mapToScene(self.rect().topRight()).y(),
-                   self.mapToScene(self.rect().bottomRight()).y(),
-                   self.mapToScene(self.rect().bottomLeft()).y())
+        r = self.mapRectToScene(self.rect())
+        return max(r.topLeft().y(),
+                   r.topRight().y(),
+                   r.bottomRight().y(),
+                   r.bottomLeft().y())
 
     # ---------------------------------------------------------------------
     def setSceneLeft(self, left):
@@ -288,6 +293,7 @@ class BaseItem(QGraphicsItem):
                       "arkaPlanRengi": self.arkaPlanRengi,
                       "pen": self._pen,
                       "font": self._font,
+                      "yaziHiza": int(self.painterTextOption.alignment()),
                       "text": self.text(),
                       "isPinned": self.isPinned,
                       "command": self._command,
@@ -673,8 +679,8 @@ class BaseItem(QGraphicsItem):
             # painter.setWorldMatrixEnabled(False)
             painter.save()
             painter.setFont(self._font)
-            painter.setPen(
-                self.textPen)  # we recreate textPen from same exact color. otherwise, color's alpha not working.
+            # we recreate textPen from same exact color. otherwise, color's alpha not working.
+            painter.setPen(self.textPen)
             painter.translate(self._rect.center())
             painter.rotate(-self.rotation())
 

@@ -2559,6 +2559,8 @@ class DefterAnaPencere(QMainWindow):
             # TODO: renkler bir sekilde sistem rengine donuyor.
             lineItem.setRotation(itemDict["rotation"])
             lineItem.setText(itemDict.get("text", ""))
+            if itemDict.get("yaziHiza", None):
+                lineItem.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
             lineItem.setScale(itemDict["scale"])
             lineItem.setZValue(itemDict["zValue"])
             lineItem.isPinned = itemDict["isPinned"]
@@ -2583,6 +2585,8 @@ class DefterAnaPencere(QMainWindow):
             rectItem.setScale(itemDict["scale"])
             rectItem.setZValue(itemDict["zValue"])
             rectItem.isPinned = itemDict["isPinned"]
+            if itemDict.get("yaziHiza", None):
+                rectItem.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
             rectItem._text = itemDict["text"]
             rectItem._command = itemDict["command"]
 
@@ -2605,6 +2609,8 @@ class DefterAnaPencere(QMainWindow):
             ellipseItem.setScale(itemDict["scale"])
             ellipseItem.setZValue(itemDict["zValue"])
             ellipseItem.isPinned = itemDict["isPinned"]
+            if itemDict.get("yaziHiza", None):
+                ellipseItem.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
             ellipseItem._text = itemDict["text"]
             ellipseItem._command = itemDict["command"]
 
@@ -2625,6 +2631,8 @@ class DefterAnaPencere(QMainWindow):
                               closePath=itemDict.get("isPathClosed", True))
             pathItem.setRotation(itemDict["rotation"])
             pathItem.setText(itemDict["text"])
+            if itemDict.get("yaziHiza", None):
+                pathItem.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
             pathItem.setScale(itemDict["scale"])
             pathItem.setZValue(itemDict["zValue"])
             pathItem.isPinned = itemDict["isPinned"]
@@ -2670,6 +2678,8 @@ class DefterAnaPencere(QMainWindow):
             imageItem.isPinned = itemDict["isPinned"]
             imageItem.isMirrorX = itemDict["isMirrorX"]
             imageItem.isMirrorY = itemDict["isMirrorY"]
+            if itemDict.get("yaziHiza", None):
+                imageItem.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
             imageItem._text = itemDict["text"]
             imageItem._command = itemDict["command"]
             # imageItem.reload_image_after_scale()
@@ -2694,6 +2704,10 @@ class DefterAnaPencere(QMainWindow):
             else:
                 textItem.setHtml(itemDict["html"])
                 textItem.isPlainText = False
+            if itemDict.get("yaziHiza", None):
+                option = textItem.doc.defaultTextOption()
+                option.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
+                textItem.doc.setDefaultTextOption(option)
             textItem.textItemFocusedOut.connect(lambda: self.cScene.is_text_item_empty(textItem))
             textItem.setPos(itemDict["pos"])
             textItem.setRotation(itemDict["rotation"])
@@ -2766,7 +2780,10 @@ class DefterAnaPencere(QMainWindow):
             videoItem.isPinned = itemDict["isPinned"]
             # videoItem.isMirrorX = itemDict["isMirrorX"]
             # videoItem.isMirrorY = itemDict["isMirrorY"]
-            videoItem._text = itemDict["text"]
+            if itemDict.get("yaziHiza", None):
+                videoItem.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
+            # videoItem._text = itemDict["text"]
+            videoItem.eskiYazi = itemDict["text"]
             videoItem._command = itemDict["command"]
             # videoItem.reload_image_after_scale()
 
@@ -2808,6 +2825,8 @@ class DefterAnaPencere(QMainWindow):
             dosyaNesnesi.isPinned = itemDict["isPinned"]
             # dosyaNesnesi.isMirrorX = itemDict["isMirrorX"]
             # dosyaNesnesi.isMirrorY = itemDict["isMirrorY"]
+            if itemDict.get("yaziHiza", None):
+                dosyaNesnesi.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
             dosyaNesnesi._text = itemDict["text"]
             dosyaNesnesi._command = itemDict["command"]
             # dosyaNesnesi.reload_image_after_scale()
@@ -5809,7 +5828,7 @@ class DefterAnaPencere(QMainWindow):
 
         item = VideoItem(dosyaYolu, pos, QRectF(0, 0, 320, 240),
                          self.yaziRengi,
-                         QColor(0, 0, 0, 0),
+                         QColor.fromRgbF(0, 0, 0, 0),
                          self._pen,
                          self.font())
         self.increase_zvalue(item)

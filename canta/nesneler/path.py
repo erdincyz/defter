@@ -86,8 +86,8 @@ class PathItem(QGraphicsItem):
         self.textPadding = 20
 
         self.painterTextOption = QTextOption()
-        self.painterTextOption.setAlignment(Qt.AlignCenter)
         self.painterTextOption.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
+        self.painterTextOption.setAlignment(Qt.AlignCenter)
 
         self.painterTextScale = 1
         self.painterTextRect = QRectF(self.boundingRect())
@@ -242,6 +242,7 @@ class PathItem(QGraphicsItem):
                       "font": self._font,
                       "yaziRengi": self.yaziRengi,
                       "arkaPlanRengi": self.arkaPlanRengi,
+                      "yaziHiza": int(self.painterTextOption.alignment()),
                       "text": self.text(),
                       "isPinned": self.isPinned,
                       "command": self._command,

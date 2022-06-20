@@ -147,6 +147,7 @@ class DosyaNesnesi(BaseItem):
                       "pen": self._pen,
                       "font": self._font,
                       # "imageOpacity": self.imageOpacity,
+                      "yaziHiza": int(self.painterTextOption.alignment()),
                       "text": self.text(),
                       "isPinned": self.isPinned,
                       "command": self._command,
@@ -244,48 +245,19 @@ class DosyaNesnesi(BaseItem):
         # painter.drawPixmap(0,0,self.ikonBoyutu.width(), self.ikonBoyutu.height(), self.ikon.pixmap(self.ikonBoyutu))
 
         # painter.setWorldMatrixEnabled(False)
+
+        painter.setBrush(self.renk_yazi_alti_kutusu)
+        painter.setPen(Qt.NoPen)
+        painter.drawRect(self._rect.toRect())
+
         painter.save()
         # we recreate textPen from same exact color. otherwise, color's alpha not working.
         painter.setPen(self.textPen)
         painter.translate(self._rect.center())
         painter.rotate(-self.rotation())
-
         painter.scale(self.painterTextScale, self.painterTextScale)
         painter.translate(-self._rect.center())
-
-        # ---------------------------------------------------------------------
-        # --  basla --  elided text cizmek icin --
-        # ---------------------------------------------------------------------
-        # metrics = painter.fontMetrics()
-        # txt = metrics.elidedText(self._text, Qt.ElideRight, self._rect.width() / scale)
-        # # Qt.AlignCenter hem AlignVCenter hem de AlignHCenter icin yeterli
-        # # ayrica en fazla iki tane kullanilabiliyormus, ve AlignCenter 2 tane sayiliyormus.
-        # # painter.drawText(self._rect, Qt.AlignCenter | Qt.AlignVCenter, txt)
-        # painter.drawText(self._rect, Qt.AlignCenter, txt)
-        # ---------------------------------------------------------------------
-        # ---  bitir --- elided text cizmek icin --
-        # ---------------------------------------------------------------------
-
-        # painter.drawRect(r)
-        # painter.drawText(self._rect, self._text, self.painterTextOption)
-        # painter.drawText(self.painterTextRect, self._text, self.painterTextOption)
-
-        painter.save()
-        painter.setBrush(self.renk_yazi_alti_kutusu)
-        painter.setPen(Qt.NoPen)
-
-        # metrics = painter.fontMetrics()
-        # r = QRectF(metrics.boundingRect(self._rect.toRect(), Qt.TextWrapAnywhere, self._text))
-        # r.moveCenter(self._rect.center())
-        # # draw text background rect
-        # painter.drawRect(r.intersected(self._rect))
-
-        painter.drawRect(self._rect.toRect())
-        painter.restore()
-
         painter.drawText(self.painterTextRect, self.filePathForSave, self.painterTextOption)
-
-        # painter.drawText(10,10, txt)
         painter.restore()
         # painter.setWorldMatrixEnabled(True)
 

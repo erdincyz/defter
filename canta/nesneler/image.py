@@ -179,6 +179,7 @@ class Image(BaseItem):
                       "pen": self._pen,
                       "font": self._font,
                       "imageOpacity": self.imageOpacity,
+                      "yaziHiza": int(self.painterTextOption.alignment()),
                       "text": self.text(),
                       "isPinned": self.isPinned,
                       "isMirrorX": self.isMirrorX,

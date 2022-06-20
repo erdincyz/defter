@@ -71,6 +71,7 @@ class VideoItem(BaseItem):
 
         # url = QUrl("http://")
         if os.path.exists(filePath):
+            self.eskiYazi = self.text()
             self.setText("Loading...")
             url = QUrl.fromLocalFile(filePath)
             # media = QMediaContent(url)
@@ -154,7 +155,8 @@ class VideoItem(BaseItem):
                 if not self.isEmbeded:  # embed ise zaten tmp klasorden hedef klasore baska metodta kopylanıyor hepsi.
                     video_adres = os.path.join(html_klasor_kayit_adres, "videos", video_adi)
 
-        # video_str = f'<video src="{self.filePathForSave}" width:{self.videoItem.size().width()}; height{self.videoItem.size().height()}"></video>'
+        # video_str = f'<video src="{self.filePathForSave}" width:{self.videoItem.size().width()};' \
+        #             f' height{self.videoItem.size().height()}"></video>'
         video_str = f'<video style="width:100%; height:100%;" controls> <source src="{video_adres}"></video>'
 
         # rect = self.sceneBoundingRect()
@@ -241,6 +243,7 @@ class VideoItem(BaseItem):
                       "pen": self._pen,
                       "font": self._font,
                       # "imageOpacity": self.imageOpacity,
+                      "yaziHiza": int(self.painterTextOption.alignment()),
                       "text": self.text(),
                       "isPinned": self.isPinned,
                       "command": self._command,
@@ -314,7 +317,7 @@ class VideoItem(BaseItem):
 
     # ---------------------------------------------------------------------
     def act_video_changed(self, video_hazir_mi):
-        self.setText("")
+        self.setText(self.eskiYazi)
         self.video_hazir_mi = video_hazir_mi
         # self.player.play()
 
@@ -663,7 +666,7 @@ class VideoItem(BaseItem):
             if self.isAudioSliderHovered:
                 painter.setOpacity(1)
             painter.drawEllipse(self.audioSliderEllipseRect)
-            
+
         # # # # # # debug start - pos() # # # # #
         # p = self.pos()
         # s = self.scenePos()

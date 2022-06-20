@@ -202,6 +202,7 @@ class Text(QGraphicsTextItem):
                       "yaziRengi": self.yaziRengi,
                       "arkaPlanRengi": self.arkaPlanRengi,
                       "isPlainText": self.isPlainText,
+                      "yaziHiza": int(self.doc.defaultTextOption().alignment()),
                       "isPinned": self.isPinned,
                       "command": self._command,
                       }
@@ -378,23 +379,23 @@ class Text(QGraphicsTextItem):
 
     # ---------------------------------------------------------------------
     def sceneRight(self):
-        return max(self.mapToScene(self.boundingRect().topRight()).x(),
-                   self.mapToScene(self.boundingRect().bottomRight()).x())
+        return max(self.sceneBoundingRect().topRight().x(),
+                   self.sceneBoundingRect().bottomRight().x())
 
     # ---------------------------------------------------------------------
     def sceneLeft(self):
-        return min(self.mapToScene(self.boundingRect().topLeft()).x(),
-                   self.mapToScene(self.boundingRect().bottomLeft()).x())
+        return min(self.sceneBoundingRect().topLeft().x(),
+                   self.sceneBoundingRect().bottomLeft().x())
 
     # ---------------------------------------------------------------------
     def sceneTop(self):
-        return min(self.mapToScene(self.boundingRect().topLeft()).y(),
-                   self.mapToScene(self.boundingRect().topRight()).y())
+        return min(self.sceneBoundingRect().topLeft().y(),
+                   self.sceneBoundingRect().topRight().y())
 
     # ---------------------------------------------------------------------
     def sceneBottom(self):
-        return max(self.mapToScene(self.boundingRect().bottomRight()).y(),
-                   self.mapToScene(self.boundingRect().bottomLeft()).y())
+        return max(self.sceneBoundingRect().bottomRight().y(),
+                   self.sceneBoundingRect().bottomLeft().y())
 
     # ---------------------------------------------------------------------
     def setSceneLeft(self, left):
