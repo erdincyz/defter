@@ -5,7 +5,6 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '20/12/21'
 
-import uuid
 from PySide6.QtGui import (QBrush, QPainterPath, QPainterPathStroker)
 from PySide6.QtWidgets import (QGraphicsItem)
 from PySide6.QtCore import (QRectF, Qt)
@@ -20,7 +19,7 @@ class YuvarlakFircaBoyutu(QGraphicsItem):
     def __init__(self, pos, rect, arkaPlanRengi, pen, parent=None):
         super(YuvarlakFircaBoyutu, self).__init__(parent)
 
-        self._kim = uuid.uuid4().hex
+        self._kim = shared.kim(kac_basamak=16)
 
         self.setPos(pos)
         self._rect = rect

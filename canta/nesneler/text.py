@@ -6,7 +6,6 @@ __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
 # from math import fabs
-import uuid
 from PySide6.QtCore import Qt, Signal, QSizeF, QRectF, QPointF, Slot, QUrl
 from PySide6.QtGui import QBrush, QPen, QColor, QPainterPath
 from PySide6.QtWidgets import QGraphicsTextItem, QStyle
@@ -26,7 +25,7 @@ class Text(QGraphicsTextItem):
     def __init__(self, cursorPos, yaziRengi, arkaPlanRengi, pen, font, rect=None, text=None, parent=None):
         super(Text, self).__init__(text, parent)
 
-        self._kim = uuid.uuid4().hex
+        self._kim = shared.kim(kac_basamak=16)
 
         self.setAcceptHoverEvents(True)
 

@@ -5,7 +5,6 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
-import uuid
 from PySide6.QtCore import Qt, QRectF, QRect, QSizeF, QSize, QPointF, Slot, QBuffer, QIODevice
 from PySide6.QtGui import QPainterPath, QPainterPathStroker, QPen, QBrush, QColor, QTransform, QTextOption, QPainter
 from PySide6.QtSvg import QSvgGenerator
@@ -21,7 +20,7 @@ class PathItem(QGraphicsItem):
     def __init__(self, pos, yaziRengi, arkaPlanRengi, pen, font, path=None, parent=None):
         super(PathItem, self).__init__(parent)
 
-        self._kim = uuid.uuid4().hex
+        self._kim = shared.kim(kac_basamak=16)
 
         self.setPos(pos)
 

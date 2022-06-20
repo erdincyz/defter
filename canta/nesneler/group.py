@@ -5,7 +5,6 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
-import uuid
 from PySide6.QtCore import (Qt, QRectF, QPointF)
 from PySide6.QtGui import (QColor, QPen)
 from PySide6.QtWidgets import (QStyle, QGraphicsItem)
@@ -19,7 +18,7 @@ class Group(QGraphicsItem):
     def __init__(self, arkaPlanRengi=QColor(Qt.transparent), pen=QPen(Qt.DotLine), parent=None):
         super(Group, self).__init__(parent)
 
-        self._kim = uuid.uuid4().hex
+        self._kim = shared.kim(kac_basamak=16)
 
         self._itemsBoundingRect = QRectF()
 

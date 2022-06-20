@@ -6,6 +6,7 @@ __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
 import os
+from uuid import uuid4
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
@@ -42,6 +43,12 @@ KUTUPHANE_NESNESI = userType + 12
 LINE_ITEM_TYPE = userType + 13
 DOSYA_ITEM_TYPE = userType + 14
 YUVARLAK_FIRCA_BOYUTU_ITEM_TYPE = userType + 15
+
+
+# ---------------------------------------------------------------------
+def kim(kac_basamak):
+    # veya str(uuid.uuid4())[:5] yerine uuid.uuid4().hex[:5]
+    return uuid4().hex[:kac_basamak]
 
 
 # ---------------------------------------------------------------------

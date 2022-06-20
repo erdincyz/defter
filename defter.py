@@ -8,7 +8,6 @@ __license__ = 'GPLv3'
 
 import sys
 import os
-import uuid
 import subprocess
 import locale
 import operator
@@ -2567,7 +2566,7 @@ class DefterAnaPencere(QMainWindow):
             lineItem._command = itemDict["command"]
 
             if isPaste:
-                lineItem._kim = uuid.uuid4().hex
+                lineItem._kim = shared.kim(kac_basamak=16)
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, lineItem)
             else:
                 lineItem._kim = itemDict.get("kim")
@@ -2591,7 +2590,7 @@ class DefterAnaPencere(QMainWindow):
             rectItem._command = itemDict["command"]
 
             if isPaste:
-                rectItem._kim = uuid.uuid4().hex
+                rectItem._kim = shared.kim(kac_basamak=16)
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, rectItem)
                 # rectItem.setPos(QPointF(itemDict["pos"]))
             else:
@@ -2615,7 +2614,7 @@ class DefterAnaPencere(QMainWindow):
             ellipseItem._command = itemDict["command"]
 
             if isPaste:
-                ellipseItem._kim = uuid.uuid4().hex
+                ellipseItem._kim = shared.kim(kac_basamak=16)
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, ellipseItem)
             else:
                 ellipseItem._kim = itemDict.get("kim")
@@ -2639,7 +2638,7 @@ class DefterAnaPencere(QMainWindow):
             pathItem._command = itemDict["command"]
 
             if isPaste:
-                pathItem._kim = uuid.uuid4().hex
+                pathItem._kim = shared.kim(kac_basamak=16)
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, pathItem)
             else:
                 pathItem._kim = itemDict.get("kim")
@@ -2685,7 +2684,7 @@ class DefterAnaPencere(QMainWindow):
             # imageItem.reload_image_after_scale()
 
             if isPaste:
-                imageItem._kim = uuid.uuid4().hex
+                imageItem._kim = shared.kim(kac_basamak=16)
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, imageItem)
             else:
                 imageItem._kim = itemDict.get("kim")
@@ -2717,7 +2716,7 @@ class DefterAnaPencere(QMainWindow):
             textItem._command = itemDict["command"]
 
             if isPaste:
-                textItem._kim = uuid.uuid4().hex
+                textItem._kim = shared.kim(kac_basamak=16)
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, textItem)
             else:
                 textItem._kim = itemDict.get("kim")
@@ -2746,7 +2745,7 @@ class DefterAnaPencere(QMainWindow):
             groupItem.isPinned = itemDict["isPinned"]
 
             if isPaste:
-                groupItem._kim = uuid.uuid4().hex
+                groupItem._kim = shared.kim(kac_basamak=16)
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, groupItem)
             else:
                 groupItem._kim = itemDict.get("kim")
@@ -2788,7 +2787,7 @@ class DefterAnaPencere(QMainWindow):
             # videoItem.reload_image_after_scale()
 
             if isPaste:
-                videoItem._kim = uuid.uuid4().hex
+                videoItem._kim = shared.kim(kac_basamak=16)
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, videoItem)
             else:
                 videoItem._kim = itemDict.get("kim")
@@ -2832,7 +2831,7 @@ class DefterAnaPencere(QMainWindow):
             # dosyaNesnesi.reload_image_after_scale()
 
             if isPaste:
-                dosyaNesnesi._kim = uuid.uuid4().hex
+                dosyaNesnesi._kim = shared.kim(kac_basamak=16)
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_paste", self.cScene, dosyaNesnesi)
             else:
                 dosyaNesnesi._kim = itemDict.get("kim")
@@ -9335,7 +9334,7 @@ class DefterAnaPencere(QMainWindow):
             nav_html = f"""
              <nav>
                 {self._nav_sayfa_linkleri}
-            </nav>\n
+            </nav>
             """
             margin_left = "margin-left:100px;"
 
@@ -9370,39 +9369,36 @@ class DefterAnaPencere(QMainWindow):
         html = f"""
         <html>
         <head>\n
-            <title>{self.cModel.fileName} - {sayfa_adi}</title>\n
-            <style>\n
-                body {{\n
-                background: {arkaplan_renk};\n
+            <title>{self.cModel.fileName} - {sayfa_adi}</title>
+            <style>
+                body {{
+                background: {arkaplan_renk};
                 margin:0;
                 padding:0;
-                    }}\n
-                div {{\n
-                    display: flex;\n
-                    flex-wrap: wrap;\n
-                    justify-content: center;\n
-                    align-items: center;\n}}
-                    
-                    {nav_style}\n
-    
+                    }}
+                div {{
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    align-items: center;}}
+                    {nav_style}
                 main{{
                 position:absolute;
-                
                     display:block;
-                    background: {arkaplan_renk};\n
+                    background: {arkaplan_renk};
                     {arkaplan_resim}
                     background-repeat:no-repeat;
                     background-position: center center;
-                    width:{sayfa.scene.sceneRect().width()};\n
-                    height:{sayfa.scene.sceneRect().height()};\n
-                    {margin_left}\n
+                    width:{sayfa.scene.sceneRect().width()};
+                    height:{sayfa.scene.sceneRect().height()};
+                    {margin_left}
                 }}
-            </style>\n
-        </head>\n
-        <body>\n
-            {nav_html}\n
-            <main>{icerik_div}</main>\n
-        </body>\n
+            </style>
+        </head>
+        <body>
+            {nav_html}
+            <main>{icerik_div}</main>
+        </body>
         </html>
         """
 
@@ -9508,7 +9504,7 @@ class DefterAnaPencere(QMainWindow):
             # !! deprecated distutils.dir_util.copy_tree - python3.10
             # !! distutils.dir_util.copy_tree(self.cModel.tempDirPath, tempDirPath)
             # once acik sahne temp klasorunu tamamen kopyaliyoruz yeni bir temp klasore
-            #TODO: dirs_exist_ok python 3.8 gerektiriyor.
+            # TODO: dirs_exist_ok python 3.8 gerektiriyor.
             # shutil.copytree(self.cModel.tempDirPath, hedef_klasor, dirs_exist_ok=True)
             images_klasoru = os.path.join(self.cModel.tempDirPath, "images")
             if os.path.exists(images_klasoru):

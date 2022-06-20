@@ -5,7 +5,6 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
-import uuid
 from PySide6.QtGui import QPen
 from PySide6.QtWidgets import QGraphicsLineItem, QGraphicsTextItem
 from PySide6.QtCore import Qt
@@ -21,7 +20,7 @@ class MirrorLine(QGraphicsLineItem):
         super(MirrorLine, self).__init__(parent)
 
         # self.setFlag(QGraphicsLineItem.ItemIgnoresTransformations, True)
-        self._kim = uuid.uuid4().hex
+        self._kim = shared.kim(kac_basamak=16)
         pen = QPen(Qt.blue, 1, Qt.DashDotDotLine)
         self.setPen(pen)
         self.setZValue(10000)

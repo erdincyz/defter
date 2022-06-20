@@ -7,7 +7,6 @@ __author__ = 'Erdinç Yılmaz'
 __date__ = '3/27/16'
 
 import os
-import uuid
 import shutil
 
 from PySide6.QtCore import (Qt, QRectF, QPointF, Slot, Signal, QThread, QLineF, QObject)
@@ -16,6 +15,7 @@ from PySide6.QtWidgets import (QApplication, QGraphicsScene)
 # from sub.items.base import BaseItem
 # TODO: bunu sadece dragEnterEvent kaynagi belirlemek icin kullaniyoruz, bi inceleyelim
 from canta.nesneler.yuvarlakFircaBoyutu import YuvarlakFircaBoyutu
+from canta.shared import kim
 from canta.treeView import TreeView
 from canta.selectionQueue import SelectionQueue
 from canta.nesneler.image import Image
@@ -277,10 +277,9 @@ class Scene(QGraphicsScene):
             os.makedirs(imageDirectory)
         self.parent().cModel.embededImageCounter += 1
         # return os.path.join(imageFolder, "{}.jpg".format(self.embededImageCounter))
-        # veya str(uuid.uuid4())[:5] yerine uuid.uuid4().hex[:5]
         return os.path.join(imageDirectory,
                             "defterHtml-{}-{}-{}".format(self.parent().cModel.embededImageCounter,
-                                                              str(uuid.uuid4())[:5],
+                                                              kim(kac_basamak=5),
                                                               baseName))
 
     # ---------------------------------------------------------------------

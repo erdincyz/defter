@@ -6,7 +6,6 @@ __author__ = 'Erdinç Yılmaz'
 __date__ = '5/11/16'
 
 # from math import fabs
-import uuid
 from PySide6.QtGui import QTextOption
 from PySide6.QtCore import Qt, Signal, QPointF
 from PySide6.QtWidgets import QGraphicsTextItem
@@ -26,7 +25,7 @@ class TempTextItem(QGraphicsTextItem):
     def __init__(self, width, font, color, text=None, parent=None):
         super(TempTextItem, self).__init__(text, parent)
 
-        self._kim = uuid.uuid4().hex
+        self._kim = shared.kim(kac_basamak=16)
         self.setFlags(self.ItemIsFocusable)
 
         self.setTextInteractionFlags(Qt.TextEditorInteraction)

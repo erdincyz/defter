@@ -6,7 +6,6 @@ __date__ = '02/Nov/2018'
 __author__ = 'Erdinç Yılmaz'
 
 import math
-import uuid
 from PySide6.QtCore import Qt, QRectF, QSizeF, QPointF, QLineF, QBuffer, QIODevice, QSize
 from PySide6.QtGui import QPainterPath, QPainterPathStroker, QPen, QColor, QTransform, QPolygonF, QTextOption, QBrush, \
     QPainter
@@ -23,7 +22,7 @@ class LineItem(QGraphicsItem):
     def __init__(self, pos, pen, yaziRengi=None, font=None, line=None, parent=None):
         super(LineItem, self).__init__(parent)
 
-        self._kim = uuid.uuid4().hex
+        self._kim = shared.kim(kac_basamak=16)
 
         self.setAcceptHoverEvents(True)
 

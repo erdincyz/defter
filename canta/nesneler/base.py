@@ -5,7 +5,6 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
-import uuid
 from PySide6.QtGui import (QPen, QBrush, QPainterPath, QPainterPathStroker, QColor, QTextOption)
 from PySide6.QtWidgets import (QGraphicsItem, QStyle)
 from PySide6.QtCore import (QRectF, Qt, QSizeF, QPointF, Slot)
@@ -22,7 +21,7 @@ class BaseItem(QGraphicsItem):
         super(BaseItem, self).__init__(parent)
         # QGraphicsItem.__init__(self, parent,scene)
 
-        self._kim = uuid.uuid4().hex
+        self._kim = shared.kim(kac_basamak=16)
 
         self.setPos(pos)
         self._rect = rect
