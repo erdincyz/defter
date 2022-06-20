@@ -2017,19 +2017,18 @@ class DefterAnaPencere(QMainWindow):
         # print("data changed on clipboard")
         # self.actionPaste.setEnabled(True)
         mimeData = self.clipboard.mimeData()
-        if mimeData.hasText() or mimeData.hasHtml():
-            self.actionPasteAsPlainText.setEnabled(True)
+        if any((mimeData.hasText(), mimeData.hasHtml(), mimeData.hasImage(), mimeData.data('scene/items'))):
             self.actionPaste.setEnabled(True)
         else:
+            self.actionPaste.setEnabled(False)
+
+        if mimeData.hasText() or mimeData.hasHtml():
+            self.actionPasteAsPlainText.setEnabled(True)
+        else:
             self.actionPasteAsPlainText.setEnabled(False)
-            self.actionPaste.setEnabled(True)
         # if mimeData.data('scene/items') or mimeData.hasText() or mimeData.hasHtml or mimeData.hasImage():
         # program kapanip acilinca, mimeData.data('scene/items') --> b'' donduruyor. ve None olmuyor boylece,
         # dolayisiyla gerek yok, demek tutmuyor item bilgisini program kapaninca.
-        if mimeData.hasImage():
-            self.actionPaste.setEnabled(True)
-        else:
-            self.actionPaste.setEnabled(True)
 
     # ---------------------------------------------------------------------
     def create_tab(self, tempDirPath=None):
@@ -4470,7 +4469,6 @@ class DefterAnaPencere(QMainWindow):
         else:
             self.actionEmbedBackgroundImage.setVisible(False)
 
-
         menu.addActions((self.actionPaste,
                          self.actionPasteAsPlainText,
                          menu.addSeparator(),
@@ -5455,7 +5453,7 @@ class DefterAnaPencere(QMainWindow):
         # print(self.cScene.selectedItems())
 
         if self.cScene.selectedItems():
-            self.actionCut.setEnabled(True)
+            # self.actionCut.setEnabled(True)
             self.actionCopy.setEnabled(True)
             self.actionBringToFront.setEnabled(True)
             self.actionSendToBack.setEnabled(True)
@@ -5486,7 +5484,7 @@ class DefterAnaPencere(QMainWindow):
 
         else:
             # self.cScene.activeItem = None
-            self.actionCut.setEnabled(False)
+            # self.actionCut.setEnabled(False)
             self.actionCopy.setEnabled(False)
             self.actionGroupItems.setEnabled(False)
             self.actionUnGroupItems.setEnabled(False)
@@ -6133,11 +6131,13 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_paste_as_plain_text(self):
+        mimeData = self.clipboard.mimeData()
+        if not mimeData.hasText() or not mimeData.hasHtml():
+            return
         self.lutfen_bekleyin_goster()
-
         textItem = Text(self.get_mouse_scene_pos(), self.yaziRengi, self.arkaPlanRengi, self._pen, self.currentFont)
         textItem.set_document_url(self.cScene.tempDirPath)
-        mimeData = self.clipboard.mimeData()
+
         if mimeData.hasText():
             textItem.setPlainText(mimeData.text())
             textItem.textItemFocusedOut.connect(lambda: self.cScene.is_text_item_empty(textItem))
@@ -6261,6 +6261,7 @@ class DefterAnaPencere(QMainWindow):
                 # return
 
             else:
+                self.lutfen_bekleyin_gizle()
                 return
 
         stream = QDataStream(itemData, QIODevice.ReadOnly)
