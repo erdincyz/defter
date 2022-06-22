@@ -2271,7 +2271,7 @@ class DefterAnaPencere(QMainWindow):
             if itemDict["type"] == Image.Type and itemDict["isEmbeded"]:
                 yeniBaseName = "{}_{}".format(prefix, os.path.basename(itemDict["filePath"]))
                 itemDict["filePath"] = os.path.join(os.path.dirname(itemDict["filePath"]), yeniBaseName)
-            elif itemDict["type"] == Group.Type:
+            elif itemDict["type"] == shared.GROUP_ITEM_TYPE:
                 self.rec_modify_image_items_paths_in_dict_for_import(itemDict["group_children"], prefix)
 
             if "children" in itemDict:
@@ -2407,7 +2407,7 @@ class DefterAnaPencere(QMainWindow):
             self.ekle_sil_butonlari_guncelle()
 
             # for itemDict in sceneDict["itemList"]:
-            #     if itemDict["type"] == Group.Type:
+            #     if itemDict["type"] == shared.GROUP_ITEM_TYPE:
             #         group = self.add_item_to_scene_from_dict(itemDict)
             #         self.dict_to_scene_recursive_group(itemDict["group_children"], group)
             #
@@ -2728,7 +2728,7 @@ class DefterAnaPencere(QMainWindow):
             return textItem
             # TODO: item edit edilebilir halde yazi secili kaliyor, ya focus ya text interactionflag
 
-        elif itemType == Group.Type:
+        elif itemType == shared.GROUP_ITEM_TYPE:
             groupItem = Group(itemDict["arkaPlanRengi"], itemDict["pen"])
             # group = QGraphicsItemGroup(None)
             groupItem.setFlags(groupItem.ItemIsSelectable
@@ -2845,7 +2845,7 @@ class DefterAnaPencere(QMainWindow):
 
         for childDict in itemDictList:
 
-            if childDict["type"] == Group.Type:
+            if childDict["type"] == shared.GROUP_ITEM_TYPE:
                 group = self.add_item_to_scene_from_dict(childDict)
                 self.dict_to_scene_recursive_group(childDict["group_children"], group)
                 group.setParentItem(parentItem)
@@ -2853,7 +2853,7 @@ class DefterAnaPencere(QMainWindow):
                 # before parented scale / after parented scale
                 group.scaleWithOffset(childDict["scale"] / group.scale())
 
-                if parentItem.type() == Group.Type:
+                if parentItem.type() == shared.GROUP_ITEM_TYPE:
                     parentItem.parentedWithParentOperation.append(group)
                 if isInGroup:
                     group.setFlag(group.ItemIsSelectable, False)
@@ -2869,7 +2869,7 @@ class DefterAnaPencere(QMainWindow):
                 # before parented scale / after parented scale
                 # c.scaleWithOffset(childDict["scale"] / c.scale())
 
-                if parentItem.type() == Group.Type:
+                if parentItem.type() == shared.GROUP_ITEM_TYPE:
                     parentItem.parentedWithParentOperation.append(c)
                 if isInGroup:
                     c.setFlag(c.ItemIsSelectable, False)
@@ -2879,13 +2879,13 @@ class DefterAnaPencere(QMainWindow):
                 if "children" in childDict:
                     self.dict_to_scene_recursive_parent(childDict["children"], c)
 
-        if parentItem.type() == Group.Type:
+        if parentItem.type() == shared.GROUP_ITEM_TYPE:
             parentItem.updateBoundingRect()
 
     # ---------------------------------------------------------------------
     def dict_to_scene_recursive_group(self, groupedItemsDictList, group):
         for groupedItemDict in groupedItemsDictList:
-            if groupedItemDict["type"] == Group.Type:
+            if groupedItemDict["type"] == shared.GROUP_ITEM_TYPE:
                 groupedGroup = self.add_item_to_scene_from_dict(groupedItemDict)
                 self.dict_to_scene_recursive_group(groupedItemDict["group_children"], groupedGroup)
 
@@ -2944,7 +2944,7 @@ class DefterAnaPencere(QMainWindow):
         self.cScene.undoStack.beginMacro(self.tr("load_page_{}".format(sceneDict["sayfaAdi"])))
         for itemDict in sceneDict["itemList"]:
 
-            if itemDict["type"] == Group.Type:
+            if itemDict["type"] == shared.GROUP_ITEM_TYPE:
                 group = self.add_item_to_scene_from_dict(itemDict)
                 self.dict_to_scene_recursive_group(itemDict["group_children"], group)
 
@@ -2977,7 +2977,7 @@ class DefterAnaPencere(QMainWindow):
     def oklari_bagla(self):
         for nesne in self.cScene.items():
             # if nesne.type() == LineItem.Type:
-            if nesne.type() == LineItem.Type and nesne.baglanmis_nesneler:
+            if nesne.type() == shared.LINE_ITEM_TYPE and nesne.baglanmis_nesneler:
                 for baglanan_nesne_kimligi, nokta in nesne.baglanmis_nesneler.items():
                     baglanan_nesne = self.cScene._kimlik_nesne_sozluk[baglanan_nesne_kimligi]
                     if 1 == nokta:
@@ -3108,7 +3108,7 @@ class DefterAnaPencere(QMainWindow):
         for c in children:
             cPropDict = c.get_properties_for_save_binary()
             if c.childItems():
-                if c.type() == Group.Type:
+                if c.type() == shared.GROUP_ITEM_TYPE:
                     cPropDict["children"] = self.scene_to_dict_binary_recursive(c.parentedWithParentOperation)
                     cPropDict["group_children"] = self.scene_to_dict_binary_recursive(c.allFirstLevelGroupChildren)
                 else:
@@ -3127,7 +3127,7 @@ class DefterAnaPencere(QMainWindow):
             if not item.parentItem():  # root itemlari isliyoruz sadece
                 itemPropDict = item.get_properties_for_save_binary()
                 if item.childItems():
-                    if item.type() == Group.Type:
+                    if item.type() == shared.GROUP_ITEM_TYPE:
                         itemPropDict["children"] = self.scene_to_dict_binary_recursive(item.parentedWithParentOperation)
                         itemPropDict["group_children"] = self.scene_to_dict_binary_recursive(
                             item.allFirstLevelGroupChildren)
@@ -4843,7 +4843,7 @@ class DefterAnaPencere(QMainWindow):
     def yazi_nesnesi_iceriginin_karakter_bicimini_degistir(self, bicim):
         # bu degisiklikleri yazi nesnesinin documentinin undo redo stacki takip eder.
         if len(self.cScene.selectionQueue) == 1:
-            if self.cScene.activeItem.type() == Text.Type:
+            if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.hasFocus():
                     cursor = self.cScene.activeItem.textCursor()
                     if not cursor.hasSelection():
@@ -4865,7 +4865,7 @@ class DefterAnaPencere(QMainWindow):
         if self.cScene.selectionQueue:
             startedMacro = False
             for item in self.cScene.selectionQueue:
-                if item.type() == Group.Type:
+                if item.type() == shared.GROUP_ITEM_TYPE:
                     continue
                 if not startedMacro:
                     self.cScene.undoStack.beginMacro(aciklama)
@@ -4889,7 +4889,7 @@ class DefterAnaPencere(QMainWindow):
 
         aciklama = self.tr("bold")
         if len(self.cScene.selectionQueue) == 1:
-            if self.cScene.activeItem.type() == Text.Type:
+            if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.hasFocus():
                     # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
@@ -4915,7 +4915,7 @@ class DefterAnaPencere(QMainWindow):
 
         aciklama = self.tr("underline")
         if len(self.cScene.selectionQueue) == 1:
-            if self.cScene.activeItem.type() == Text.Type:
+            if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.hasFocus():
                     # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
@@ -4941,7 +4941,7 @@ class DefterAnaPencere(QMainWindow):
 
         aciklama = self.tr("italic")
         if len(self.cScene.selectionQueue) == 1:
-            if self.cScene.activeItem.type() == Text.Type:
+            if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.hasFocus():
                     # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
@@ -4967,7 +4967,7 @@ class DefterAnaPencere(QMainWindow):
 
         aciklama = self.tr("strikeout")
         if len(self.cScene.selectionQueue) == 1:
-            if self.cScene.activeItem.type() == Text.Type:
+            if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.hasFocus():
                     # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
@@ -4993,7 +4993,7 @@ class DefterAnaPencere(QMainWindow):
 
         aciklama = self.tr("overline")
         if len(self.cScene.selectionQueue) == 1:
-            if self.cScene.activeItem.type() == Text.Type:
+            if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.hasFocus():
                     # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
@@ -5009,7 +5009,7 @@ class DefterAnaPencere(QMainWindow):
         # cursor = self.cTab.textCursor()
 
         if len(self.cScene.selectionQueue) == 1:
-            if self.cScene.activeItem.type() == Text.Type:
+            if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 # if self.cScene.activeItem.hasFocus():
                 cursor = self.cScene.activeItem.textCursor()
                 if styleIndex:
@@ -5102,7 +5102,7 @@ class DefterAnaPencere(QMainWindow):
         else:
             startedMacro = False
             for item in self.cScene.selectionQueue:
-                if item.type() == Group.Type:
+                if item.type() == shared.GROUP_ITEM_TYPE:
                     continue
                 if not startedMacro:
                     self.cScene.undoStack.beginMacro(aciklama)
@@ -5335,7 +5335,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionShowInFileManager.setVisible(False)
 
-        if item.type() == Text.Type:
+        if item.type() == shared.TEXT_ITEM_TYPE:
             self.actionResizeTextItemToFitView.setVisible(True)
             # self.actionShowInFileManager.setVisible(True)
             self.actionExportSelectedTextItemContentAsPdf.setVisible(True)
@@ -5364,7 +5364,7 @@ class DefterAnaPencere(QMainWindow):
             self.actionExportSelectedTextItemContentAsPdf.setVisible(False)
             self.actionPrintSelectedTextItemContent.setVisible(False)
 
-        if item.type() == Image.Type:
+        if item.type() == shared.IMAGE_ITEM_TYPE:
             self.actionShowInFileManager.setVisible(True)
             # self.actionEmbedImage.setVisible(True)
             self.actionExportImage.setVisible(True)
@@ -5382,7 +5382,7 @@ class DefterAnaPencere(QMainWindow):
             self.actionShowImageInfo.setVisible(False)
             self.actionCrop.setVisible(False)
 
-        if item.type() == VideoItem.Type:
+        if item.type() == shared.VIDEO_ITEM_TYPE:
             self.actionShowInFileManager.setVisible(True)
             # self.actionEmbedVideo,
             # self.actionExportVideo,
@@ -5407,7 +5407,7 @@ class DefterAnaPencere(QMainWindow):
             self.actionPinItem.setEnabled(True)
             self.actionUnPinItem.setEnabled(False)
 
-        if item.type() == DosyaNesnesi.Type:
+        if item.type() == shared.DOSYA_ITEM_TYPE:
             # self.actionConvertToWebItem.setVisible(True)
             # self.actionShowAsWebPage.setVisible(True)
             self.actionShowInFileManager.setVisible(True)
@@ -5458,12 +5458,12 @@ class DefterAnaPencere(QMainWindow):
             self.actionBringToFront.setEnabled(True)
             self.actionSendToBack.setEnabled(True)
             self.actionDeleteItem.setEnabled(True)
-            if self.cScene.activeItem.type() == Group.Type:
+            if self.cScene.activeItem.type() == shared.GROUP_ITEM_TYPE:
                 self.actionUnGroupItems.setEnabled(True)
             else:
                 self.actionUnGroupItems.setEnabled(False)
 
-            if self.cScene.activeItem.type() == Text.Type:
+            if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 self.yaziListeBicimiCBox.setEnabled(True)
             else:
                 self.yaziListeBicimiCBox.setEnabled(False)
@@ -5475,7 +5475,7 @@ class DefterAnaPencere(QMainWindow):
             else:
                 self.actionParent.setEnabled(False)
                 self.actionUnParent.setEnabled(True)
-                if self.cScene.activeItem.type() == Group.Type:
+                if self.cScene.activeItem.type() == shared.GROUP_ITEM_TYPE:
                     if not (self.cScene.activeItem.parentItem() or self.cScene.activeItem.parentedWithParentOperation):
                         self.actionUnParent.setEnabled(False)
                 else:
@@ -5641,7 +5641,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot(Image)
     def act_crop(self, item):
 
-        if item and item.type() == Image.Type:  # hotkeyden item none gelirse diye
+        if item and item.type() == shared.IMAGE_ITEM_TYPE:  # hotkeyden item none gelirse diye
             self.cScene.set_tool(toolType=Scene.CropImageTool)
         else:
             self.log(self.tr("No active image item!"), 5000, toStatusBarOnly=True)
@@ -6017,7 +6017,7 @@ class DefterAnaPencere(QMainWindow):
         # if not item.parentItem():
         itemPropDict = item.get_properties_for_save_binary()
         if item.childItems():
-            if item.type() == Group.Type:
+            if item.type() == shared.GROUP_ITEM_TYPE:
                 itemPropDict["children"] = self.scene_to_dict_binary_recursive(item.parentedWithParentOperation)
                 itemPropDict["group_children"] = self.scene_to_dict_binary_recursive(item.allFirstLevelGroupChildren)
             else:
@@ -6281,7 +6281,7 @@ class DefterAnaPencere(QMainWindow):
             # item = stream.readQVariant()
             # print(item)
 
-            if itemDict["type"] == Group.Type:
+            if itemDict["type"] == shared.GROUP_ITEM_TYPE:
                 group = self.add_item_to_scene_from_dict(itemDict, isPaste=True)
                 # parentItem() == None her zaman.
                 # self.increase_zvalue(group)
@@ -6493,7 +6493,7 @@ class DefterAnaPencere(QMainWindow):
             # item = stream.readQVariant()
             # print(item)
 
-            if itemDict["type"] == Group.Type:
+            if itemDict["type"] == shared.GROUP_ITEM_TYPE:
                 item = self.add_item_to_scene_from_dict(itemDict, isPaste=True)
                 # self.increase_zvalue(item)
                 self.dict_to_scene_recursive_group(itemDict["group_children"], item)
@@ -6546,7 +6546,7 @@ class DefterAnaPencere(QMainWindow):
             # item = stream.readQVariant()
             # print(item)
 
-            if itemDict["type"] == Group.Type:
+            if itemDict["type"] == shared.GROUP_ITEM_TYPE:
                 item = self.add_item_to_scene_from_dict(itemDict, isPaste=True)
                 # self.increase_zvalue(item)
                 self.dict_to_scene_recursive_group(itemDict["group_children"], item)
@@ -6906,7 +6906,7 @@ class DefterAnaPencere(QMainWindow):
                     items.add(self.cScene.get_items_selected_top_level_parentitem(item))
                 else:
                     # filtering possible nonparent and nonparented items
-                    if item.type() == Group.Type:
+                    if item.type() == shared.GROUP_ITEM_TYPE:
                         if not (item.parentItem() or item.parentedWithParentOperation):
                             continue
                     else:
@@ -6921,7 +6921,7 @@ class DefterAnaPencere(QMainWindow):
                 undoRedo.undoableUnParent(self.cScene.undoStack, self.tr("_unparent"), item, None, item.scenePos())
 
             else:
-                if item.type() == Group.Type:
+                if item.type() == shared.GROUP_ITEM_TYPE:
                     # group.itemChange de ItemChildRemovedChange var. dolayısıyla kopyada iter ediyoruz
                     for c in item.parentedWithParentOperation[:]:
                         undoRedo.undoableUnParent(self.cScene.undoStack, self.tr("_unparent"), c, None, c.scenePos())
@@ -7007,12 +7007,12 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_ungroup_items(self):
         self.lutfen_bekleyin_goster()
-        group = self.cScene.activeItem
-        if group.type() == Group.Type:
+        grup = self.cScene.activeItem
+        if grup.type() == shared.GROUP_ITEM_TYPE:
             # gRot = group.rotation()
             # group.destroyGroup()
             self.cScene.undoStack.beginMacro(self.tr("ungroup"))
-            undoRedo.undoableUnGroup(self.cScene.undoStack, self.tr("ungroup"), group)
+            undoRedo.undoableUnGroup(self.cScene.undoStack, self.tr("ungroup"), grup)
             # if gRot:
             #     for item in self.cScene.selectionQueue:
             #         if item.parentItem() in self.cScene.selectionQueue:
@@ -7162,13 +7162,13 @@ class DefterAnaPencere(QMainWindow):
         if self.cScene.selectionQueue:
             if ilkHaleDondur:
                 for item in self.cScene.selectionQueue:
-                    if item.type() == Group.Type:
+                    if item.type() == shared.GROUP_ITEM_TYPE:
                         continue
                     item.setYaziRengi(item.gecici_degisken_eski_col)
                     del item.gecici_degisken_eski_col
             else:
                 for item in self.cScene.selectionQueue:
-                    if item.type() == Group.Type:
+                    if item.type() == shared.GROUP_ITEM_TYPE:
                         continue
                     if not hasattr(item, "gecici_degisken_eski_col"):
                         item.gecici_degisken_eski_col = item.yaziRengi
@@ -7195,7 +7195,7 @@ class DefterAnaPencere(QMainWindow):
             if len(self.cScene.selectionQueue) > 1:
                 self.cScene.undoStack.beginMacro(self.tr("change items' text color"))
             for item in self.cScene.selectionQueue:
-                if item.type() == Group.Type:
+                if item.type() == shared.GROUP_ITEM_TYPE:
                     continue
                 undoRedo.undoableSetTextColor(self.cScene.undoStack, self.tr("change item's text color"), item, col)
             if len(self.cScene.selectionQueue) > 1:
@@ -7220,13 +7220,13 @@ class DefterAnaPencere(QMainWindow):
         if self.cScene.selectionQueue:
             if ilkHaleDondur:
                 for item in self.cScene.selectionQueue:
-                    if item.type() == Group.Type:
+                    if item.type() == shared.GROUP_ITEM_TYPE:
                         continue
                     item.setCizgiRengi(item.gecici_degisken_eski_col)
                     del item.gecici_degisken_eski_col
             else:
                 for item in self.cScene.selectionQueue:
-                    if item.type() == Group.Type:
+                    if item.type() == shared.GROUP_ITEM_TYPE:
                         continue
                     if not hasattr(item, "gecici_degisken_eski_col"):
                         item.gecici_degisken_eski_col = item.cizgiRengi
@@ -7252,7 +7252,7 @@ class DefterAnaPencere(QMainWindow):
             if len(self.cScene.selectionQueue) > 1:
                 self.cScene.undoStack.beginMacro(self.tr("change items' line color"))
             for item in self.cScene.selectionQueue:
-                if item.type() == Group.Type:
+                if item.type() == shared.GROUP_ITEM_TYPE:
                     continue
                 undoRedo.undoableSetLineColor(self.cScene.undoStack, self.tr("change item's line color"), item, col)
             if len(self.cScene.selectionQueue) > 1:
@@ -7277,14 +7277,14 @@ class DefterAnaPencere(QMainWindow):
     def onizle_set_item_background_color(self, col, ilkHaleDondur=False):
         if ilkHaleDondur:
             for item in self.cScene.selectionQueue:
-                if item.type() == Group.Type or item.type() == LineItem.Type:
+                if item.type() == shared.GROUP_ITEM_TYPE or item.type() == shared.LINE_ITEM_TYPE:
                     continue
                 item.setArkaPlanRengi(item.gecici_degisken_eski_col)
                 del item.gecici_degisken_eski_col
 
         else:
             for item in self.cScene.selectionQueue:
-                if item.type() == Group.Type or item.type() == LineItem.Type:
+                if item.type() == shared.GROUP_ITEM_TYPE or item.type() == shared.LINE_ITEM_TYPE:
                     continue
                 if not hasattr(item, "gecici_degisken_eski_col"):
                     item.gecici_degisken_eski_col = item.arkaPlanRengi
@@ -7313,12 +7313,12 @@ class DefterAnaPencere(QMainWindow):
             if len(self.cScene.selectionQueue) > 1:
                 self.cScene.undoStack.beginMacro(self.tr("change items' background color"))
             for item in self.cScene.selectionQueue:
-                if item.type() == Group.Type or item.type() == LineItem.Type:
+                if item.type() == shared.GROUP_ITEM_TYPE or item.type() == shared.LINE_ITEM_TYPE:
                     continue
                     # for c in item.childItems():
                     #     c.undoableSetItemBackgroundColor(self.cScene.undoStack,
                     #                                             self.tr("change item's background color"), c, col)
-                if not item.type() == LineItem.Type:
+                if not item.type() == shared.LINE_ITEM_TYPE:
                     undoRedo.undoableSetItemBackgroundColor(self.cScene.undoStack,
                                                             self.tr("change item's background color"),
                                                             item,
@@ -7593,7 +7593,7 @@ class DefterAnaPencere(QMainWindow):
         if self.cScene.selectionQueue:
             startedMacro = False
             for item in self.cScene.selectionQueue:
-                if isinstance(item, BaseItem) or item.type() == Text.Type:
+                if isinstance(item, BaseItem) or item.type() == shared.TEXT_ITEM_TYPE:
                     if not startedMacro:
                         self.cScene.undoStack.beginMacro(self.tr("change width"))
                         startedMacro = True
@@ -7604,7 +7604,7 @@ class DefterAnaPencere(QMainWindow):
                                                     item.rect(),
                                                     item.pos())
 
-                elif item.type() == LineItem.Type:
+                elif item.type() == shared.LINE_ITEM_TYPE:
                     if not startedMacro:
                         self.cScene.undoStack.beginMacro(self.tr("change length"))
                         startedMacro = True
@@ -7634,7 +7634,7 @@ class DefterAnaPencere(QMainWindow):
         if self.cScene.selectionQueue:
             startedMacro = False
             for item in self.cScene.selectionQueue:
-                if isinstance(item, BaseItem) or item.type() == Text.Type:
+                if isinstance(item, BaseItem) or item.type() == shared.TEXT_ITEM_TYPE:
                     if not startedMacro:
                         self.cScene.undoStack.beginMacro(self.tr("change height"))
                         startedMacro = True
@@ -7655,7 +7655,7 @@ class DefterAnaPencere(QMainWindow):
         if self.cScene.selectionQueue:
             startedMacro = False
             for item in self.cScene.selectionQueue:
-                if item.type() is not Group.Type:
+                if item.type() is not shared.GROUP_ITEM_TYPE:
                     if not startedMacro:
                         self.cScene.undoStack.beginMacro(self.tr("change font"))
                         startedMacro = True
@@ -7675,7 +7675,7 @@ class DefterAnaPencere(QMainWindow):
         if self.cScene.selectionQueue:
             startedMacro = False
             for item in self.cScene.selectionQueue:
-                if item.type() is not Group.Type:
+                if item.type() is not shared.GROUP_ITEM_TYPE:
                     if not startedMacro:
                         self.cScene.undoStack.beginMacro(self.tr("change text size"))
                         startedMacro = True
@@ -7697,7 +7697,7 @@ class DefterAnaPencere(QMainWindow):
         for item in self.cScene.selectionQueue:
             if item.parentItem() in self.cScene.selectionQueue:
                 continue
-            if item.type() == PathItem.Type:
+            if item.type() == shared.PATH_ITEM_TYPE:
                 undoRedo.undoableRotate(self.cScene.undoStack, self.tr("rotate"), item, rotation)
             else:
                 undoRedo.undoableRotateWithOffset(self.cScene.undoStack, self.tr("rotate"), item, rotation)
@@ -7706,7 +7706,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def change_transform_box_values(self, item):
-        if item.type() == LineItem.Type:
+        if item.type() == shared.LINE_ITEM_TYPE:
             self.itemWidthSBox_tbar.setValue(item._line.length() * item.scale())
             self.itemWidthSBox_nesnedw.setValue(item._line.length() * item.scale())
 
@@ -7883,7 +7883,7 @@ class DefterAnaPencere(QMainWindow):
                 # undoableApplyStylePreset(self, description, item, pen, brush, font):
                 # pen = QPen(style.foreground().color())
 
-                if item.type() == Group.Type:
+                if item.type() == shared.GROUP_ITEM_TYPE:
                     self.cScene.undoStack.beginMacro(self.tr("apply style preset to the selected group"))
                     for cItem in item.childItems():
                         undoRedo.undoableApplyStylePresetToItem(self.cScene.undoStack,
@@ -8271,10 +8271,10 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_show_in_file_manager(self):
 
-        if self.cScene.activeItem.type() == Text.Type:
+        if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
             url = self.cScene.activeItem.get_document_url()
             url = url.toLocalFile()
-        elif self.cScene.activeItem.type() in [Image.Type, VideoItem.Type, DosyaNesnesi.Type]:
+        elif self.cScene.activeItem.type() in [shared.IMAGE_ITEM_TYPE, shared.VIDEO_ITEM_TYPE, shared.DOSYA_ITEM_TYPE]:
             url = self.cScene.activeItem.filePathForSave
         else:
             return
@@ -8581,7 +8581,7 @@ class DefterAnaPencere(QMainWindow):
         if self.cScene.selectionQueue:
             yaziNesneleri = []
             for item in self.cScene.selectionQueue:
-                if item.type() == Text.Type:
+                if item.type() == shared.TEXT_ITEM_TYPE:
                     yaziNesneleri.append(item)
 
             if len(yaziNesneleri) > 1:
@@ -8632,7 +8632,7 @@ class DefterAnaPencere(QMainWindow):
             itemsToEmbed = []
 
             for item in self.cScene.selectionQueue:
-                if item.type() == Image.Type:
+                if item.type() == shared.IMAGE_ITEM_TYPE:
                     if not item.isEmbeded:
                         if os.path.exists(item.filePathForSave):
                             itemsToEmbed.append(item)
@@ -8693,7 +8693,7 @@ class DefterAnaPencere(QMainWindow):
                 i = 2
                 filePathsForSaveSet = set()
                 for item in self.cScene.selectionQueue:
-                    if item.type() == Image.Type:
+                    if item.type() == shared.IMAGE_ITEM_TYPE:
                         if os.path.exists(item.filePathForSave):
                             filePathsForSaveSet.add(item.filePathForSave)
 
@@ -8775,7 +8775,7 @@ class DefterAnaPencere(QMainWindow):
 
             # self.cScene.undoStack.beginMacro(self.tr("Embed video(s)"))
             for item in self.cScene.selectionQueue:
-                if item.type() == VideoItem.Type:
+                if item.type() == shared.VIDEO_ITEM_TYPE:
                     if not item.isEmbeded:
                         if os.path.exists(item.filePathForSave):
                             itemsToEmbed.append(item)
@@ -8839,7 +8839,7 @@ class DefterAnaPencere(QMainWindow):
                 i = 2
                 filePathsForSaveSet = set()
                 for item in self.cScene.selectionQueue:
-                    if item.type() == VideoItem.Type:
+                    if item.type() == shared.VIDEO_ITEM_TYPE:
                         if os.path.exists(item.filePathForSave):
                             filePathsForSaveSet.add(item.filePathForSave)
 
@@ -8898,7 +8898,7 @@ class DefterAnaPencere(QMainWindow):
 
             # self.cScene.undoStack.beginMacro(self.tr("Embed file(s)"))
             for item in self.cScene.selectionQueue:
-                if item.type() == DosyaNesnesi.Type:
+                if item.type() == shared.DOSYA_ITEM_TYPE:
                     if not item.isEmbeded:
                         if os.path.exists(item.filePathForSave):
                             itemsToEmbed.append(item)
@@ -8961,7 +8961,7 @@ class DefterAnaPencere(QMainWindow):
                 i = 2
                 filePathsForSaveSet = set()
                 for item in self.cScene.selectionQueue:
-                    if item.type() == DosyaNesnesi.Type:
+                    if item.type() == shared.DOSYA_ITEM_TYPE:
                         if os.path.exists(item.filePathForSave):
                             filePathsForSaveSet.add(item.filePathForSave)
 
@@ -9538,11 +9538,11 @@ class DefterAnaPencere(QMainWindow):
                 shutil.copy2(sayfa.view.backgroundImagePath, kopyalanacak_adres)
 
             for nesne in sayfa.scene.items():
-                if nesne.type() == Image.Type:
+                if nesne.type() == shared.IMAGE_ITEM_TYPE:
                     ic_klasor = "images"
-                elif nesne.type() == DosyaNesnesi.Type:
+                elif nesne.type() == shared.DOSYA_ITEM_TYPE:
                     ic_klasor = "files"
-                elif nesne.type() == VideoItem.Type:
+                elif nesne.type() == shared.VIDEO_ITEM_TYPE:
                     ic_klasor = "videos"
                 else:
                     continue
@@ -9763,7 +9763,7 @@ class DefterAnaPencere(QMainWindow):
         # self.textEdit.print_(printer)
 
         if len(self.cScene.selectionQueue) == 1:
-            if self.cScene.activeItem.type() == Text.Type:
+            if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 p = QPainter()
                 if not p.begin(printer):
                     print("hata")

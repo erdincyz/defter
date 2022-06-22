@@ -81,6 +81,31 @@ class BaseItem(QGraphicsItem):
         self.oklar_dxdy_nokta = {}
 
     # ---------------------------------------------------------------------
+    def type(self):
+        # Enable the use of qgraphicsitem_cast with this item.
+        return BaseItem.Type
+
+    # ---------------------------------------------------------------------
+    @property
+    def isPinned(self):
+        return self._isPinned
+
+    # ---------------------------------------------------------------------
+    @isPinned.setter
+    def isPinned(self, value):
+        if value:
+            self.setFlags(self.ItemIsSelectable
+                          # | self.ItemIsMovable
+                          #  | item.ItemIsFocusable
+                          )
+
+        else:
+            self.setFlags(self.ItemIsSelectable
+                          | self.ItemIsMovable
+                          | self.ItemIsFocusable)
+        self._isPinned = value
+
+    # ---------------------------------------------------------------------
     def ok_ekle(self, ok, scenepPos, okunHangiNoktasi):
 
         # self.oklar_dxdy_nokta.append((ok, self.mapFromScene(scenePos)))
@@ -114,29 +139,34 @@ class BaseItem(QGraphicsItem):
                     ok.temp_append(QPointF(scx - dxdy_nokta[0], scy - dxdy_nokta[1]))
 
     # ---------------------------------------------------------------------
-    def type(self):
-        # Enable the use of qgraphicsitem_cast with this item.
-        return BaseItem.Type
+    def get_properties_for_save_binary(self):
+        properties = {"type": self.type(),
+                      "kim": self._kim,
+                      "rect": self.rect(),
+                      "pos": self.pos(),
+                      "rotation": self.rotation(),
+                      "scale": self.scale(),
+                      "zValue": self.zValue(),
+                      "yaziRengi": self.yaziRengi,
+                      "arkaPlanRengi": self.arkaPlanRengi,
+                      "pen": self._pen,
+                      "font": self._font,
+                      "yaziHiza": int(self.painterTextOption.alignment()),
+                      "text": self.text(),
+                      "isPinned": self.isPinned,
+                      "command": self._command,
+                      }
+        # print(properties["scale"])
+        return properties
 
     # ---------------------------------------------------------------------
-    @property
-    def isPinned(self):
-        return self._isPinned
-
-    # ---------------------------------------------------------------------
-    @isPinned.setter
-    def isPinned(self, value):
-        if value:
-            self.setFlags(self.ItemIsSelectable
-                          # | self.ItemIsMovable
-                          #  | item.ItemIsFocusable
-                          )
-
-        else:
-            self.setFlags(self.ItemIsSelectable
-                          | self.ItemIsMovable
-                          | self.ItemIsFocusable)
-        self._isPinned = value
+    def varsaEnUsttekiGrubuGetir(self):
+        parentItem = self.parentItem()
+        while parentItem:
+            if parentItem.type() == shared.GROUP_ITEM_TYPE:
+                return parentItem
+            parentItem = parentItem.parentItem()
+        return None
 
     # ---------------------------------------------------------------------
     def sceneCenter(self):
@@ -278,27 +308,6 @@ class BaseItem(QGraphicsItem):
             c.flipVertical(self.sceneCenter().y())
         if eskiRot:
             self.rotateWithOffset(eskiRot)
-
-    # ---------------------------------------------------------------------
-    def get_properties_for_save_binary(self):
-        properties = {"type": self.type(),
-                      "kim": self._kim,
-                      "rect": self.rect(),
-                      "pos": self.pos(),
-                      "rotation": self.rotation(),
-                      "scale": self.scale(),
-                      "zValue": self.zValue(),
-                      "yaziRengi": self.yaziRengi,
-                      "arkaPlanRengi": self.arkaPlanRengi,
-                      "pen": self._pen,
-                      "font": self._font,
-                      "yaziHiza": int(self.painterTextOption.alignment()),
-                      "text": self.text(),
-                      "isPinned": self.isPinned,
-                      "command": self._command,
-                      }
-        # print(properties["scale"])
-        return properties
 
     # ---------------------------------------------------------------------
     def create_resize_handles(self):
@@ -1243,13 +1252,13 @@ class BaseItem(QGraphicsItem):
         if delta > 0:
             # self.setRotation(self.rotation() + 5)
             self.scene().undoRedo.undoableRotateWithOffset(self.scene().undoStack, "rotate", self,
-                                                         self.rotation() + 5)
+                                                           self.rotation() + 5)
             # self.rotateWithOffset(self.rotation() + 5, self)
 
         else:
             # self.setRotation(self.rotation() - 5)
             self.scene().undoRedo.undoableRotateWithOffset(self.scene().undoStack, "rotate", self,
-                                                         self.rotation() - 5)
+                                                           self.rotation() - 5)
             # self.rotateWithOffset(self.rotation() - 5, self)
         self.update_painter_text_rect()
         # self.update()

@@ -114,78 +114,29 @@ class Text(QGraphicsTextItem):
         self.oklar_dxdy_nokta = {}
 
     # ---------------------------------------------------------------------
-    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
-        rect = self.sceneBoundingRect()
+    def type(self):
+        # Enable the use of qgraphicsitem_cast with this item.
+        return Text.Type
 
-        x = self.scenePos().x()
-        y = self.scenePos().y()
-        xs = self.scene().sceneRect().x()
-        ys = self.scene().sceneRect().y()
-        x = x - xs
-        y = y - ys
+    # ---------------------------------------------------------------------
+    @property
+    def isPinned(self):
+        return self._isPinned
 
-        w = rect.width()
-        h = rect.height()
+    # ---------------------------------------------------------------------
+    @isPinned.setter
+    def isPinned(self, value):
+        if value:
+            self.setFlags(self.ItemIsSelectable
+                          # | self.ItemIsMovable
+                          #  | item.ItemIsFocusable
+                          )
 
-        bicimSozluk = self.ver_karakter_bicimi()
-        bold = "font-weight:bold;" if bicimSozluk["b"] else ""
-        italic = "font-style:italic;" if bicimSozluk["i"] else ""
-        underline = "underline" if bicimSozluk["u"] else ""
-        strikeOut = "line-through" if bicimSozluk["s"] else ""
-        overline = "overline" if bicimSozluk["o"] else ""
-        bicimler1 = bold + italic
-        if any((underline, strikeOut, overline)):
-            bicimler2 = f"text-decoration: {underline} {strikeOut} {overline};"
         else:
-            bicimler2 = ""
-
-        renk_arkaPlan = f"({self.arkaPlanRengi.red()},{self.arkaPlanRengi.green()},{self.arkaPlanRengi.blue()},{self.arkaPlanRengi.alpha() / 255})"
-        renk_yazi = f"({self.yaziRengi.red()},{self.yaziRengi.green()},{self.yaziRengi.blue()},{self.yaziRengi.alpha() / 255})"
-
-        if self.isPlainText:
-            yazi_str = f'<p style=" background:rgba{renk_arkaPlan}; display: inline-block; color:rgba{renk_yazi}; margin:0; padding:7px;">{self.text()}</p>'
-        else:
-            html = self.toHtml()
-            body_baslangic = html.find("<bo")
-            bas = html.find('">', body_baslangic)
-            son = html.find("</bo")
-            # yazi = self.toHtml()
-            yazi_str = self.toHtml()[bas + 2:son]
-
-        hiza = self.ver_yazi_hizasi()
-        # if hiza == Qt.AlignLeft or hiza == Qt.AlignLeft | Qt.AlignVCenter:
-        #     yazi_hiza = "left"
-        if hiza == Qt.AlignCenter or hiza == Qt.AlignCenter | Qt.AlignVCenter:
-            yazi_hiza = "center"
-        elif hiza == Qt.AlignRight or hiza == Qt.AlignRight | Qt.AlignVCenter:
-            yazi_hiza = "right"
-        elif hiza == Qt.AlignJustify or hiza == Qt.AlignJustify | Qt.AlignVCenter:
-            yazi_hiza = "justify"
-        else:
-            yazi_hiza = "left"
-
-        div_str = f"""
-                    <article style="
-                     
-                     font-size:{self.fontPointSize()}pt; 
-                     font-family:{self.font().family()};
-                     text-align: {yazi_hiza};
-                     {bicimler1}
-                     {bicimler2}
-                     position:absolute;
-                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
-                     top:{y}px;
-                     left:{x}px;
-                     width:{w};
-                     height:{h};
-                     transform-box: fill-box;
-                     transform-origin: top left;
-                     transform: rotate({self.rotation()}deg);
-                     
-                     " id="{self._kim}">{yazi_str}</article>\n
-            """
-
-        return div_str
+            self.setFlags(self.ItemIsSelectable
+                          | self.ItemIsMovable
+                          | self.ItemIsFocusable)
+        self._isPinned = value
 
     # ---------------------------------------------------------------------
     def get_properties_for_save_binary(self):
@@ -249,24 +200,13 @@ class Text(QGraphicsTextItem):
                     ok.temp_append(QPointF(scx - dxdy_nokta[0], scy - dxdy_nokta[1]))
 
     # ---------------------------------------------------------------------
-    @property
-    def isPinned(self):
-        return self._isPinned
-
-    # ---------------------------------------------------------------------
-    @isPinned.setter
-    def isPinned(self, value):
-        if value:
-            self.setFlags(self.ItemIsSelectable
-                          # | self.ItemIsMovable
-                          #  | item.ItemIsFocusable
-                          )
-
-        else:
-            self.setFlags(self.ItemIsSelectable
-                          | self.ItemIsMovable
-                          | self.ItemIsFocusable)
-        self._isPinned = value
+    def varsaEnUsttekiGrubuGetir(self):
+        parentItem = self.parentItem()
+        while parentItem:
+            if parentItem.type() == shared.GROUP_ITEM_TYPE:
+                return parentItem
+            parentItem = parentItem.parentItem()
+        return None
 
     # ---------------------------------------------------------------------
     def set_document_url(self, url):
@@ -358,11 +298,6 @@ class Text(QGraphicsTextItem):
         self.topRightHandle.moveTopRight(self.boundingRect().topRight())
         self.bottomRightHandle.moveBottomRight(self.boundingRect().bottomRight())
         self.bottomLeftHandle.moveBottomLeft(self.boundingRect().bottomLeft())
-
-    # ---------------------------------------------------------------------
-    def type(self):
-        # Enable the use of qgraphicsitem_cast with this item.
-        return Text.Type
 
     # ---------------------------------------------------------------------
     def sceneCenter(self):
@@ -945,91 +880,6 @@ class Text(QGraphicsTextItem):
                 self.scene().undoStack.endMacro()
 
     # ---------------------------------------------------------------------
-    def paint(self, painter, option, widget):
-
-        painter.save()
-        # painter.fillRect(option.rect, self.arkaPlanRengi)
-        painter.fillRect(option.rect, self.brush())
-
-        if option.state & QStyle.State_Selected or self.cosmeticSelect:
-            if self.isActiveItem:
-                selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
-            else:
-                selectionPenBottom = self.selectionPenBottom
-            painter.setPen(selectionPenBottom)
-            painter.drawRect(option.rect)
-
-            ########################################################################
-            # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
-            ########################################################################
-            # if not self.isPinned and self.isActiveItem:
-            #     # painter.setPen(self.handlePen)
-            #     painter.drawRect(self.topLeftHandle)
-            #     painter.drawRect(self.topRightHandle)
-            #     painter.drawRect(self.bottomRightHandle)
-            #     painter.drawRect(self.bottomLeftHandle)
-            ########################################################################
-
-        if self.isTextOverflowed:
-            painter.setPen(QPen(Qt.red, 2, Qt.DashLine))
-            painter.drawLine(self._rect.bottomLeft(), self._rect.bottomRight())
-
-        # painter.setPen(Qt.blue)
-        # painter.drawRect(self.boundingRect())
-        # painter.setPen(Qt.green)
-        # painter.drawRect(self.rect())
-        painter.restore()
-
-        # option2 = QStyleOptionGraphicsItem(option)
-        # option2.state = 0
-        # option.state &= ~(QStyle.State_Selected | QStyle.State_HasFocus)
-        # option2.exposedRect.setSize(self.document().pageSize())
-        # option2.exposedRect.setSize(self.document().documentLayout().documentSize())
-
-        # option.exposedRect = self.boundingRect()
-        # option.rect = option.exposedRect.toRect()
-
-        # rect = QRectF(self.rect())
-        # rect.moveTo(0, 0)
-        # option2.exposedRect = rect
-
-        # TODO bunlar niye koyuldu?
-        option.exposedRect = self._rect
-        option.rect = self._rect.toRect()
-
-        # painter.setClipRect(option.exposedRect)
-        super(Text, self).paint(painter, option, widget)
-
-        # self.doc.drawContents(painter, self.rect())
-
-        # # # # # # debug start - pos() # # # # #
-        # p = self.pos()
-        # s = self.scenePos()
-        # painter.drawText(self.rect(),
-        #                  "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
-        # painter.setPen(QPen(Qt.green, 12))
-        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
-        # # # t = self.transformOriginPoint()
-        # # # painter.drawRect(t.x()-12, t.y()-12,24,24)
-        # mapped = self.mapToScene(self.rect().topLeft())
-        # painter.drawText(self.rect().x(), self.rect().y(), "{0:.2f}  {1:.2f} map".format(mapped.x(), mapped.y()))
-        # painter.drawEllipse(self.scenePos(), 10, 10)
-        # painter.setPen(Qt.blue)
-        # painter.drawEllipse(self.mapFromScene(self.pos()), 10, 10)
-        # r = self.textItem.boundingRect()
-        # r = self.mapRectFromItem(self.textItem, r)
-        # painter.drawRect(r)
-        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
-        # painter.setPen(QPen(Qt.red,17))
-        # painter.drawPoint(self.rect().center())
-        # painter.setPen(QPen(Qt.green,12))
-        # painter.drawPoint(self.boundingRect().center())
-        # painter.setPen(QPen(Qt.blue,8))
-        # painter.drawPoint(self.sceneBoundingRect().center())
-        # painter.drawRect(self.sceneBoundingRect())
-        # # # # # # debug end - pos() # # # # #
-
-    # ---------------------------------------------------------------------
     def mousePressEvent(self, event):
 
         self._resizing = False  # we could use "self._resizingFrom = 0" instead, but self._resizing is more explicit.
@@ -1324,3 +1174,162 @@ class Text(QGraphicsTextItem):
                         QPointF(self.sceneLeft(), self.sceneBottom() + 10))
 
         super(Text, self).keyPressEvent(event)
+
+    # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
+        rect = self.sceneBoundingRect()
+
+        x = self.scenePos().x()
+        y = self.scenePos().y()
+        xs = self.scene().sceneRect().x()
+        ys = self.scene().sceneRect().y()
+        x = x - xs
+        y = y - ys
+
+        w = rect.width()
+        h = rect.height()
+
+        bicimSozluk = self.ver_karakter_bicimi()
+        bold = "font-weight:bold;" if bicimSozluk["b"] else ""
+        italic = "font-style:italic;" if bicimSozluk["i"] else ""
+        underline = "underline" if bicimSozluk["u"] else ""
+        strikeOut = "line-through" if bicimSozluk["s"] else ""
+        overline = "overline" if bicimSozluk["o"] else ""
+        bicimler1 = bold + italic
+        if any((underline, strikeOut, overline)):
+            bicimler2 = f"text-decoration: {underline} {strikeOut} {overline};"
+        else:
+            bicimler2 = ""
+
+        renk_arkaPlan = f"({self.arkaPlanRengi.red()},{self.arkaPlanRengi.green()},{self.arkaPlanRengi.blue()},{self.arkaPlanRengi.alpha() / 255})"
+        renk_yazi = f"({self.yaziRengi.red()},{self.yaziRengi.green()},{self.yaziRengi.blue()},{self.yaziRengi.alpha() / 255})"
+
+        if self.isPlainText:
+            yazi_str = f'<p style=" background:rgba{renk_arkaPlan}; display: inline-block; color:rgba{renk_yazi}; margin:0; padding:7px;">{self.text()}</p>'
+        else:
+            html = self.toHtml()
+            body_baslangic = html.find("<bo")
+            bas = html.find('">', body_baslangic)
+            son = html.find("</bo")
+            # yazi = self.toHtml()
+            yazi_str = self.toHtml()[bas + 2:son]
+
+        hiza = self.ver_yazi_hizasi()
+        # if hiza == Qt.AlignLeft or hiza == Qt.AlignLeft | Qt.AlignVCenter:
+        #     yazi_hiza = "left"
+        if hiza == Qt.AlignCenter or hiza == Qt.AlignCenter | Qt.AlignVCenter:
+            yazi_hiza = "center"
+        elif hiza == Qt.AlignRight or hiza == Qt.AlignRight | Qt.AlignVCenter:
+            yazi_hiza = "right"
+        elif hiza == Qt.AlignJustify or hiza == Qt.AlignJustify | Qt.AlignVCenter:
+            yazi_hiza = "justify"
+        else:
+            yazi_hiza = "left"
+
+        div_str = f"""
+                    <article style="
+
+                     font-size:{self.fontPointSize()}pt; 
+                     font-family:{self.font().family()};
+                     text-align: {yazi_hiza};
+                     {bicimler1}
+                     {bicimler2}
+                     position:absolute;
+                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
+                     top:{y}px;
+                     left:{x}px;
+                     width:{w};
+                     height:{h};
+                     transform-box: fill-box;
+                     transform-origin: top left;
+                     transform: rotate({self.rotation()}deg);
+
+                     " id="{self._kim}">{yazi_str}</article>\n
+            """
+
+        return div_str
+
+    # ---------------------------------------------------------------------
+    def paint(self, painter, option, widget):
+
+        painter.save()
+        # painter.fillRect(option.rect, self.arkaPlanRengi)
+        painter.fillRect(option.rect, self.brush())
+
+        if option.state & QStyle.State_Selected or self.cosmeticSelect:
+            if self.isActiveItem:
+                selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
+            else:
+                selectionPenBottom = self.selectionPenBottom
+            painter.setPen(selectionPenBottom)
+            painter.drawRect(option.rect)
+
+            ########################################################################
+            # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
+            ########################################################################
+            # if not self.isPinned and self.isActiveItem:
+            #     # painter.setPen(self.handlePen)
+            #     painter.drawRect(self.topLeftHandle)
+            #     painter.drawRect(self.topRightHandle)
+            #     painter.drawRect(self.bottomRightHandle)
+            #     painter.drawRect(self.bottomLeftHandle)
+            ########################################################################
+
+        if self.isTextOverflowed:
+            painter.setPen(QPen(Qt.red, 2, Qt.DashLine))
+            painter.drawLine(self._rect.bottomLeft(), self._rect.bottomRight())
+
+        # painter.setPen(Qt.blue)
+        # painter.drawRect(self.boundingRect())
+        # painter.setPen(Qt.green)
+        # painter.drawRect(self.rect())
+        painter.restore()
+
+        # option2 = QStyleOptionGraphicsItem(option)
+        # option2.state = 0
+        # option.state &= ~(QStyle.State_Selected | QStyle.State_HasFocus)
+        # option2.exposedRect.setSize(self.document().pageSize())
+        # option2.exposedRect.setSize(self.document().documentLayout().documentSize())
+
+        # option.exposedRect = self.boundingRect()
+        # option.rect = option.exposedRect.toRect()
+
+        # rect = QRectF(self.rect())
+        # rect.moveTo(0, 0)
+        # option2.exposedRect = rect
+
+        # TODO bunlar niye koyuldu?
+        option.exposedRect = self._rect
+        option.rect = self._rect.toRect()
+
+        # painter.setClipRect(option.exposedRect)
+        super(Text, self).paint(painter, option, widget)
+
+        # self.doc.drawContents(painter, self.rect())
+
+        # # # # # # debug start - pos() # # # # #
+        # p = self.pos()
+        # s = self.scenePos()
+        # painter.drawText(self.rect(),
+        #                  "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
+        # painter.setPen(QPen(Qt.green, 12))
+        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
+        # # # t = self.transformOriginPoint()
+        # # # painter.drawRect(t.x()-12, t.y()-12,24,24)
+        # mapped = self.mapToScene(self.rect().topLeft())
+        # painter.drawText(self.rect().x(), self.rect().y(), "{0:.2f}  {1:.2f} map".format(mapped.x(), mapped.y()))
+        # painter.drawEllipse(self.scenePos(), 10, 10)
+        # painter.setPen(Qt.blue)
+        # painter.drawEllipse(self.mapFromScene(self.pos()), 10, 10)
+        # r = self.textItem.boundingRect()
+        # r = self.mapRectFromItem(self.textItem, r)
+        # painter.drawRect(r)
+        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
+        # painter.setPen(QPen(Qt.red,17))
+        # painter.drawPoint(self.rect().center())
+        # painter.setPen(QPen(Qt.green,12))
+        # painter.drawPoint(self.boundingRect().center())
+        # painter.setPen(QPen(Qt.blue,8))
+        # painter.drawPoint(self.sceneBoundingRect().center())
+        # painter.drawRect(self.sceneBoundingRect())
+        # # # # # # debug end - pos() # # # # #

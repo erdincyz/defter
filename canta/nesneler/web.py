@@ -55,3 +55,12 @@ class Web(BaseItem):
     def type(self):
         # Enable the use of qgraphicsitem_cast with this item.
         return Web.Type
+
+    # ---------------------------------------------------------------------
+    def varsaEnUsttekiGrubuGetir(self):
+        parentItem = self.parentItem()
+        while parentItem:
+            if parentItem.type() == shared.GROUP_ITEM_TYPE:
+                return parentItem
+            parentItem = parentItem.parentItem()
+        return None

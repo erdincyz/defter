@@ -791,6 +791,9 @@ class Scene(QGraphicsScene):
                     self.addItem(self.drawLineItem)
                     ustuneOkCizilenItem = self.itemAt(event.scenePos(), self.views()[0].transform())
                     if ustuneOkCizilenItem:
+                        enustGrup = ustuneOkCizilenItem.varsaEnUsttekiGrubuGetir()
+                        if enustGrup:
+                            ustuneOkCizilenItem = enustGrup
                         # item sabit, icindeki cizgi degisiyor mousemoveda,diyoruz simdilik
                         # if not self.drawLineItem in ustuneOkCizilenItem.oklar_dxdy_nokta.keys():
                         ustuneOkCizilenItem.ok_ekle(self.drawLineItem, event.scenePos(), 1)
@@ -801,11 +804,15 @@ class Scene(QGraphicsScene):
                     if self.drawLineItem in ustuneOkCizilenItemList:
                         ustuneOkCizilenItemList.remove(self.drawLineItem)
                     if ustuneOkCizilenItemList:
+                        ustuneOkunIkinciNoktasiCizilenNesne = ustuneOkCizilenItemList[0]
+                        enustGrup = ustuneOkunIkinciNoktasiCizilenNesne.varsaEnUsttekiGrubuGetir()
+                        if enustGrup:
+                            ustuneOkunIkinciNoktasiCizilenNesne = enustGrup
                         # okun iki noktasi da ayni nesne ustunde olacak ise
                         # burda ikinci noktayi koydugumuzda, okun  nesneye olan ilk bagini cozup
                         # sonra hiç bir noktasini baglamadan normal parent ediyoruz
                         # asagi tasindi
-                        if self.drawLineItem in ustuneOkCizilenItemList[0].oklar_dxdy_nokta:
+                        if self.drawLineItem in ustuneOkunIkinciNoktasiCizilenNesne.oklar_dxdy_nokta:
                             # undoRedo.undoableAddItem ile ekledikten sonra parent ediyoruz
                             # bu asamada yaparsak gecici oku parent etmis oluruz ki siliniyor zaten az sonra
                             oku_normal_parent_et = True
@@ -814,7 +821,7 @@ class Scene(QGraphicsScene):
                             # beklenen normal islem bu
                             # okun ilk noktasi boslukta ya da baska nesneye bagli
                             # burda da okun ikinci noktasini uzerine tikladigimiz nesneye bagliyoruz
-                            ustuneOkCizilenItemList[0].ok_ekle(self.drawLineItem, event.scenePos(), 2)
+                            ustuneOkunIkinciNoktasiCizilenNesne.ok_ekle(self.drawLineItem, event.scenePos(), 2)
 
                     # normal ok cizme islemiyle devam
 
@@ -834,11 +841,11 @@ class Scene(QGraphicsScene):
                     if oku_normal_parent_et:
                         #  once az once drawLineItem olsuturulurken olasi baglanmis
                         #  ilk nokta bagliligini cozuyoruz
-                        ustuneOkCizilenItemList[0].ok_sil(self.drawLineItem)
+                        ustuneOkunIkinciNoktasiCizilenNesne.ok_sil(self.drawLineItem)
                         # su an okun 2 noktasi da hic bir yere baglai degil, okta da baglanmis_nesneler = {}
-                        yeniPos = ustuneOkCizilenItemList[0].mapFromScene(self.drawLineItem.scenePos())
+                        yeniPos = ustuneOkunIkinciNoktasiCizilenNesne.mapFromScene(self.drawLineItem.scenePos())
                         undoRedo.undoableParent(self.undoStack, self.tr("_parent"), self.drawLineItem,
-                                                ustuneOkCizilenItemList[0], QPointF(yeniPos))
+                                                ustuneOkunIkinciNoktasiCizilenNesne, QPointF(yeniPos))
 
                     self.drawLineItem = None
 

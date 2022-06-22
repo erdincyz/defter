@@ -143,88 +143,9 @@ class VideoItem(BaseItem):
             self.hoverMoveEvent = super(VideoItem, self).hoverMoveEvent
 
     # ---------------------------------------------------------------------
-    def html_dive_cevir(self, html_klasor_kayit_adres, video_kopyalaniyor_mu):
-        video_adi = os.path.basename(self.filePathForSave)
-        video_adres = self.filePathForSave
-        if not html_klasor_kayit_adres:  # def dosyasi icine kaydet
-            if self.isEmbeded:
-                video_adres = os.path.join("videos", video_adi)
-        else:  # dosya html olarak baska bir yere kaydediliyor
-            # kopyalanmazsa da, zaten embed olmayan video normal hddeki adresten yuklenecektir.
-            if video_kopyalaniyor_mu:
-                if not self.isEmbeded:  # embed ise zaten tmp klasorden hedef klasore baska metodta kopylanıyor hepsi.
-                    video_adres = os.path.join(html_klasor_kayit_adres, "videos", video_adi)
-
-        # video_str = f'<video src="{self.filePathForSave}" width:{self.videoItem.size().width()};' \
-        #             f' height{self.videoItem.size().height()}"></video>'
-        video_str = f'<video style="width:100%; height:100%;" controls> <source src="{video_adres}"></video>'
-
-        # rect = self.sceneBoundingRect()
-        # xr = rect.left()
-        # yr = rect.top()
-        # xs = self.scene().sceneRect().x()
-        # ys = self.scene().sceneRect().y()
-        # x = xr - xs
-        # y = yr - ys
-
-        w = self._rect.width() * self.scale()
-        h = self._rect.height() * self.scale()
-        c = self.sceneBoundingRect().center()
-        xr = c.x() - w / 2
-        yr = c.y() - h / 2
-        xs = self.scene().sceneRect().x()
-        ys = self.scene().sceneRect().y()
-        x = xr - xs
-        y = yr - ys
-
-        bicimSozluk = self.ver_karakter_bicimi()
-        bold = "font-weight:bold;" if bicimSozluk["b"] else ""
-        italic = "font-style:italic;" if bicimSozluk["i"] else ""
-        underline = "underline" if bicimSozluk["u"] else ""
-        strikeOut = "line-through" if bicimSozluk["s"] else ""
-        overline = "overline" if bicimSozluk["o"] else ""
-        bicimler1 = bold + italic
-        if any((underline, strikeOut, overline)):
-            bicimler2 = f"text-decoration: {underline} {strikeOut} {overline};"
-        else:
-            bicimler2 = ""
-
-        renk_arkaPlan = f"({self.arkaPlanRengi.red()},{self.arkaPlanRengi.green()},{self.arkaPlanRengi.blue()},{self.arkaPlanRengi.alpha() / 255})"
-        renk_yazi = f"({self.yaziRengi.red()},{self.yaziRengi.green()},{self.yaziRengi.blue()},{self.yaziRengi.alpha() / 255})"
-
-        hiza = self.ver_yazi_hizasi()
-        # if hiza == Qt.AlignLeft or hiza == Qt.AlignLeft | Qt.AlignVCenter:
-        #     yazi_hiza = "left"
-        if hiza == Qt.AlignCenter or hiza == Qt.AlignCenter | Qt.AlignVCenter:
-            yazi_hiza = "center"
-        elif hiza == Qt.AlignRight or hiza == Qt.AlignRight | Qt.AlignVCenter:
-            yazi_hiza = "right"
-        elif hiza == Qt.AlignJustify or hiza == Qt.AlignJustify | Qt.AlignVCenter:
-            yazi_hiza = "justify"
-        else:
-            yazi_hiza = "left"
-
-        div_str = f"""
-                    <div style="
-                     background:rgba{renk_arkaPlan};
-                     color:rgba{renk_yazi};
-                     font-size:{self.fontPointSize()}pt; 
-                     font-family:{self.font().family()};
-                     text-align: {yazi_hiza};
-                     {bicimler1}
-                     {bicimler2}
-                     position:absolute;
-                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
-                     width:{self._rect.width() * self.scale()}px;
-                     height:{self._rect.height() * self.scale()}px;
-                     top:{y}px;
-                     left:{x}px;
-                     transform-box: fill-box;
-                     transform-origin: center;
-                     transform: rotate({self.rotation()}deg);" id="{self._kim}">{video_str}{self.text()}</div>\n"""
-
-        # /*background-image:url('{resim_adres}');*/
-        return div_str
+    def type(self):
+        # Enable the use of qgraphicsitem_cast with this item.
+        return VideoItem.Type
 
     # ---------------------------------------------------------------------
     def get_properties_for_save_binary(self):
@@ -251,9 +172,13 @@ class VideoItem(BaseItem):
         return properties
 
     # ---------------------------------------------------------------------
-    def type(self):
-        # Enable the use of qgraphicsitem_cast with this item.
-        return VideoItem.Type
+    def varsaEnUsttekiGrubuGetir(self):
+        parentItem = self.parentItem()
+        while parentItem:
+            if parentItem.type() == shared.GROUP_ITEM_TYPE:
+                return parentItem
+            parentItem = parentItem.parentItem()
+        return None
 
     # ---------------------------------------------------------------------
     def nesne_sahneden_silinmek_uzere(self):
@@ -690,3 +615,87 @@ class VideoItem(BaseItem):
         # painter.drawPoint(self.sceneBoundingRect().center())
         # painter.drawRect(self.sceneBoundingRect())
         # # # # # # debug end - pos() # # # # #
+
+    # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, video_kopyalaniyor_mu):
+        video_adi = os.path.basename(self.filePathForSave)
+        video_adres = self.filePathForSave
+        if not html_klasor_kayit_adres:  # def dosyasi icine kaydet
+            if self.isEmbeded:
+                video_adres = os.path.join("videos", video_adi)
+        else:  # dosya html olarak baska bir yere kaydediliyor
+            # kopyalanmazsa da, zaten embed olmayan video normal hddeki adresten yuklenecektir.
+            if video_kopyalaniyor_mu:
+                if not self.isEmbeded:  # embed ise zaten tmp klasorden hedef klasore baska metodta kopylanıyor hepsi.
+                    video_adres = os.path.join(html_klasor_kayit_adres, "videos", video_adi)
+
+        # video_str = f'<video src="{self.filePathForSave}" width:{self.videoItem.size().width()};' \
+        #             f' height{self.videoItem.size().height()}"></video>'
+        video_str = f'<video style="width:100%; height:100%;" controls> <source src="{video_adres}"></video>'
+
+        # rect = self.sceneBoundingRect()
+        # xr = rect.left()
+        # yr = rect.top()
+        # xs = self.scene().sceneRect().x()
+        # ys = self.scene().sceneRect().y()
+        # x = xr - xs
+        # y = yr - ys
+
+        w = self._rect.width() * self.scale()
+        h = self._rect.height() * self.scale()
+        c = self.sceneBoundingRect().center()
+        xr = c.x() - w / 2
+        yr = c.y() - h / 2
+        xs = self.scene().sceneRect().x()
+        ys = self.scene().sceneRect().y()
+        x = xr - xs
+        y = yr - ys
+
+        bicimSozluk = self.ver_karakter_bicimi()
+        bold = "font-weight:bold;" if bicimSozluk["b"] else ""
+        italic = "font-style:italic;" if bicimSozluk["i"] else ""
+        underline = "underline" if bicimSozluk["u"] else ""
+        strikeOut = "line-through" if bicimSozluk["s"] else ""
+        overline = "overline" if bicimSozluk["o"] else ""
+        bicimler1 = bold + italic
+        if any((underline, strikeOut, overline)):
+            bicimler2 = f"text-decoration: {underline} {strikeOut} {overline};"
+        else:
+            bicimler2 = ""
+
+        renk_arkaPlan = f"({self.arkaPlanRengi.red()},{self.arkaPlanRengi.green()},{self.arkaPlanRengi.blue()},{self.arkaPlanRengi.alpha() / 255})"
+        renk_yazi = f"({self.yaziRengi.red()},{self.yaziRengi.green()},{self.yaziRengi.blue()},{self.yaziRengi.alpha() / 255})"
+
+        hiza = self.ver_yazi_hizasi()
+        # if hiza == Qt.AlignLeft or hiza == Qt.AlignLeft | Qt.AlignVCenter:
+        #     yazi_hiza = "left"
+        if hiza == Qt.AlignCenter or hiza == Qt.AlignCenter | Qt.AlignVCenter:
+            yazi_hiza = "center"
+        elif hiza == Qt.AlignRight or hiza == Qt.AlignRight | Qt.AlignVCenter:
+            yazi_hiza = "right"
+        elif hiza == Qt.AlignJustify or hiza == Qt.AlignJustify | Qt.AlignVCenter:
+            yazi_hiza = "justify"
+        else:
+            yazi_hiza = "left"
+
+        div_str = f"""
+                    <div style="
+                     background:rgba{renk_arkaPlan};
+                     color:rgba{renk_yazi};
+                     font-size:{self.fontPointSize()}pt; 
+                     font-family:{self.font().family()};
+                     text-align: {yazi_hiza};
+                     {bicimler1}
+                     {bicimler2}
+                     position:absolute;
+                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
+                     width:{self._rect.width() * self.scale()}px;
+                     height:{self._rect.height() * self.scale()}px;
+                     top:{y}px;
+                     left:{x}px;
+                     transform-box: fill-box;
+                     transform-origin: center;
+                     transform: rotate({self.rotation()}deg);" id="{self._kim}">{video_str}{self.text()}</div>\n"""
+
+        # /*background-image:url('{resim_adres}');*/
+        return div_str

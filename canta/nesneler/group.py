@@ -50,6 +50,30 @@ class Group(QGraphicsItem):
         self.oklar_dxdy_nokta = {}
 
     # ---------------------------------------------------------------------
+    def type(self):
+        return Group.Type
+
+    # ---------------------------------------------------------------------
+    @property
+    def isPinned(self):
+        return self._isPinned
+
+    # ---------------------------------------------------------------------
+    @isPinned.setter
+    def isPinned(self, value):
+        if value:
+            self.setFlags(self.ItemIsSelectable
+                          # | self.ItemIsMovable
+                          #  | item.ItemIsFocusable
+                          )
+
+        else:
+            self.setFlags(self.ItemIsSelectable
+                          | self.ItemIsMovable
+                          | self.ItemIsFocusable)
+        self._isPinned = value
+
+    # ---------------------------------------------------------------------
     def ok_ekle(self, ok, scenepPos, okunHangiNoktasi):
 
         # self.oklar_dxdy_nokta.append((ok, self.mapFromScene(scenePos)))
@@ -80,24 +104,13 @@ class Group(QGraphicsItem):
                     ok.temp_append(QPointF(scx - dxdy_nokta[0], scy - dxdy_nokta[1]))
 
     # ---------------------------------------------------------------------
-    @property
-    def isPinned(self):
-        return self._isPinned
-
-    # ---------------------------------------------------------------------
-    @isPinned.setter
-    def isPinned(self, value):
-        if value:
-            self.setFlags(self.ItemIsSelectable
-                          # | self.ItemIsMovable
-                          #  | item.ItemIsFocusable
-                          )
-
-        else:
-            self.setFlags(self.ItemIsSelectable
-                          | self.ItemIsMovable
-                          | self.ItemIsFocusable)
-        self._isPinned = value
+    def varsaEnUsttekiGrubuGetir(self):
+        parentItem = self.parentItem()
+        while parentItem:
+            if parentItem.type() == shared.GROUP_ITEM_TYPE:
+                return parentItem
+            parentItem = parentItem.parentItem()
+        return None
 
     # ---------------------------------------------------------------------
     def update_resize_handles(self, force=False):
@@ -107,14 +120,6 @@ class Group(QGraphicsItem):
         # we may add resize functions to the group object in the future.
         # so ...
         pass
-
-    # ---------------------------------------------------------------------
-    def type(self):
-        return Group.Type
-
-    # ---------------------------------------------------------------------
-    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
-        return ""
 
     # ---------------------------------------------------------------------
     def get_properties_for_save_binary(self):
@@ -546,44 +551,6 @@ class Group(QGraphicsItem):
         self.update()
 
     # ---------------------------------------------------------------------
-    def paint(self, painter, option, widget=None):
-        # painter.setBrush(self.arkaPlanRengi)
-
-        if option.state & QStyle.State_Selected or self.cosmeticSelect:
-            if self.isActiveItem:
-                selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
-            else:
-                selectionPenBottom = self.selectionPenBottom
-
-            painter.setPen(selectionPenBottom)
-            painter.drawRect(self.boundingRect())
-
-            # painter.setPen(self.selectionPenTop)
-            # painter.drawRect(self.boundingRect())
-
-        else:
-            painter.setPen(self._pen)
-            painter.drawRect(self.boundingRect())
-
-        # # # # # debug start - pos() # # # # #
-        # p = self.pos()
-        # s = self.scenePos()
-        # painter.drawText(self.boundingRect(),
-        #                  "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
-        # painter.setPen(QPen(Qt.green,12))
-        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
-        # t = self.transformOriginPoint()
-        # painter.drawRect(t.x()-12, t.y()-12,24,24)
-        # mapped = self.mapToScene(self.boundingRect().topLeft())
-        # painter.drawText(self.boundingRect().center().x(), self.boundingRect().center().y(),
-        #                  "{0:.2f}  {1:.2f}".format(mapped.x(), mapped.y()))
-        # painter.drawText(self.boundingRect().center().x(), self.boundingRect().center().y(),
-        #                  "{0:.3f}".format(self.scale()))
-        # painter.drawRect(self.boundingRect())
-        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
-        # # # # # debug end - pos() # # # # #
-
-    # ---------------------------------------------------------------------
     def mousePressEvent(self, event):
 
         super(Group, self).mousePressEvent(event)
@@ -720,3 +687,45 @@ class Group(QGraphicsItem):
         for c in self.childItems():
             c.changeImageItemTextBackgroundColorAlpha(delta)
         self.scene().undoStack.endMacro()
+
+    # ---------------------------------------------------------------------
+    def paint(self, painter, option, widget=None):
+        # painter.setBrush(self.arkaPlanRengi)
+
+        if option.state & QStyle.State_Selected or self.cosmeticSelect:
+            if self.isActiveItem:
+                selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
+            else:
+                selectionPenBottom = self.selectionPenBottom
+
+            painter.setPen(selectionPenBottom)
+            painter.drawRect(self.boundingRect())
+
+            # painter.setPen(self.selectionPenTop)
+            # painter.drawRect(self.boundingRect())
+
+        else:
+            painter.setPen(self._pen)
+            painter.drawRect(self.boundingRect())
+
+        # # # # # debug start - pos() # # # # #
+        # p = self.pos()
+        # s = self.scenePos()
+        # painter.drawText(self.boundingRect(),
+        #                  "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
+        # painter.setPen(QPen(Qt.green,12))
+        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
+        # t = self.transformOriginPoint()
+        # painter.drawRect(t.x()-12, t.y()-12,24,24)
+        # mapped = self.mapToScene(self.boundingRect().topLeft())
+        # painter.drawText(self.boundingRect().center().x(), self.boundingRect().center().y(),
+        #                  "{0:.2f}  {1:.2f}".format(mapped.x(), mapped.y()))
+        # painter.drawText(self.boundingRect().center().x(), self.boundingRect().center().y(),
+        #                  "{0:.3f}".format(self.scale()))
+        # painter.drawRect(self.boundingRect())
+        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
+        # # # # # debug end - pos() # # # # #
+
+    # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
+        return ""

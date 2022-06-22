@@ -9,8 +9,7 @@ import filecmp
 import os
 import shutil
 
-from PySide6.QtCore import QRectF
-from PySide6.QtGui import QUndoCommand, QPixmap
+from PySide6.QtGui import QUndoCommand
 from canta.nesneler.group import Group
 from canta.nesneler.base import BaseItem
 from canta import shared
@@ -93,8 +92,38 @@ class UndoableAddItem(QUndoCommand):
         # alt satiri burda cagirmiyoruz cunku bazi nesneler ilk once bos olarak ekleniyor, icerikleri sonra ekleniyor.
         # self.scene.unite_with_scene_rect(self.item.mapRectToScene(self.item.boundingRect()))
 
+        # oklar varsa oka bu nesneyi kaydet
+        if self.item.oklar_dxdy_nokta:
+            for ok, dx_dy_nokta in self.item.oklar_dxdy_nokta.items():
+                ok.baglanmis_nesneler[self.item._kim] = dx_dy_nokta[2]
+
+        # silinen ok ise, okun eski bagli oldugu nesnelere okun bilgisini tekrar ekliyoruz
+        if self.item.type() == shared.LINE_ITEM_TYPE:
+            if self.item.baglanmis_nesneler:
+                for baglanmis_nesne_kimlik, nokta in self.item.baglanmis_nesneler.items():  # dict items()
+                    baglanmis_nesne = self.scene._kimlik_nesne_sozluk[baglanmis_nesne_kimlik]
+                    if nokta == 1:
+                        baglanmis_nesne.ok_ekle(self.item, self.item.mapToScene(self.item._line.p1()),
+                                                1)
+                    if nokta == 2:
+                        baglanmis_nesne.ok_ekle(self.item, self.item.mapToScene(self.item._line.p2()),
+                                                2)
+
     # ---------------------------------------------------------------------
     def undo(self):
+
+        # oklar varsa, oktan bu nesneyi sil, (silinen nesne bir ok nesnesi degil)
+        if self.item.oklar_dxdy_nokta:
+            for ok in self.item.oklar_dxdy_nokta.keys():
+                del ok.baglanmis_nesneler[self.item._kim]
+
+        # silinen ok ise, okun baglanmis oldugu nesnelerden okun bilgisini siliyoruz
+        if self.item.type() == shared.LINE_ITEM_TYPE:
+            if self.item.baglanmis_nesneler:
+                for baglanmis_nesne_kimlik, nokta in self.item.baglanmis_nesneler.items():  # dict items()
+                    baglanmis_nesne = self.scene._kimlik_nesne_sozluk[baglanmis_nesne_kimlik]
+                    del baglanmis_nesne.oklar_dxdy_nokta[self.item]
+
         self.scene.clearSelection()
         self.scene.removeItem(self.item)
 
@@ -715,6 +744,9 @@ class UndoableResizeLineItem(QUndoCommand):
                 ustuneOkCizilenItemList_p1.remove(self.cizgiNesnesi)
             if ustuneOkCizilenItemList_p1:
                 p1_in_baglanacagi_yeni_nesne = ustuneOkCizilenItemList_p1[0]
+                enustGrup = p1_in_baglanacagi_yeni_nesne.varsaEnUsttekiGrubuGetir()
+                if enustGrup:
+                    p1_in_baglanacagi_yeni_nesne = enustGrup
 
                 if self.p1_in_baglandigi_eski_nesne:  # noktayi bosluktan yeni nesnenin ustune tasiyor da olabiliriz 
                     if not p1_in_baglanacagi_yeni_nesne._kim == self.p1_in_baglandigi_eski_nesne._kim:
@@ -736,6 +768,9 @@ class UndoableResizeLineItem(QUndoCommand):
                 ustuneOkCizilenItemList_p2.remove(self.cizgiNesnesi)
             if ustuneOkCizilenItemList_p2:
                 p2_in_baglanacagi_yeni_nesne = ustuneOkCizilenItemList_p2[0]
+                enustGrup = p2_in_baglanacagi_yeni_nesne.varsaEnUsttekiGrubuGetir()
+                if enustGrup:
+                    p2_in_baglanacagi_yeni_nesne = enustGrup
 
                 if self.p2_in_baglandigi_eski_nesne:  # noktayi bosluktan yeni nesnenin ustune tasiyor da olabiliriz
                     if not p2_in_baglanacagi_yeni_nesne._kim == self.p2_in_baglandigi_eski_nesne._kim:
@@ -767,6 +802,9 @@ class UndoableResizeLineItem(QUndoCommand):
                 ustuneOkCizilenItemList_p1.remove(self.cizgiNesnesi)
             if ustuneOkCizilenItemList_p1:
                 p1_in_baglanacagi_yeni_nesne = ustuneOkCizilenItemList_p1[0]
+                enustGrup = p1_in_baglanacagi_yeni_nesne.varsaEnUsttekiGrubuGetir()
+                if enustGrup:
+                    p1_in_baglanacagi_yeni_nesne = enustGrup
 
                 if self.p1_in_baglandigi_eski_nesne:  # noktayi bosluktan yeni nesnenin ustune tasiyor da olabiliriz
                     if not p1_in_baglanacagi_yeni_nesne._kim == self.p1_in_baglandigi_eski_nesne._kim:
@@ -788,6 +826,9 @@ class UndoableResizeLineItem(QUndoCommand):
                 ustuneOkCizilenItemList_p2.remove(self.cizgiNesnesi)
             if ustuneOkCizilenItemList_p2:
                 p2_in_baglanacagi_yeni_nesne = ustuneOkCizilenItemList_p2[0]
+                enustGrup = p2_in_baglanacagi_yeni_nesne.varsaEnUsttekiGrubuGetir()
+                if enustGrup:
+                    p2_in_baglanacagi_yeni_nesne = enustGrup
 
                 if self.p2_in_baglandigi_eski_nesne:  # noktayi bosluktan yeni nesnenin ustune tasiyor da olabiliriz
                     if not p2_in_baglanacagi_yeni_nesne._kim == self.p2_in_baglandigi_eski_nesne._kim:
@@ -1902,10 +1943,10 @@ class UndoableEmbedSceneBackgroundImage(QUndoCommand):
         if os.path.exists(self.eskiImagePath):
             resim_klasor = os.path.join(self.view.scene().tempDirPath, "images")
             for resimAdi in os.listdir(resim_klasor):
-                resimAdres = os.path.join(resim_klasor,resimAdi)
+                resimAdres = os.path.join(resim_klasor, resimAdi)
                 if filecmp.cmp(view.backgroundImagePath, resimAdres, shallow=True):
-                   self.kopya_var = True
-                   break
+                    self.kopya_var = True
+                    break
 
         if self.kopya_var:
             self.yeniImagePath = resimAdres

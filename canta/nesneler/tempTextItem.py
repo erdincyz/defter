@@ -22,6 +22,7 @@ class TempTextItem(QGraphicsTextItem):
 
     # textItemSelectedChanged = Signal(QGraphicsTextItem)
 
+    # ---------------------------------------------------------------------
     def __init__(self, width, font, color, text=None, parent=None):
         super(TempTextItem, self).__init__(text, parent)
 
@@ -45,12 +46,6 @@ class TempTextItem(QGraphicsTextItem):
     def type(self):
         # Enable the use of qgraphicsitem_cast with this item.
         return TempTextItem.Type
-
-    # ---------------------------------------------------------------------
-    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
-        # Ola ki bu nesne aktif iken HTML olarak kaydet cagrilirsa diye
-        # None dondurmeyelim stringe ekleniyor bu
-        return ""
 
     # ---------------------------------------------------------------------
     def scaleWithOffset(self, scale):
@@ -81,44 +76,6 @@ class TempTextItem(QGraphicsTextItem):
         dx = center.x() - c.x()
         dy = center.y() - c.y()
         self.moveBy(dx, dy)
-
-    # ---------------------------------------------------------------------
-    def paint(self, painter, option, widget):
-
-        # # # # # # debug start - pos() # # # # #
-        # p = self.pos()
-        # s = self.scenePos()
-        # painter.drawText(self.boundingRect(),
-        #                  "{0:.2f},  {1:.2f}\n{2:.2f},  {3:.2f}".format(p.x(), p.y(), s.x(), s.y()))
-        # # t = self.transformOriginPoint()
-        # # painter.drawRect(t.x()-12, t.y()-12,24,24)
-        # mapped = self.mapToScene(self.rect().topLeft())
-        # painter.drawText(self.rect().x(), self.rect().y(), "{0:.2f}  {1:.2f}".format(mapped.x(), mapped.y()))
-        # r = self.textItem.boundingRect()
-        # r = self.mapRectFromItem(self.textItem, r)
-        # painter.drawRect(r)
-        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
-        # # # # # # debug end - pos() # # # # #
-
-        # option2 = QStyleOptionGraphicsItem(option)
-        # option2.state = 0
-        # option.state &= ~(QStyle.State_Selected | QStyle.State_HasFocus)
-        # option2.exposedRect.setSize(self.document().pageSize())
-        # option2.exposedRect.setSize(self.document().documentLayout().documentSize())
-
-        # option.exposedRect = self.boundingRect()
-        # option.rect = option.exposedRect.toRect()
-
-        # rect = QRectF(self.rect())
-        # rect.moveTo(0, 0)
-        # option2.exposedRect = rect
-        # option.exposedRect = self._rect
-        # option.rect = self._rect.toRect()
-
-        # painter.setClipRect(option.exposedRect)
-        super(TempTextItem, self).paint(painter, option, widget)
-
-        # self.doc.drawContents(painter, self.rect())
 
     # ---------------------------------------------------------------------
     def changeImageItemTextBackgroundColorAlpha(self, delta):
@@ -168,3 +125,47 @@ class TempTextItem(QGraphicsTextItem):
                 self.setSelected(False)
 
         super(TempTextItem, self).keyPressEvent(event)
+
+    # ---------------------------------------------------------------------
+    def paint(self, painter, option, widget):
+
+        # # # # # # debug start - pos() # # # # #
+        # p = self.pos()
+        # s = self.scenePos()
+        # painter.drawText(self.boundingRect(),
+        #                  "{0:.2f},  {1:.2f}\n{2:.2f},  {3:.2f}".format(p.x(), p.y(), s.x(), s.y()))
+        # # t = self.transformOriginPoint()
+        # # painter.drawRect(t.x()-12, t.y()-12,24,24)
+        # mapped = self.mapToScene(self.rect().topLeft())
+        # painter.drawText(self.rect().x(), self.rect().y(), "{0:.2f}  {1:.2f}".format(mapped.x(), mapped.y()))
+        # r = self.textItem.boundingRect()
+        # r = self.mapRectFromItem(self.textItem, r)
+        # painter.drawRect(r)
+        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
+        # # # # # # debug end - pos() # # # # #
+
+        # option2 = QStyleOptionGraphicsItem(option)
+        # option2.state = 0
+        # option.state &= ~(QStyle.State_Selected | QStyle.State_HasFocus)
+        # option2.exposedRect.setSize(self.document().pageSize())
+        # option2.exposedRect.setSize(self.document().documentLayout().documentSize())
+
+        # option.exposedRect = self.boundingRect()
+        # option.rect = option.exposedRect.toRect()
+
+        # rect = QRectF(self.rect())
+        # rect.moveTo(0, 0)
+        # option2.exposedRect = rect
+        # option.exposedRect = self._rect
+        # option.rect = self._rect.toRect()
+
+        # painter.setClipRect(option.exposedRect)
+        super(TempTextItem, self).paint(painter, option, widget)
+
+        # self.doc.drawContents(painter, self.rect())
+
+    # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
+        # Ola ki bu nesne aktif iken HTML olarak kaydet cagrilirsa diye
+        # None dondurmeyelim stringe ekleniyor bu
+        return ""

@@ -79,90 +79,6 @@ class Image(BaseItem):
         return Image.Type
 
     # ---------------------------------------------------------------------
-    def mirror(self, x, y):
-        if x:
-            self.isMirrorX = not self.isMirrorX
-        if y:
-            self.isMirrorY = not self.isMirrorY
-        self.reload_image_after_scale()
-
-    # ---------------------------------------------------------------------
-    def flipHorizontal(self, mposx):
-        self.mirror(x=True, y=False)
-        super(Image, self).flipHorizontal(mposx)
-
-    # ---------------------------------------------------------------------
-    def flipVertical(self, mposy):
-        self.mirror(x=False, y=True)
-        super(Image, self).flipVertical(mposy)
-
-    # ---------------------------------------------------------------------
-    def html_dive_cevir(self, html_klasor_kayit_adres, resim_kopyalaniyor_mu):
-        # resim_adres= f'<img src="{item.filePathForSave}" style="object-fit: fill;"></img>'
-        resim_adi = os.path.basename(self.filePathForSave)
-        resim_adres = self.filePathForSave
-        if not html_klasor_kayit_adres:  # def dosyasi icine kaydediliyor
-            if self.isEmbeded:
-                resim_adres = os.path.join("images", resim_adi)
-        else:  # dosya html olarak baska bir yere kaydediliyor
-            # kopyalanmazsa da, zaten embed olmayan resim normal hddeki adresten yuklenecektir.
-            if resim_kopyalaniyor_mu:
-                if not self.isEmbeded:  # embed ise zaten tmp klasorden hedef klasore baska metodta kopylanıyor hepsi.
-                    resim_adres = os.path.join(html_klasor_kayit_adres, "images", resim_adi)
-
-        img_str = f'<img src="{resim_adres}" style="width:100%; height:100%;"></img>'
-
-        w = self._rect.width() * self.scale()
-        h = self._rect.height() * self.scale()
-        
-        c = self.sceneBoundingRect().center()
-        
-        xr = c.x() - w/2
-        yr = c.y() - h/2
-        xs = self.scene().sceneRect().x()
-        ys = self.scene().sceneRect().y()
-        x = xr - xs
-        y = yr - ys
-
-        bicimSozluk = self.ver_karakter_bicimi()
-        bold = "font-weight:bold;" if bicimSozluk["b"] else ""
-        italic = "font-style:italic;" if bicimSozluk["i"] else ""
-        underline = "underline" if bicimSozluk["u"] else ""
-        strikeOut = "line-through" if bicimSozluk["s"] else ""
-        overline = "overline" if bicimSozluk["o"] else ""
-        bicimler1 = bold + italic
-        if any((underline, strikeOut, overline)):
-            bicimler2 = f"text-decoration: {underline} {strikeOut} {overline};"
-        else:
-            bicimler2 = ""
-
-        renk_arkaPlan = f"({self.arkaPlanRengi.red()},{self.arkaPlanRengi.green()},{self.arkaPlanRengi.blue()},{self.arkaPlanRengi.alpha() / 255})"
-        renk_yazi = f"({self.yaziRengi.red()},{self.yaziRengi.green()},{self.yaziRengi.blue()},{self.yaziRengi.alpha() / 255})"
-
-        div_str = f"""
-                    <div style="
-                     background:rgba{renk_arkaPlan};
-                     color:rgba{renk_yazi};
-                     font-size:{self.fontPointSize()}pt; 
-                     font-family:{self.font().family()};
-                     {bicimler1}
-                     {bicimler2}
-                     position:absolute;
-                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
-                     width:{self._rect.width() * self.scale()}px;
-                     height:{self._rect.height() * self.scale()}px;
-                     top:{y}px;
-                     left:{x}px;
-                     opacity:{self.imageOpacity};
-                     transform-box: fill-box;
-                     transform-origin: center;
-                     transform: rotate({self.rotation()}deg);
-                     " id="{self._kim}">{img_str}</div>\n"""
-
-        # /*background-image:url('{resim_adres}');*/
-        return div_str
-
-    # ---------------------------------------------------------------------
     def get_properties_for_save_binary(self):
         properties = {"type": self.type(),
                       "kim": self._kim,
@@ -187,6 +103,24 @@ class Image(BaseItem):
                       "command": self._command,
                       }
         return properties
+
+    # ---------------------------------------------------------------------
+    def mirror(self, x, y):
+        if x:
+            self.isMirrorX = not self.isMirrorX
+        if y:
+            self.isMirrorY = not self.isMirrorY
+        self.reload_image_after_scale()
+
+    # ---------------------------------------------------------------------
+    def flipHorizontal(self, mposx):
+        self.mirror(x=True, y=False)
+        super(Image, self).flipHorizontal(mposx)
+
+    # ---------------------------------------------------------------------
+    def flipVertical(self, mposy):
+        self.mirror(x=False, y=True)
+        super(Image, self).flipVertical(mposy)
 
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
@@ -620,7 +554,7 @@ class Image(BaseItem):
             painter.setPen(self.yaziRengi)
             # painter.setOpacity(.35)
             painter.drawRect(self.cropRectF)
-            
+
         # # # # # # debug start - pos() # # # # #
         # p = self.pos()
         # s = self.scenePos()
@@ -644,3 +578,69 @@ class Image(BaseItem):
         # painter.drawPoint(self.sceneBoundingRect().center())
         # painter.drawRect(self.sceneBoundingRect())
         # # # # # # debug end - pos() # # # # #
+
+    # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, resim_kopyalaniyor_mu):
+        # resim_adres= f'<img src="{item.filePathForSave}" style="object-fit: fill;"></img>'
+        resim_adi = os.path.basename(self.filePathForSave)
+        resim_adres = self.filePathForSave
+        if not html_klasor_kayit_adres:  # def dosyasi icine kaydediliyor
+            if self.isEmbeded:
+                resim_adres = os.path.join("images", resim_adi)
+        else:  # dosya html olarak baska bir yere kaydediliyor
+            # kopyalanmazsa da, zaten embed olmayan resim normal hddeki adresten yuklenecektir.
+            if resim_kopyalaniyor_mu:
+                if not self.isEmbeded:  # embed ise zaten tmp klasorden hedef klasore baska metodta kopylanıyor hepsi.
+                    resim_adres = os.path.join(html_klasor_kayit_adres, "images", resim_adi)
+
+        img_str = f'<img src="{resim_adres}" style="width:100%; height:100%;"></img>'
+
+        w = self._rect.width() * self.scale()
+        h = self._rect.height() * self.scale()
+
+        c = self.sceneBoundingRect().center()
+
+        xr = c.x() - w / 2
+        yr = c.y() - h / 2
+        xs = self.scene().sceneRect().x()
+        ys = self.scene().sceneRect().y()
+        x = xr - xs
+        y = yr - ys
+
+        bicimSozluk = self.ver_karakter_bicimi()
+        bold = "font-weight:bold;" if bicimSozluk["b"] else ""
+        italic = "font-style:italic;" if bicimSozluk["i"] else ""
+        underline = "underline" if bicimSozluk["u"] else ""
+        strikeOut = "line-through" if bicimSozluk["s"] else ""
+        overline = "overline" if bicimSozluk["o"] else ""
+        bicimler1 = bold + italic
+        if any((underline, strikeOut, overline)):
+            bicimler2 = f"text-decoration: {underline} {strikeOut} {overline};"
+        else:
+            bicimler2 = ""
+
+        renk_arkaPlan = f"({self.arkaPlanRengi.red()},{self.arkaPlanRengi.green()},{self.arkaPlanRengi.blue()},{self.arkaPlanRengi.alpha() / 255})"
+        renk_yazi = f"({self.yaziRengi.red()},{self.yaziRengi.green()},{self.yaziRengi.blue()},{self.yaziRengi.alpha() / 255})"
+
+        div_str = f"""
+                    <div style="
+                     background:rgba{renk_arkaPlan};
+                     color:rgba{renk_yazi};
+                     font-size:{self.fontPointSize()}pt; 
+                     font-family:{self.font().family()};
+                     {bicimler1}
+                     {bicimler2}
+                     position:absolute;
+                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
+                     width:{self._rect.width() * self.scale()}px;
+                     height:{self._rect.height() * self.scale()}px;
+                     top:{y}px;
+                     left:{x}px;
+                     opacity:{self.imageOpacity};
+                     transform-box: fill-box;
+                     transform-origin: center;
+                     transform: rotate({self.rotation()}deg);
+                     " id="{self._kim}">{img_str}</div>\n"""
+
+        # /*background-image:url('{resim_adres}');*/
+        return div_str

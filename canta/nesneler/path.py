@@ -94,6 +94,52 @@ class PathItem(QGraphicsItem):
         self.oklar_dxdy_nokta = {}
 
     # ---------------------------------------------------------------------
+    def type(self):
+        return PathItem.Type
+
+    # ---------------------------------------------------------------------
+    def get_properties_for_save_binary(self):
+        properties = {"type": self.type(),
+                      # "painterPath": self.path(),
+                      "kim": self._kim,
+                      "painterPathAsList": self.toList(),
+                      "isPathClosed": self.isPathClosed(),
+                      "pos": self.pos(),
+                      "rotation": self.rotation(),
+                      "scale": self.scale(),
+                      "zValue": self.zValue(),
+                      "pen": self._pen,
+                      "font": self._font,
+                      "yaziRengi": self.yaziRengi,
+                      "arkaPlanRengi": self.arkaPlanRengi,
+                      "yaziHiza": int(self.painterTextOption.alignment()),
+                      "text": self.text(),
+                      "isPinned": self.isPinned,
+                      "command": self._command,
+                      }
+        return properties
+
+    # ---------------------------------------------------------------------
+    @property
+    def isPinned(self):
+        return self._isPinned
+
+    # ---------------------------------------------------------------------
+    @isPinned.setter
+    def isPinned(self, value):
+        if value:
+            self.setFlags(self.ItemIsSelectable
+                          # | self.ItemIsMovable
+                          #  | item.ItemIsFocusable
+                          )
+
+        else:
+            self.setFlags(self.ItemIsSelectable
+                          | self.ItemIsMovable
+                          | self.ItemIsFocusable)
+        self._isPinned = value
+
+    # ---------------------------------------------------------------------
     def ok_ekle(self, ok, scenepPos, okunHangiNoktasi):
 
         # self.oklar_dxdy_nokta.append((ok, self.mapFromScene(scenePos)))
@@ -124,28 +170,13 @@ class PathItem(QGraphicsItem):
                     ok.temp_append(QPointF(scx - dxdy_nokta[0], scy - dxdy_nokta[1]))
 
     # ---------------------------------------------------------------------
-    def type(self):
-        return PathItem.Type
-
-    # ---------------------------------------------------------------------
-    @property
-    def isPinned(self):
-        return self._isPinned
-
-    # ---------------------------------------------------------------------
-    @isPinned.setter
-    def isPinned(self, value):
-        if value:
-            self.setFlags(self.ItemIsSelectable
-                          # | self.ItemIsMovable
-                          #  | item.ItemIsFocusable
-                          )
-
-        else:
-            self.setFlags(self.ItemIsSelectable
-                          | self.ItemIsMovable
-                          | self.ItemIsFocusable)
-        self._isPinned = value
+    def varsaEnUsttekiGrubuGetir(self):
+        parentItem = self.parentItem()
+        while parentItem:
+            if parentItem.type() == shared.GROUP_ITEM_TYPE:
+                return parentItem
+            parentItem = parentItem.parentItem()
+        return None
 
     # ---------------------------------------------------------------------
     def update_resize_handles(self, force=False):
@@ -155,98 +186,6 @@ class PathItem(QGraphicsItem):
         # we may add resize functions to the PathItem object in the future.
         # so ...
         pass
-
-    # ---------------------------------------------------------------------
-    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
-
-        rect = self.sceneBoundingRect()
-        w = rect.width()
-        h = rect.height()
-
-        x = rect.left()
-        y = rect.top()
-
-        xs = self.scene().sceneRect().x()
-        ys = self.scene().sceneRect().y()
-        x = x - xs
-        y = y - ys
-
-        buffer = QBuffer()
-        buffer.open(QIODevice.WriteOnly)
-
-        generator = QSvgGenerator()
-        # generator.setFileName("dosya.svg")
-        generator.setOutputDevice(buffer)
-        # generator.setResolution(72)
-
-        # generator.setSize(QSize(w, h))  # kaymalara sebep oluyor
-        generator.setViewBox(QRectF(-w / 2, -h / 2, w, h))
-        generator.setTitle(self._kim)
-        generator.setDescription("")
-        # painter = QPainter(generator)
-        painter = QPainter()
-        painter.begin(generator)
-        painter.setPen(self._pen)
-        painter.setBrush(self._brush)
-
-        painter.rotate(self.rotation())
-        painter.drawPath(self._path)
-        painter.rotate(-self.rotation())
-
-        if self._text:
-            # painter.setWorldMatrixEnabled(False)
-            painter.save()
-            painter.setFont(self._font)
-            # painter.setPen(self.textPen)
-            painter.setPen(self.yaziRengi)
-            painter.translate(self.boundingRect().center())
-            painter.rotate(-self.rotation())
-            painter.scale(self.painterTextScale, self.painterTextScale)
-            painter.translate(-self.boundingRect().center())
-            painter.drawText(self.painterTextRect, self._text, self.painterTextOption)
-            painter.restore()
-            # painter.setWorldMatrixEnabled(True)
-
-        painter.end()
-
-        svg_string = buffer.data().data().decode("utf-8")
-
-        # background: rgba{self.arkaPlanRengi.toTuple()};\n
-        div_str = f"""
-                    <div style="
-                     position:absolute;
-                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
-                     width:{w}px;
-                     height:{h}px;
-                     top:{y}px;
-                     left:{x}px;" id="{self._kim}">{svg_string}</div>\n
-                     
-            """
-
-        # return svg_string
-        return div_str
-
-    # ---------------------------------------------------------------------
-    def get_properties_for_save_binary(self):
-        properties = {"type": self.type(),
-                      # "painterPath": self.path(),
-                      "kim": self._kim,
-                      "painterPathAsList": self.toList(),
-                      "isPathClosed": self.isPathClosed(),
-                      "pos": self.pos(),
-                      "rotation": self.rotation(),
-                      "scale": self.scale(),
-                      "zValue": self.zValue(),
-                      "pen": self._pen,
-                      "font": self._font,
-                      "yaziRengi": self.yaziRengi,
-                      "arkaPlanRengi": self.arkaPlanRengi,
-                      "yaziHiza": int(self.painterTextOption.alignment()),
-                      "text": self.text(),
-                      "isPinned": self.isPinned,
-                      "command": self._command,
-                      }
-        return properties
 
     # ---------------------------------------------------------------------
     def isPathClosed(self):
@@ -893,100 +832,6 @@ class PathItem(QGraphicsItem):
         self.painterTextRect = r
 
     # ---------------------------------------------------------------------
-    def paint(self, painter, option, widget=None):
-        painter.setPen(self._pen)
-        painter.setBrush(self._brush)
-        painter.drawPath(self._path)
-
-        # if self.pixmap.isNull():
-        #     painter.setPen(self._pen)
-        #     painter.setBrush(self._brush)
-        #     painter.drawPath(self._path)
-        # else:
-        #     painter.drawPixmap(self.boundingRect().toRect(), self.pixmap)
-
-        if self._text:
-            # painter.setWorldMatrixEnabled(False)
-            painter.save()
-            painter.setFont(self._font)
-            # painter.setPen(self.textPen)
-            painter.setPen(self.yaziRengi)
-            painter.translate(self.boundingRect().center())
-            painter.rotate(-self.rotation())
-            painter.scale(self.painterTextScale, self.painterTextScale)
-            painter.translate(-self.boundingRect().center())
-            # metrics = painter.fontMetrics()
-            # text = metrics.elidedText(self.text(), Qt.ElideRight, self.boundingRect().width())
-            # TODO: self.boundingRect().width() calismadi, sceneWidth() de biraz maliyetli, optimize edilebilir.
-            # txt = metrics.elidedText(self._text, Qt.ElideRight, self.sceneWidth() / scale)
-            # painter.drawText(self.boundingRect(), Qt.AlignCenter | Qt.AlignVCenter, txt)
-            painter.drawText(self.painterTextRect, self._text, self.painterTextOption)
-            painter.restore()
-            # painter.setWorldMatrixEnabled(True)
-
-        if self.intersects:
-            pen = QPen(self._pen)
-            pen.setColor(self.arkaPlanRengi)
-            painter.setPen(pen)
-            painter.setBrush(self.arkaPlanRengi)
-            # self.startPointRect.setSize(self.startPointRect.size() * self._pen.width())
-            painter.drawEllipse(self.startPointRect)
-
-        if option.state & QStyle.State_Selected or self.cosmeticSelect:
-
-            if self.isActiveItem:
-                selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
-            else:
-                selectionPenBottom = self.selectionPenBottom
-
-            painter.setBrush(Qt.NoBrush)
-
-            # if self.pixmap.isNull():
-            if self.editMode:
-                painter.setPen(selectionPenBottom)
-                painter.drawPath(self._path)
-
-                # painter.setPen(self.selectionPenTop)
-                # painter.drawPath(self._path)
-
-                path = self.path()
-                painter.setPen(QPen(self.cizgiRengi, 5))
-                for i in range(path.elementCount()):
-                    painter.drawPoint(QPointF(path.elementAt(i).x, path.elementAt(i).y))
-                if self.secilen_nokta:
-                    painter.setPen(QPen(Qt.red, 10))
-                    painter.drawPoint(
-                        QPointF(path.elementAt(self.secilen_nokta_idx).x, path.elementAt(self.secilen_nokta_idx).y))
-
-            else:
-                painter.setPen(selectionPenBottom)
-                painter.drawRect(self.boundingRect())
-
-                # painter.setPen(self.selectionPenTop)
-                # painter.drawRect(self.boundingRect())
-
-            # if self.editMode:
-            #     # for a future release, draw points
-            #     path = self.path()
-            #     painter.setPen(QPen(self.cizgiRengi, 10))
-            #     for i in range(path.elementCount()):
-            #         painter.drawPoint(QPointF(path.elementAt(i).x, path.elementAt(i).y))
-
-        # # # # # debug start - pos() # # # # #
-        # p = self.pos()
-        # s = self.scenePos()
-        # painter.drawText(self.boundingRect(), "{},  {}\n{},  {}".format(p.x(), p.y(), s.x(), s.y()))
-        # painter.setPen(QPen(Qt.green, 12))
-        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
-        # painter.drawRect(self.boundingRect())
-        # painter.drawRect(p.x(),p.y(),100,100)
-        # painter.drawRect(s.x(),s.y(),100,100)
-        # painter.drawRect(0,0,15,15)
-        # painter.drawRect(self.path().controlPointRect())
-        # painter.drawRect(self.boundingRect())
-        # # # # # debug end - pos() # # # # #
-
-    # ---------------------------------------------------------------------
     def wheelEvent(self, event):
         # factor = 1.41 ** (event.delta() / 240.0)
         # self.scale(factor, factor)
@@ -1349,3 +1194,167 @@ class PathItem(QGraphicsItem):
                 self.scene().select_all_children_recursively(self, cosmeticSelect=False, topmostParent=True)
             else:
                 self.scene().select_all_children_recursively(self, cosmeticSelect=False)
+
+    # ---------------------------------------------------------------------
+    def paint(self, painter, option, widget=None):
+        painter.setPen(self._pen)
+        painter.setBrush(self._brush)
+        painter.drawPath(self._path)
+
+        # if self.pixmap.isNull():
+        #     painter.setPen(self._pen)
+        #     painter.setBrush(self._brush)
+        #     painter.drawPath(self._path)
+        # else:
+        #     painter.drawPixmap(self.boundingRect().toRect(), self.pixmap)
+
+        if self._text:
+            # painter.setWorldMatrixEnabled(False)
+            painter.save()
+            painter.setFont(self._font)
+            # painter.setPen(self.textPen)
+            painter.setPen(self.yaziRengi)
+            painter.translate(self.boundingRect().center())
+            painter.rotate(-self.rotation())
+            painter.scale(self.painterTextScale, self.painterTextScale)
+            painter.translate(-self.boundingRect().center())
+            # metrics = painter.fontMetrics()
+            # text = metrics.elidedText(self.text(), Qt.ElideRight, self.boundingRect().width())
+            # TODO: self.boundingRect().width() calismadi, sceneWidth() de biraz maliyetli, optimize edilebilir.
+            # txt = metrics.elidedText(self._text, Qt.ElideRight, self.sceneWidth() / scale)
+            # painter.drawText(self.boundingRect(), Qt.AlignCenter | Qt.AlignVCenter, txt)
+            painter.drawText(self.painterTextRect, self._text, self.painterTextOption)
+            painter.restore()
+            # painter.setWorldMatrixEnabled(True)
+
+        if self.intersects:
+            pen = QPen(self._pen)
+            pen.setColor(self.arkaPlanRengi)
+            painter.setPen(pen)
+            painter.setBrush(self.arkaPlanRengi)
+            # self.startPointRect.setSize(self.startPointRect.size() * self._pen.width())
+            painter.drawEllipse(self.startPointRect)
+
+        if option.state & QStyle.State_Selected or self.cosmeticSelect:
+
+            if self.isActiveItem:
+                selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
+            else:
+                selectionPenBottom = self.selectionPenBottom
+
+            painter.setBrush(Qt.NoBrush)
+
+            # if self.pixmap.isNull():
+            if self.editMode:
+                painter.setPen(selectionPenBottom)
+                painter.drawPath(self._path)
+
+                # painter.setPen(self.selectionPenTop)
+                # painter.drawPath(self._path)
+
+                path = self.path()
+                painter.setPen(QPen(self.cizgiRengi, 5))
+                for i in range(path.elementCount()):
+                    painter.drawPoint(QPointF(path.elementAt(i).x, path.elementAt(i).y))
+                if self.secilen_nokta:
+                    painter.setPen(QPen(Qt.red, 10))
+                    painter.drawPoint(
+                        QPointF(path.elementAt(self.secilen_nokta_idx).x, path.elementAt(self.secilen_nokta_idx).y))
+
+            else:
+                painter.setPen(selectionPenBottom)
+                painter.drawRect(self.boundingRect())
+
+                # painter.setPen(self.selectionPenTop)
+                # painter.drawRect(self.boundingRect())
+
+            # if self.editMode:
+            #     # for a future release, draw points
+            #     path = self.path()
+            #     painter.setPen(QPen(self.cizgiRengi, 10))
+            #     for i in range(path.elementCount()):
+            #         painter.drawPoint(QPointF(path.elementAt(i).x, path.elementAt(i).y))
+
+        # # # # # debug start - pos() # # # # #
+        # p = self.pos()
+        # s = self.scenePos()
+        # painter.drawText(self.boundingRect(), "{},  {}\n{},  {}".format(p.x(), p.y(), s.x(), s.y()))
+        # painter.setPen(QPen(Qt.green, 12))
+        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
+        # painter.drawRect(self.boundingRect())
+        # painter.drawRect(p.x(),p.y(),100,100)
+        # painter.drawRect(s.x(),s.y(),100,100)
+        # painter.drawRect(0,0,15,15)
+        # painter.drawRect(self.path().controlPointRect())
+        # painter.drawRect(self.boundingRect())
+        # # # # # debug end - pos() # # # # #
+
+    # ---------------------------------------------------------------------
+    def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
+
+        rect = self.sceneBoundingRect()
+        w = rect.width()
+        h = rect.height()
+
+        x = rect.left()
+        y = rect.top()
+
+        xs = self.scene().sceneRect().x()
+        ys = self.scene().sceneRect().y()
+        x = x - xs
+        y = y - ys
+
+        buffer = QBuffer()
+        buffer.open(QIODevice.WriteOnly)
+
+        generator = QSvgGenerator()
+        # generator.setFileName("dosya.svg")
+        generator.setOutputDevice(buffer)
+        # generator.setResolution(72)
+
+        # generator.setSize(QSize(w, h))  # kaymalara sebep oluyor
+        generator.setViewBox(QRectF(-w / 2, -h / 2, w, h))
+        generator.setTitle(self._kim)
+        generator.setDescription("")
+        # painter = QPainter(generator)
+        painter = QPainter()
+        painter.begin(generator)
+        painter.setPen(self._pen)
+        painter.setBrush(self._brush)
+
+        painter.rotate(self.rotation())
+        painter.drawPath(self._path)
+        painter.rotate(-self.rotation())
+
+        if self._text:
+            # painter.setWorldMatrixEnabled(False)
+            painter.save()
+            painter.setFont(self._font)
+            # painter.setPen(self.textPen)
+            painter.setPen(self.yaziRengi)
+            painter.translate(self.boundingRect().center())
+            painter.rotate(-self.rotation())
+            painter.scale(self.painterTextScale, self.painterTextScale)
+            painter.translate(-self.boundingRect().center())
+            painter.drawText(self.painterTextRect, self._text, self.painterTextOption)
+            painter.restore()
+            # painter.setWorldMatrixEnabled(True)
+
+        painter.end()
+
+        svg_string = buffer.data().data().decode("utf-8")
+
+        # background: rgba{self.arkaPlanRengi.toTuple()};\n
+        div_str = f"""
+                    <div style="
+                     position:absolute;
+                     z-index:{int(self.zValue() * 10) if self.zValue() else 0};
+                     width:{w}px;
+                     height:{h}px;
+                     top:{y}px;
+                     left:{x}px;" id="{self._kim}">{svg_string}</div>\n
+
+            """
+
+        # return svg_string
+        return div_str
