@@ -1129,6 +1129,8 @@ class LineItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def rotateItem(self, delta):
+        if not self.isDrawingFinished:
+            return
 
         # self.setTransformOriginPoint(self.boundingRect().center())
         if delta > 0:

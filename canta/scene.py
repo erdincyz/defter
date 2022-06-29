@@ -478,7 +478,7 @@ class Scene(QGraphicsScene):
     def _fircaBoyutuItem_olustur(self):
         rect = QRectF(-self.scenePen.widthF() / 2, -self.scenePen.widthF() / 2, self.scenePen.widthF(),
                       self.scenePen.widthF())
-        pen = QPen(self.scenePen.color(), 2, Qt.DashLine, Qt.RoundCap, Qt.RoundJoin)
+        pen = QPen(self.scenePen.color(), 1, Qt.DashLine, Qt.RoundCap, Qt.RoundJoin)
         self.fircaBoyutuItem = YuvarlakFircaBoyutu(self.fircaSonPos, rect, QColor.fromRgbF(0, 0, 0, 0),
                                                    # self.scenePen,
                                                    pen)
@@ -519,12 +519,15 @@ class Scene(QGraphicsScene):
             self.drawLineItem.setCizgiKalinligi(cap)
 
         elif self.toolType == self.DrawPathTool:
-            if self.fircaBoyutuItem:
-                if angleDeltaY > 0:
-                    cap = self.parent().fircaBuyult()
-                else:
-                    cap = self.parent().fircaKucult()
 
+            if angleDeltaY > 0:
+                cap = self.parent().fircaBuyult()
+            else:
+                cap = self.parent().fircaKucult()
+
+            self.pathItem.setCizgiKalinligi(cap)
+
+            if self.fircaBoyutuItem:
                 rect = QRectF(-cap / 2, -cap / 2, cap, cap)
                 self.fircaBoyutuItem.setRect(rect)
 

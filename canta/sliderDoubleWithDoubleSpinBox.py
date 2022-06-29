@@ -9,17 +9,17 @@ __author__ = 'Erdinç Yılmaz'
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
 from PySide6.QtCore import Qt, Signal
 
-from canta.spinBox import DoubleSpinBox
+from canta.spinBoxlar import DoubleSpinBox
 from canta.slider import Slider
 
 
 #######################################################################
-class DoubleSliderWithDoubleSpinBox(QWidget):
+class SliderDoubleWithDoubleSpinBox(QWidget):
     degerDegisti = Signal(float)
 
     # ---------------------------------------------------------------------
     def __init__(self, yerlesim=Qt.Horizontal, parent=None):
-        super(DoubleSliderWithDoubleSpinBox, self).__init__(parent)
+        super(SliderDoubleWithDoubleSpinBox, self).__init__(parent)
 
         if yerlesim == Qt.Horizontal:
             anaLay = QHBoxLayout()
@@ -66,6 +66,11 @@ class DoubleSliderWithDoubleSpinBox(QWidget):
     def setMaximum(self, deger):
         self.slider.setMaximum(deger * 10)
         self.dSpinBox.setMaximum(deger)
+
+    # ---------------------------------------------------------------------
+    def setRange(self, minimum, maximum):
+        self.setMinimum(minimum)
+        self.setMaximum(maximum)
 
     # ---------------------------------------------------------------------
     def setSingleStep(self, deger):

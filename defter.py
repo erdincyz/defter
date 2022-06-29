@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # .
 
+# الحمد لله
+
 __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '25/03/16'
@@ -26,7 +28,7 @@ from PySide6.QtGui import (QCursor, QKeySequence, QIcon, QPixmap, QColor, QPen, 
                            QImageReader, QImage, QPixmapCache, QTextCharFormat, QTextCursor, QPalette, QTextListFormat,
                            QTextBlockFormat, QPageSize, QPageLayout, QAction, QActionGroup, QUndoGroup, QUndoStack,
                            QShortcut)
-from PySide6.QtWebEngineCore import QWebEngineSettings  #, QWebEngineProfile, QWebEnginePage
+from PySide6.QtWebEngineCore import QWebEngineSettings  # , QWebEngineProfile, QWebEnginePage
 
 from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QApplication,
                                QFileDialog, QToolBar, QMenuBar, QMenu, QColorDialog, QMessageBox,
@@ -37,23 +39,24 @@ from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, Q
 
 from PySide6.QtCore import (Qt, QRectF, QCoreApplication, QSettings, QPoint, Slot, QSizeF, QSize, QFile, QSaveFile,
                             QIODevice, QDataStream, QMimeData, QByteArray, QPointF, qCompress, qUncompress, QLocale,
-                            QThread, QUrl, QLineF, QObject, QRect, QTimer, QBuffer, QDir)
+                            QThread, QUrl, QLineF, QObject, QRect, QTimer, QDir)
 
 from PySide6.QtWebEngineWidgets import QWebEngineView
 
 from PySide6.QtPrintSupport import QPrinter, QPrinterInfo
 from canta import shared
 from canta.dockWidget import DockWidget
+from canta.nesneOzellikleriYuzenWidget import NesneOzellikleriYuzenWidget
 from canta.printPreviewDialog import PrintPreviewDialog
+from canta.renkSecici import RenkSeciciWidget
 from canta.scene import Scene
 from canta.view import View
 from canta.ekranKutuphane import EkranKutuphane
 from canta.sahneKutuphane import SahneKutuphane
 from canta.tabWidget import TabWidget
 from canta.tabBar import TabBar
-from canta.spinBox import (SpinBox, SpinBoxForRotation)
-# from canta.slider import Slider
-from canta.doubleSliderWithDoubleSpinBox import DoubleSliderWithDoubleSpinBox
+from canta.spinBoxlar import SpinBox, SpinBoxForRotation
+from canta.sliderDoubleWithDoubleSpinBox import SliderDoubleWithDoubleSpinBox
 from canta.komutPenceresi import CommandDialog
 from canta.nesneler.base import BaseItem
 from canta.nesneler.ellipse import Ellipse
@@ -76,7 +79,7 @@ from canta.htmlParsers import ImgSrcParser
 from canta.treeView import TreeView
 from canta.treeDelegate import TreeDelegate
 from canta.treeSayfa import Sayfa
-from canta.pushButton import PushButton
+from canta.pushButton import PushButton, PushButtonRenk
 from canta.yuzenWidget import YuzenWidget
 from canta.with_signals_updates_blocked import signals_blocked_and_updates_disabled as signals_updates_blocked, \
     signals_blocked
@@ -199,11 +202,10 @@ class DefterAnaPencere(QMainWindow):
         self.ekle_hotkeys()
 
         self.act_switch_to_selection_tool()
-        self.olustur_yazi_ozellikleriDW()
         self.olustur_nesne_ozellikleriDW()
-        self.olustur_cizgi_ozellikleriDW()
         self.olustur_stillerDW()
-        self.olustur_yuzen_stillerDW()
+        self.olustur_stillerYW()
+        self.olustur_nesne_ozellikleriYW()
         self.olustur_sahneye_baski_siniri_cizim_ayarlari()
         self.arsivleme_programi_adres_belirle()
 
@@ -249,38 +251,130 @@ class DefterAnaPencere(QMainWindow):
         super(DefterAnaPencere, self).setCursor(cursor)
 
     # ---------------------------------------------------------------------
-    def olustur_yazi_ozellikleriDW(self):
+    def olustur_nesne_ozellikleriDW(self):
 
-        self.yaziOzellikleriDW = DockWidget(self.tr("Text Properties"), self)
-        self.yaziOzellikleriDW.setObjectName("yaziOzellikleriDW")
-        self.yaziOzellikleriDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.yaziOzellikleriDW)
+        self.nesneOzellikleriDW = DockWidget(self.tr("Item Properties"), self)
+        self.nesneOzellikleriDW.setObjectName("nesneOzellikleriDW")
+        self.nesneOzellikleriDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.addDockWidget(Qt.RightDockWidgetArea, self.nesneOzellikleriDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
 
-        scroll = QScrollArea()
-        # scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        # scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll.setWidgetResizable(True)
-        # scroll.setBackgroundRole(QPalette.Dark)
-        self.yaziOzellikleriDW.setWidget(scroll)
-        # scrollLayout = QVBoxLayout(scroll)
+        self.nesneOzellikleriDWScroll = QScrollArea()
+        # self.nesneOzellikleriDWScroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        # self.nesneOzellikleriDWScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.nesneOzellikleriDWScroll.setWidgetResizable(True)
+        # self.nesneOzellikleriDWScroll.setBackgroundRole(QPalette.Dark)
+        self.nesneOzellikleriDW.setWidget(self.nesneOzellikleriDWScroll)
+        # scrollLayout = QVBoxLayout(self.nesneOzellikleriDWScroll)
 
-        self.yaziOzellikleriDWBaseWidget = QWidget(scroll)
-        # self.yaziOzellikleriDW.setWidget(self.yaziOzellikleriDWBaseWidget)
-        anaWidgetLayout = QVBoxLayout(self.yaziOzellikleriDWBaseWidget)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetFixedSize)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
-        anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetMaximumSize)
-        # anaWidgetLayout.setContentsMargins(0,0,0,0)
-        # self.yaziOzellikleriDW.setContentsMargins(0, 0, 0, 0)
-        # self.yaziOzellikleriDWBaseWidget.setContentsMargins(0,0,0,0)
-        # scrollLayout.addWidget(self.yaziOzellikleriDWBaseWidget)
-        scroll.setWidget(self.yaziOzellikleriDWBaseWidget)
-        # scroll.setLayout(layout)
+        self.nesneOzellikleriDWBaseWidget = QWidget(self.nesneOzellikleriDWScroll)
+        # self.nesneOzellikleriDW.setWidget(self.nesneOzellikleriDWBaseWidget)
+        anaLay = QVBoxLayout(self.nesneOzellikleriDWBaseWidget)
+        # anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
+        # anaLay.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
+        anaLay.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
+        # anaLay.setSizeConstraint(QVBoxLayout.SetMaximumSize)
+        # anaLay.setContentsMargins(0,0,0,0)
+        # self.nesneOzellikleriDW.setContentsMargins(0, 0, 0, 0)
+        # self.nesneOzellikleriDWBaseWidget.setContentsMargins(0,0,0,0)
+        # scrollLayout.addWidget(self.nesneOzellikleriDWBaseWidget)
+        self.nesneOzellikleriDWScroll.setWidget(self.nesneOzellikleriDWBaseWidget)
+        # self.nesneOzellikleriDWScroll.setLayout(layout)
+
+        self.nesneGrupW = QWidget(self.nesneOzellikleriDWBaseWidget)
+        nesneLay = QVBoxLayout(self.nesneGrupW)
+        nesneLay.setContentsMargins(0, 0, 0, 0)
+        self.yaziGrupW = QWidget(self.nesneOzellikleriDWBaseWidget)
+        yaziLay = QVBoxLayout(self.yaziGrupW)
+        yaziLay.setContentsMargins(0, 0, 0, 0)
+        self.cizgiGrupW = QWidget(self.nesneOzellikleriDWBaseWidget)
+        cizgiLay = QVBoxLayout(self.cizgiGrupW)
+        cizgiLay.setContentsMargins(0, 0, 0, 0)
+
+        #######################################################################
+        #######################################################################
+        self.itemWidthSBox_nesnedw = SpinBox(self.nesneGrupW)
+        self.itemWidthSBox_nesnedw.setSuffix(" w")
+        self.itemWidthSBox_nesnedw.setMinimum(1)
+        self.itemWidthSBox_nesnedw.setMaximum(99999)
+        self.itemWidthSBox_nesnedw.setSingleStep(1)
+        self.itemWidthSBox_nesnedw.setValue(int(self.itemSize.width()))
+        self.itemWidthSBox_nesnedw.setToolTip(self.tr("Width"))
+        self.itemWidthSBox_nesnedw.valueChangedFromSpinBoxGuiNotBySetValue.connect(self.act_change_item_width)
+        self.itemWidthSBox_nesnedw.valueChanged.connect(self.itemWidthSBox_tbar.setValue)
+        # ilk acilista burasi daha sonra cagriliyor o yuzden burda itemRotationSBox_tbar baglantilarini yapiyoruz
+        self.itemWidthSBox_tbar.valueChanged.connect(self.itemWidthSBox_nesnedw.setValue)
+
+        self.itemHeightSBox_nesnedw = SpinBox(self.nesneGrupW)
+        self.itemHeightSBox_nesnedw.setSuffix(" h")
+        self.itemHeightSBox_nesnedw.setMinimum(1)
+        self.itemHeightSBox_nesnedw.setMaximum(99999)
+        self.itemHeightSBox_nesnedw.setSingleStep(1)
+        self.itemHeightSBox_nesnedw.setValue(int(self.itemSize.height()))
+        self.itemHeightSBox_nesnedw.setToolTip(self.tr("Height"))
+        self.itemHeightSBox_nesnedw.valueChangedFromSpinBoxGuiNotBySetValue.connect(self.act_change_item_height)
+        self.itemHeightSBox_nesnedw.valueChanged.connect(self.itemHeightSBox_tbar.setValue)
+        # ilk acilista burasi daha sonra cagriliyor o yuzden burda itemHeightSBox_tbar baglantilarini yapiyoruz
+        self.itemHeightSBox_tbar.valueChanged.connect(self.itemHeightSBox_nesnedw.setValue)
+
+        self.itemRotationSBox_nesnedw = SpinBoxForRotation(self.nesneGrupW)
+        self.itemRotationSBox_nesnedw.setSuffix(u"\u00b0")
+        self.itemRotationSBox_nesnedw.setValue(0)
+        self.itemRotationSBox_nesnedw.setMinimum(-1)
+        self.itemRotationSBox_nesnedw.setMaximum(360)
+        self.itemRotationSBox_nesnedw.setSingleStep(1)
+        self.itemRotationSBox_nesnedw.setToolTip(self.tr("Rotation"))
+        self.itemRotationSBox_nesnedw.valueChangedFromSpinBoxGuiNotBySetValue.connect(self.act_change_item_rotation)
+        self.itemRotationSBox_nesnedw.valueChanged.connect(self.itemRotationSBox_tbar.setValue)
+        # ilk acilista burasi daha sonra cagriliyor o yuzden burda itemRotationSBox_tbar baglantilarini yapiyoruz
+        self.itemRotationSBox_tbar.valueChanged.connect(self.itemRotationSBox_nesnedw.setValue)
+
+        boyutLay = QHBoxLayout()
+
+        boyutLay.addWidget(self.itemWidthSBox_nesnedw)
+        boyutLay.addWidget(self.itemHeightSBox_nesnedw)
+        boyutLay.addWidget(self.itemRotationSBox_nesnedw)
         # ---------------------------------------------------------------------
-        self.fontCBox_yazidw = FontComboBox(self.yaziOzellikleriDWBaseWidget)
+
+        self.nesneArkaplanRengiBtn = PushButtonRenk("", 36, 36, self.arkaPlanRengi, self.nesneGrupW)
+        self.nesneArkaplanRengiBtn.clicked.connect(self.act_set_item_background_color)
+
+        renklerDisLay = QHBoxLayout()
+        renklerSatirlarLay = QVBoxLayout()
+        renklerSatir1Lay = QHBoxLayout()
+        renklerSatir2Lay = QHBoxLayout()
+
+        self.nesne_arkaplan_rengi_btn_liste = []
+
+        for i in range(8):
+            btn = self.ver_renk_palet_buton(tip="a", gen=15, yuk=15, renk=self.nesne_arkaplan_rengi_btn_liste_acilis_renkleri[i],
+                                            parent=self.nesneGrupW)
+            renklerSatir1Lay.addWidget(btn)
+
+            self.nesne_arkaplan_rengi_btn_liste.append(btn)
+
+        for i in range(8, 16):
+            btn = self.ver_renk_palet_buton(tip="a", gen=15, yuk=15, renk=self.nesne_arkaplan_rengi_btn_liste_acilis_renkleri[i],
+                                            parent=self.nesneGrupW)
+            renklerSatir2Lay.addWidget(btn)
+
+            self.nesne_arkaplan_rengi_btn_liste.append(btn)
+
+        renklerSatirlarLay.addLayout(renklerSatir1Lay)
+        renklerSatirlarLay.addLayout(renklerSatir2Lay)
+        renklerDisLay.addWidget(self.nesneArkaplanRengiBtn)
+        renklerDisLay.addLayout(renklerSatirlarLay)
+        renklerDisLay.addStretch()
+
+        nesneLay.addLayout(renklerDisLay)
+        nesneLay.addSpacing(5)
+        nesneLay.addLayout(boyutLay)
+        nesneLay.addStretch()
+        #######################################################################
+        #######################################################################
+        # ---------------------------------------------------------------------
+        self.fontCBox_yazidw = FontComboBox(self.yaziGrupW)
         # self.fontCBox_yazidw.activated[str].connect(self.act_set_current_font)
         # self.fontCBox_yazidw.currentFontChanged.connect(self.set_text_family)
         # self.fontCBox_yazidw.currentIndexChanged.connect(self.act_change_font)
@@ -292,7 +386,7 @@ class DefterAnaPencere(QMainWindow):
         # fontCBox_tbar atamasini burda yapiyoruz.
         self.fontCBox_tbar.currentFontChanged.connect(self.fontCBox_yazidw.setCurrentFont)
 
-        self.textSizeSBox_yazidw = SpinBox(self.yaziOzellikleriDWBaseWidget)
+        self.textSizeSBox_yazidw = SpinBox(self.yaziGrupW)
         self.textSizeSBox_yazidw.setSuffix(" pt")
         self.textSizeSBox_yazidw.setValue(self.textSize)
         self.textSizeSBox_yazidw.setMaximumWidth(85)
@@ -307,7 +401,7 @@ class DefterAnaPencere(QMainWindow):
         self.textSizeSBox_tbar.valueChanged.connect(self.textSizeSBox_yazidw.setValue)
         self.textSizeSBox_yazidw.setToolTip(self.tr("Text Size"))
 
-        self.yaziListeBicimiCBox = QComboBox(self.yaziOzellikleriDWBaseWidget)
+        self.yaziListeBicimiCBox = QComboBox(self.yaziGrupW)
         self.yaziListeBicimiCBox.setMaximumWidth(135)
         self.yaziListeBicimiCBox.addItem(self.tr("Standard"))
         self.yaziListeBicimiCBox.addItem(self.tr("Bullet List (Disc)"))
@@ -323,7 +417,7 @@ class DefterAnaPencere(QMainWindow):
         # self.yaziListeBicmiAction = self.fontToolBar.addWidget(self.yaziListeBicimiCBox)
 
         # ---------------------------------------------------------------------
-        self.yaziRengiBtn = PushButton("", 36, 36, self.yaziRengi, self.yaziOzellikleriDWBaseWidget)
+        self.yaziRengiBtn = PushButtonRenk("", 36, 36, self.yaziRengi, self.yaziGrupW)
         self.yaziRengiBtn.clicked.connect(self.act_set_item_text_color)
 
         renklerDisLay = QHBoxLayout()
@@ -331,67 +425,53 @@ class DefterAnaPencere(QMainWindow):
         renklerSatir1Lay = QHBoxLayout()
         renklerSatir2Lay = QHBoxLayout()
 
-        def make_callback_set_item_text_color(button):
-            return lambda: self.act_set_item_text_color_with_pallete_button(button)
-
-        def make_callback_sag_tiklanan_butona_renk_secip_ata(button):
-            return lambda: self.act_sag_tiklanan_butona_renk_secip_ata(button, "yazi")
-
         self.yazi_rengi_btn_liste = []
 
         for i in range(8):
-            btn = PushButton("", 15, 15, renkArkaplan=self.yazi_rengi_btn_liste_acilis_renkleri[i],
-                             parent=self.yaziOzellikleriDWBaseWidget)
-            btn.setStatusTip(self.tr("Left click to set text color, Right click to modify the color."))
-            btn.setToolTip(self.tr("Left click to set text color, Right click to modify the color."))
-            btn.clicked.connect(make_callback_set_item_text_color(btn))
-            btn.sagTiklandi.connect(make_callback_sag_tiklanan_butona_renk_secip_ata(btn))
+            btn = self.ver_renk_palet_buton(tip="y", gen=15, yuk=15, renk=self.yazi_rengi_btn_liste_acilis_renkleri[i],
+                                            parent=self.yaziGrupW)
             renklerSatir1Lay.addWidget(btn)
 
             self.yazi_rengi_btn_liste.append(btn)
 
         for i in range(8, 16):
-            btn = PushButton("", 15, 15, renkArkaplan=self.yazi_rengi_btn_liste_acilis_renkleri[i],
-                             parent=self.yaziOzellikleriDWBaseWidget)
-            btn.setStatusTip(self.tr("Left click to set text color, Right click to modify the color."))
-            btn.setToolTip(self.tr("Left click to set text color, Right click to modify the color."))
-            btn.clicked.connect(make_callback_set_item_text_color(btn))
-            btn.sagTiklandi.connect(make_callback_sag_tiklanan_butona_renk_secip_ata(btn))
+            btn = self.ver_renk_palet_buton(tip="y", gen=15, yuk=15, renk=self.yazi_rengi_btn_liste_acilis_renkleri[i],
+                                            parent=self.yaziGrupW)
             renklerSatir2Lay.addWidget(btn)
 
             self.yazi_rengi_btn_liste.append(btn)
 
+        renklerSatirlarLay.addLayout(renklerSatir1Lay)
+        renklerSatirlarLay.addLayout(renklerSatir2Lay)
         renklerDisLay.addWidget(self.yaziRengiBtn)
         renklerDisLay.addLayout(renklerSatirlarLay)
         renklerDisLay.addStretch()
-        renklerSatirlarLay.addLayout(renklerSatir1Lay)
-        renklerSatirlarLay.addLayout(renklerSatir2Lay)
 
-        self.btnBold = PushButton("", 16, 16, parent=self.yaziOzellikleriDWBaseWidget)
+        self.btnBold = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnBold.setIcon(QIcon(':icons/bold.png'))
         self.btnBold.setFlat(True)
         self.btnBold.setCheckable(True)
         self.btnBold.clicked.connect(lambda: self.act_bold(from_button=True))
 
-        self.btnItalic = PushButton("", 16, 16, parent=self.yaziOzellikleriDWBaseWidget)
+        self.btnItalic = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnItalic.setIcon(QIcon(':icons/italic.png'))
         self.btnItalic.setFlat(True)
         self.btnItalic.setCheckable(True)
         self.btnItalic.clicked.connect(lambda: self.act_italic(from_button=True))
 
-        self.btnUnderline = PushButton("", 16, 16, parent=self.yaziOzellikleriDWBaseWidget)
+        self.btnUnderline = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnUnderline.setIcon(QIcon(':icons/underline.png'))
         self.btnUnderline.setFlat(True)
         self.btnUnderline.setCheckable(True)
         self.btnUnderline.clicked.connect(lambda: self.act_underline(from_button=True))
 
-        self.btnStrikeOut = PushButton("", 16, 16, parent=self.yaziOzellikleriDWBaseWidget)
+        self.btnStrikeOut = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnStrikeOut.setIcon(QIcon(':icons/strikeout.png'))
         self.btnStrikeOut.setFlat(True)
         self.btnStrikeOut.setCheckable(True)
         self.btnStrikeOut.clicked.connect(lambda: self.act_strikeout(from_button=True))
 
-        self.btnOverline = PushButton("", 16, 16, parent=self.yaziOzellikleriDWBaseWidget)
+        self.btnOverline = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnOverline.setIcon(QIcon(':icons/overline.png'))
         self.btnOverline.setFlat(True)
         self.btnOverline.setCheckable(True)
@@ -405,28 +485,28 @@ class DefterAnaPencere(QMainWindow):
         btnKaratkerBicimleriLay.addWidget(self.btnOverline)
         btnKaratkerBicimleriLay.addStretch()
 
-        grp = QButtonGroup(self.yaziOzellikleriDWBaseWidget)
+        grp = QButtonGroup(self.yaziGrupW)
         grp.buttonClicked.connect(self.act_yazi_hizala_btn)
 
-        self.btnYaziHizalaSola = PushButton("", 16, 16, parent=self.yaziOzellikleriDWBaseWidget)
+        self.btnYaziHizalaSola = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnYaziHizalaSola.setIcon(
             QIcon.fromTheme('format-justify-left', QIcon(':icons/icons/format-justify-left.png')))
         self.btnYaziHizalaSola.setFlat(True)
         self.btnYaziHizalaSola.setCheckable(True)
 
-        self.btnYaziHizalaOrtala = PushButton("", 16, 16, parent=self.yaziOzellikleriDWBaseWidget)
+        self.btnYaziHizalaOrtala = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnYaziHizalaOrtala.setIcon(
             QIcon.fromTheme('format-justify-center', QIcon(':icons/icons/format-justify-center.png')))
         self.btnYaziHizalaOrtala.setFlat(True)
         self.btnYaziHizalaOrtala.setCheckable(True)
 
-        self.btnYaziHizalaSaga = PushButton("", 16, 16, parent=self.yaziOzellikleriDWBaseWidget)
+        self.btnYaziHizalaSaga = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnYaziHizalaSaga.setIcon(
             QIcon.fromTheme('format-justify-right', QIcon(':icons/icons/format-justify-right.png')))
         self.btnYaziHizalaSaga.setFlat(True)
         self.btnYaziHizalaSaga.setCheckable(True)
 
-        self.btnYaziHizalaSigdir = PushButton("", 16, 16, parent=self.yaziOzellikleriDWBaseWidget)
+        self.btnYaziHizalaSigdir = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnYaziHizalaSigdir.setIcon(
             QIcon.fromTheme('format-justify-fill', QIcon(':icons/icons/format-justify-fill.png')))
         self.btnYaziHizalaSigdir.setFlat(True)
@@ -455,184 +535,24 @@ class DefterAnaPencere(QMainWindow):
         lay.addWidget(self.yaziListeBicimiCBox)
         lay.addStretch()
 
-        anaWidgetLayout.addLayout(renklerDisLay)
-        anaWidgetLayout.addSpacing(5)
-        anaWidgetLayout.addLayout(btnBicimlerLay)
-        anaWidgetLayout.addSpacing(5)
-        anaWidgetLayout.addWidget(self.fontCBox_yazidw)
-        anaWidgetLayout.addSpacing(5)
-        anaWidgetLayout.addLayout(lay)
-
-        # anaWidgetLayout.addStretch()
-
-    # ---------------------------------------------------------------------
-    def olustur_nesne_ozellikleriDW(self):
-
-        self.nesneOzellikleriDW = DockWidget(self.tr("Item Properties"), self)
-        self.nesneOzellikleriDW.setObjectName("nesneOzellikleriDW")
-        self.nesneOzellikleriDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.nesneOzellikleriDW)
-
-        # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
-
-        scroll = QScrollArea()
-        # scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        # scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll.setWidgetResizable(True)
-        # scroll.setBackgroundRole(QPalette.Dark)
-        self.nesneOzellikleriDW.setWidget(scroll)
-        # scrollLayout = QVBoxLayout(scroll)
-
-        self.nesneOzellikleriDWBaseWidget = QWidget(scroll)
-        # self.nesneOzellikleriDW.setWidget(self.nesneOzellikleriDWBaseWidget)
-        anaWidgetLayout = QVBoxLayout(self.nesneOzellikleriDWBaseWidget)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetFixedSize)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
-        anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetMaximumSize)
-        # anaWidgetLayout.setContentsMargins(0,0,0,0)
-        # self.nesneOzellikleriDW.setContentsMargins(0, 0, 0, 0)
-        # self.nesneOzellikleriDWBaseWidget.setContentsMargins(0,0,0,0)
-        # scrollLayout.addWidget(self.nesneOzellikleriDWBaseWidget)
-        scroll.setWidget(self.nesneOzellikleriDWBaseWidget)
-        # scroll.setLayout(layout)
-
-        # ---------------------------------------------------------------------
-        # def olustur_nesne_ozellikleriDW(self):
-        # ---------------------------------------------------------------------
-
-        self.itemWidthSBox_nesnedw = SpinBox(self.nesneOzellikleriDWBaseWidget)
-        self.itemWidthSBox_nesnedw.setSuffix(" w")
-        self.itemWidthSBox_nesnedw.setMinimum(1)
-        self.itemWidthSBox_nesnedw.setMaximum(99999)
-        self.itemWidthSBox_nesnedw.setSingleStep(1)
-        self.itemWidthSBox_nesnedw.setValue(int(self.itemSize.width()))
-        self.itemWidthSBox_nesnedw.setToolTip(self.tr("Width"))
-        self.itemWidthSBox_nesnedw.valueChangedFromSpinBoxGuiNotBySetValue.connect(self.act_change_item_width)
-        self.itemWidthSBox_nesnedw.valueChanged.connect(self.itemWidthSBox_tbar.setValue)
-        # ilk acilista burasi daha sonra cagriliyor o yuzden burda itemRotationSBox_tbar baglantilarini yapiyoruz
-        self.itemWidthSBox_tbar.valueChanged.connect(self.itemWidthSBox_nesnedw.setValue)
-
-        self.itemHeightSBox_nesnedw = SpinBox(self.nesneOzellikleriDWBaseWidget)
-        self.itemHeightSBox_nesnedw.setSuffix(" h")
-        self.itemHeightSBox_nesnedw.setMinimum(1)
-        self.itemHeightSBox_nesnedw.setMaximum(99999)
-        self.itemHeightSBox_nesnedw.setSingleStep(1)
-        self.itemHeightSBox_nesnedw.setValue(int(self.itemSize.height()))
-        self.itemHeightSBox_nesnedw.setToolTip(self.tr("Height"))
-        self.itemHeightSBox_nesnedw.valueChangedFromSpinBoxGuiNotBySetValue.connect(self.act_change_item_height)
-        self.itemHeightSBox_nesnedw.valueChanged.connect(self.itemHeightSBox_tbar.setValue)
-        # ilk acilista burasi daha sonra cagriliyor o yuzden burda itemHeightSBox_tbar baglantilarini yapiyoruz
-        self.itemHeightSBox_tbar.valueChanged.connect(self.itemHeightSBox_nesnedw.setValue)
-
-        self.itemRotationSBox_nesnedw = SpinBoxForRotation(self.nesneOzellikleriDWBaseWidget)
-        self.itemRotationSBox_nesnedw.setSuffix(u"\u00b0")
-        self.itemRotationSBox_nesnedw.setValue(0)
-        self.itemRotationSBox_nesnedw.setMinimum(-1)
-        self.itemRotationSBox_nesnedw.setMaximum(360)
-        self.itemRotationSBox_nesnedw.setSingleStep(1)
-        self.itemRotationSBox_nesnedw.setToolTip(self.tr("Rotation"))
-        self.itemRotationSBox_nesnedw.valueChangedFromSpinBoxGuiNotBySetValue.connect(self.act_change_item_rotation)
-        self.itemRotationSBox_nesnedw.valueChanged.connect(self.itemRotationSBox_tbar.setValue)
-        # ilk acilista burasi daha sonra cagriliyor o yuzden burda itemRotationSBox_tbar baglantilarini yapiyoruz
-        self.itemRotationSBox_tbar.valueChanged.connect(self.itemRotationSBox_nesnedw.setValue)
-
-        boyutLay = QHBoxLayout()
-
-        boyutLay.addWidget(self.itemWidthSBox_nesnedw)
-        boyutLay.addWidget(self.itemHeightSBox_nesnedw)
-        boyutLay.addWidget(self.itemRotationSBox_nesnedw)
-        # ---------------------------------------------------------------------
-
-        self.nesneArkaplanRengiBtn = PushButton("", 36, 36, self.arkaPlanRengi, self.nesneOzellikleriDWBaseWidget)
-        self.nesneArkaplanRengiBtn.clicked.connect(self.act_set_item_background_color)
-
-        renklerDisLay = QHBoxLayout()
-        renklerSatirlarLay = QVBoxLayout()
-        renklerSatir1Lay = QHBoxLayout()
-        renklerSatir2Lay = QHBoxLayout()
-
-        def make_callback_set_item_background_color(button):
-            return lambda: self.act_set_item_background_color_with_pallete_button(button)
-
-        def make_callback_sag_tiklanan_butona_renk_secip_ata(button):
-            return lambda: self.act_sag_tiklanan_butona_renk_secip_ata(button, "arka")
-
-        self.nesne_arkaplan_rengi_btn_liste = []
-
-        for i in range(8):
-            btn = PushButton("", 15, 15, renkArkaplan=self.nesne_arkaplan_rengi_btn_liste_acilis_renkleri[i],
-                             parent=self.nesneOzellikleriDWBaseWidget)
-            btn.setStatusTip(self.tr("Left click to set item color, Right click to modify the color."))
-            btn.setToolTip(self.tr("Left click to set item color, Right click to modify the color."))
-            btn.clicked.connect(make_callback_set_item_background_color(btn))
-            btn.sagTiklandi.connect(make_callback_sag_tiklanan_butona_renk_secip_ata(btn))
-            renklerSatir1Lay.addWidget(btn)
-
-            self.nesne_arkaplan_rengi_btn_liste.append(btn)
-
-        for i in range(8, 16):
-            btn = PushButton("", 15, 15, renkArkaplan=self.nesne_arkaplan_rengi_btn_liste_acilis_renkleri[i],
-                             parent=self.nesneOzellikleriDWBaseWidget)
-            btn.setStatusTip(self.tr("Left click to set item color, Right click to modify the color."))
-            btn.setToolTip(self.tr("Left click to set item color, Right click to modify the color."))
-            btn.clicked.connect(make_callback_set_item_background_color(btn))
-            btn.sagTiklandi.connect(make_callback_sag_tiklanan_butona_renk_secip_ata(btn))
-            renklerSatir2Lay.addWidget(btn)
-
-            self.nesne_arkaplan_rengi_btn_liste.append(btn)
-
-        renklerDisLay.addWidget(self.nesneArkaplanRengiBtn)
-        renklerDisLay.addLayout(renklerSatirlarLay)
-        renklerDisLay.addStretch()
-        renklerSatirlarLay.addLayout(renklerSatir1Lay)
-        renklerSatirlarLay.addLayout(renklerSatir2Lay)
-
-        anaWidgetLayout.addLayout(renklerDisLay)
-        anaWidgetLayout.addSpacing(5)
-        anaWidgetLayout.addLayout(boyutLay)
-
-        # anaWidgetLayout.addStretch()
-
-    # ---------------------------------------------------------------------
-    def olustur_cizgi_ozellikleriDW(self):
-
-        self.cizgiOzellikleriDW = DockWidget(self.tr("Line && Pen Properties"), self)
-        self.cizgiOzellikleriDW.setObjectName("cizgiOzellikleriDW")
-        self.cizgiOzellikleriDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.cizgiOzellikleriDW)
-
-        # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
-
-        scroll = QScrollArea()
-        # scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        # scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll.setWidgetResizable(True)
-        # scroll.setBackgroundRole(QPalette.Dark)
-        self.cizgiOzellikleriDW.setWidget(scroll)
-        # scrollLayout = QVBoxLayout(scroll)
-
-        self.cizgiOzellikleriDWBaseWidget = QWidget(scroll)
-        # self.cizgiOzellikleriDW.setWidget(self.cizgiOzellikleriDWBaseWidget)
-        anaWidgetLayout = QVBoxLayout(self.cizgiOzellikleriDWBaseWidget)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetFixedSize)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
-        anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetMaximumSize)
-        # anaWidgetLayout.setContentsMargins(0,0,0,0)
-        # self.cizgiOzellikleriDW.setContentsMargins(0, 0, 0, 0)
-        # self.cizgiOzellikleriDWBaseWidget.setContentsMargins(0,0,0,0)
-        # scrollLayout.addWidget(self.cizgiOzellikleriDWBaseWidget)
-        scroll.setWidget(self.cizgiOzellikleriDWBaseWidget)
-        # scroll.setLayout(layout)
+        yaziLay.addLayout(renklerDisLay)
+        yaziLay.addSpacing(5)
+        yaziLay.addLayout(btnBicimlerLay)
+        yaziLay.addSpacing(5)
+        yaziLay.addWidget(self.fontCBox_yazidw)
+        yaziLay.addSpacing(5)
+        yaziLay.addLayout(lay)
+        yaziLay.addStretch()
+        #######################################################################
+        #######################################################################
 
         # ---------------------------------------------------------------------
         # def olustur_cizgi_ozellikleriDW(self):
         # ---------------------------------------------------------------------
         # ---- cizgi tipi -----------------------------------------------------------------
-        cizgiTipiLabel = QLabel(self.tr("Line Type"), self.cizgiOzellikleriDWBaseWidget)
+        cizgiTipiLabel = QLabel(self.tr("Line Type"), self.cizgiGrupW)
         cizgiTipiLabel.setFixedWidth(67)
-        self.cizgiTipiCBox = ComboBox(self.cizgiOzellikleriDWBaseWidget)
+        self.cizgiTipiCBox = ComboBox(self.cizgiGrupW)
         self.cizgiTipiCBox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.cizgiTipiCBox.setIconSize(QSize(100, 15))
         self.cizgiTipiCBox.addItem(self.tr("      No Line"), userData=Qt.NoPen)
@@ -651,9 +571,9 @@ class DefterAnaPencere(QMainWindow):
         cizgiTipiLayout.addWidget(self.cizgiTipiCBox)
 
         # ---- cizgi birlesim tipi -----------------------------------------------------------------
-        cizgiBirlesimTipiLabel = QLabel(self.tr("Join Style"), self.cizgiOzellikleriDWBaseWidget)
+        cizgiBirlesimTipiLabel = QLabel(self.tr("Join Style"), self.cizgiGrupW)
         cizgiBirlesimTipiLabel.setFixedWidth(67)
-        self.cizgiBirlesimTipiCBox = ComboBox(self.cizgiOzellikleriDWBaseWidget)
+        self.cizgiBirlesimTipiCBox = ComboBox(self.cizgiGrupW)
         self.cizgiBirlesimTipiCBox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.cizgiBirlesimTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Round"),
                                            userData=Qt.RoundJoin)  # Yuvarlak
@@ -669,9 +589,9 @@ class DefterAnaPencere(QMainWindow):
         cizgiBirlesimTipiLayout.addWidget(self.cizgiBirlesimTipiCBox)
 
         # ---- cizgi ucu tipi -----------------------------------------------------------------
-        cizgiUcuTipiLabel = QLabel(self.tr("Cap Style"), self.cizgiOzellikleriDWBaseWidget)
+        cizgiUcuTipiLabel = QLabel(self.tr("Cap Style"), self.cizgiGrupW)
         cizgiUcuTipiLabel.setFixedWidth(67)
-        self.cizgiUcuTipiCBox = ComboBox(self.cizgiOzellikleriDWBaseWidget)
+        self.cizgiUcuTipiCBox = ComboBox(self.cizgiGrupW)
         self.cizgiUcuTipiCBox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.cizgiUcuTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Flat"), userData=Qt.FlatCap)
         self.cizgiUcuTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Square"), userData=Qt.SquareCap)
@@ -684,8 +604,8 @@ class DefterAnaPencere(QMainWindow):
         cizgiUcuTipiLayout.addWidget(self.cizgiUcuTipiCBox)
 
         # ---- cizgi kalinligi -----------------------------------------------------------------
-        self.cizgiKalinligiDSliderWithDSBox = DoubleSliderWithDoubleSpinBox(yerlesim=Qt.Horizontal,
-                                                                            parent=self.cizgiOzellikleriDWBaseWidget)
+        self.cizgiKalinligiDSliderWithDSBox = SliderDoubleWithDoubleSpinBox(yerlesim=Qt.Horizontal,
+                                                                            parent=self.cizgiGrupW)
         # self.cizgiKalinligiSBox.setSuffix(" h")
         self.cizgiKalinligiDSliderWithDSBox.setMinimum(0)
         self.cizgiKalinligiDSliderWithDSBox.setMaximum(100)
@@ -701,10 +621,10 @@ class DefterAnaPencere(QMainWindow):
         self.cizgiKalinligiDSliderWithDSBox_tbar.degerDegisti.connect(
             lambda x: self.cizgiKalinligiDSliderWithDSBox.setValue(x * 10))
 
-        cizgiOzellikleriniSifirlaBtn = QPushButton(self.tr("Reset"), self.cizgiOzellikleriDWBaseWidget)
+        cizgiOzellikleriniSifirlaBtn = QPushButton(self.tr("Reset"), self.cizgiGrupW)
         cizgiOzellikleriniSifirlaBtn.clicked.connect(self.act_cizgi_ozelliklerini_sifirla)
 
-        self.cizgiRengiBtn = PushButton("", 36, 36, self.cizgiRengi, self.cizgiOzellikleriDWBaseWidget)
+        self.cizgiRengiBtn = PushButtonRenk("", 36, 36, self.cizgiRengi, self.cizgiGrupW)
         self.cizgiRengiBtn.clicked.connect(self.act_set_item_line_color)
 
         renklerDisLay = QHBoxLayout()
@@ -712,54 +632,124 @@ class DefterAnaPencere(QMainWindow):
         renklerSatir1Lay = QHBoxLayout()
         renklerSatir2Lay = QHBoxLayout()
 
-        def make_callback_set_item_line_color(button):
-            return lambda: self.act_set_item_line_color_with_pallete_button(button)
-
-        def make_callback_sag_tiklanan_butona_renk_secip_ata(button):
-            return lambda: self.act_sag_tiklanan_butona_renk_secip_ata(button, "cizgi")
-
         self.cizgi_rengi_btn_liste = []
 
         for i in range(8):
-            btn = PushButton("", 15, 15, renkArkaplan=self.cizgi_rengi_btn_liste_acilis_renkleri[i],
-                             parent=self.cizgiOzellikleriDWBaseWidget)
-            btn.setStatusTip(self.tr("Left click to set line color, Right click to modify color."))
-            btn.setToolTip(self.tr("Left click to set line color, Right click to modify color."))
-            btn.clicked.connect(make_callback_set_item_line_color(btn))
-            btn.sagTiklandi.connect(make_callback_sag_tiklanan_butona_renk_secip_ata(btn))
+            btn = self.ver_renk_palet_buton(tip="c", gen=15, yuk=15, renk=self.cizgi_rengi_btn_liste_acilis_renkleri[i],
+                                            parent=self.cizgiGrupW)
             renklerSatir1Lay.addWidget(btn)
 
             self.cizgi_rengi_btn_liste.append(btn)
 
         for i in range(8, 16):
-            btn = PushButton("", 15, 15, renkArkaplan=self.cizgi_rengi_btn_liste_acilis_renkleri[i],
-                             parent=self.cizgiOzellikleriDWBaseWidget)
-            btn.setStatusTip(self.tr("Left click to set line color, Right click to modify color."))
-            btn.setToolTip(self.tr("Left click to set line color, Right click to modify color."))
-            btn.clicked.connect(make_callback_set_item_line_color(btn))
-            btn.sagTiklandi.connect(make_callback_sag_tiklanan_butona_renk_secip_ata(btn))
+            btn = self.ver_renk_palet_buton(tip="c", gen=15, yuk=15, renk=self.cizgi_rengi_btn_liste_acilis_renkleri[i],
+                                            parent=self.cizgiGrupW)
+
             renklerSatir2Lay.addWidget(btn)
 
             self.cizgi_rengi_btn_liste.append(btn)
 
+        cizgiLay.addLayout(renklerDisLay)
+        cizgiLay.addSpacing(5)
+        cizgiLay.addWidget(self.cizgiKalinligiDSliderWithDSBox)
+        cizgiLay.addLayout(cizgiTipiLayout)
+        cizgiLay.addLayout(cizgiBirlesimTipiLayout)
+        cizgiLay.addLayout(cizgiUcuTipiLayout)
+        cizgiLay.addWidget(cizgiOzellikleriniSifirlaBtn)
+        cizgiLay.addStretch()
+        # anaLay.addStretch()
+
+        renklerSatirlarLay.addLayout(renklerSatir1Lay)
+        renklerSatirlarLay.addLayout(renklerSatir2Lay)
         renklerDisLay.addWidget(self.cizgiRengiBtn)
         renklerDisLay.addLayout(renklerSatirlarLay)
         renklerDisLay.addStretch()
-        renklerSatirlarLay.addLayout(renklerSatir1Lay)
-        renklerSatirlarLay.addLayout(renklerSatir2Lay)
 
-        anaWidgetLayout.addLayout(renklerDisLay)
-        anaWidgetLayout.addSpacing(5)
-        anaWidgetLayout.addWidget(self.cizgiKalinligiDSliderWithDSBox)
-        anaWidgetLayout.addLayout(cizgiTipiLayout)
-        anaWidgetLayout.addLayout(cizgiBirlesimTipiLayout)
-        anaWidgetLayout.addLayout(cizgiUcuTipiLayout)
-        anaWidgetLayout.addWidget(cizgiOzellikleriniSifirlaBtn)
-        anaWidgetLayout.addStretch()
-        # anaWidgetLayout.addStretch()
+        # Renk Secici
+        # ---------------------------------------------------------------------
+        self.radioBtnGroup = QButtonGroup(self)
+        self.radioArkaplan = QRadioButton(self.tr("Background"), self)
+        self.radioYazi = QRadioButton(self.tr("Text"), self)
+        self.radioCizgi = QRadioButton(self.tr("Line && Pen"), self)
+        self.radioBtnGroup.addButton(self.radioArkaplan)
+        self.radioBtnGroup.addButton(self.radioYazi)
+        self.radioBtnGroup.addButton(self.radioCizgi)
+        self.radioArkaplan.setChecked(True)
+        self.renk_tipi = "a"
+        self.nesneGrupW.show()
+        self.yaziGrupW.hide()
+        self.cizgiGrupW.hide()
+        radioLay = QHBoxLayout()
+        radioLay.addWidget(self.radioArkaplan)
+        radioLay.addWidget(self.radioYazi)
+        radioLay.addWidget(self.radioCizgi)
+
+        self.radioBtnGroup.buttonToggled.connect(self.act_radio_secim_degisti)
+
+        self.renkSecici = RenkSeciciWidget(self.cizgiRengi, boyut=64, parent=self.cizgiGrupW)
+        self.renkSecici.renkDegisti.connect(self.renk_secicide_renk_degisti)
+        self.renkSecici.anaLay.setContentsMargins(0, 0, 0, 0)
+        shared.kutulu_arkaplan_olustur(self.nesneArkaplanRengiBtn, 5)
+        shared.kutulu_arkaplan_olustur(self.yaziRengiBtn, 5)
+        shared.kutulu_arkaplan_olustur(self.cizgiRengiBtn, 5)
+
+        anaLay.addLayout(radioLay)
+        anaLay.addWidget(self.renkSecici)
+        anaLay.addWidget(self.nesneGrupW)
+        anaLay.addWidget(self.yaziGrupW)
+        anaLay.addWidget(self.cizgiGrupW)
 
     # ---------------------------------------------------------------------
-    def olustur_yuzen_stillerDW(self):
+    def act_radio_secim_degisti(self, btn):
+        if btn == self.radioArkaplan:
+            if self.cScene.activeItem:
+                renk = self.cScene.activeItem.arkaPlanRengi
+            else:
+                renk = self.arkaPlanRengi
+            self.renk_tipi = "a"
+
+            self.nesneGrupW.show()
+            self.yaziGrupW.hide()
+            self.cizgiGrupW.hide()
+
+        elif btn == self.radioYazi:
+            if self.cScene.activeItem:
+                renk = self.cScene.activeItem.yaziRengi
+            else:
+                renk = self.yaziRengi
+            self.renk_tipi = "y"
+
+            self.nesneGrupW.hide()
+            self.yaziGrupW.show()
+            self.cizgiGrupW.hide()
+
+        elif btn == self.radioCizgi:
+            if self.cScene.activeItem:
+                renk = self.cScene.activeItem.cizgiRengi
+            else:
+                renk = self.cizgiRengi
+            self.renk_tipi = "c"
+
+            self.nesneGrupW.hide()
+            self.yaziGrupW.hide()
+            self.cizgiGrupW.show()
+
+        self.renkSecici.disardan_renk_gir(renk)
+
+    # ---------------------------------------------------------------------
+    def renk_secicide_renk_degisti(self, renk):
+        if self.renk_tipi == "a":
+            self.arkaPlanRengi = renk
+            self.act_set_item_background_color(renk, renkSecicidenMi=True)
+        elif self.renk_tipi == "y":
+            self.yaziRengi = renk
+            self.act_set_item_text_color(renk, renkSecicidenMi=True)
+        elif self.renk_tipi == "c":
+            self.cizgiRengi = renk
+            self.act_set_item_line_color(renk, renkSecicidenMi=True)
+
+    # ---------------------------------------------------------------------
+    def olustur_stillerYW(self):
 
         self.stillerYuzenWidget = YuzenWidget(self)
         self.stillerYuzenWidget.hide()
@@ -796,12 +786,12 @@ class DefterAnaPencere(QMainWindow):
 
         self.stillerDWBaseWidget = QWidget(scroll)
         # self.stillerDW.setWidget(self.stillerDWBaseWidget)
-        anaWidgetLayout = QVBoxLayout(self.stillerDWBaseWidget)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetFixedSize)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
-        anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetMaximumSize)
-        # anaWidgetLayout.setContentsMargins(0,0,0,0)
+        anaLay = QVBoxLayout(self.stillerDWBaseWidget)
+        # anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
+        # anaLay.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
+        anaLay.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
+        # anaLay.setSizeConstraint(QVBoxLayout.SetMaximumSize)
+        # anaLay.setContentsMargins(0,0,0,0)
         # self.stillerDW.setContentsMargins(0, 0, 0, 0)
         # self.stillerDWBaseWidget.setContentsMargins(0,0,0,0)
         # scrollLayout.addWidget(self.stillerDWBaseWidget)
@@ -822,7 +812,7 @@ class DefterAnaPencere(QMainWindow):
         self.stylePresetsListWidget.itemSelectionChanged.connect(self.act_stylePresetsListWidget_secim_degisti)
         # self.stylePresetsListWidget.addItem(ListWidgetItem("asd"))
 
-        anaWidgetLayout.addWidget(self.stylePresetsListWidget)
+        anaLay.addWidget(self.stylePresetsListWidget)
 
         btnLayout = QHBoxLayout()
 
@@ -874,7 +864,7 @@ class DefterAnaPencere(QMainWindow):
         btnLayout.addWidget(addStylePresetBtn)
         btnLayout.addWidget(self.removeStylePresetBtn)
         btnLayout.addWidget(stylePrestesMenuBtn)
-        anaWidgetLayout.addLayout(btnLayout)
+        anaLay.addLayout(btnLayout)
 
     # ---------------------------------------------------------------------
     def olustur_sahneye_baski_siniri_cizim_ayarlari(self):
@@ -896,12 +886,12 @@ class DefterAnaPencere(QMainWindow):
 
         self.baskiSiniriCizimAyarlariDWBW = QWidget(scroll)
         # self.baskiSiniriCizimAyarlariDW.setWidget(self.baskiSiniriCizimAyarlariDWBW)
-        anaWidgetLayout = QVBoxLayout(self.baskiSiniriCizimAyarlariDWBW)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetFixedSize)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
-        anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
-        # anaWidgetLayout.setSizeConstraint(QVBoxLayout.SetMaximumSize)
-        # anaWidgetLayout.setContentsMargins(10,15,0,0)
+        anaLay = QVBoxLayout(self.baskiSiniriCizimAyarlariDWBW)
+        # anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
+        # anaLay.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
+        anaLay.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
+        # anaLay.setSizeConstraint(QVBoxLayout.SetMaximumSize)
+        # anaLay.setContentsMargins(10,15,0,0)
         # self.baskiSiniriCizimAyarlariDW.setContentsMargins(0, 0, 0, 0)
         # self.baskiSiniriCizimAyarlariDWBW.setContentsMargins(0,0,0,0)
         # scrollLayout.addWidget(self.baskiSiniriCizimAyarlariDWBW)
@@ -917,7 +907,8 @@ class DefterAnaPencere(QMainWindow):
         self.baskiSinirGBoxLay = QVBoxLayout(self.baskiSinirGBox)
 
         renkLbl = QLabel(self.tr("Color"), self.baskiSiniriCizimAyarlariDWBW)
-        self.baskiCerceveRengiBtn = PushButton("", 36, 16, self.baskiCerceveRengi, self.baskiSiniriCizimAyarlariDWBW)
+        self.baskiCerceveRengiBtn = PushButtonRenk("", 36, 16, self.baskiCerceveRengi,
+                                                   self.baskiSiniriCizimAyarlariDWBW)
         self.baskiCerceveRengiBtn.clicked.connect(self.act_baski_cerceve_rengi_kur)
 
         renkLay = QHBoxLayout()
@@ -1016,7 +1007,7 @@ class DefterAnaPencere(QMainWindow):
         self.baskiSinirGBoxLay.addLayout(boyutLay)
         self.baskiSinirGBoxLay.addLayout(sigdirUstLay)
 
-        anaWidgetLayout.addWidget(self.baskiSinirGBox)
+        anaLay.addWidget(self.baskiSinirGBox)
 
     # ---------------------------------------------------------------------
     def act_baski_cerceve_rengi_kur(self):
@@ -1026,7 +1017,7 @@ class DefterAnaPencere(QMainWindow):
         if not col.isValid():
             return
 
-        self.baskiCerceveRengiBtn.arkaplan_rengi_degistir(col)
+        self.baskiCerceveRengiBtn.renkGuncelle(col)
         self.baskiCerceveRengi = col
 
         self.cView.baski_cerceve_rengi_kur(col)
@@ -1827,17 +1818,17 @@ class DefterAnaPencere(QMainWindow):
 
         self.settings.beginGroup("YaziRengiButonlari")
         for i, btn in enumerate(self.yazi_rengi_btn_liste):
-            self.settings.setValue("{}".format(i), btn.renkArkaplan)
+            self.settings.setValue("{}".format(i), btn.renk)
         self.settings.endGroup()
 
         self.settings.beginGroup("NesneArkaplanRengiButonlari")
         for i, btn in enumerate(self.nesne_arkaplan_rengi_btn_liste):
-            self.settings.setValue("{}".format(i), btn.renkArkaplan)
+            self.settings.setValue("{}".format(i), btn.renk)
         self.settings.endGroup()
 
         self.settings.beginGroup("CizgiRengiButonlari")
         for i, btn in enumerate(self.cizgi_rengi_btn_liste):
-            self.settings.setValue("{}".format(i), btn.renkArkaplan)
+            self.settings.setValue("{}".format(i), btn.renk)
         self.settings.endGroup()
 
     # ---------------------------------------------------------------------
@@ -3595,7 +3586,7 @@ class DefterAnaPencere(QMainWindow):
         self.addAction(self.actionClearBackgroundImage)
 
         self.actionEmbedBackgroundImage = QAction(QIcon(':icons/background-set.png'), self.tr("Embed Background Image"),
-                                                self.mBar)
+                                                  self.mBar)
         self.actionEmbedBackgroundImage.triggered.connect(self.act_embed_background_image)
         self.actionEmbedBackgroundImage.setVisible(False)
 
@@ -3845,42 +3836,28 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleSayfalarDW.triggered.connect(
             lambda: self.sayfalarDW.setVisible(not self.sayfalarDW.isVisible()))
 
-        self.actionToggleKutuphaneDW = QAction(QIcon(':icons/properties.png'), self.tr('Library'), dockWidgetsMenu)
-        self.actionToggleKutuphaneDW.setShortcut(QKeySequence("Ctrl+Alt+2"))
-        self.actionToggleKutuphaneDW.setCheckable(True)
-        self.actionToggleKutuphaneDW.triggered.connect(
-            lambda: self.kutuphaneDW.setVisible(not self.kutuphaneDW.isVisible()))
-
-        self.actionToggleYaziOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Text Properties'),
-                                                     dockWidgetsMenu)
-        self.actionToggleYaziOzellikleriDW.setShortcut(QKeySequence("Ctrl+Alt+3"))
-        self.actionToggleYaziOzellikleriDW.setCheckable(True)
-        self.actionToggleYaziOzellikleriDW.triggered.connect(
-            lambda: self.yaziOzellikleriDW.setVisible(not self.yaziOzellikleriDW.isVisible()))
-
         self.actionToggleNesneOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Item Properties'),
                                                       dockWidgetsMenu)
-        self.actionToggleNesneOzellikleriDW.setShortcut(QKeySequence("Ctrl+Alt+4"))
+        self.actionToggleNesneOzellikleriDW.setShortcut(QKeySequence("Ctrl+Alt+2"))
         self.actionToggleNesneOzellikleriDW.setCheckable(True)
         self.actionToggleNesneOzellikleriDW.triggered.connect(
             lambda: self.nesneOzellikleriDW.setVisible(not self.nesneOzellikleriDW.isVisible()))
 
-        self.actionToggleCizgiOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Line && Pen Properties'),
-                                                      dockWidgetsMenu)
-        self.actionToggleCizgiOzellikleriDW.setShortcut(QKeySequence("Ctrl+Alt+5"))
-        self.actionToggleCizgiOzellikleriDW.setCheckable(True)
-        self.actionToggleCizgiOzellikleriDW.triggered.connect(
-            lambda: self.cizgiOzellikleriDW.setVisible(not self.cizgiOzellikleriDW.isVisible()))
-
         self.actionToggleStillerDW = QAction(QIcon(':icons/properties.png'), self.tr('Style Presets'), dockWidgetsMenu)
-        self.actionToggleStillerDW.setShortcut(QKeySequence("Ctrl+Alt+6"))
+        self.actionToggleStillerDW.setShortcut(QKeySequence("Ctrl+Alt+3"))
         self.actionToggleStillerDW.setCheckable(True)
         self.actionToggleStillerDW.triggered.connect(
             lambda: self.stillerDW.setVisible(not self.stillerDW.isVisible()))
 
+        self.actionToggleKutuphaneDW = QAction(QIcon(':icons/properties.png'), self.tr('Library'), dockWidgetsMenu)
+        self.actionToggleKutuphaneDW.setShortcut(QKeySequence("Ctrl+Alt+4"))
+        self.actionToggleKutuphaneDW.setCheckable(True)
+        self.actionToggleKutuphaneDW.triggered.connect(
+            lambda: self.kutuphaneDW.setVisible(not self.kutuphaneDW.isVisible()))
+
         self.actionToggleBaskiSiniriCizimAyarlariDW = QAction(QIcon(':icons/properties.png'),
                                                               self.tr('Draw Print Borders'), dockWidgetsMenu)
-        self.actionToggleBaskiSiniriCizimAyarlariDW.setShortcut(QKeySequence("Ctrl+Alt+7"))
+        self.actionToggleBaskiSiniriCizimAyarlariDW.setShortcut(QKeySequence("Ctrl+Alt+5"))
         self.actionToggleBaskiSiniriCizimAyarlariDW.setCheckable(True)
         self.actionToggleBaskiSiniriCizimAyarlariDW.triggered.connect(
             lambda: self.baskiSiniriCizimAyarlariDW.setVisible(not self.baskiSiniriCizimAyarlariDW.isVisible()))
@@ -3888,10 +3865,8 @@ class DefterAnaPencere(QMainWindow):
         dockWidgetsMenu.addActions((self.actionTumPanelleriGoster,
                                     self.actionToggleSayfalarDW,
                                     self.actionToggleKutuphaneDW,
-                                    self.actionToggleYaziOzellikleriDW,
-                                    self.actionToggleNesneOzellikleriDW,
-                                    self.actionToggleCizgiOzellikleriDW,
                                     self.actionToggleStillerDW,
+                                    self.actionToggleNesneOzellikleriDW,
                                     self.actionToggleBaskiSiniriCizimAyarlariDW))
 
         self.zoomMenu = QMenu(self.tr("Zoom"), self.viewMenu)
@@ -4416,11 +4391,9 @@ class DefterAnaPencere(QMainWindow):
                                           # dockWidgetsMenu actions
                                           self.actionTumPanelleriGoster,
                                           self.actionToggleSayfalarDW,
-                                          self.actionToggleKutuphaneDW,
-                                          self.actionToggleYaziOzellikleriDW,
                                           self.actionToggleNesneOzellikleriDW,
-                                          self.actionToggleCizgiOzellikleriDW,
                                           self.actionToggleStillerDW,
+                                          self.actionToggleKutuphaneDW,
                                           self.actionToggleBaskiSiniriCizimAyarlariDW,
                                           # view menu actions
                                           self.actionToggleStatusBar,
@@ -4505,6 +4478,44 @@ class DefterAnaPencere(QMainWindow):
             self.stillerYuzenWidget.setVisible(True)
         else:
             self.stillerYuzenWidget.setVisible(False)
+
+    # ---------------------------------------------------------------------
+    def stil_uygula_yuzen_listwidget_goster_gizle2(self):
+
+        # if not self.yuzenStylePresetsListWidget.isVisible():
+        if not self.stillerDW.isVisible():
+            self.stillerDW.setFloating(True)
+            self.stillerDW.move(self.cView.mapFromGlobal(QCursor.pos()))
+            # self.yuzenStylePresetsListWidget.resize(250, self.yuzenStylePresetsListWidget.count() * 21)
+            # self.stillerYuzenWidget.adjustSize()
+            self.stillerDW.setVisible(True)
+        else:
+            self.stillerDW.setVisible(False)
+
+    # ---------------------------------------------------------------------
+    def nesne_ozellikleriYW_goster_gizle(self):
+
+        # if not self.yuzenStylePresetsListWidget.isVisible():
+        if not self.nesneOzellikleriYW.isVisible():
+            self.nesneOzellikleriYW.move(self.cView.mapFromGlobal(QCursor.pos()))
+            # self.yuzenStylePresetsListWidget.resize(250, self.yuzenStylePresetsListWidget.count() * 21)
+            # self.stillerYuzenWidget.adjustSize()
+            self.nesneOzellikleriYW.setVisible(True)
+        else:
+            self.nesneOzellikleriYW.setVisible(False)
+
+    # ---------------------------------------------------------------------
+    def olustur_nesne_ozellikleriYW(self):
+
+        self.nesneOzellikleriYW = NesneOzellikleriYuzenWidget(self.arkaPlanRengi, self.yaziRengi, self.cizgiRengi,
+                                                              self._pen.widthF(), self)
+        self.nesneOzellikleriYW.hide()
+        self.nesneOzellikleriYW.arkaPlanRengiDegisti.connect(self.act_set_item_background_color)
+        self.nesneOzellikleriYW.yaziRengiDegisti.connect(self.act_set_item_text_color)
+        self.nesneOzellikleriYW.cizgiRengiDegisti.connect(self.act_set_item_line_color)
+        self.nesneOzellikleriYW.cizgiKalinligiDegisti.connect(self.act_cizgi_kalinligi_degistir)
+        self.nesneOzellikleriYW.cizgiKalinligiDegisti.connect(
+            lambda x: self.cizgiKalinligiDSliderWithDSBox_tbar.setValue(x * 10))
 
     # ---------------------------------------------------------------------
     def olustur_tools_toolbar(self):
@@ -4638,7 +4649,7 @@ class DefterAnaPencere(QMainWindow):
         # ---- cizgi kalinligi -----------------------------------------------------------------
 
         # ---- cizgi kalinligi -----------------------------------------------------------------
-        self.cizgiKalinligiDSliderWithDSBox_tbar = DoubleSliderWithDoubleSpinBox(yerlesim=Qt.Horizontal,
+        self.cizgiKalinligiDSliderWithDSBox_tbar = SliderDoubleWithDoubleSpinBox(yerlesim=Qt.Horizontal,
                                                                                  parent=self.cizgiOzellikleriToolBar)
         # self.cizgiKalinligiSBox.setSuffix(" h")
         self.cizgiKalinligiDSliderWithDSBox_tbar.setMaximumWidth(150)
@@ -5312,20 +5323,16 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def on_dock_widgets_menu_about_to_show(self):
         self.actionToggleSayfalarDW.setChecked(self.sayfalarDW.isVisible())
-        self.actionToggleKutuphaneDW.setChecked(self.kutuphaneDW.isVisible())
-        self.actionToggleYaziOzellikleriDW.setChecked(self.yaziOzellikleriDW.isVisible())
         self.actionToggleNesneOzellikleriDW.setChecked(self.nesneOzellikleriDW.isVisible())
-        self.actionToggleCizgiOzellikleriDW.setChecked(self.cizgiOzellikleriDW.isVisible())
         self.actionToggleStillerDW.setChecked(self.stillerDW.isVisible())
+        self.actionToggleKutuphaneDW.setChecked(self.kutuphaneDW.isVisible())
         self.actionToggleBaskiSiniriCizimAyarlariDW.setChecked(self.baskiSiniriCizimAyarlariDW.isVisible())
 
     # ---------------------------------------------------------------------
     def act_tum_panelleri_goster(self):
         self.sayfalarDW.setVisible(True)
         self.kutuphaneDW.setVisible(True)
-        self.yaziOzellikleriDW.setVisible(True)
         self.nesneOzellikleriDW.setVisible(True)
-        self.cizgiOzellikleriDW.setVisible(True)
         self.stillerDW.setVisible(True)
         self.baskiSiniriCizimAyarlariDW.setVisible(True)
 
@@ -7104,57 +7111,54 @@ class DefterAnaPencere(QMainWindow):
                                                  view=self.cView, color=col)
 
     # ---------------------------------------------------------------------
+    def _make_callback_sol_tiklanan_butonla_renk_degistir(self, button, tip):
+        return lambda: self.act_sol_tiklanan_butonla_renk_degistir(button, tip)
+
+    # ---------------------------------------------------------------------
+    def _make_callback_sag_tiklanan_butona_renk_secip_ata(self, button, tip):
+        return lambda: self.act_sag_tiklanan_butona_renk_secip_ata(button, tip)
+
+    # ---------------------------------------------------------------------
+    def ver_renk_palet_buton(self, tip, gen, yuk, renk, parent):
+        btn = PushButtonRenk("", gen, yuk, renk, parent)
+        btn.setStatusTip(self.tr("Left click to set line color, Right click to modify color."))
+        btn.setToolTip(self.tr("Left click to set line color, Right click to modify color."))
+
+        btn.clicked.connect(self._make_callback_sol_tiklanan_butonla_renk_degistir(btn, tip))
+        btn.sagTiklandi.connect(self._make_callback_sag_tiklanan_butona_renk_secip_ata(btn, tip))
+
+        return btn
+
+    # ---------------------------------------------------------------------
     @Slot()
     def act_sag_tiklanan_butona_renk_secip_ata(self, btn, tip):
 
         # bir de belki sag tiklayinca bg colora transparent secengi olsun.
 
-        if tip == "yazi":
-            yeni_renk = self.act_set_item_text_color(col=None, eskiRenk=btn.renkArkaplan)
-        elif tip == "arka":
-            yeni_renk = self.act_set_item_background_color(col=None, eskiRenk=btn.renkArkaplan)
-        elif tip == "cizgi":
-            yeni_renk = self.act_set_item_line_color(col=None, eskiRenk=btn.renkArkaplan)
+        if tip == "y":
+            yeni_renk = self.act_set_item_text_color(col=None, eskiRenk=btn.renk)
+        elif tip == "a":
+            yeni_renk = self.act_set_item_background_color(col=None, eskiRenk=btn.renk)
+        elif tip == "c":
+            yeni_renk = self.act_set_item_line_color(col=None, eskiRenk=btn.renk)
 
         if not yeni_renk.isValid():
             return
 
-        btn.arkaplan_rengi_degistir(yeni_renk)
-
-    # # ---------------------------------------------------------------------
-    # @Slot()
-    # def act_sag_tiklanan_butona_renk_secip_ata(self, btn, tip):
-    #
-    #     # TODO: currentColorChanged signal
-    #     # bir de belki sag tiklayinca bg colora transparent secengi olsun.
-    #
-    #     eski_renk = btn.renkArkaplan
-    #     if not eski_renk:
-    #         eski_renk = QColor()
-    #
-    #     col = QColorDialog.getColor(eski_renk,
-    #                                 self,
-    #                                 self.tr("Palette Color"),
-    #                                 QColorDialog.DontUseNativeDialog |
-    #                                 QColorDialog.ShowAlphaChannel)
-    #     if not col.isValid():
-    #         return
-    #
-    #     btn.arkaplan_rengi_degistir(col)
-    #     if tip == "yazi":
-    #         self.act_set_item_text_color_with_pallete_button(btn)
-    #     elif tip == "arka":
-    #         self.act_set_item_background_color_with_pallete_button(btn)
-    #     elif tip == "cizgi":
-    #         self.act_set_item_line_color_with_pallete_button(btn)
+        btn.renkGuncelle(yeni_renk)
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_set_item_text_color_with_pallete_button(self, btn):
-        if btn.renkArkaplan:
-            self.act_set_item_text_color(col=btn.renkArkaplan, eskiRenk=self.yaziRengiBtn.renkArkaplan)
+    def act_sol_tiklanan_butonla_renk_degistir(self, btn, tip):
+        if btn.renk:
+            if tip == "a":
+                self.act_set_item_background_color(col=btn.renk, eskiRenk=self.nesneArkaplanRengiBtn.renk)
+            if tip == "y":
+                self.act_set_item_text_color(col=btn.renk, eskiRenk=self.yaziRengiBtn.renk)
+            elif tip == "c":
+                self.act_set_item_line_color(col=btn.renk, eskiRenk=self.cizgiRengiBtn.renk)
         else:
-            self.act_sag_tiklanan_butona_renk_secip_ata(btn, "yazi")
+            self.act_sag_tiklanan_butona_renk_secip_ata(btn, tip)
 
     # ---------------------------------------------------------------------
     def onizle_set_item_text_color(self, col, ilkHaleDondur=False):
@@ -7176,10 +7180,10 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_set_item_text_color(self, col=None, eskiRenk=None):
+    def act_set_item_text_color(self, col=None, eskiRenk=None, renkSecicidenMi=False):
 
         if not eskiRenk:
-            eskiRenk = self.yaziRengiBtn.renkArkaplan
+            eskiRenk = self.yaziRengiBtn.renk
 
         if not col:
             #  # eskiRenk=self.yaziRengi, olamiyor cunku dokuman yazi rengi o an secili nesneden farkli olabilir.
@@ -7197,23 +7201,17 @@ class DefterAnaPencere(QMainWindow):
             for item in self.cScene.selectionQueue:
                 if item.type() == shared.GROUP_ITEM_TYPE:
                     continue
-                undoRedo.undoableSetTextColor(self.cScene.undoStack, self.tr("change item's text color"), item, col)
+                undoRedo.undoableSetTextColor(self.cScene.undoStack,
+                                              self.tr("change item's text color"),
+                                              item, col, renkSecicidenMi)
             if len(self.cScene.selectionQueue) > 1:
                 self.cScene.undoStack.endMacro()
         else:  # sahne icin degistir
             self.yaziRengi = self.cScene.yaziRengi = col
-            self.degistir_yazi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=True)
+            self.degistir_yazi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=True,
+                                           renkSecicidenMi=renkSecicidenMi)
 
         return col
-
-    # ---------------------------------------------------------------------
-    @Slot()
-    def act_set_item_line_color_with_pallete_button(self, btn):
-
-        if btn.renkArkaplan:
-            self.act_set_item_line_color(col=btn.renkArkaplan, eskiRenk=self.cizgiRengiBtn.renkArkaplan)
-        else:
-            self.act_sag_tiklanan_butona_renk_secip_ata(btn, "cizgi")
 
     # ---------------------------------------------------------------------
     def onizle_set_item_line_color(self, col, ilkHaleDondur=False):
@@ -7234,7 +7232,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_set_item_line_color(self, col=None, eskiRenk=None):
+    def act_set_item_line_color(self, col=None, eskiRenk=None, renkSecicidenMi=False):
 
         if not eskiRenk:
             eskiRenk = self.cizgiRengi
@@ -7254,24 +7252,19 @@ class DefterAnaPencere(QMainWindow):
             for item in self.cScene.selectionQueue:
                 if item.type() == shared.GROUP_ITEM_TYPE:
                     continue
-                undoRedo.undoableSetLineColor(self.cScene.undoStack, self.tr("change item's line color"), item, col)
+                undoRedo.undoableSetLineColor(self.cScene.undoStack,
+                                              self.tr("change item's line color"),
+                                              item, col, renkSecicidenMi)
             if len(self.cScene.selectionQueue) > 1:
                 self.cScene.undoStack.endMacro()
         else:  # sahne icin degistir
             self.cizgiRengi = col
             self._pen.setColor(col)
             self.cScene.scenePen = QPen(self._pen)
-            self.degistir_cizgi_rengi_ikonu(col, nesne_arkaplan_ikonu_guncelle=True)
+            self.degistir_cizgi_rengi_ikonu(col, nesne_arkaplan_ikonu_guncelle=True,
+                                            renkSecicidenMi=renkSecicidenMi)
 
         return col
-
-    # ---------------------------------------------------------------------
-    @Slot()
-    def act_set_item_background_color_with_pallete_button(self, btn):
-        if btn.renkArkaplan:
-            self.act_set_item_background_color(col=btn.renkArkaplan, eskiRenk=self.nesneArkaplanRengiBtn.renkArkaplan)
-        else:
-            self.act_sag_tiklanan_butona_renk_secip_ata(btn, "arka")
 
     # ---------------------------------------------------------------------
     def onizle_set_item_background_color(self, col, ilkHaleDondur=False):
@@ -7292,7 +7285,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_set_item_background_color(self, col=None, eskiRenk=None):
+    def act_set_item_background_color(self, col=None, eskiRenk=None, renkSecicidenMi=False):
 
         if not eskiRenk:
             eskiRenk = self.arkaPlanRengi
@@ -7321,19 +7314,18 @@ class DefterAnaPencere(QMainWindow):
                 if not item.type() == shared.LINE_ITEM_TYPE:
                     undoRedo.undoableSetItemBackgroundColor(self.cScene.undoStack,
                                                             self.tr("change item's background color"),
-                                                            item,
-                                                            col)
+                                                            item, col, renkSecicidenMi)
             if len(self.cScene.selectionQueue) > 1:
                 self.cScene.undoStack.endMacro()
-
         else:  # sahne icin degistir
             self.arkaPlanRengi = self.cScene.arkaPlanRengi = col
-            self.degistir_nesne_arkaplan_rengi_ikonu()
+            self.degistir_nesne_arkaplan_rengi_ikonu(renkSecicidenMi=renkSecicidenMi)
 
         return col
 
     # ---------------------------------------------------------------------
-    def degistir_yazi_rengi_ikonu(self, yaziRengi=None, nesne_arkaplan_ikonu_guncelle=True):
+    def degistir_yazi_rengi_ikonu(self, yaziRengi=None, nesne_arkaplan_ikonu_guncelle=True,
+                                  renkSecicidenMi=False):
         if not yaziRengi:
             yaziRengi = self.yaziRengi
 
@@ -7356,7 +7348,10 @@ class DefterAnaPencere(QMainWindow):
         # self.actionItemLineColor.setIcon(QIcon(pix))
         self.actionItemTextColor.setIcon(QIcon(pix))
         try:
-            self.yaziRengiBtn.arkaplan_rengi_degistir(yaziRengi)
+            self.yaziRengiBtn.renkGuncelle(yaziRengi)
+            if self.renk_tipi == "y" and not renkSecicidenMi:
+                self.renkSecici.disardan_renk_gir(yaziRengi)
+
         except Exception as e:
             pass
 
@@ -7364,7 +7359,8 @@ class DefterAnaPencere(QMainWindow):
             self.degistir_nesne_arkaplan_rengi_ikonu()
 
     # ---------------------------------------------------------------------
-    def degistir_cizgi_rengi_ikonu(self, cizgiRengi=None, nesne_arkaplan_ikonu_guncelle=True):
+    def degistir_cizgi_rengi_ikonu(self, cizgiRengi=None, nesne_arkaplan_ikonu_guncelle=True,
+                                   renkSecicidenMi=False):
 
         if not cizgiRengi:
             cizgiRengi = self.cizgiRengi
@@ -7391,7 +7387,9 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionItemLineColor.setIcon(QIcon(pix))
         try:
-            self.cizgiRengiBtn.arkaplan_rengi_degistir(cizgiRengi)
+            self.cizgiRengiBtn.renkGuncelle(cizgiRengi)
+            if self.renk_tipi == "c" and not renkSecicidenMi:
+                self.renkSecici.disardan_renk_gir(cizgiRengi)
         except Exception as e:
             pass
 
@@ -7399,7 +7397,8 @@ class DefterAnaPencere(QMainWindow):
             self.degistir_nesne_arkaplan_rengi_ikonu()
 
     # ---------------------------------------------------------------------
-    def degistir_nesne_arkaplan_rengi_ikonu(self, arkaplanRengi=None, yaziRengi=None, cizgiRengi=None):
+    def degistir_nesne_arkaplan_rengi_ikonu(self, arkaplanRengi=None, yaziRengi=None, cizgiRengi=None,
+                                            renkSecicidenMi=False):
 
         if not arkaplanRengi:
             arkaplanRengi = self.arkaPlanRengi
@@ -7416,7 +7415,7 @@ class DefterAnaPencere(QMainWindow):
         # pixTextBackgroundColor = QPixmap(16, 16)
         pix.fill(arkaplanRengi)
 
-        painterTBgC = QPainter(pix)
+        painter = QPainter(pix)
         # pix2 = QPixmap(8, 8)
         # pix2.fill(Qt.red)
         # painterTextBgColor.drawPixmap(pix2.rect(), pix2)
@@ -7427,21 +7426,24 @@ class DefterAnaPencere(QMainWindow):
         # font.setPointSize(14)
 
         # font = QFont("serif", 8)
-        # painterTBgC.setFont(font)
-        # painterTBgC.setPen(QColor(Qt.red))
-        # painterTBgC.setPen(cizgiRengi)
-        # painterTBgC.drawRect(0, 0, 15, 15)
-        # painterTBgC.setPen(yaziRengi)
+        # painter.setFont(font)
+        # painter.setPen(QColor(Qt.red))
+        # painter.setPen(cizgiRengi)
+        # painter.drawRect(0, 0, 15, 15)
+        # painter.setPen(yaziRengi)
         # pixFont = QPixmap(16, 16)
-        # painterTBgC.drawText(pixFont.rect(), Qt.AlignCenter, "A")
-        painterTBgC.end()
-        painterTBgC = None
-        del painterTBgC
+        # painter.drawText(pixFont.rect(), Qt.AlignCenter, "A")
+        painter.end()
+        painter = None
+        del painter
 
         self.actionItemBackgroundColor.setIcon(QIcon(pix))
 
         try:
-            self.nesneArkaplanRengiBtn.arkaplan_rengi_degistir(arkaplanRengi)
+            self.nesneArkaplanRengiBtn.renkGuncelle(arkaplanRengi)
+            if self.renk_tipi == "a" and not renkSecicidenMi:
+                self.renkSecici.disardan_renk_gir(arkaplanRengi)
+
         except Exception as e:
             pass
 
@@ -7516,7 +7518,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def fircaBuyult(self):
-        self._pen.setWidthF(self._pen.widthF() + 1)
+        self._pen.setWidthF(self._pen.widthF() + 0.5)
         self.cScene.scenePen = QPen(self._pen)
         # self.act_cizgi_kalinligi_degistir(self._pen.widthF() + 0.5)
         self.change_line_widthF(self._pen.widthF())
@@ -7525,7 +7527,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def fircaKucult(self):
         if self._pen.widthF() > 1:
-            self._pen.setWidthF(self._pen.widthF() - 1)
+            self._pen.setWidthF(self._pen.widthF() - 0.5)
             self.cScene.scenePen = QPen(self._pen)
             # self.act_cizgi_kalinligi_degistir(self._pen.widthF() - 0.5)
             self.change_line_widthF(self._pen.widthF())
@@ -8136,9 +8138,7 @@ class DefterAnaPencere(QMainWindow):
             self.utilitiesToolBar.hide()
             self._statusBar.hide()
             self.mBar.hide()
-            self.yaziOzellikleriDW.hide()
             self.nesneOzellikleriDW.hide()
-            self.cizgiOzellikleriDW.hide()
             self.stillerDW.hide()
             self.baskiSiniriCizimAyarlariDW.hide()
             self.sayfalarDW.hide()
@@ -8369,7 +8369,8 @@ class DefterAnaPencere(QMainWindow):
 
         # iptal edildi !! -> onemli: text nesnesindeki set_document_url'de de images-html klasoru ekleniyor.
         # img src= direkt adres yazabiliyoruz boylelikle
-        text = self.cScene.activeItem.toHtml().replace(url, "{}".format(os.path.join("images-html", os.path.basename(imagePath))))
+        text = self.cScene.activeItem.toHtml().replace(url, "{}".format(
+            os.path.join("images-html", os.path.basename(imagePath))))
         self.cScene.activeItem.setHtml(text)
         self.cScene.activeItem.update()
 
@@ -8946,7 +8947,7 @@ class DefterAnaPencere(QMainWindow):
             filtre = self.tr("All Files (*)")
             fn = QFileDialog.getSaveFileName(self,
                                              self.tr("Save file(s) as"),
-                                             "", # baseName
+                                             "",  # baseName
                                              filtre,
                                              self.sonKlasorDisaAktar
                                              )
@@ -9257,7 +9258,7 @@ class DefterAnaPencere(QMainWindow):
         wTip1 = lay.itemAtPosition(3, 1).widget()
         wTip2 = lay.itemAtPosition(3, 2).widget()
         # wTip2.hide()
-        lay.addWidget(dosyalarKopyalansinMiCBox,2,1)
+        lay.addWidget(dosyalarKopyalansinMiCBox, 2, 1)
         lay.replaceWidget(wAd1, dosyalarKopyalansinMiCBox)
         lay.addWidget(wAd0, 3, 0)
         lay.addWidget(wAd1, 3, 1)
@@ -9343,7 +9344,7 @@ class DefterAnaPencere(QMainWindow):
         if sayfa.view.backgroundImagePath:
             if def_dosyasi_icine_kaydet:
                 arkaplan_resim_adres = os.path.join("images", os.path.basename(sayfa.view.backgroundImagePath))
-            else: # disari kayit
+            else:  # disari kayit
                 if sayfa.view.backgroundImagePathIsEmbeded:
                     arkaplan_resim_adres = os.path.join("images", os.path.basename(sayfa.view.backgroundImagePath))
                 else:
@@ -9426,7 +9427,7 @@ class DefterAnaPencere(QMainWindow):
                 self._nav_sayfa_linkleri += f'<a style="padding-left:{oteleme}px;"' \
                                             f' href="{sayfa_adi}"> {sayfa_adi}</a>\n'
             else:
-                self._nav_sayfa_linkleri += f'<a style="padding-left:{oteleme}px;"'\
+                self._nav_sayfa_linkleri += f'<a style="padding-left:{oteleme}px;"' \
                                             f' href="{html_dosya_kayit_adres}"> {sayfa_adi}</a>\n'
 
             self._html_sayfa_listesi.append((ic_sayfa, html_dosya_kayit_adres))
@@ -9486,8 +9487,8 @@ class DefterAnaPencere(QMainWindow):
                 self.dosyalari_kopyala(self.cModel.enSonAktifSayfa, html_klasor_kayit_adres)
             sayfa = self.cModel.enSonAktifSayfa
             html = self.sayfa_html_olustur(sayfa, html_klasor_kayit_adres,
-                                              tekSayfaMi=True, def_dosyasi_icine_kaydet=False,
-                                              dosya_kopyalaniyor_mu=dosyalar_kopyalansin_mi)
+                                           tekSayfaMi=True, def_dosyasi_icine_kaydet=False,
+                                           dosya_kopyalaniyor_mu=dosyalar_kopyalansin_mi)
             if sayfa.adi[0] == "★":
                 sayfa_adi = f"{sayfa.adi[2:]}.html"
             else:
@@ -9518,7 +9519,7 @@ class DefterAnaPencere(QMainWindow):
             files_klasoru = os.path.join(self.cModel.tempDirPath, "files")
             if os.path.exists(files_klasoru):
                 shutil.copytree(files_klasoru, os.path.join(hedef_klasor, "files"), dirs_exist_ok=True)
-            
+
             videos_klasoru = os.path.join(self.cModel.tempDirPath, "videos")
             if os.path.exists(videos_klasoru):
                 shutil.copytree(videos_klasoru, os.path.join(hedef_klasor, "videos"), dirs_exist_ok=True)
@@ -9555,7 +9556,8 @@ class DefterAnaPencere(QMainWindow):
                         hedef_nesne_tipi_klasoru = os.path.join(hedef_klasor, ic_klasor)
                         if not os.path.exists(hedef_nesne_tipi_klasoru):
                             os.makedirs(hedef_nesne_tipi_klasoru, exist_ok=True)
-                        kopyalanacak_adres = os.path.join(hedef_nesne_tipi_klasoru, os.path.basename(nesne.filePathForSave))
+                        kopyalanacak_adres = os.path.join(hedef_nesne_tipi_klasoru,
+                                                          os.path.basename(nesne.filePathForSave))
                         shutil.copy2(nesne.filePathForSave, kopyalanacak_adres)
                     else:
                         # if not filecmp.cmp(imgPath, yeniImgPath, shallow=True):
@@ -9573,7 +9575,7 @@ class DefterAnaPencere(QMainWindow):
         #             # print(yeniImgPath)
         #         except Exception as e:
         #             self.log(str(e), level=3)
-        
+
     # ---------------------------------------------------------------------
     def _get_printer(self):
         if not self.printer:
@@ -10009,7 +10011,7 @@ class DefterAnaPencere(QMainWindow):
         # baseName = sayfa.adi
         fn = QFileDialog.getSaveFileName(self,
                                          self.tr('Save Image as'),
-                                         "", # baseName
+                                         "",  # baseName
                                          self.supportedImageFormats,
                                          self.sonKlasorDisaAktar
                                          )

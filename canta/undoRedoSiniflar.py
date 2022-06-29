@@ -1221,23 +1221,26 @@ class UndoableSetLineColor(QUndoCommand):
     """ """
 
     # ---------------------------------------------------------------------
-    def __init__(self, description, item, color, parent=None):
+    def __init__(self, description, item, color, renkSecicidenMi, parent=None):
         super(UndoableSetLineColor, self).__init__(description, parent)
         self.item = item
         self.color = color
         self.eskiColor = item.cizgiRengi
+        self.renkSecicidenMi = renkSecicidenMi
 
     # ---------------------------------------------------------------------
     def redo(self):
         self.item.setCizgiRengi(self.color)
         if self.item.isSelected():
-            self.item.scene().parent().degistir_cizgi_rengi_ikonu(self.color, nesne_arkaplan_ikonu_guncelle=True)
+            self.item.scene().parent().degistir_cizgi_rengi_ikonu(self.color, nesne_arkaplan_ikonu_guncelle=True,
+                                                                  renkSecicidenMi=self.renkSecicidenMi)
 
     # ---------------------------------------------------------------------
     def undo(self):
         self.item.setCizgiRengi(self.eskiColor)
         if self.item.isSelected():
-            self.item.scene().parent().degistir_cizgi_rengi_ikonu(self.eskiColor, nesne_arkaplan_ikonu_guncelle=True)
+            self.item.scene().parent().degistir_cizgi_rengi_ikonu(self.eskiColor, nesne_arkaplan_ikonu_guncelle=True,
+                                                                  renkSecicidenMi=self.renkSecicidenMi)
 
 
 ########################################################################
@@ -1245,11 +1248,12 @@ class UndoableSetTextColor(QUndoCommand):
     """ """
 
     # ---------------------------------------------------------------------
-    def __init__(self, description, item, color, parent=None):
+    def __init__(self, description, item, color, renkSecicidenMi, parent=None):
         super(UndoableSetTextColor, self).__init__(description, parent)
         self.item = item
         self.color = color
         self.eskiColor = item.yaziRengi
+        self.renkSecicidenMi = renkSecicidenMi
         # if item.type() == shared.TEXT_ITEM_TYPE:
         #     self.eskiColor = item.defaultTextColor()
         #     # self.setText("change text color")
@@ -1260,13 +1264,15 @@ class UndoableSetTextColor(QUndoCommand):
     def redo(self):
         self.item.setYaziRengi(self.color)
         if self.item.isSelected():
-            self.item.scene().parent().degistir_yazi_rengi_ikonu(self.color, nesne_arkaplan_ikonu_guncelle=True)
+            self.item.scene().parent().degistir_yazi_rengi_ikonu(self.color, nesne_arkaplan_ikonu_guncelle=True,
+                                                                 renkSecicidenMi=self.renkSecicidenMi)
 
     # ---------------------------------------------------------------------
     def undo(self):
         self.item.setYaziRengi(self.eskiColor)
         if self.item.isSelected():
-            self.item.scene().parent().degistir_yazi_rengi_ikonu(self.eskiColor, nesne_arkaplan_ikonu_guncelle=True)
+            self.item.scene().parent().degistir_yazi_rengi_ikonu(self.eskiColor, nesne_arkaplan_ikonu_guncelle=True,
+                                                                 renkSecicidenMi=self.renkSecicidenMi)
 
 
 ########################################################################
@@ -1356,11 +1362,12 @@ class UndoableSetItemBackgroundColor(QUndoCommand):
     """ """
 
     # ---------------------------------------------------------------------
-    def __init__(self, description, item, color, parent=None):
+    def __init__(self, description, item, color, renkSecicidenMi, parent=None):
         super(UndoableSetItemBackgroundColor, self).__init__(description, parent)
         self.item = item
         self.color = color
         self.eskiColor = item.arkaPlanRengi
+        self.renkSecicidenMi = renkSecicidenMi
 
     # # ---------------------------------------------------------------------
     # def id(self):
@@ -1387,14 +1394,14 @@ class UndoableSetItemBackgroundColor(QUndoCommand):
         self.item.setArkaPlanRengi(self.color)
         if self.item.isSelected():
             self.item.scene().parent().degistir_nesne_arkaplan_rengi_ikonu(self.color, self.item.yaziRengi,
-                                                                           self.item.cizgiRengi)
+                                                                           self.item.cizgiRengi, self.renkSecicidenMi)
 
     # ---------------------------------------------------------------------
     def undo(self):
         self.item.setArkaPlanRengi(self.eskiColor)
         if self.item.isSelected():
             self.item.scene().parent().degistir_nesne_arkaplan_rengi_ikonu(self.eskiColor, self.item.yaziRengi,
-                                                                           self.item.cizgiRengi)
+                                                                           self.item.cizgiRengi, self.renkSecicidenMi)
 
 
 ########################################################################

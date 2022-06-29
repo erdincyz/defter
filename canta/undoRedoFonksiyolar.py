@@ -13,8 +13,8 @@ from canta.undoRedoSiniflar import UndoableSayfaAdiDegistir, UndoableAddItem, Un
     UndoableSetLineColorAlpha, UndoableSetTextColorAlpha, UndoableSetItemBackgroundColor, \
     UndoableSetItemBackgroundColorAlpha, UndoableApplyStylePresetToItem, UndoableApplyStylePreset, \
     UndoableSetImageOpacity, UndoableSetSceneBackgroundBrush, UndoableSetSceneBackgroundImage, \
-    UndoableEmbedSceneBackgroundImage, UndoableSetPinStatus, UndoableItemSetText, UndoableItemCustomCommand,\
-    UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, UndoableResizeLineItem,\
+    UndoableEmbedSceneBackgroundImage, UndoableSetPinStatus, UndoableItemSetText, UndoableItemCustomCommand, \
+    UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, UndoableResizeLineItem, \
     UndoableMovePathPoint, UndoableSetTextAlignment, UndoableSetCharacterFormat, UndoableSetLineWidthF, \
     UndoableConvertToPlainText, UndoRedoBaglantisiYaziNesnesiDocuna
 
@@ -164,14 +164,26 @@ def undoableSetLineWidthF(undoStack, description, item, widthF):
 
 
 # ---------------------------------------------------------------------
-def undoableSetLineColor(undoStack, description, item, color):
-    command = UndoableSetLineColor(description, item, color)
+def undoableSetLineColor(undoStack, description, item, color, renkSecicidenMi):
+    command = UndoableSetLineColor(description, item, color, renkSecicidenMi)
     undoStack.push(command)
 
 
 # ---------------------------------------------------------------------
-def undoableSetTextColor(undoStack, description, item, color):
-    command = UndoableSetTextColor(description, item, color)
+def undoableSetTextColor(undoStack, description, item, color, renkSecicidenMi):
+    command = UndoableSetTextColor(description, item, color, renkSecicidenMi)
+    undoStack.push(command)
+
+
+# ---------------------------------------------------------------------
+def undoableSetItemBackgroundColor(undoStack, description, item, color, renkSecicidenMi):
+    command = UndoableSetItemBackgroundColor(description, item, color, renkSecicidenMi)
+    undoStack.push(command)
+
+
+# ---------------------------------------------------------------------
+def undoableSetItemBackgroundColorAlpha(undoStack, description, item, color):
+    command = UndoableSetItemBackgroundColorAlpha(description, item, color)
     undoStack.push(command)
 
 
@@ -184,18 +196,6 @@ def undoableSetLineColorAlpha(undoStack, description, item, color):
 # ---------------------------------------------------------------------
 def undoableSetTextColorAlpha(undoStack, description, item, color):
     command = UndoableSetTextColorAlpha(description, item, color)
-    undoStack.push(command)
-
-
-# ---------------------------------------------------------------------
-def undoableSetItemBackgroundColor(undoStack, description, item, color):
-    command = UndoableSetItemBackgroundColor(description, item, color)
-    undoStack.push(command)
-
-
-# ---------------------------------------------------------------------
-def undoableSetItemBackgroundColorAlpha(undoStack, description, item, color):
-    command = UndoableSetItemBackgroundColorAlpha(description, item, color)
     undoStack.push(command)
 
 
@@ -235,7 +235,7 @@ def undoableSetSceneBackgroundImage(undoStack, description, view, imagePath):
 
 
 # ---------------------------------------------------------------------
-def undoableEmbedSceneBackgroundImage(undoStack, description, view,):
+def undoableEmbedSceneBackgroundImage(undoStack, description, view, ):
     command = UndoableEmbedSceneBackgroundImage(description, view)
     undoStack.push(command)
 

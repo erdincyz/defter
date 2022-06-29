@@ -9,7 +9,7 @@ import os
 from uuid import uuid4
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QPixmap, QPainter, QBrush
 from PySide6.QtWidgets import QGraphicsItem
 
 DEFTER_KLASOR_ADRES = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -77,3 +77,20 @@ def calculate_alpha(delta, col):
     return col
 
     # return QColor().fromRgb(col.red(), col.green(),col.blue(),col.alpha())
+
+
+# ---------------------------------------------------------------------
+def kutulu_arkaplan_olustur(widget, kareBoyutu=10):
+    kb = kareBoyutu
+
+    pMap = QPixmap(2 * kb, 2 * kb)
+    p = QPainter(pMap)
+    p.fillRect(0, 0, kb, kb, QColor(200, 200, 200))
+    p.fillRect(kb, kb, kb, kb, QColor(210, 210, 210))
+    p.fillRect(0, kb, kb, kb, QColor(190, 190, 190))
+    p.fillRect(kb, 0, kb, kb, QColor(200, 200, 200))
+    p.end()
+    palette = widget.palette()
+    palette.setBrush(widget.backgroundRole(), QBrush(pMap))
+    widget.setAutoFillBackground(True)
+    widget.setPalette(palette)

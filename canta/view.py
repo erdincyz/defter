@@ -76,8 +76,12 @@ class View(QGraphicsView):
 
     # ---------------------------------------------------------------------
     def contextMenuEvent(self, event):
-        QGraphicsView.contextMenuEvent(self, event)
 
+        if event.modifiers() == Qt.ControlModifier:
+            self.scene().parent().nesne_ozellikleriYW_goster_gizle()
+            return
+
+        QGraphicsView.contextMenuEvent(self, event)
         # mouse altinda bir nesne varsa ve sag click menusunu gosterdiyse event.accepted() doner.
         if not event.isAccepted():
             self.scene().parent().view_context_menu_goster(event.globalPos())
@@ -106,7 +110,6 @@ class View(QGraphicsView):
     def drawBackground(self, painter, rectf):
         painter.setBrushOrigin(0, 0)
         painter.fillRect(rectf, self.backgroundBrush())
-
 
         # ---  pos debug start   ---
         # painter.drawRect(self.sceneRect())
@@ -336,12 +339,15 @@ class View(QGraphicsView):
             # return ediyoruz ki normal view ctrl hizli scroll iptal olsun
             return
         if event.modifiers() & Qt.ShiftModifier:
-            self.scene().tekerlek_ile_firca_boyu_degistir(event.angleDelta().y())
-            # print(event.isAccepted())
-            # if (event.isAccepted()):
-            #     return
-            # alt satir olmazsa shift nesnelere gecmiyor.
-            return QGraphicsView.wheelEvent(self, event)
+            #     # self.scene().tekerlek_ile_firca_boyu_degistir(event.angleDelta().y())
+            #     # print(event.isAccepted())
+            #     # if (event.isAccepted()):
+            #     #     return
+            #     # alt satir olmazsa shift nesnelere gecmiyor.
+
+            # if not self.scene().activeItem:
+            if self.itemAt(event.position().toPoint()):
+                return QGraphicsView.wheelEvent(self, event)
         else:
             super(View, self).wheelEvent(event)
         # superi cagirmayalim cunku scrool bar move ediyor normalde wheel

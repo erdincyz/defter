@@ -872,6 +872,9 @@ class PathItem(QGraphicsItem):
         # elif toplam == ctrlAltShift:
         #     self.scaleItemByScalingPath(event.delta())
 
+        if not self.isDrawingFinished:
+            self.scene().tekerlek_ile_firca_boyu_degistir(event.delta())
+
         else:
             super(PathItem, self).wheelEvent(event)
 
@@ -992,6 +995,8 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def rotateItem(self, delta):
+        if not self.isDrawingFinished:
+            return
 
         # self.setTransformOriginPoint(self.boundingRect().center())
         if delta > 0:

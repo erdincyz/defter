@@ -6,7 +6,7 @@ __date__ = '26/1/22'
 __author__ = 'Erdinç Yılmaz'
 
 from PySide6.QtCore import Qt, QPoint
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSizePolicy
 
 
 #######################################################################
@@ -18,11 +18,14 @@ class YuzenWidget(QWidget):
 
         # self.setMinimumHeight(400)
         self.setAutoFillBackground(True)
+        # self.setStyleSheet("QWidget {background-color: #ccc;}")
         self.setContentsMargins(0, 0, 0, 0)
         self.setWindowFlags(Qt.FramelessWindowHint)
         # self.setSizeGripEnabled(True)
         self.setStatusTip(self.tr("Move with left mouse button, resize with right mouse button."))
         # self.setToolTip(self.tr("Move with left mouse button, resize with right mouse button."))
+
+        self.setFocusPolicy(Qt.WheelFocus)
 
         self.mPos = QPoint()
         self.sagClick = False
@@ -30,7 +33,7 @@ class YuzenWidget(QWidget):
 
         self.anaLay = QVBoxLayout(self)
         self.anaLay.setContentsMargins(1, 0, 1, 1)
-        self.anaLay.setSpacing(0)
+        self.anaLay.setSpacing(1)
         # self.anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
         baslikLay = QHBoxLayout()
         baslikLay.setContentsMargins(0, 0, 0, 0)
@@ -43,20 +46,29 @@ class YuzenWidget(QWidget):
         self.kapatBtn = QPushButton(self)
         self.kapatBtn.setFlat(True)
         self.kapatBtn.setText("X")
+        self.kapatBtn.setStyleSheet("QPushButton {background-color: #ddd;}")
         # self.kapatBtn.setMinimumHeight(15)
         # self.kapatBtn.setMinimumWidth(30)
         self.kapatBtn.setMaximumWidth(30)
+        # self.kapatBtn.clicked.connect(self.close)
         self.kapatBtn.clicked.connect(self.hide)
 
-        baslikLay.addStretch()
+        self.baslikEtiket = QLabel(self)
+        self.baslikEtiket.setStyleSheet("QLabel {background-color: #ddd;}")
+        baslikLay.addWidget(self.baslikEtiket)
+        # baslikLay.addStretch()
         # baslikLay.addWidget(tasiWidget)
         baslikLay.addWidget(self.kapatBtn)
 
         self.anaLay.addLayout(baslikLay)
 
-        # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.baslikEtiket.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.icerikToplamMinWidth = 0
         self.icerikToplamMinHeight = 0
+
+    # ---------------------------------------------------------------------
+    def yazBaslik(self, yazi):
+        self.baslikEtiket.setText(yazi)
 
     # ---------------------------------------------------------------------
     def ekleWidget(self, widget):
@@ -71,7 +83,12 @@ class YuzenWidget(QWidget):
         self.icerikToplamMinWidth += widget.minimumWidth()
         self.icerikToplamMinHeight += widget.minimumHeight()
         self.anaLay.addWidget(widget)
+        # self.baslikEtiket.setMinimumWidth(self.icerikToplamMinWidth - self.kapatBtn.maximumWidth())
         self.adjustSize()
+
+    # ---------------------------------------------------------------------
+    def addStretchToLayout(self):
+        self.anaLay.addStretch()
 
     # ---------------------------------------------------------------------
     # def sizeHint(self):

@@ -5,9 +5,9 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
-from PySide6.QtGui import (QPen, QBrush, QPainterPath, QPainterPathStroker, QColor, QTextOption)
-from PySide6.QtWidgets import (QGraphicsItem, QStyle)
-from PySide6.QtCore import (QRectF, Qt, QSizeF, QPointF, Slot)
+from PySide6.QtGui import QPen, QBrush, QPainterPath, QPainterPathStroker, QColor, QTextOption, QLinearGradient, QCursor
+from PySide6.QtWidgets import QGraphicsItem, QStyle
+from PySide6.QtCore import QRectF, Qt, QSizeF, QPointF, Slot, QRect
 from canta.nesneler.tempTextItem import TempTextItem
 from canta import shared
 
@@ -1093,27 +1093,28 @@ class BaseItem(QGraphicsItem):
         ctrlAltShift = int(Qt.ControlModifier) + int(Qt.AltModifier) + int(Qt.ShiftModifier)
 
         # if event.modifiers() & Qt.ControlModifier:
-        if toplam == ctrlShift:
-            self.scaleItem(event.delta())
-            # self.scaleItem(event.angleDelta().y())
 
         # elif event.modifiers() & Qt.ShiftModifier:
-        elif toplam == shift:
+        if toplam == shift:
             self.rotateItem(event.delta())
 
         # elif event.modifiers() & Qt.AltModifier:
         elif toplam == alt:
             self.changeBackgroundColorAlpha(event.delta())
 
+        elif toplam == ctrlShift:
+            self.scaleItem(event.delta())
+            # self.scaleItem(event.angleDelta().y())
+
         elif toplam == ctrlAlt:
             self.changeTextColorAlpha(event.delta())
 
-        elif toplam == ctrlAltShift:
-            self.changeFontSize(event.delta())
-        #
         elif toplam == altShift:
             # self.changeImageItemTextBackgroundColorAlpha(event.delta())
             self.changeLineColorAlpha(event.delta())
+
+        elif toplam == ctrlAltShift:
+            self.changeFontSize(event.delta())
 
         # elif toplam == ctrlAltShift:
         #     self.scaleItemByResizing(event.delta())
