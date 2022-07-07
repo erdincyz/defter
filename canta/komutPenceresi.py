@@ -46,17 +46,17 @@ class CommandDialog(QDialog):
         btnLayout.addWidget(saveBtn)
         layout.addLayout(btnLayout)
 
-        self.init_settings()
-        self.read_settings()
+        self.olustur_ayarlar()
+        self.oku_ayarlar()
         # commandDialog.accepted.connect()
 
     # ---------------------------------------------------------------------
     def closeEvent(self, event):
-        self.write_settings()
+        self.yaz_ayarlar()
         event.accept()
 
     # ---------------------------------------------------------------------
-    def init_settings(self):
+    def olustur_ayarlar(self):
         QCoreApplication.setOrganizationName(shared.DEFTER_ORG_NAME)
         QCoreApplication.setOrganizationDomain(shared.DEFTER_ORG_DOMAIN)
         QCoreApplication.setApplicationName(shared.DEFTER_APP_NAME)
@@ -64,14 +64,14 @@ class CommandDialog(QDialog):
         # self.settings.clear()
 
     # ---------------------------------------------------------------------
-    def read_settings(self):
+    def oku_ayarlar(self):
         self.settings.beginGroup("CommandDialogSettings")
         if self.settings.contains("CWinGeometry"):
             self.restoreGeometry(self.settings.value("CWinGeometry"))
         self.settings.endGroup()
 
     # ---------------------------------------------------------------------
-    def write_settings(self):
+    def yaz_ayarlar(self):
         self.settings.beginGroup("CommandDialogSettings")
         self.settings.setValue("CWinGeometry", self.saveGeometry())
         self.settings.endGroup()

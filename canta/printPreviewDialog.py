@@ -93,15 +93,15 @@ class PrintPreviewDialog(QMainWindow):
         # self.setWindowModality(Qt.WindowModal)
         # self.setWindowModality(Qt.ApplicationModal)
 
-        # self.accepted.connect(self.write_settings)
+        # self.accepted.connect(self.yaz_ayarlar)
 
         self.printer = printer
         self.printDialog = None
 
         self.setGeometry(600, 150, 700, 800)
 
-        self.init_settings()
-        self.read_gui_settings()
+        self.olustur_ayarlar()
+        self.oku_arayuz_ayarlari()
 
         self.create_preview_widget(printer)
         self.create_tool_bar()
@@ -124,7 +124,7 @@ class PrintPreviewDialog(QMainWindow):
 
     # ---------------------------------------------------------------------
     def closeEvent(self, QCloseEvent):
-        self.write_settings()
+        self.yaz_ayarlar()
         super(PrintPreviewDialog, self).closeEvent(QCloseEvent)
 
     # ---------------------------------------------------------------------
@@ -206,7 +206,7 @@ class PrintPreviewDialog(QMainWindow):
             if self.parent().cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 self.radioContent.setEnabled(True)
 
-        self.radioBtnGroup.buttonClicked.connect(self.act_radio_button_toggled)
+        self.radioBtnGroup.buttonClicked.connect(self.act_radio_button_group_clicked)
 
         # ---------------------------------------------------------------------
         # options widgets
@@ -279,10 +279,10 @@ class PrintPreviewDialog(QMainWindow):
         # bu secili_mi sinyalini etrafta dolastirmaktansa, _paint methodlarında
         # self.cboxAsViewed secili durumu kontrol ediliyor,
         # burda tekrar paint methodunu cagiriyoruz
-        self.act_radio_button_toggled(self.radioBtnGroup.checkedButton())
+        self.act_radio_button_group_clicked(self.radioBtnGroup.checkedButton())
 
     # ---------------------------------------------------------------------
-    def act_radio_button_toggled(self, btn):
+    def act_radio_button_group_clicked(self, btn):
         # TODO: buyuk dosyalar icin. end call edilsin hemen bitmemis ise.
         # QPrinter().paintingActive()
         # QPrinter().paintEngine().isActive()
@@ -318,7 +318,7 @@ class PrintPreviewDialog(QMainWindow):
         # bu sinyali etrafta dolastirmaktansa, _paint methodlarında
         # hangi radyo buton secili kontrol ediyoruz
         # burda tekrar paint methodunu cagiriyoruz
-        self.act_radio_button_toggled(self.radioBtnGroup.checkedButton())
+        self.act_radio_button_group_clicked(self.radioBtnGroup.checkedButton())
 
     # ---------------------------------------------------------------------
     def _update_options_group_box(self, tip):
@@ -529,7 +529,7 @@ class PrintPreviewDialog(QMainWindow):
             self.actionFitPage.setChecked(False)
 
     # ---------------------------------------------------------------------
-    def init_settings(self):
+    def olustur_ayarlar(self):
         QCoreApplication.setOrganizationName(shared.DEFTER_ORG_NAME)
         QCoreApplication.setOrganizationDomain(shared.DEFTER_ORG_DOMAIN)
         QCoreApplication.setApplicationName(shared.DEFTER_APP_NAME)
@@ -537,7 +537,7 @@ class PrintPreviewDialog(QMainWindow):
         # self.settings.clear()
 
     # ---------------------------------------------------------------------
-    def read_gui_settings(self):
+    def oku_arayuz_ayarlari(self):
         self.settings.beginGroup("PrintDialogSettings")
         if self.settings.contains("printWinGeometry"):
             self.restoreGeometry(self.settings.value("printWinGeometry"))
@@ -548,7 +548,7 @@ class PrintPreviewDialog(QMainWindow):
         self.settings.endGroup()
 
     # ---------------------------------------------------------------------
-    def write_settings(self):
+    def yaz_ayarlar(self):
         self.settings.beginGroup("PrintDialogSettings")
         self.settings.setValue("printWinGeometry", self.saveGeometry())
         self.settings.setValue("printWinState", self.saveState(0))  # version=0

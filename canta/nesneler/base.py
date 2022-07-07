@@ -1055,8 +1055,8 @@ class BaseItem(QGraphicsItem):
 
         # cursor = self.scene().parent().cursor()
 
-        # if self.isSelected() and self.scene().toolType == self.scene().NoTool:
-        if self.scene().toolType == self.scene().NoTool:
+        # if self.isSelected() and self.scene().aktifArac == self.scene().SecimAraci:
+        if self.scene().aktifArac == self.scene().SecimAraci:
             if self.topLeftHandle.contains(event.pos()) or self.bottomRightHandle.contains(event.pos()):
                 self.scene().parent().setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
                 # self.setCursor(Qt.SizeFDiagCursor, gecici_mi=True)

@@ -13,7 +13,8 @@ from PySide6.QtGui import QColor, QPixmap, QPainter, QBrush
 from PySide6.QtWidgets import QGraphicsItem
 
 DEFTER_KLASOR_ADRES = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-DEFTER_AYARLAR_DOSYA_ADRES = os.path.join(DEFTER_KLASOR_ADRES, "_settings.ini")
+DEFTER_AYARLAR_DOSYA_ADRES = os.path.join(DEFTER_KLASOR_ADRES, "_ayarlar.ini")
+DEFTER_AYARLAR_ARACLAR_DOSYA_ADRES = os.path.join(DEFTER_KLASOR_ADRES, "_ayarlar_araclar.ini")
 DEFTER_ORG_NAME = "defter"
 DEFTER_ORG_DOMAIN = "defter"
 DEFTER_APP_NAME = "Defter"

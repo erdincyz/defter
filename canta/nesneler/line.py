@@ -19,7 +19,8 @@ from canta.nesneler.tempTextItem import TempTextItem
 class LineItem(QGraphicsItem):
     Type = shared.LINE_ITEM_TYPE
 
-    def __init__(self, pos, pen, yaziRengi=None, font=None, line=None, parent=None):
+    def __init__(self, pos, pen, yaziRengi=None, arkaPlanRengi=QColor(Qt.transparent), font=None, line=None,
+                 parent=None):
         super(LineItem, self).__init__(parent)
 
         self._kim = shared.kim(kac_basamak=16)
@@ -61,6 +62,7 @@ class LineItem(QGraphicsItem):
         self.setCizgiRengi(self.cizgiRengi)  # also sets self._pen
         self.yaziRengi = yaziRengi
         self.setYaziRengi(yaziRengi)
+        self.arkaPlanRengi = arkaPlanRengi  # Ok-cizgi nesnesinde kullanilmiyor
 
         self.tempTextItem = None
         self.tempEskiText = ""
@@ -101,6 +103,8 @@ class LineItem(QGraphicsItem):
                       "zValue": self.zValue(),
                       "pen": self._pen,
                       "font": self._font,
+                      "yaziRengi": self.yaziRengi,
+                      "arkaPlanRengi": self.arkaPlanRengi,
                       "yaziHiza": int(self.painterTextOption.alignment()),
                       "text": self.text(),
                       "isPinned": self.isPinned,
@@ -228,8 +232,11 @@ class LineItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def setArkaPlanRengi(self, col):
-        # dummy method
-        pass
+        # arkaPlanRengi Ok-Cizgi Nesnesinde kullanilmiyor
+        # fasulyeden method
+        self.arkaPlanRengi = col
+        # self.setBrush(QBrush(col))
+        # self.update()
 
     # ---------------------------------------------------------------------
     def brush(self):
@@ -443,7 +450,7 @@ class LineItem(QGraphicsItem):
         # cursor = self.scene().parent().cursor()
 
         # if self.isSelected():
-        if self.scene().toolType == self.scene().NoTool:
+        if self.scene().aktifArac == self.scene().SecimAraci:
             if self.p1Handle.contains(event.pos()) or self.p2Handle.contains(event.pos()):
                 self.scene().parent().setCursor(Qt.SizeAllCursor, gecici_mi=True)
             else:
@@ -688,11 +695,6 @@ class LineItem(QGraphicsItem):
         self._pen.setWidthF(width)
         self.okBoyutu = width * 3
         self.ok_ucu_guncelle()
-        # self.textPen.setWidthF(width)
-
-        # self.selectionPenBottom.setWidthF(width)
-        # self.selectionPenBottomIfAlsoActiveItem.setWidthF(width)
-        # self.selectionPenTop.setWidthF(width)
 
         self.update()
 
@@ -701,8 +703,6 @@ class LineItem(QGraphicsItem):
         # drawing text after drawing rect does not apply alpha
         # we need to reconstruct the color with same values.
         self.yaziRengi = col
-        # self.textPen = QPen(QColor().fromRgb(col.red(), col.green(), col.blue(), col.alpha()))
-        # self.textPen = QPen(col)
         self.update()
 
     # ---------------------------------------------------------------------

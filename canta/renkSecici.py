@@ -99,12 +99,12 @@ class RenkSecilenKareW(QWidget):
         return renk
 
     # ---------------------------------------------------------------------
-    def disardanYazRenkTon(self, renkTon):
+    def yazRenkTonDisardan(self, renkTon):
         self.renkTon = renkTon
         self.renkleriAyarla()
 
     # ---------------------------------------------------------------------
-    def disardanYazSeffaflik(self, alpha):
+    def yazSeffaflikDisardan(self, alpha):
         self.seffalik = alpha
 
     # ---------------------------------------------------------------------
@@ -224,12 +224,13 @@ class RenkSeciciWidget(QWidget):
 
     # ---------------------------------------------------------------------
     def disardan_renk_gir(self, renk):
-        self.eskiRenk = renk.toHsv()
-        # self.rTonVeSayiKutusu.setValue(self.eskiRenk.hsvHue())
-        self.seffalik_cubugu_arkaplan_degistir(self.eskiRenk.hsvHue())
-        # self.rSeffaflikVeSayiKutusu.setValue(self.eskiRenk.alpha())
-        self.disardan_renk_ton_degisti_slider(self.eskiRenk.hsvHue())
-        self.disardan_renk_seffaflik_degisti_slider(self.eskiRenk.alpha())
+        # self.eskiRenk = renk.toHsv()
+        self.eskiRenk = renk
+        self.rTonVeSayiKutusu.setValue(self.eskiRenk.hsvHue())
+        # self.seffalik_cubugu_arkaplan_degistir(self.eskiRenk.hsvHue())
+        self.rSeffaflikVeSayiKutusu.setValue(self.eskiRenk.alpha())
+        self.renk_ton_degisti_disardan(self.eskiRenk.hsvHue())
+        self.renk_seffaflik_degisti_disardan(self.eskiRenk.alpha())
         self.renkSecmeKutusu.halkayi_koordianata_tasi(self.eskiRenk.saturation(), self.eskiRenk.value())
 
     # ---------------------------------------------------------------------
@@ -238,13 +239,19 @@ class RenkSeciciWidget(QWidget):
         self.renkDegisti.emit(renk)
 
     # ---------------------------------------------------------------------
-    def disardan_renk_ton_degisti_slider(self, hue):
-        self.renkSecmeKutusu.disardanYazRenkTon(hue)
+    def renk_ton_degisti_disardan(self, hue):
+        self.renkSecmeKutusu.yazRenkTonDisardan(hue)
         self.seffalik_cubugu_arkaplan_degistir(hue)
+        self.rTonVeSayiKutusu.blockSignals(True)
+        self.rTonVeSayiKutusu.setValue(hue)
+        self.rTonVeSayiKutusu.blockSignals(False)
 
     # ---------------------------------------------------------------------
-    def disardan_renk_seffaflik_degisti_slider(self, alpha):
-        self.renkSecmeKutusu.disardanYazSeffaflik(alpha)
+    def renk_seffaflik_degisti_disardan(self, alpha):
+        self.renkSecmeKutusu.yazSeffaflikDisardan(alpha)
+        self.rSeffaflikVeSayiKutusu.blockSignals(True)
+        self.rSeffaflikVeSayiKutusu.setValue(alpha)
+        self.rSeffaflikVeSayiKutusu.blockSignals(False)
 
     # ---------------------------------------------------------------------
     def renk_ton_degisti_slider(self, hue):

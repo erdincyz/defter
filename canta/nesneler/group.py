@@ -5,9 +5,9 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
-from PySide6.QtCore import (Qt, QRectF, QPointF)
-from PySide6.QtGui import (QColor, QPen)
-from PySide6.QtWidgets import (QStyle, QGraphicsItem)
+from PySide6.QtCore import Qt, QRectF, QPointF
+from PySide6.QtGui import QColor, QPen
+from PySide6.QtWidgets import QStyle, QGraphicsItem
 from canta import shared
 
 
@@ -15,7 +15,8 @@ from canta import shared
 class Group(QGraphicsItem):
     Type = shared.GROUP_ITEM_TYPE
 
-    def __init__(self, arkaPlanRengi=QColor(Qt.transparent), pen=QPen(Qt.DotLine), parent=None):
+    def __init__(self, arkaPlanRengi=QColor(Qt.transparent), yaziRengi=QColor(Qt.transparent), pen=QPen(Qt.DotLine),
+                 parent=None):
         super(Group, self).__init__(parent)
 
         self._kim = shared.kim(kac_basamak=16)
@@ -36,8 +37,9 @@ class Group(QGraphicsItem):
         self.activeItemLineColor = shared.activeItemLineColor
         self._pen = pen
         self.setCizgiRengi(pen.color())
-        # self.arkaPlanRengi(arkaPlanRengi)  # no need, in gorupItem, it only sets self.arkaplanRengi
-        self.arkaPlanRengi = arkaPlanRengi
+        self.arkaPlanRengi = arkaPlanRengi  # grup nesnesinde kullanilmiyor
+        self.yaziRengi = yaziRengi  # grup nesnesinde kullanilmiyor
+        self.cizgiRengi = pen.color()
 
         self.cosmeticSelect = False
         self.isActiveItem = False
@@ -129,7 +131,8 @@ class Group(QGraphicsItem):
                       "rotation": self.rotation(),
                       "scale": self.scale(),
                       "zValue": self.zValue(),
-                      "arkaPlanRengi": self.arkaPlanRengi,
+                      "yaziRengi": self.yaziRengi,  # yaziRengi grup nesnesinde aktik olarak kullanilmiyor
+                      "arkaPlanRengi": self.arkaPlanRengi,  # arkaPlanRengi grup nesnesinde aktik olarak kullanilmiyor
                       "pen": self._pen,
                       "isPinned": self.isPinned,
                       }
@@ -521,7 +524,7 @@ class Group(QGraphicsItem):
                                         self.activeItemLineColor.saturation(),
                                         self.activeItemLineColor.value())
         self._pen.setColor(col)
-        # self.cizgiRengi = col
+        self.cizgiRengi = col
 
         self.selectionPenBottom = QPen(_selectionLineBgColor,
                                        self.secili_nesne_kalem_kalinligi,
@@ -546,9 +549,15 @@ class Group(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def setArkaPlanRengi(self, col):
+        # arkaplanRengi ve yaziRengi grup nesnesinde kullanilmiyor
+        # fasulyeden method
         self.arkaPlanRengi = col
-        # self.setBrush(QBrush(col))
-        self.update()
+
+    # ---------------------------------------------------------------------
+    def setYaziRengi(self, col):
+        # arkaplanRengi ve yaziRengi grup nesnesinde kullanilmiyor
+        # fasulyeden method
+        self.yaziRengi = col
 
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):

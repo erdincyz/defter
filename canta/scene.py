@@ -14,6 +14,7 @@ from PySide6.QtGui import (QPixmap, QCursor, QPen, QImage, QUndoStack, QColor)
 from PySide6.QtWidgets import (QApplication, QGraphicsScene)
 # from sub.items.base import BaseItem
 # TODO: bunu sadece dragEnterEvent kaynagi belirlemek icin kullaniyoruz, bi inceleyelim
+from canta.arac import Arac
 from canta.nesneler.yuvarlakFircaBoyutu import YuvarlakFircaBoyutu
 from canta.shared import kim
 from canta.treeView import TreeView
@@ -24,48 +25,59 @@ from canta.nesneler.text import Text
 from canta.nesneler.rect import Rect
 from canta.nesneler.ellipse import Ellipse
 from canta.nesneler.path import PathItem
-from canta.nesneler.group import Group
 # from canta.nesneler.video import VideoItem
 # from canta.nesneler.dosya import DosyaNesnesi
 from canta.nesneler.mirrorLine import MirrorLine
 from canta.threadWorkers import DownloadWorker
-from canta import undoRedoFonksiyolar as undoRedo
+from canta import undoRedoFonksiyolar as undoRedo, shared
 
 
 ########################################################################
 class Scene(QGraphicsScene):
     # itemMoved = Signal(QGraphicsItem, QPointF)
     itemMoved = Signal(object, QPointF)
-    (NoTool, DrawLineTool, RectTool, EllipseTool,
-     DrawPathTool, TextTool, ImageTool, VideoTool,
-     DosyaAraci, MirrorX, MirrorY, CropImageTool) = range(12)
 
     # textItemSelected = Signal(QGraphicsTextItem)
 
     # ---------------------------------------------------------------------
-    def __init__(self, tempDirPath, yaziRengi, arkaPlanRengi, scenePen, parent=None):
+    def __init__(self, tempDirPath, yaziTipi, parent=None):
         super(Scene, self).__init__(parent)
 
         # gradient = QRadialGradient(0, 0, 10)
         # gradient.setSpread(QGradient.RepeatSpread)
         # self.setBackgroundBrush(gradient)
 
+        # her belgede arac ozellikleri farkli olsun diye classta degil de burda tanimladik
+        self.SecimAraci = Arac('secimAraci')
+        self.OkAraci = Arac('okAraci')
+        self.DortgenAraci = Arac('dortgenAraci')
+        self.YuvarlakAraci = Arac('yuvarlakAraci')
+        self.KalemAraci = Arac('kalemAraci')
+        self.YaziAraci = Arac('yaziAraci')
+        self.ResimAraci = Arac('resimAraci')
+        self.VideoAraci = Arac('videoAraci')
+        self.DosyaAraci = Arac('dosyaAraci')
+        self.AynalaXAraci = Arac('aynalaXAraci')
+        self.AynalaYAraci = Arac('aynalaYAraci')
+        self.ResimKirpAraci = Arac('resimKirpAraci')
+
+        self.araclar = (self.SecimAraci, self.OkAraci, self.DortgenAraci, self.YuvarlakAraci, self.KalemAraci,
+                        self.YaziAraci, self.ResimAraci, self.VideoAraci, self.DosyaAraci, self.AynalaXAraci,
+                        self.AynalaYAraci, self.ResimKirpAraci)
+
         self.setItemIndexMethod(self.NoIndex)
 
         self.tempDirPath = tempDirPath
-        self.arkaPlanRengi = arkaPlanRengi
-        self.yaziRengi = yaziRengi
-        
-        self.sonZDeger = 0
+        self.setFont(yaziTipi)
 
-        self.scenePen = scenePen
+        self.sonZDeger = 0
 
         # self.tempDirPath = tempfile.TemporaryDirectory().name
         # self.tempDirPath = tempfile.TemporaryDirectory()
 
         # self.saveFilePath = None
 
-        self.toolType = self.NoTool
+        self.aktifArac = self.SecimAraci
 
         # TODO: itemlara set data ve data diyebiliyoruz, (key = int ,value = QVariant)
 
@@ -105,29 +117,60 @@ class Scene(QGraphicsScene):
 
     # ---------------------------------------------------------------------
     def get_properties_for_save(self):
+
+        aracOzellikleriSozluk = {}
+        for arac in self.araclar:
+            aracOzellikleriSozluk[arac.tip] = arac.oku_ozellikler()
+
         view = self.views()[0]
-        properties = {"yaziRengi": self.yaziRengi,
-                      "arkaPlanRengi": self.arkaPlanRengi,
-                      "scenePen": self.scenePen,
-                      "sceneRect": self.sceneRect(),
-                      "sonZDeger": self.sonZDeger,
-                      # "embededImageCounter": self.embededImageCounter,
-                      "backgroundBrush": view.backgroundBrush(),
-                      "backgroundImagePath": view.backgroundImagePath,
-                      "backgroundImagePathIsEmbeded": view.backgroundImagePathIsEmbeded,
-                      # "viewMatrix": self.views()[0].matrix()
-                      "viewTransform": view.transform(),
-                      "viewHorizontalScrollBarValue": view.horizontalScrollBar().value(),
-                      "viewVerticalScrollBarValue": view.verticalScrollBar().value()
-                      }
+        properties = {
+            "sceneRect": self.sceneRect(),
+            "sonZDeger": self.sonZDeger,
+            # "embededImageCounter": self.embededImageCounter,
+            "backgroundBrush": view.backgroundBrush(),
+            "backgroundImagePath": view.backgroundImagePath,
+            "backgroundImagePathIsEmbeded": view.backgroundImagePathIsEmbeded,
+            # "viewMatrix": self.views()[0].matrix()
+            "viewTransform": view.transform(),
+            "viewHorizontalScrollBarValue": view.horizontalScrollBar().value(),
+            "viewVerticalScrollBarValue": view.verticalScrollBar().value(),
+            "aracOzellikleriSozluk": aracOzellikleriSozluk
+        }
         return properties
 
     # ---------------------------------------------------------------------
-    def set_tool(self, toolType, itemText=None, dosyaYolu=None, pos=None):
+    def arac_ozellikleri_yukle(self, aracOzellikleriSozluk):
+        if aracOzellikleriSozluk:
+            for arac in self.araclar:
+                arac.yaz_ozellikler(aracOzellikleriSozluk[arac.tip])
+
+    # ---------------------------------------------------------------------
+    def nesne_ozellikleri_guncelle(self):
+        # self.parent().fircaDirektDegerGir(self.aktifArac.kalem.widthF())
+
+        # self.parent()._pen = QPen(self.aktifArac.kalem)
+        self.parent().change_line_style_options(self.aktifArac.kalem)
+        # self.parent().cizgiRengi = self.cizgiRengi = self.aktifArac.cizgiRengi
+        self.parent().degistir_cizgi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
+
+        # self.parent().currentFont = self.aktifArac.yaziTipi
+        # self.setFont(self.aktifArac.yaziTipi)
+
+        # self.parent().yaziRengi = self.yaziRengi = self.aktifArac.yaziRengi
+        # self.parent().arkaPlanRengi = self.arkaPlanRengi = self.aktifArac.arkaPlanRengi
+
+        self.parent().degistir_yazi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
+        self.parent().degistir_nesne_arkaplan_rengi_ikonu()
+        self.parent().change_text_size_spinbox_value(self.aktifArac.yaziBoyutu)
+        self.parent().change_line_style_options(self.aktifArac.kalem)
+        # self.parent().change_font_combobox_value(self.aktifArac.yaziTipi)
+
+    # ---------------------------------------------------------------------
+    def aktif_arac_degistir(self, aktifArac, itemText=None, dosyaYolu=None, pos=None):
         # parca bir cok yerde bunu kapatmaktansa basta kapatıp
         # asagida gerekirse aciyoruz
-        # setMouseTracking kullanan araclardan sadece DrawPathTool tekrar tekrar cizim yapiyor
-        # digerleri tek islem yapiyor ve tooldan cikiyor yani set_tool yani burasi cagriliyor
+        # setMouseTracking kullanan araclardan sadece KalemAraci tekrar tekrar cizim yapiyor
+        # digerleri tek islem yapiyor ve tooldan cikiyor yani aktif_arac_degistir yani burasi cagriliyor
         # DrawPathToolda surekli cizim yapabildiğimiz için kapatmaya gerek yok
         # aslında bunu da fircaBoyutuItem icin aciyoruz sadece (ilerde baska seylerde de kullanabiliriz)
         # GUNCELLEME: self.views()[0].hasMouseTracking(), False donduruyor ama tracking yapiyor!?
@@ -138,7 +181,7 @@ class Scene(QGraphicsScene):
         # self.views()[0].setMouseTracking(False)
         self.finish_interactive_tools()
 
-        self.toolType = toolType
+        self.aktifArac = aktifArac
         self.dosyaYolu = dosyaYolu
         self.itemText = itemText
 
@@ -158,35 +201,27 @@ class Scene(QGraphicsScene):
             # signallerinden mi cagriliyor, gibi.. anladın sen.
             self.activeItem.clearFocus()
 
-        if toolType == self.NoTool:
+        # pixmap.setMask(pixmap.mask())
+        # cursor = QCursor(pixmap.scaled(QSize(20, 20)))
+        self.parent().setCursor(self.aktifArac.imlec)
+
+        self.nesne_ozellikleri_guncelle()
+
+        if aktifArac == self.SecimAraci:
             # finish_interactive_tools ta alt satir cagriliyor
             # self.parent().setCursor(Qt.ArrowCursor)
             return
 
-        elif toolType == self.TextTool:
-            pixmap = QPixmap(':icons/cursor-text.png')
-        elif toolType == self.RectTool:
-            pixmap = QPixmap(':icons/cursor-rectangle.png')
-        elif toolType == self.DrawLineTool:
+        elif aktifArac == self.OkAraci:
             # self.views()[0].setMouseTracking(True)
-            pixmap = QPixmap(':icons/cursor-line.png')
             self.drawLineItem = None
-        elif toolType == self.EllipseTool:
-            pixmap = QPixmap(':icons/cursor-circle.png')
-        elif toolType == self.DrawPathTool:
-            pixmap = QPixmap(':icons/cursor-pen.png')
-            # self.pathItem = PathItem(self.yaziRengi, self.arkaPlanRengi, QPen(self.scenePen))
-            # self.addItem(self.pathItem)
+            return
+        elif aktifArac == self.KalemAraci:
             # self.views()[0].setMouseTracking(True)
             self.pathItem = None
-        elif toolType == self.ImageTool:
-            pixmap = QPixmap(':icons/cursor-image.png')
-        elif toolType == self.VideoTool:
-            pixmap = QPixmap(":icons/cursor-pen.png")
-        elif toolType == self.DosyaAraci:
-            pixmap = QPixmap(":icons/cursor-pen.png")
+            return
 
-        elif toolType == self.MirrorX:
+        elif aktifArac == self.AynalaXAraci:
             r = self.views()[0].get_visible_rect()
             self.mirrorLineItem = MirrorLine(posFeedback=pos, axis="x")
             self.mirrorLineItem.setLine(pos.x(),
@@ -197,10 +232,9 @@ class Scene(QGraphicsScene):
             # self.views()[0].setMouseTracking(True)
             self.addItem(self.mirrorLineItem)
             self.mirrorLineItem.updateScale()
-            self.parent().setCursor(Qt.ArrowCursor)
             return
 
-        elif toolType == self.MirrorY:
+        elif aktifArac == self.AynalaYAraci:
             r = self.views()[0].get_visible_rect()
             self.mirrorLineItem = MirrorLine(posFeedback=pos, axis="y")
             self.mirrorLineItem.setLine(r.left(),
@@ -211,29 +245,10 @@ class Scene(QGraphicsScene):
             # self.views()[0].setMouseTracking(True)
             self.addItem(self.mirrorLineItem)
             self.mirrorLineItem.updateScale()
-            self.parent().setCursor(Qt.ArrowCursor)
             return
-            # vh = self.views()[0].height()
-            # pixmap = QPixmap(1,vh)
-            # # pix.fill(Qt.transparent)
-            # painter = QPainter(pixmap)
-            # painter.drawLine(0,0,0,vh)
-            # painter.end()
-            # painter = None
-            # del painter
-        elif toolType == self.CropImageTool:
+        elif aktifArac == self.ResimKirpAraci:
             self.activeItem._isCropping = True
-            self.parent().setCursor(Qt.CrossCursor)
             return
-
-        # pixmap.setMask(pixmap.mask())
-        # cursor = QCursor(pixmap.scaled(QSize(20, 20)))
-        self.parent().setCursor(QCursor(pixmap))
-        # mesela drawpath tool secildi, hemen sahne uzerine gelindi shifte basildi
-        # firca boyutu ayarlamak icin, focus yoksa  key press event calismiyor
-        # tabi tool secildi , sayfa degistirldi yine focus gidiyor.
-        # acaba follow focus mu yapsak
-        # self.views()[0].setFocus()
 
     # ---------------------------------------------------------------------
     def unite_with_scene_rect(self, rect):
@@ -279,8 +294,8 @@ class Scene(QGraphicsScene):
         # return os.path.join(imageFolder, "{}.jpg".format(self.embededImageCounter))
         return os.path.join(imageDirectory,
                             "defterHtml-{}-{}-{}".format(self.parent().cModel.embededImageCounter,
-                                                              kim(kac_basamak=5),
-                                                              baseName))
+                                                         kim(kac_basamak=5),
+                                                         baseName))
 
     # ---------------------------------------------------------------------
     def get_unique_path_for_embeded_image(self, baseName):
@@ -353,7 +368,7 @@ class Scene(QGraphicsScene):
 
     # ---------------------------------------------------------------------
     def select_all_children_recursively(self, item, cosmeticSelect, topmostParent=False):
-        if item.type() == Group.Type:
+        if item.type() == shared.GROUP_ITEM_TYPE:
             items = item.parentedWithParentOperation
         else:
             items = item.childItems()
@@ -400,7 +415,7 @@ class Scene(QGraphicsScene):
             self.removeItem(self.mirrorLineItem)
             self.mirrorLineItem = None
 
-        if self.toolType == self.DrawPathTool:
+        if self.aktifArac == self.KalemAraci:
             if self.pathItem:
 
                 if self.pathItem.path().elementCount() > 1:
@@ -421,7 +436,7 @@ class Scene(QGraphicsScene):
                     for nokta in [ilk_nokta, son_nokta]:
                         nesne = self.itemAt(nokta, self.views()[0].transform())
                         if nesne:
-                            if nesne.type() == Image.Type:
+                            if nesne.type() == shared.IMAGE_ITEM_TYPE:
                                 ustuneCizilenResimNesnesi = nesne
                                 break
 
@@ -444,7 +459,7 @@ class Scene(QGraphicsScene):
 
                 return
 
-        elif self.toolType == self.DrawLineTool:
+        elif self.aktifArac == self.OkAraci:
 
             if self.drawLineItem:
                 if self.drawLineItem.length() > 0:
@@ -457,30 +472,32 @@ class Scene(QGraphicsScene):
                     self.removeItem(self.drawLineItem)
                     self.drawLineItem = None
 
-        elif self.toolType == self.CropImageTool:
+        elif self.aktifArac == self.ResimKirpAraci:
             # diger durumlar icin Image.hoverLeaveEvent() kullanildi.
-            if self.activeItem and self.activeItem.type() == Image.Type:
+            if self.activeItem and self.activeItem.type() == shared.IMAGE_ITEM_TYPE:
                 self.activeItem.finish_crop()
 
-        self.no_toola_gec()
+        self.secim_aracina_gec()
 
     # ---------------------------------------------------------------------
-    def no_toola_gec(self):
+    def secim_aracina_gec(self):
         # GUNCELLEME (set tool icindeki guncellemeye bakiniz)
         # Alt satir simdilik iptal
         # self.views()[0].setMouseTracking(False)
-        self.toolType = self.NoTool
+        self.aktifArac = self.SecimAraci
         self.parent().setCursor(Qt.ArrowCursor)
         # self.deleteLater()
         self.parent().actionSwitchToSelectionTool.setChecked(True)
 
     # ---------------------------------------------------------------------
     def _fircaBoyutuItem_olustur(self):
-        rect = QRectF(-self.scenePen.widthF() / 2, -self.scenePen.widthF() / 2, self.scenePen.widthF(),
-                      self.scenePen.widthF())
-        pen = QPen(self.scenePen.color(), 1, Qt.DashLine, Qt.RoundCap, Qt.RoundJoin)
+        rect = QRectF(-self.KalemAraci.kalem.widthF() / 2,
+                      -self.KalemAraci.kalem.widthF() / 2,
+                      self.KalemAraci.kalem.widthF(),
+                      self.KalemAraci.kalem.widthF())
+        pen = QPen(self.KalemAraci.kalem.color(), 1, Qt.DashLine, Qt.RoundCap, Qt.RoundJoin)
         self.fircaBoyutuItem = YuvarlakFircaBoyutu(self.fircaSonPos, rect, QColor.fromRgbF(0, 0, 0, 0),
-                                                   # self.scenePen,
+                                                   # self.KalemAraci.kalem,
                                                    pen)
         self.parent().increase_zvalue(self.fircaBoyutuItem)
         self.addItem(self.fircaBoyutuItem)
@@ -492,7 +509,7 @@ class Scene(QGraphicsScene):
     # def wheelEvent(self, event):
     #     # factor = 1.41 ** (event.delta() / 240.0)
     #     # self.scale(factor, factor)
-    #     if self.toolType == self.DrawPathTool:
+    #     if self.aktifArac == self.KalemAraci:
     #         if event.modifiers() & Qt.ShiftModifier:
     #             if self.fircaBoyutuItem:
     #
@@ -510,7 +527,7 @@ class Scene(QGraphicsScene):
     # ---------------------------------------------------------------------
     def tekerlek_ile_firca_boyu_degistir(self, angleDeltaY):
         # ok cizerken self.fircaBoyutuItem kullanmiyoruz.
-        if self.toolType == self.DrawLineTool:
+        if self.aktifArac == self.OkAraci:
             if angleDeltaY > 0:
                 cap = self.parent().fircaBuyult()
             else:
@@ -518,7 +535,7 @@ class Scene(QGraphicsScene):
 
             self.drawLineItem.setCizgiKalinligi(cap)
 
-        elif self.toolType == self.DrawPathTool:
+        elif self.aktifArac == self.KalemAraci:
 
             if angleDeltaY > 0:
                 cap = self.parent().fircaBuyult()
@@ -533,7 +550,7 @@ class Scene(QGraphicsScene):
 
     # ---------------------------------------------------------------------
     def shift_drag_ile_firca_boyu_degistir(self, yariCap):
-        if self.toolType == self.DrawPathTool:
+        if self.aktifArac == self.KalemAraci:
 
             if self.fircaBoyutuItem:
                 cap = 2 * yariCap
@@ -548,15 +565,15 @@ class Scene(QGraphicsScene):
 
         # TODO: basitlesitrilebilir , if hasattr(self.activeItem, 'tempTextItem'): ile belki..
         if self.activeItem:
-            if self.activeItem.type() == Text.Type:
+            if self.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if not self.activeItem.hasFocus():
                     devam = True
 
             # bu ikisinde tempTextItem yok
-            elif self.activeItem.type() == Group.Type:
+            elif self.activeItem.type() == shared.GROUP_ITEM_TYPE:
                 devam = True
             # bu ikisinde tempTextItem yok
-            elif self.activeItem.type() == LineItem.Type:
+            elif self.activeItem.type() == shared.LINE_ITEM_TYPE:
                 devam = True
             # geri kalanlarda tempTextItem var, (nesne uzerine yazi yazdigimiz item bu)
             else:
@@ -599,7 +616,8 @@ class Scene(QGraphicsScene):
 
     # ---------------------------------------------------------------------
     def create_empty_text_object_with_double_click(self, scenePos):
-        textItem = Text(scenePos, self.yaziRengi, self.arkaPlanRengi, QPen(self.scenePen), self.font())
+        textItem = Text(scenePos, self.YaziAraci.yaziRengi, self.YaziAraci.arkaPlanRengi, QPen(self.YaziAraci.kalem),
+                        self.font())
         textItem.set_document_url(self.tempDirPath)
         textItem.textItemFocusedOut.connect(self.is_text_item_empty)
         self.parent().increase_zvalue(textItem)
@@ -613,7 +631,7 @@ class Scene(QGraphicsScene):
         if event.button() == Qt.LeftButton:
             # drawlnetool kontrolune gerek yok esasen cunku ilktiklamada cizgiyi bitirip sahneye ekliyor.
             # ama coklu cizgi eklenirse hatirlatma olsun diye..
-            if not self.toolType == self.DrawPathTool and not self.toolType == self.DrawLineTool:
+            if not self.aktifArac == self.KalemAraci and not self.aktifArac == self.OkAraci:
                 if not self.itemAt(event.scenePos(), self.views()[0].transform()):
                     # modifier yoksa olustur. cunku mesela ctrl basili ise yaiNesnesi olusturup,hemen yazi nesnesine
                     # gidiyor ciftTiklama o da miniWebGezgini aciyor ve yazi bos oldugu ici siliniyor
@@ -629,7 +647,7 @@ class Scene(QGraphicsScene):
 
         if event.button() == Qt.LeftButton:
 
-            if self.toolType == self.NoTool:
+            if self.aktifArac == self.SecimAraci:
                 # if event.modifiers() & Qt.AltModifier:
                 #     duplicateItem = self.itemAt(event.scenePos())
                 #     self.parent().act_copy()
@@ -640,7 +658,7 @@ class Scene(QGraphicsScene):
                 # self.movingItem = self.itemAt(mousePos)
                 self.movingItem = self.itemAt(mousePos, self.views()[0].transform())
                 if self.movingItem:  # and event.button() == Qt.LeftButton
-                    if self.movingItem.topLevelItem().type() == Group.Type:
+                    if self.movingItem.topLevelItem().type() == shared.GROUP_ITEM_TYPE:
                         if self.movingItem in self.movingItem.topLevelItem().allNonGroupGroupChildren:
                             self.movingItem = self.movingItem.topLevelItem()
                     self.eskiPosOfMovingItem = self.movingItem.pos()
@@ -668,14 +686,15 @@ class Scene(QGraphicsScene):
 
                 return QGraphicsScene.mousePressEvent(self, event)
 
-            elif self.toolType == self.RectTool:
+            elif self.aktifArac == self.DortgenAraci:
 
                 # rect = QRectF(event.scenePos(), self.itemSize).translated(-self.itemSize.width() / 2,
                 #                                                           -self.itemSize.height() / 2)
 
                 # rect = QRectF(event.scenePos(), QSizeF(1, 1))
                 rect = QRectF(0, 0, 1, 1)
-                item = Rect(event.scenePos(), rect, self.yaziRengi, self.arkaPlanRengi, QPen(self.scenePen),
+                item = Rect(event.scenePos(), rect, self.DortgenAraci.yaziRengi, self.DortgenAraci.arkaPlanRengi,
+                            QPen(self.DortgenAraci.kalem),
                             self.font())
                 self.parent().increase_zvalue(item)
 
@@ -686,12 +705,13 @@ class Scene(QGraphicsScene):
                 undoRedo.undoableAddItem(self.undoStack, description=self.tr("add rectangle"), scene=self, item=item)
                 return QGraphicsScene.mousePressEvent(self, event)
 
-            elif self.toolType == self.EllipseTool:
+            elif self.aktifArac == self.YuvarlakAraci:
                 # rect = QRectF(event.scenePos(), self.itemSize).translated(-self.itemSize.width() / 2,
                 #                                                           -self.itemSize.height() / 2)
                 # rect = QRectF(event.scenePos(), QSizeF(1, 1))
                 rect = QRectF(0, 0, 1, 1)
-                item = Ellipse(event.scenePos(), rect, self.yaziRengi, self.arkaPlanRengi, QPen(self.scenePen),
+                item = Ellipse(event.scenePos(), rect, self.YuvarlakAraci.yaziRengi, self.YuvarlakAraci.arkaPlanRengi,
+                               QPen(self.YuvarlakAraci.kalem),
                                self.font())
                 self.parent().increase_zvalue(item)
                 item.hide_resize_handles()
@@ -700,12 +720,12 @@ class Scene(QGraphicsScene):
                 undoRedo.undoableAddItem(self.undoStack, description=self.tr("add ellipse"), scene=self, item=item)
                 return QGraphicsScene.mousePressEvent(self, event)
 
-            elif self.toolType == self.TextTool:
+            elif self.aktifArac == self.YaziAraci:
 
                 textItem = Text(event.scenePos(),
-                                self.yaziRengi,
-                                self.arkaPlanRengi,
-                                QPen(self.scenePen),
+                                self.YaziAraci.yaziRengi,
+                                self.YaziAraci.arkaPlanRengi,
+                                QPen(self.YaziAraci.kalem),
                                 self.font(),
                                 text=self.itemText)
                 textItem.set_document_url(self.tempDirPath)
@@ -715,55 +735,58 @@ class Scene(QGraphicsScene):
                 # self.addItem(textItem)
                 undoRedo.undoableAddItem(self.undoStack, description=self.tr("add text"), scene=self, item=textItem)
                 # self.itemText = None
-                self.no_toola_gec()
-                # self.toolType = self.NoTool
+                self.secim_aracina_gec()
+                # self.aktifArac = self.SecimAraci
                 # self.parent().setCursor(Qt.ArrowCursor)
                 # self.parent().actionSwitchToSelectionTool.setChecked(True)
                 return QGraphicsScene.mousePressEvent(self, event)
 
-            # elif self.toolType == self.ImageTool:
+            # elif self.aktifArac == self.ResimAraci:
             #     pos = event.scenePos()
             #     pixMap = QPixmap(self.dosyaYolu).scaled(self.itemSize.toSize(), Qt.KeepAspectRatio)
             #     rect = QRectF(pixMap.rect())
             #     rect.moveTo(pos.x() - rect.width() / 2, pos.y() - rect.height() / 2)
-            #     self.addItem(Image(self.dosyaYolu, pixMap, rect, self.yaziRengi, self.arkaPlanRengi, self.scenePen))
+            #     self.addItem(
+            #         Image(self.dosyaYolu, pixMap, rect, self.ResimAraci.yaziRengi, self.ResimAraci.arkaPlanRengi,
+            #               self.ResimAraci.kalem))
             #     pixMap = None
-            #     #self.dosyaYolu = None
+            #     # self.dosyaYolu = None
 
-            elif self.toolType == self.ImageTool:
+            elif self.aktifArac == self.ResimAraci:
                 self.parent().lutfen_bekleyin_goster()
                 self.parent().ekle_resim_direkt(self.dosyaYolu, event.scenePos())
-                self.no_toola_gec()
+                self.secim_aracina_gec()
                 self.parent().lutfen_bekleyin_gizle()
-                # self.toolType = self.NoTool
+                # self.aktifArac = self.SecimAraci
                 # self.parent().setCursor(Qt.ArrowCursor)
                 # self.parent().actionSwitchToSelectionTool.setChecked(True)
                 return QGraphicsScene.mousePressEvent(self, event)
 
-            elif self.toolType == self.VideoTool:
+            elif self.aktifArac == self.VideoAraci:
                 self.parent().lutfen_bekleyin_goster()
                 self.parent().ekle_video_direkt(self.dosyaYolu, event.scenePos())
-                self.no_toola_gec()
+                self.secim_aracina_gec()
                 self.parent().lutfen_bekleyin_gizle()
-                # self.toolType = self.NoTool
+                # self.aktifArac = self.SecimAraci
                 # self.parent().setCursor(Qt.ArrowCursor)
                 # self.parent().actionSwitchToSelectionTool.setChecked(True)
                 return QGraphicsScene.mousePressEvent(self, event)
 
-            elif self.toolType == self.DosyaAraci:
+            elif self.aktifArac == self.DosyaAraci:
                 self.parent().lutfen_bekleyin_goster()
                 self.parent().ekle_dosya_direkt(self.dosyaYolu, event.scenePos())
-                self.no_toola_gec()
+                self.secim_aracina_gec()
                 self.parent().lutfen_bekleyin_gizle()
-                # self.toolType = self.NoTool
+                # self.aktifArac = self.SecimAraci
                 # self.parent().setCursor(Qt.ArrowCursor)
                 # self.parent().actionSwitchToSelectionTool.setChecked(True)
                 return QGraphicsScene.mousePressEvent(self, event)
 
-            elif self.toolType == self.DrawPathTool:
+            elif self.aktifArac == self.KalemAraci:
                 self.views()[0].setDragModeNoDrag()
                 if not self.pathItem:
-                    self.pathItem = PathItem(event.scenePos(), self.yaziRengi, self.arkaPlanRengi, QPen(self.scenePen),
+                    self.pathItem = PathItem(event.scenePos(), self.KalemAraci.yaziRengi, self.KalemAraci.arkaPlanRengi,
+                                             QPen(self.KalemAraci.kalem),
                                              self.font())
                     self.parent().increase_zvalue(self.pathItem)
                     # self.pathItem.move_start_point(event.scenePos())
@@ -783,10 +806,11 @@ class Scene(QGraphicsScene):
                 # return QGraphicsScene.mousePressEvent(self, event)
                 return
 
-            elif self.toolType == self.DrawLineTool:
+            elif self.aktifArac == self.OkAraci:
                 self.views()[0].setDragModeNoDrag()
                 if not self.drawLineItem:
-                    self.drawLineItem = LineItem(event.scenePos(), QPen(self.scenePen), yaziRengi=self.yaziRengi,
+                    self.drawLineItem = LineItem(event.scenePos(), QPen(self.OkAraci.kalem),
+                                                 yaziRengi=self.OkAraci.yaziRengi,
                                                  font=self.font())
                     self.parent().increase_zvalue(self.drawLineItem)
                     # self.drawLineItem.move_start_point(event.scenePos())
@@ -852,20 +876,20 @@ class Scene(QGraphicsScene):
 
                     self.drawLineItem = None
 
-                    self.no_toola_gec()
+                    self.secim_aracina_gec()
                 return QGraphicsScene.mousePressEvent(self, event)
                 # super(Scene, self).mousePressEvent(event)
 
-            elif self.toolType == self.MirrorX:
+            elif self.aktifArac == self.AynalaXAraci:
                 self.parent().act_mirror_x(event.scenePos())  # bu finish_interactive_toolsu da cagiriyor.
 
-            elif self.toolType == self.MirrorY:
+            elif self.aktifArac == self.AynalaYAraci:
                 self.parent().act_mirror_y(event.scenePos())  # bu finish_interactive_toolsu da cagiriyor.
 
             # if not event.modifiers() & Qt.ShiftModifier:
             # if not event.modifiers() & Qt.AltModifier:
-            #     if not self.toolType == self.DrawPathTool:
-            #         self.toolType = self.NoTool
+            #     if not self.aktifArac == self.KalemAraci:
+            #         self.aktifArac = self.SecimAraci
             #         self.parent().setCursor(Qt.ArrowCursor)
             #
             #     self.pathItem = None
@@ -873,10 +897,10 @@ class Scene(QGraphicsScene):
 
     # ---------------------------------------------------------------------
     def mouseMoveEvent(self, event):
-        if self.toolType == self.DrawPathTool:
+        if self.aktifArac == self.KalemAraci:
             self.fircaSonPos = event.scenePos()
 
-        if self.pathItem and self.toolType == self.DrawPathTool:
+        if self.pathItem and self.aktifArac == self.KalemAraci:
             if event.modifiers() & Qt.ShiftModifier and self.fircaBoyutuItem:
 
                 # self.fircaBoyutuItem.setPos(QPointF(event.scenePos().x(), event.scenePos().y()))
@@ -907,7 +931,7 @@ class Scene(QGraphicsScene):
                     else:
                         return
 
-        if self.drawLineItem and self.toolType == self.DrawLineTool:
+        if self.drawLineItem and self.aktifArac == self.OkAraci:
             self.drawLineItem.temp_append(event.scenePos())
             # self.drawLineItem.line().setP2(event.scenePos())
             # self.drawLineItem.setLine(QLineF(self.line.line().p1(), mouseEvent.scenePos()))
@@ -915,7 +939,7 @@ class Scene(QGraphicsScene):
             # return QGraphicsScene.mouseMoveEvent(self, event)
             return
 
-        if self.toolType == self.MirrorX:
+        if self.aktifArac == self.AynalaXAraci:
             self.mirrorLineItem.updatePosFeedBack(event.scenePos())
             r = self.views()[0].get_visible_rect()
 
@@ -932,7 +956,7 @@ class Scene(QGraphicsScene):
 
             self.mirrorLineItem.updateScale()
 
-        if self.toolType == self.MirrorY:
+        if self.aktifArac == self.AynalaYAraci:
             self.mirrorLineItem.updatePosFeedBack(event.scenePos())
             r = self.views()[0].get_visible_rect()
             self.mirrorLineItem.setLine(r.left(),
@@ -959,10 +983,10 @@ class Scene(QGraphicsScene):
         if event.button() == Qt.LeftButton:
             self.views()[0].setDragModeRubberBandDrag()
             # if event.modifiers() & Qt.AltModifier:
-            #     if self.toolType == self.RectTool or self.toolType == self.EllipseTool:
-            #         self.toolType = self.NoTool
+            #     if self.aktifArac == self.DortgenAraci or self.aktifArac == self.YuvarlakAraci:
+            #         self.aktifArac = self.SecimAraci
             #         self.parent().setCursor(Qt.ArrowCursor)
-            if self.toolType == self.DrawPathTool:
+            if self.aktifArac == self.KalemAraci:
                 # # return QGraphicsScene.mousePressEvent(self, event)
                 # if event.modifiers() & Qt.ControlModifier:
                 #     return QGraphicsScene.mouseReleaseEvent(self, event)
@@ -976,17 +1000,17 @@ class Scene(QGraphicsScene):
                 return QGraphicsScene.mouseReleaseEvent(self, event)
                 # return
 
-            if self.toolType == self.DrawLineTool:
+            if self.aktifArac == self.OkAraci:
                 return QGraphicsScene.mouseReleaseEvent(self, event)
 
-            elif self.toolType == self.RectTool or self.toolType == self.EllipseTool:
+            elif self.aktifArac == self.DortgenAraci or self.aktifArac == self.YuvarlakAraci:
                 self.lastItem.show_resize_handles()
                 # if not event.modifiers() & Qt.AltModifier:
                 if not self.space_tusu_su_an_basili:
-                    # self.toolType = self.NoTool
+                    # self.aktifArac = self.SecimAraci
                     # self.parent().setCursor(Qt.ArrowCursor)
                     # self.parent().actionSwitchToSelectionTool.setChecked(True)
-                    self.no_toola_gec()
+                    self.secim_aracina_gec()
                 self.lastItem = None
                 # return QGraphicsScene.mousePressEvent(self, event)
                 return QGraphicsScene.mouseReleaseEvent(self, event)
@@ -1020,7 +1044,7 @@ class Scene(QGraphicsScene):
 
         if event.key() == Qt.Key_Delete \
                 or event.key() == Qt.Key_Backspace:
-            if self.toolType == self.DrawPathTool:
+            if self.aktifArac == self.KalemAraci:
                 if self.pathItem:
                     if self.pathItem.path().elementCount() > 1:
                         self.pathItem.sonNoktaSil()
@@ -1033,11 +1057,13 @@ class Scene(QGraphicsScene):
         if event.key() == Qt.Key_Enter \
                 or event.key() == Qt.Key_Return:
 
-            if self.toolType == self.MirrorX:
-                self.parent().act_mirror_x(self.parent().get_mouse_scene_pos())  # bu finish_interactive_toolsu da cagiriyor.
+            if self.aktifArac == self.AynalaXAraci:
+                self.parent().act_mirror_x(
+                    self.parent().get_mouse_scene_pos())  # bu finish_interactive_toolsu da cagiriyor.
 
-            elif self.toolType == self.MirrorY:
-                self.parent().act_mirror_y(self.parent().get_mouse_scene_pos())  # bu finish_interactive_toolsu da cagiriyor.
+            elif self.aktifArac == self.AynalaYAraci:
+                self.parent().act_mirror_y(
+                    self.parent().get_mouse_scene_pos())  # bu finish_interactive_toolsu da cagiriyor.
 
         if event.key() == Qt.Key_Enter \
                 or event.key() == Qt.Key_Return:
@@ -1072,7 +1098,7 @@ class Scene(QGraphicsScene):
 
             if event.key() == Qt.Key_Shift:
 
-                if self.toolType == self.DrawPathTool:
+                if self.aktifArac == self.KalemAraci:
                     if not self.fircaBoyutuItem:
                         self._fircaBoyutuItem_olustur()
 
@@ -1102,11 +1128,11 @@ class Scene(QGraphicsScene):
             self.space_tusu_su_an_basili = False
 
         # if event.key() == Qt.Key_Alt:
-        #     if self.toolType == self.RectTool or self.toolType == self.EllipseTool:
-        #         self.toolType = self.NoTool
+        #     if self.aktifArac == self.DortgenAraci or self.aktifArac == self.YuvarlakAraci:
+        #         self.aktifArac = self.SecimAraci
         #         self.parent().setCursor(Qt.ArrowCursor)
 
-        if self.toolType == self.DrawPathTool:
+        if self.aktifArac == self.KalemAraci:
             if event.key() == Qt.Key_Shift:
                 if self.fircaBoyutuItem:
                     self.removeItem(self.fircaBoyutuItem)
@@ -1238,8 +1264,9 @@ class Scene(QGraphicsScene):
                         # print(imageSavePath)
                         # pixMap = QPixmap(image)
                         rect = QRectF(pixMap.rect())
-                        imageItem = Image(imageSavePath, event.scenePos(), rect, self.yaziRengi, self.arkaPlanRengi,
-                                          QPen(self.scenePen), self.font())
+                        imageItem = Image(imageSavePath, event.scenePos(), rect, self.ResimAraci.yaziRengi,
+                                          self.ResimAraci.arkaPlanRengi,
+                                          QPen(self.ResimAraci.kalem), self.font())
 
                         imageItem.isEmbeded = True
 
@@ -1276,7 +1303,8 @@ class Scene(QGraphicsScene):
 
             elif webUrl:
                 # for webUrl in webUrlPaths:
-                textItem = Text(event.scenePos(), self.yaziRengi, self.arkaPlanRengi, QPen(self.scenePen),
+                textItem = Text(event.scenePos(), self.YaziAraci.yaziRengi, self.YaziAraci.arkaPlanRengi,
+                                QPen(self.YaziAraci.kalem),
                                 self.font())
                 textItem.set_document_url(self.tempDirPath)
                 self.parent().increase_zvalue(textItem)
@@ -1292,7 +1320,9 @@ class Scene(QGraphicsScene):
                 self.unite_with_scene_rect(textItem.sceneBoundingRect())
 
         elif event.mimeData().hasHtml():
-            textItem = Text(event.scenePos(), self.yaziRengi, self.arkaPlanRengi, QPen(self.scenePen), self.font())
+            textItem = Text(event.scenePos(), self.YaziAraci.yaziRengi, self.YaziAraci.arkaPlanRengi,
+                            QPen(self.YaziAraci.kalem),
+                            self.font())
             textItem.set_document_url(self.tempDirPath)
             self.parent().increase_zvalue(textItem)
             # bu ikisi bir onceki eventtek kalan modifieri donduruyor. o yuzden query kullaniyoruz.
@@ -1323,7 +1353,9 @@ class Scene(QGraphicsScene):
             self.unite_with_scene_rect(textItem.sceneBoundingRect())
 
         elif event.mimeData().hasText():
-            textItem = Text(event.scenePos(), self.yaziRengi, self.arkaPlanRengi, QPen(self.scenePen), self.font())
+            textItem = Text(event.scenePos(), self.YaziAraci.yaziRengi, self.YaziAraci.arkaPlanRengi,
+                            QPen(self.YaziAraci.kalem),
+                            self.font())
             textItem.set_document_url(self.tempDirPath)
             # textItem.update_resize_handles()
             self.parent().increase_zvalue(textItem)
@@ -1375,8 +1407,9 @@ class Scene(QGraphicsScene):
             # print(imageSavePath)
             # pixMap = QPixmap(image)
             rect = QRectF(pixMap.rect())
-            imageItem = Image(imageSavePath, event.scenePos(), rect, self.yaziRengi, self.arkaPlanRengi,
-                              QPen(self.scenePen), self.font())
+            imageItem = Image(imageSavePath, event.scenePos(), rect, self.ResimAraci.yaziRengi,
+                              self.ResimAraci.arkaPlanRengi,
+                              QPen(self.ResimAraci.kalem), self.font())
 
             imageItem.isEmbeded = True
 
@@ -1480,8 +1513,9 @@ class Scene(QGraphicsScene):
             pixMap = QPixmap(imagePath)
             # pixMap = QPixmap(image)
             rect = QRectF(pixMap.rect())
-            imageItem = Image(imagePath, event.scenePos(), rect, self.yaziRengi, self.arkaPlanRengi,
-                              QPen(self.scenePen), self.font())
+            imageItem = Image(imagePath, event.scenePos(), rect, self.ResimAraci.yaziRengi,
+                              self.ResimAraci.arkaPlanRengi,
+                              QPen(self.ResimAraci.kalem), self.font())
 
             imageItem.isEmbeded = True
 
@@ -1503,8 +1537,8 @@ class Scene(QGraphicsScene):
         # pixMap = QPixmap(image)
         rect = QRectF(pixMap.rect())
 
-        imageItem = Image(imagePath, scenePos, rect, self.yaziRengi, self.arkaPlanRengi,
-                          QPen(self.scenePen), self.font())
+        imageItem = Image(imagePath, scenePos, rect, self.ResimAraci.yaziRengi, self.ResimAraci.arkaPlanRengi,
+                          QPen(self.ResimAraci.kalem), self.font())
         imageItem.originalSourceFilePath = url
         imageItem.isEmbeded = True
 

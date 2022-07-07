@@ -1488,12 +1488,11 @@ class UndoableApplyStylePreset(QUndoCommand):
         self.scene.parent().currentFont = self.font
         self.scene.setFont(self.font)
 
-        self.scene.parent()._pen = self.pen
-        self.scene.scenePen = self.pen
+        self.scene.aktifArac.kalem = self.pen
 
-        self.scene.parent().yaziRengi = self.scene.yaziRengi = self.yaziRengi
-        self.scene.parent().cizgiRengi = self.scene.cizgiRengi = self.cizgiRengi
-        self.scene.parent().arkaPlanRengi = self.scene.arkaPlanRengi = self.yeniArkaPlanRengi
+        self.scene.aktifArac.yaziRengi = self.yaziRengi
+        self.scene.aktifArac.cizgiRengi = self.cizgiRengi
+        self.scene.aktifArac.arkaPlanRengi = self.yeniArkaPlanRengi
 
         self.scene.parent().degistir_yazi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
         self.scene.parent().degistir_cizgi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
@@ -1508,12 +1507,11 @@ class UndoableApplyStylePreset(QUndoCommand):
         self.scene.parent().currentFont = self.eskiFont
         self.scene.setFont(self.eskiFont)
 
-        self.scene.parent()._pen = self.eskiPen
-        self.scene.scenePen = self.eskiPen
+        self.scene.aktifArac.kalem = self.eskiPen
 
-        self.scene.parent().yaziRengi = self.scene.yaziRengi = self.eskiYaziRengi
-        self.scene.parent().cizgiRengi = self.scene.cizgiRengi = self.eskiCizgiRengi
-        self.scene.parent().arkaPlanRengi = self.scene.arkaPlanRengi = self.eskiArkaPlanRengi
+        self.scene.aktifArac.yaziRengi = self.eskiYaziRengi
+        self.scene.aktifArac.cizgiRengi = self.eskiCizgiRengi
+        self.scene.aktifArac.arkaPlanRengi = self.eskiArkaPlanRengi
 
         self.scene.parent().degistir_yazi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
         self.scene.parent().degistir_cizgi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)

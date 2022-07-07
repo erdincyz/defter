@@ -146,16 +146,8 @@ class DefterAnaPencere(QMainWindow):
 
         self.theme = None
 
-        # read_user_settings icinde tekrar atamalar yapiliyor
-        self.arkaPlanRengi = QColor(71, 177, 213)
-        self.cizgiRengi = QColor(Qt.black)
-        self.yaziRengi = QColor(Qt.black)
-        self.baskiCerceveRengi = QColor(Qt.black)
-        self._pen = QPen(self.cizgiRengi,
-                         0,
-                         Qt.SolidLine,
-                         Qt.FlatCap,
-                         Qt.RoundJoin)
+        # oku_kullanici_ayarlari icinde tekrar atamalar yapiliyor
+        self.baskiCerceveRengi = QColor(0, 0, 0)
 
         self.karakter_bicimi_sozluk = {"b": False,
                                        "i": False,
@@ -181,8 +173,8 @@ class DefterAnaPencere(QMainWindow):
 
         self.imlec_arac = None
 
-        self.init_settings()
-        self.read_user_settings()
+        self.olustur_ayarlar()
+        self.oku_kullanici_ayarlari()
         self.olustur_sayfalarDW()
         self.olustur_tab_widget()
         self.olustur_kutuphaneDW()
@@ -201,15 +193,16 @@ class DefterAnaPencere(QMainWindow):
 
         self.ekle_hotkeys()
 
-        self.act_switch_to_selection_tool()
         self.olustur_nesne_ozellikleriDW()
+        self.olustur_nesne_ozellikleriYW()
         self.olustur_stillerDW()
         self.olustur_stillerYW()
-        self.olustur_nesne_ozellikleriYW()
         self.olustur_sahneye_baski_siniri_cizim_ayarlari()
         self.arsivleme_programi_adres_belirle()
 
-        self.read_gui_settings()
+        self.act_switch_to_selection_tool()
+
+        self.oku_arayuz_ayarlari()
         # self.actionAlwaysOnTopToggle u , read_gui_settingste sinyalleri block ederek set ediyoruz.
         # etmezsek ustuste iki tane show oluyor, ilk acılıs harici, daha settings olusmadigindan ilk acilista da
         # eger burdaki self.show() u kaldirisak ilk acilista acilmiyor, dolayisi ile boyle bir workaround
@@ -337,7 +330,7 @@ class DefterAnaPencere(QMainWindow):
         boyutLay.addWidget(self.itemRotationSBox_nesnedw)
         # ---------------------------------------------------------------------
 
-        self.nesneArkaplanRengiBtn = PushButtonRenk("", 36, 36, self.arkaPlanRengi, self.nesneGrupW)
+        self.nesneArkaplanRengiBtn = PushButtonRenk("", 36, 36, self.cScene.aktifArac.arkaPlanRengi, self.nesneGrupW)
         self.nesneArkaplanRengiBtn.clicked.connect(self.act_set_item_background_color)
 
         renklerDisLay = QHBoxLayout()
@@ -348,14 +341,16 @@ class DefterAnaPencere(QMainWindow):
         self.nesne_arkaplan_rengi_btn_liste = []
 
         for i in range(8):
-            btn = self.ver_renk_palet_buton(tip="a", gen=15, yuk=15, renk=self.nesne_arkaplan_rengi_btn_liste_acilis_renkleri[i],
+            btn = self.ver_renk_palet_buton(tip="a", gen=15, yuk=15,
+                                            renk=self.nesne_arkaplan_rengi_btn_liste_acilis_renkleri[i],
                                             parent=self.nesneGrupW)
             renklerSatir1Lay.addWidget(btn)
 
             self.nesne_arkaplan_rengi_btn_liste.append(btn)
 
         for i in range(8, 16):
-            btn = self.ver_renk_palet_buton(tip="a", gen=15, yuk=15, renk=self.nesne_arkaplan_rengi_btn_liste_acilis_renkleri[i],
+            btn = self.ver_renk_palet_buton(tip="a", gen=15, yuk=15,
+                                            renk=self.nesne_arkaplan_rengi_btn_liste_acilis_renkleri[i],
                                             parent=self.nesneGrupW)
             renklerSatir2Lay.addWidget(btn)
 
@@ -417,7 +412,7 @@ class DefterAnaPencere(QMainWindow):
         # self.yaziListeBicmiAction = self.fontToolBar.addWidget(self.yaziListeBicimiCBox)
 
         # ---------------------------------------------------------------------
-        self.yaziRengiBtn = PushButtonRenk("", 36, 36, self.yaziRengi, self.yaziGrupW)
+        self.yaziRengiBtn = PushButtonRenk("", 36, 36, self.cScene.aktifArac.yaziRengi, self.yaziGrupW)
         self.yaziRengiBtn.clicked.connect(self.act_set_item_text_color)
 
         renklerDisLay = QHBoxLayout()
@@ -610,7 +605,7 @@ class DefterAnaPencere(QMainWindow):
         self.cizgiKalinligiDSliderWithDSBox.setMinimum(0)
         self.cizgiKalinligiDSliderWithDSBox.setMaximum(100)
         self.cizgiKalinligiDSliderWithDSBox.setSingleStep(0.1)
-        self.cizgiKalinligiDSliderWithDSBox.setValue(self._pen.widthF() * 10)
+        self.cizgiKalinligiDSliderWithDSBox.setValue(self.cScene.aktifArac.cizgiKalinligi * 10)
         # self.cizgiKalinligiSBox.valueChangedFromSpinBoxGuiNotBySetValue.connect(self.act_change_item_height)
         self.cizgiKalinligiDSliderWithDSBox.setToolTip(self.tr("Line Width"))
 
@@ -624,7 +619,7 @@ class DefterAnaPencere(QMainWindow):
         cizgiOzellikleriniSifirlaBtn = QPushButton(self.tr("Reset"), self.cizgiGrupW)
         cizgiOzellikleriniSifirlaBtn.clicked.connect(self.act_cizgi_ozelliklerini_sifirla)
 
-        self.cizgiRengiBtn = PushButtonRenk("", 36, 36, self.cizgiRengi, self.cizgiGrupW)
+        self.cizgiRengiBtn = PushButtonRenk("", 36, 36, self.cScene.aktifArac.cizgiRengi, self.cizgiGrupW)
         self.cizgiRengiBtn.clicked.connect(self.act_set_item_line_color)
 
         renklerDisLay = QHBoxLayout()
@@ -684,9 +679,9 @@ class DefterAnaPencere(QMainWindow):
         radioLay.addWidget(self.radioYazi)
         radioLay.addWidget(self.radioCizgi)
 
-        self.radioBtnGroup.buttonToggled.connect(self.act_radio_secim_degisti)
+        self.radioBtnGroup.buttonClicked.connect(self.act_radio_secim_degisti)
 
-        self.renkSecici = RenkSeciciWidget(self.cizgiRengi, boyut=64, parent=self.cizgiGrupW)
+        self.renkSecici = RenkSeciciWidget(self.cScene.aktifArac.arkaPlanRengi, boyut=64, parent=self.nesneOzellikleriDWBaseWidget)
         self.renkSecici.renkDegisti.connect(self.renk_secicide_renk_degisti)
         self.renkSecici.anaLay.setContentsMargins(0, 0, 0, 0)
         shared.kutulu_arkaplan_olustur(self.nesneArkaplanRengiBtn, 5)
@@ -705,7 +700,7 @@ class DefterAnaPencere(QMainWindow):
             if self.cScene.activeItem:
                 renk = self.cScene.activeItem.arkaPlanRengi
             else:
-                renk = self.arkaPlanRengi
+                renk = self.cScene.aktifArac.arkaPlanRengi
             self.renk_tipi = "a"
 
             self.nesneGrupW.show()
@@ -716,7 +711,7 @@ class DefterAnaPencere(QMainWindow):
             if self.cScene.activeItem:
                 renk = self.cScene.activeItem.yaziRengi
             else:
-                renk = self.yaziRengi
+                renk = self.cScene.aktifArac.yaziRengi
             self.renk_tipi = "y"
 
             self.nesneGrupW.hide()
@@ -727,7 +722,7 @@ class DefterAnaPencere(QMainWindow):
             if self.cScene.activeItem:
                 renk = self.cScene.activeItem.cizgiRengi
             else:
-                renk = self.cizgiRengi
+                renk = self.cScene.aktifArac.cizgiRengi
             self.renk_tipi = "c"
 
             self.nesneGrupW.hide()
@@ -739,13 +734,13 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def renk_secicide_renk_degisti(self, renk):
         if self.renk_tipi == "a":
-            self.arkaPlanRengi = renk
+            self.cScene.aktifArac.arkaPlanRengi = renk
             self.act_set_item_background_color(renk, renkSecicidenMi=True)
         elif self.renk_tipi == "y":
-            self.yaziRengi = renk
+            self.cScene.aktifArac.yaziRengi = renk
             self.act_set_item_text_color(renk, renkSecicidenMi=True)
         elif self.renk_tipi == "c":
-            self.cizgiRengi = renk
+            self.cScene.aktifArac.cizgiRengi = renk
             self.act_set_item_line_color(renk, renkSecicidenMi=True)
 
     # ---------------------------------------------------------------------
@@ -1661,15 +1656,16 @@ class DefterAnaPencere(QMainWindow):
         self.actionReopenLastClosedTab.setEnabled(True)
 
     # ---------------------------------------------------------------------
-    def init_settings(self):
+    def olustur_ayarlar(self):
         QCoreApplication.setOrganizationName(shared.DEFTER_ORG_NAME)
         QCoreApplication.setOrganizationDomain(shared.DEFTER_ORG_DOMAIN)
         QCoreApplication.setApplicationName(shared.DEFTER_APP_NAME)
         self.settings = QSettings(shared.DEFTER_AYARLAR_DOSYA_ADRES, QSettings.IniFormat)
+        self.settingsAraclar = QSettings(shared.DEFTER_AYARLAR_ARACLAR_DOSYA_ADRES, QSettings.IniFormat)
         # self.settings.clear()
 
     # ---------------------------------------------------------------------
-    def read_user_settings(self):
+    def oku_kullanici_ayarlari(self):
         KULLANICI_KLASORU = os.path.expanduser("~")
         self.settings.beginGroup("UserSettings")
         if self.settings.contains("sonKlasor"):
@@ -1681,12 +1677,7 @@ class DefterAnaPencere(QMainWindow):
             self.sonKlasorHTML = self.settings.value("sonKlasorHTML", KULLANICI_KLASORU)
             self.itemSize = self.settings.value("itemSize", QSizeF(25, 25))
             self.textSize = int(self.settings.value("textSize", 10))
-            self.arkaPlanRengi = self.settings.value("arkaPlanRengi", QColor(71, 177, 213))
-            self.cizgiRengi = self.settings.value("cizgiRengi", QColor(Qt.black))
-            self.baskiCerceveRengi = self.settings.value("baskiCerceveRengi", QColor(Qt.black))
-            self.yaziRengi = self.settings.value("yaziRengi", QColor(Qt.black))
-
-            self._pen = self.settings.value("kalem", QPen(self.cizgiRengi, 0, Qt.SolidLine, Qt.FlatCap, Qt.RoundJoin))
+            self.baskiCerceveRengi = self.settings.value("baskiCerceveRengi", QColor(0, 0, 0))
 
             font = QFont(self.settings.value("currentFont", QApplication.font().family()))
             font.setPointSize(self.textSize)
@@ -1735,7 +1726,7 @@ class DefterAnaPencere(QMainWindow):
         self.settings.endGroup()
 
     # ---------------------------------------------------------------------
-    def read_gui_settings(self):
+    def oku_arayuz_ayarlari(self):
 
         self.settings.beginGroup("GuiSettings")
         if self.settings.contains("winGeometry"):
@@ -1766,7 +1757,7 @@ class DefterAnaPencere(QMainWindow):
         self.settings.endGroup()
 
     # ---------------------------------------------------------------------
-    def write_settings(self):
+    def yaz_ayarlar(self):
         self.settings.beginGroup("GuiSettings")
         self.settings.setValue("winGeometry", self.saveGeometry())
         self.settings.setValue("winState", self.saveState(0))  # version=0
@@ -1786,11 +1777,7 @@ class DefterAnaPencere(QMainWindow):
         self.settings.setValue("sonKlasorHTML", self.sonKlasorHTML)
         self.settings.setValue("itemSize", self.itemSize)
         self.settings.setValue("textSize", self.textSize)
-        self.settings.setValue("cizgiRengi", self.cizgiRengi)
         self.settings.setValue("baskiCerceveRengi", self.baskiCerceveRengi)
-        self.settings.setValue("yaziRengi", self.yaziRengi)
-        self.settings.setValue("arkaPlanRengi", self.arkaPlanRengi)
-        self.settings.setValue("kalem", self._pen)
         self.settings.setValue("currentFont", self.fontCBox_tbar.currentFont())
         # self.settings.setValue("currentFont", self.fontCBox_tbar.currentText())
         # self.settings.setValue("currentFont", self.fontCBox_yazidw.currentText())
@@ -1832,6 +1819,40 @@ class DefterAnaPencere(QMainWindow):
         self.settings.endGroup()
 
     # ---------------------------------------------------------------------
+    def oku_arac_ayarlari(self):
+        # ilk acilista problem degil, ayar dosyasi yoksa dongude yok
+        sozlukler = {}
+        self.settingsAraclar.beginGroup("AracOzellikleri")
+        for arac_tip in self.settingsAraclar.childGroups():
+            self.settingsAraclar.beginGroup(arac_tip)
+            sozlukler[arac_tip] = {
+                "kalem": self.settingsAraclar.value("kalem"),
+                "yaziTipi": self.settingsAraclar.value("yaziTipi"),
+                "arkaPlanRengi": self.settingsAraclar.value("arkaPlanRengi"),
+                "yaziRengi": self.settingsAraclar.value("yaziRengi"),
+                "cizgiRengi": self.settingsAraclar.value("cizgiRengi"),
+                "yaziHiza": self.settingsAraclar.value("yaziHiza"),
+                "karakter_bicimi_sozluk": self.settingsAraclar.value("karakter_bicimi_sozluk")}
+            self.settingsAraclar.endGroup()
+        self.settingsAraclar.endGroup()
+        self.cScene.arac_ozellikleri_yukle(sozlukler)
+
+    # ---------------------------------------------------------------------
+    def yaz_arac_ayarlari(self):
+        self.settingsAraclar.beginGroup("AracOzellikleri")
+        for arac in self.cScene.araclar:
+            self.settingsAraclar.beginGroup(arac.tip)
+            self.settingsAraclar.setValue("kalem", arac.kalem)
+            self.settingsAraclar.setValue("yaziTipi", arac.yaziTipi)
+            self.settingsAraclar.setValue("arkaPlanRengi", arac.arkaPlanRengi)
+            self.settingsAraclar.setValue("yaziRengi", arac.yaziRengi)
+            self.settingsAraclar.setValue("cizgiRengi", arac.cizgiRengi)
+            self.settingsAraclar.setValue("yaziHiza", int(arac.yaziHiza))
+            self.settingsAraclar.setValue("karakter_bicimi_sozluk", arac.karakter_bicimi_sozluk)
+            self.settingsAraclar.endGroup()
+        self.settingsAraclar.endGroup()
+
+    # ---------------------------------------------------------------------
     def clean_temp_dirs(self):
         for tempDirPath in self.tabWidget.get_all_widgets_temp_dir_paths():
             # if os.path.exists(tab.scene().tempDirPath):
@@ -1857,7 +1878,8 @@ class DefterAnaPencere(QMainWindow):
         if degisen_sahne_var_mi:
             cvp = self.do_you_want_to_save_for_close_event()
             if cvp == "d":
-                self.write_settings()
+                self.yaz_ayarlar()
+                self.yaz_arac_ayarlari()
                 self.clean_temp_dirs()
                 self.clean_download_threads()
                 # 1-) bu PyQt5 te yoktu. PySide6 ye gecince gerekti. Baglantiyi koparmazsak event.accept dedikten sonra
@@ -1880,7 +1902,8 @@ class DefterAnaPencere(QMainWindow):
             elif cvp == "c":
                 event.ignore()
         else:
-            self.write_settings()
+            self.yaz_ayarlar()
+            self.yaz_arac_ayarlari()
             self.clean_temp_dirs()
             self.clean_download_threads()
             for model in self.tabWidget.modeller:
@@ -2074,7 +2097,7 @@ class DefterAnaPencere(QMainWindow):
 
         # scene = QGraphicsScene(self)  # veya self.cScene =  .. parent etmezsek selfe
 
-        scene = Scene(tempDirPath, self.yaziRengi, self.arkaPlanRengi, QPen(self._pen), self)
+        scene = Scene(tempDirPath, QFont(self.currentFont), self)
         # scene.setSceneRect(QRectF(0, 0, 400, 600))
         # scene.destroyed.connect(self.yazyaz)
 
@@ -2082,6 +2105,7 @@ class DefterAnaPencere(QMainWindow):
         view = View(scene, self)
 
         self.cScene = scene
+        self.oku_arac_ayarlari()
         self.cView = view
         self.cView.baski_cerceve_rengi_kur(self.baskiCerceveRengi)
         # view.setViewport(QGLWidget())
@@ -2090,7 +2114,6 @@ class DefterAnaPencere(QMainWindow):
         # self.tabWidget.setUpdatesEnabled(False)
         # self.tabWidget.addTab(view, "untitled")
         # scene.saveFilePath = None
-        scene.setFont(QFont(self.currentFont))
 
         # scene.modified.connect(lambda throw_away=0: self.star_modified_tabs(view))
         scene.undoStack.cleanChanged.connect(self.star_modified_scenes)
@@ -2165,7 +2188,7 @@ class DefterAnaPencere(QMainWindow):
         if temiz_mi:
             if itemText[0] == "★":
                 sayfa.adi = itemText[2:]
-                # sayfa.yaziRengi = QColor(Qt.black)
+                # sayfa.yaziRengi = QColor(0,0,0)
         else:
             if not itemText[0] == "★":
                 sayfa.adi = ("★ %s" % itemText)
@@ -2238,6 +2261,10 @@ class DefterAnaPencere(QMainWindow):
             self.cScene = self.cView.scene()
             self.cScene.setFocus()
             self.undoGroup.setActiveStack(self.cScene.undoStack)
+            # act_switch_to_selection_tool secimi sifirladigi icin bu sekilde tercih ettik
+            # mesela kalem aracinda iken sayfa degisirse arac secili kaliyor ama secim araci arkaplanda
+            # secilmis oldugudan tekrar kaleme tiklamak gerekiyor cizim icin
+            self.cScene.secim_aracina_gec()
 
             try:
                 self.sahneKutuphane.tempDirPath = self.cModel.tempDirPath
@@ -2539,10 +2566,11 @@ class DefterAnaPencere(QMainWindow):
 
         itemType = itemDict["type"]
 
-        if itemType == LineItem.Type:
+        if itemType == shared.LINE_ITEM_TYPE:
             lineItem = LineItem(pos=itemDict["pos"],
                                 pen=itemDict["pen"],
-                                yaziRengi=itemDict.get("yaziRengi", self.yaziRengi),
+                                yaziRengi=itemDict.get("yaziRengi", QColor(0,0,0)),
+                                arkaPlanRengi=itemDict.get("arkaPlanRengi", QColor(255,255,255)),
                                 line=itemDict["line"],
                                 font=itemDict.get("font", self.font()))
             # TODO: renkler bir sekilde sistem rengine donuyor.
@@ -2565,7 +2593,7 @@ class DefterAnaPencere(QMainWindow):
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, lineItem)
             return lineItem
 
-        elif itemType == Rect.Type:
+        elif itemType == shared.RECT_ITEM_TYPE:
             rectItem = Rect(itemDict["pos"], itemDict["rect"], itemDict["yaziRengi"], itemDict["arkaPlanRengi"],
                             itemDict["pen"], itemDict["font"])
             # rectItem.setRect(rectItem.mapRectFromScene(item["rect"]))
@@ -2590,7 +2618,7 @@ class DefterAnaPencere(QMainWindow):
                 # rectItem.setPos(itemDict["pos"])
             return rectItem
 
-        elif itemType == Ellipse.Type:
+        elif itemType == shared.ELLIPSE_ITEM_TYPE:
             ellipseItem = Ellipse(itemDict["pos"], itemDict["rect"], itemDict["yaziRengi"], itemDict["arkaPlanRengi"],
                                   itemDict["pen"], itemDict["font"])
             ellipseItem.setPos(itemDict["pos"])
@@ -2612,7 +2640,7 @@ class DefterAnaPencere(QMainWindow):
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, ellipseItem)
             return ellipseItem
 
-        elif itemType == PathItem.Type:
+        elif itemType == shared.PATH_ITEM_TYPE:
             pathItem = PathItem(itemDict["pos"], itemDict["yaziRengi"], itemDict["arkaPlanRengi"], itemDict["pen"],
                                 itemDict["font"])
             # TODO: renkler bir sekilde sistem rengine donuyor.
@@ -2637,7 +2665,7 @@ class DefterAnaPencere(QMainWindow):
 
             return pathItem
 
-        elif itemType == Image.Type:
+        elif itemType == shared.IMAGE_ITEM_TYPE:
             # rect = item["rect"]
             # pixMap = QPixmap(item["filePath"]).scaled(rect.size().toSize(), Qt.KeepAspectRatio)
             # imageItem = Image(item["filePath"], pixMap, item["rect"], item["arkaPlanRengi"], item["pen"])
@@ -2684,7 +2712,7 @@ class DefterAnaPencere(QMainWindow):
             # pixMap = None
             return imageItem
 
-        elif itemType == Text.Type:
+        elif itemType == shared.TEXT_ITEM_TYPE:
             textItem = Text(itemDict["pos"], itemDict["yaziRengi"], itemDict["arkaPlanRengi"], itemDict["pen"],
                             itemDict["font"], rect=itemDict["rect"])
             textItem.set_document_url(self.cScene.tempDirPath)
@@ -2720,7 +2748,7 @@ class DefterAnaPencere(QMainWindow):
             # TODO: item edit edilebilir halde yazi secili kaliyor, ya focus ya text interactionflag
 
         elif itemType == shared.GROUP_ITEM_TYPE:
-            groupItem = Group(itemDict["arkaPlanRengi"], itemDict["pen"])
+            groupItem = Group(itemDict["arkaPlanRengi"], itemDict.get("yaziRengi", QColor(0, 0, 0)), itemDict["pen"])
             # group = QGraphicsItemGroup(None)
             groupItem.setFlags(groupItem.ItemIsSelectable
                                | groupItem.ItemIsMovable
@@ -2743,7 +2771,7 @@ class DefterAnaPencere(QMainWindow):
                 undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, groupItem)
             return groupItem
 
-        elif itemType == VideoItem.Type:
+        elif itemType == shared.VIDEO_ITEM_TYPE:
             # rect = item["rect"]
             # pixMap = QPixmap(item["filePath"]).scaled(rect.size().toSize(), Qt.KeepAspectRatio)
             # imageItem = Image(item["filePath"], pixMap, item["rect"], item["arkaPlanRengi"], item["pen"])
@@ -2787,7 +2815,7 @@ class DefterAnaPencere(QMainWindow):
             # pixMap = None
             return videoItem
 
-        elif itemType == DosyaNesnesi.Type:
+        elif itemType == shared.DOSYA_ITEM_TYPE:
             # rect = item["rect"]
             # pixMap = QPixmap(item["filePath"]).scaled(rect.size().toSize(), Qt.KeepAspectRatio)
             # imageItem = Image(item["filePath"], pixMap, item["rect"], item["arkaPlanRengi"], item["pen"])
@@ -2915,9 +2943,8 @@ class DefterAnaPencere(QMainWindow):
         # self.tv_sayfa_degistir(self.sayfalarDWTreeView.currentItem(), 0)
 
         self.cScene.sonZDeger = sceneDict.get("sonZDeger", 0)
-        self.cScene.arkaPlanRengi = sceneDict["arkaPlanRengi"]
-        self.cScene.scenePen = sceneDict["scenePen"]
         self.cScene.setSceneRect(sceneDict["sceneRect"])
+        self.cScene.arac_ozellikleri_yukle(sceneDict.get("aracOzellikleriSozluk", None))
         self.cView.setBackgroundBrush(sceneDict["backgroundBrush"])
         if sceneDict["backgroundImagePath"]:
             self.cView.set_background_image(os.path.join(self.cScene.tempDirPath, "images",
@@ -4013,6 +4040,20 @@ class DefterAnaPencere(QMainWindow):
                                                            self.itemContextMenu)
         self.actionAddSelectedItemStyleAsAPreset.triggered.connect(self.act_add_style_preset)
 
+        self.actionSeciliNesneStiliniSeciliAracaUygula = QAction(QIcon(':icons/icons/text-html.png'),
+                                                                 self.tr(
+                                                                     "Apply selected item's style to the active tool"),
+                                                                 self.itemContextMenu)
+        self.actionSeciliNesneStiliniSeciliAracaUygula.triggered.connect(
+            self.act_secili_nesne_stilini_secili_araca_uygula)
+
+        self.actionSeciliNesneStiliniKendiAracinaUygula = QAction(QIcon(':icons/icons/text-html.png'),
+                                                                 self.tr(
+                                                                     "Set selected item's style as tool default"),
+                                                                 self.itemContextMenu)
+        self.actionSeciliNesneStiliniKendiAracinaUygula.triggered.connect(
+            self.act_secili_nesne_stilini_kendi_aracina_uygula)
+
         self.actionShowInFileManager = QAction(QIcon(':icons/icons/text-html.png'), self.tr("Show in file manager"),
                                                self.itemContextMenu)
         self.actionShowInFileManager.triggered.connect(self.act_show_in_file_manager)
@@ -4128,7 +4169,9 @@ class DefterAnaPencere(QMainWindow):
                                          self.actionExportSelectedTextItemContentAsPdf,
                                          self.actionPrintSelectedTextItemContent,
                                          self.itemContextMenu.addSeparator(),
-                                         self.actionAddSelectedItemStyleAsAPreset
+                                         self.actionAddSelectedItemStyleAsAPreset,
+                                         self.actionSeciliNesneStiliniSeciliAracaUygula,
+                                         self.actionSeciliNesneStiliniKendiAracinaUygula
                                          ))
 
         self.groupContextMenu = QMenu(self.tr("Group Menu"), self)
@@ -4345,6 +4388,8 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionShowAsWebPage,
                                           self.actionConvertToWebItem,
                                           self.actionAddSelectedItemStyleAsAPreset,
+                                          self.actionSeciliNesneStiliniSeciliAracaUygula,
+                                          self.actionSeciliNesneStiliniKendiAracinaUygula,
                                           self.actionExportSelectedTextItemContentAsPdf,
                                           self.actionPrintSelectedTextItemContent,
                                           # file menu actions
@@ -4507,8 +4552,12 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def olustur_nesne_ozellikleriYW(self):
 
-        self.nesneOzellikleriYW = NesneOzellikleriYuzenWidget(self.arkaPlanRengi, self.yaziRengi, self.cizgiRengi,
-                                                              self._pen.widthF(), self)
+        # self.arkaPlanRengi vs iptal edilince, nesneye bile tiklasak, secim aracina geciyor, sahneye tiklasa yine ayni
+        # kalemde iken de kalem secili zaten
+        self.nesneOzellikleriYW = NesneOzellikleriYuzenWidget(self.cScene.aktifArac.arkaPlanRengi, # secim toolu
+                                                              self.cScene.aktifArac.yaziRengi, 
+                                                              self.cScene.aktifArac.cizgiRengi,
+                                                              self.cScene.aktifArac.cizgiKalinligi, self)
         self.nesneOzellikleriYW.hide()
         self.nesneOzellikleriYW.arkaPlanRengiDegisti.connect(self.act_set_item_background_color)
         self.nesneOzellikleriYW.yaziRengiDegisti.connect(self.act_set_item_text_color)
@@ -4656,7 +4705,7 @@ class DefterAnaPencere(QMainWindow):
         self.cizgiKalinligiDSliderWithDSBox_tbar.setMinimum(0)
         self.cizgiKalinligiDSliderWithDSBox_tbar.setMaximum(100)
         self.cizgiKalinligiDSliderWithDSBox_tbar.setSingleStep(0.1)
-        self.cizgiKalinligiDSliderWithDSBox_tbar.setValue(self._pen.widthF() * 10)
+        self.cizgiKalinligiDSliderWithDSBox_tbar.setValue(self.cScene.aktifArac.cizgiKalinligi * 10)
         # self.cizgiKalinligiSBox.valueChangedFromSpinBoxGuiNotBySetValue.connect(self.act_change_item_height)
         self.cizgiKalinligiDSliderWithDSBox_tbar.setToolTip(self.tr("Line Width"))
         self.cizgiKalinligiDSliderWithDSBox_tbar.degerDegisti.connect(self.act_cizgi_kalinligi_degistir)
@@ -5576,8 +5625,11 @@ class DefterAnaPencere(QMainWindow):
         # self.itemHeightSBoxAction.setVisible(False)
         # self.itemRotationSBoxAction.setVisible(False)
         # self.textSizeSBox_tbarAction.setVisible(False)
-        self.cScene.set_tool(toolType=Scene.NoTool)
+        self.cScene.aktif_arac_degistir(aktifArac=self.cScene.SecimAraci)
         self.actionSwitchToSelectionTool.setChecked(True)
+        self.cScene.clearSelection()
+        self.radioArkaplan.setChecked(True)
+        self.act_radio_secim_degisti(self.radioArkaplan)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5589,11 +5641,14 @@ class DefterAnaPencere(QMainWindow):
         # self.itemHeightSBoxAction.setVisible(False)
         # self.itemRotationSBoxAction.setVisible(False)
         # self.textSizeSBox_tbarAction.setVisible(False)
-        if self._pen.style() == Qt.PenStyle.NoPen:
+        if self.cScene.OkAraci.kalem.style() == Qt.PenStyle.NoPen:
             self.act_cizgi_tipi_degistir(Qt.SolidLine)
-            self.change_line_style_options(self._pen)
-        self.cScene.set_tool(toolType=Scene.DrawLineTool)
+            self.change_line_style_options(self.cScene.OkAraci.kalem)
+        self.cScene.aktif_arac_degistir(aktifArac=self.cScene.OkAraci)
         self.actionDrawLineItem.setChecked(True)
+        self.cScene.clearSelection()
+        self.radioCizgi.setChecked(True)
+        self.act_radio_secim_degisti(self.radioCizgi)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5602,8 +5657,11 @@ class DefterAnaPencere(QMainWindow):
         # self.itemHeightSBoxAction.setVisible(True)
         # self.itemRotationSBoxAction.setVisible(True)
         # self.textSizeSBox_tbarAction.setVisible(False)
-        self.cScene.set_tool(toolType=Scene.RectTool)
+        self.cScene.aktif_arac_degistir(aktifArac=self.cScene.DortgenAraci)
         self.actionAddRectItem.setChecked(True)
+        self.cScene.clearSelection()
+        self.radioArkaplan.setChecked(True)
+        self.act_radio_secim_degisti(self.radioArkaplan)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5612,20 +5670,27 @@ class DefterAnaPencere(QMainWindow):
         # self.itemHeightSBoxAction.setVisible(True)
         # self.itemRotationSBoxAction.setVisible(True)
         # self.textSizeSBox_tbarAction.setVisible(False)
-        self.cScene.set_tool(toolType=Scene.EllipseTool)
+        self.cScene.aktif_arac_degistir(aktifArac=self.cScene.YuvarlakAraci)
         self.actionAddEllipseItem.setChecked(True)
+        self.cScene.clearSelection()
+        self.radioArkaplan.setChecked(True)
+        self.act_radio_secim_degisti(self.radioArkaplan)
 
+    # ---------------------------------------------------------------------
     @Slot()
     def act_draw_path_item(self):
         # self.itemWidthSBoxAction.setVisible(False)
         # self.itemHeightSBoxAction.setVisible(False)
         # self.itemRotationSBoxAction.setVisible(True)
         # self.textSizeSBox_tbarAction.setVisible(False)
-        if self._pen.style() == Qt.PenStyle.NoPen:
+        if self.cScene.KalemAraci.kalem.style() == Qt.PenStyle.NoPen:
             self.act_cizgi_tipi_degistir(Qt.SolidLine)
-            self.change_line_style_options(self._pen)
-        self.cScene.set_tool(toolType=Scene.DrawPathTool)
+            self.change_line_style_options(self.cScene.KalemAraci.kalem)
+        self.cScene.aktif_arac_degistir(aktifArac=self.cScene.KalemAraci)
         self.actionDrawPathItem.setChecked(True)
+        self.cScene.clearSelection()
+        self.radioCizgi.setChecked(True)
+        self.act_radio_secim_degisti(self.radioCizgi)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5634,8 +5699,11 @@ class DefterAnaPencere(QMainWindow):
         # self.itemHeightSBoxAction.setVisible(False)
         # self.itemRotationSBoxAction.setVisible(True)
         # self.textSizeSBox_tbarAction.setVisible(True)
-        self.cScene.set_tool(toolType=Scene.TextTool, itemText="text")
+        self.cScene.aktif_arac_degistir(aktifArac=self.cScene.YaziAraci, itemText="text")
         self.actionAddTextItem.setChecked(True)
+        self.cScene.clearSelection()
+        self.radioYazi.setChecked(True)
+        self.act_radio_secim_degisti(self.radioYazi)
 
     # # ---------------------------------------------------------------------
     # def toggle_transforms_for_base(self):
@@ -5649,7 +5717,7 @@ class DefterAnaPencere(QMainWindow):
     def act_crop(self, item):
 
         if item and item.type() == shared.IMAGE_ITEM_TYPE:  # hotkeyden item none gelirse diye
-            self.cScene.set_tool(toolType=Scene.CropImageTool)
+            self.cScene.aktif_arac_degistir(aktifArac=self.cScene.ResimKirpAraci)
         else:
             self.log(self.tr("No active image item!"), 5000, toStatusBarOnly=True)
 
@@ -5668,7 +5736,7 @@ class DefterAnaPencere(QMainWindow):
         # if fn:
         if fn[0]:
             filePath = fn[0]
-            self.cScene.set_tool(toolType=Scene.ImageTool, dosyaYolu=filePath)
+            self.cScene.aktif_arac_degistir(aktifArac=self.cScene.ResimAraci, dosyaYolu=filePath)
             self.actionAddImageItem.setChecked(True)
 
             add = True
@@ -5681,7 +5749,7 @@ class DefterAnaPencere(QMainWindow):
                 action = QAction(QIcon(filePath), os.path.basename(filePath), self.recentImagesMenu)
                 action.setToolTip(filePath)
                 action.setStatusTip(filePath)
-                action.triggered.connect(lambda: self.cScene.set_tool(toolType=Scene.ImageTool, dosyaYolu=filePath))
+                action.triggered.connect(lambda: self.cScene.aktif_arac_degistir(aktifArac=self.cScene.ResimAraci, dosyaYolu=filePath))
                 action.triggered.connect(lambda: self.actionAddImageItem.setChecked(True))
                 count = len(self.recentImagesMenu.actions())
                 if count < 9:
@@ -5732,13 +5800,14 @@ class DefterAnaPencere(QMainWindow):
                 action.setToolTip(filePath)
                 action.setStatusTip(filePath)
 
-                # action.triggered.connect(lambda: self.cScene.set_tool(toolType=Scene.ImageTool, dosyaYolu=filePath))
+                # action.triggered.connect(lambda: self.cScene.aktif_arac_degistir(aktifArac=self.cScene.ResimAraci,
+                #                                                                  dosyaYolu=filePath))
                 # action.triggered.connect(lambda: self.actionAddImageItem.setChecked(True))
 
                 def make_callback(_toolType, _dosyaYolu):
-                    return lambda: self.cScene.set_tool(toolType=_toolType, dosyaYolu=_dosyaYolu)
+                    return lambda: self.cScene.aktif_arac_degistir(aktifArac=_toolType, dosyaYolu=_dosyaYolu)
 
-                action.triggered.connect(make_callback(Scene.ImageTool, filePath))
+                action.triggered.connect(make_callback(self.cScene.ResimAraci, filePath))
                 action.triggered.connect(lambda: self.actionAddImageItem.setChecked(True))
                 count = len(self.recentImagesMenu.actions())
                 if count < 9:
@@ -5760,7 +5829,11 @@ class DefterAnaPencere(QMainWindow):
         pixMap = QPixmap(dosyaYolu).scaled(viewRectSize / 1.5, Qt.KeepAspectRatio)
         rectf = QRectF(pixMap.rect())
         # rectf.moveTo(pos)
-        item = Image(dosyaYolu, pos, rectf, self.yaziRengi, self.arkaPlanRengi, self._pen, self.font(),
+        item = Image(dosyaYolu, pos, rectf, 
+                     self.cScene.aktifArac.yaziRengi, 
+                     self.cScene.aktifArac.arkaPlanRengi,
+                     self.cScene.aktifArac.kalem, 
+                     self.font(),
                      isEmbeded=isEmbeded)
         self.increase_zvalue(item)
         # self.addItem(item)
@@ -5782,7 +5855,7 @@ class DefterAnaPencere(QMainWindow):
         # if fn:
         if fn[0]:
             filePath = fn[0]
-            self.cScene.set_tool(toolType=Scene.VideoTool, dosyaYolu=filePath)
+            self.cScene.aktif_arac_degistir(aktifArac=self.cScene.VideoAraci, dosyaYolu=filePath)
             self.actionAddVideoItem.setChecked(True)
 
             self.sonKlasorVideolar = os.path.dirname(filePath)
@@ -5831,10 +5904,10 @@ class DefterAnaPencere(QMainWindow):
         # rectf.moveTo(pos)
 
         item = VideoItem(dosyaYolu, pos, QRectF(0, 0, 320, 240),
-                         self.yaziRengi,
-                         QColor.fromRgbF(0, 0, 0, 0),
-                         self._pen,
-                         self.font())
+                         self.cScene.VideoAraci.yaziRengi,
+                         self.cScene.VideoAraci.arkaPlanRengi, #QColor.fromRgbF(0, 0, 0, 0),
+                         self.cScene.VideoAraci.kalem,
+                         self.cScene.VideoAraci.yaziTipi)
         self.increase_zvalue(item)
         # self.addItem(item)
         # TODO: macro undo redo
@@ -5855,7 +5928,7 @@ class DefterAnaPencere(QMainWindow):
         # if fn:
         if fn[0]:
             filePath = fn[0]
-            self.cScene.set_tool(toolType=Scene.DosyaAraci, dosyaYolu=filePath)
+            self.cScene.aktif_arac_degistir(aktifArac=self.cScene.DosyaAraci, dosyaYolu=filePath)
             self.actionEkleDosyaNesnesi.setChecked(True)
 
             self.sonKlasorDosyalar = os.path.dirname(filePath)
@@ -5938,8 +6011,10 @@ class DefterAnaPencere(QMainWindow):
         # QString imgBase64 = ba.toBase64();
         # bu.close();
         # """
-        nesne = DosyaNesnesi(dosyaAdresi, pos, QRectF(0, 0, 125, 160), self.yaziRengi, self.arkaPlanRengi,
-                             self._pen,
+        nesne = DosyaNesnesi(dosyaAdresi, pos, QRectF(0, 0, 125, 160), 
+                             self.cScene.aktifArac.yaziRengi, 
+                             self.cScene.aktifArac.arkaPlanRengi,
+                             self.cScene.aktifArac.kalem,
                              self.font(),
                              pixmap=None)
         self.increase_zvalue(nesne)
@@ -6142,7 +6217,11 @@ class DefterAnaPencere(QMainWindow):
         if not mimeData.hasText() or not mimeData.hasHtml():
             return
         self.lutfen_bekleyin_goster()
-        textItem = Text(self.get_mouse_scene_pos(), self.yaziRengi, self.arkaPlanRengi, self._pen, self.currentFont)
+        textItem = Text(self.get_mouse_scene_pos(), 
+                        self.cScene.YaziAraci.yaziRengi, 
+                        self.cScene.YaziAraci.arkaPlanRengi, 
+                        self.cScene.YaziAraci.kalem, 
+                        self.cScene.YaziAraci.yaziTipi)
         textItem.set_document_url(self.cScene.tempDirPath)
 
         if mimeData.hasText():
@@ -6223,8 +6302,11 @@ class DefterAnaPencere(QMainWindow):
                 pixMap = QPixmap(imageSavePath)
                 # pixMap = QPixmap(image)
                 rect = QRectF(pixMap.rect())
-                imageItem = Image(imageSavePath, self.get_mouse_scene_pos(), rect, self.yaziRengi, self.arkaPlanRengi,
-                                  self._pen, self.currentFont)
+                imageItem = Image(imageSavePath, self.get_mouse_scene_pos(), rect, 
+                                  self.cScene.ResimAraci.yaziRengi, 
+                                  self.cScene.ResimAraci.arkaPlanRengi,
+                                  self.cScene.ResimAraci.kalem,
+                                  self.cScene.ResimAraci.yaziTipi)
 
                 imageItem.isEmbeded = True
 
@@ -6237,8 +6319,11 @@ class DefterAnaPencere(QMainWindow):
                 # return imageItem
 
             elif mimeData.hasHtml():
-                textItem = Text(self.get_mouse_scene_pos(), self.yaziRengi, self.arkaPlanRengi, self._pen,
-                                self.currentFont)
+                textItem = Text(self.get_mouse_scene_pos(), 
+                                self.cScene.YaziAraci.yaziRengi, 
+                                self.cScene.YaziAraci.arkaPlanRengi, 
+                                self.cScene.YaziAraci.kalem,
+                                self.cScene.YaziAraci.yaziTipi)
                 textItem.set_document_url(self.cScene.tempDirPath)
                 textItem.setHtml(mimeData.html())
                 textItem.isPlainText = False
@@ -6254,8 +6339,12 @@ class DefterAnaPencere(QMainWindow):
                 # return
             elif mimeData.hasText():
 
-                textItem = Text(self.get_mouse_scene_pos(), self.yaziRengi, self.arkaPlanRengi,
-                                self._pen, self.currentFont, text=mimeData.text())
+                textItem = Text(self.get_mouse_scene_pos(), 
+                                self.cScene.YaziAraci.yaziRengi, 
+                                self.cScene.YaziAraci.arkaPlanRengi, 
+                                self.cScene.YaziAraci.kalem,
+                                self.cScene.YaziAraci.yaziTipi,
+                                text=mimeData.text())
                 textItem.set_document_url(self.cScene.tempDirPath)
                 textItem.textItemFocusedOut.connect(lambda: self.cScene.is_text_item_empty(textItem))
                 self.increase_zvalue(textItem)
@@ -6461,7 +6550,7 @@ class DefterAnaPencere(QMainWindow):
             self.log(self.tr("Please select at least 1 item! "
                              "And click anywhere in the scene to set the mirror axis."), 5000, toStatusBarOnly=True)
             return
-        self.cScene.set_tool(toolType=Scene.MirrorY, pos=self.get_mouse_scene_pos())
+        self.cScene.aktif_arac_degistir(aktifArac=self.cScene.AynalaYAraci, pos=self.get_mouse_scene_pos())
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -6473,14 +6562,14 @@ class DefterAnaPencere(QMainWindow):
             self.log(self.tr("Please select at least 1 item! "
                              "And click anywhere in the scene to set the mirror axis."), 5000, toStatusBarOnly=True)
             return
-        self.cScene.set_tool(toolType=Scene.MirrorX, pos=self.get_mouse_scene_pos())
+        self.cScene.aktif_arac_degistir(aktifArac=self.cScene.AynalaXAraci, pos=self.get_mouse_scene_pos())
 
     # ---------------------------------------------------------------------
     @Slot()
     def act_mirror_x(self, mPos):
         # bu sahneden cagriliyor
         self.lutfen_bekleyin_goster()
-        self.cScene.set_tool(toolType=Scene.NoTool)  # bu finish_interactive_toolsu da cagiriyor.
+        self.cScene.aktif_arac_degistir(aktifArac=self.cScene.SecimAraci)  # bu finish_interactive_toolsu da cagiriyor.
 
         mposx = mPos.x()
 
@@ -6533,7 +6622,7 @@ class DefterAnaPencere(QMainWindow):
     def act_mirror_y(self, mPos):
         # bu sahneden cagriliyor
         self.lutfen_bekleyin_goster()
-        self.cScene.set_tool(toolType=Scene.NoTool)  # bu finish_interactive_toolsu da cagiriyor.
+        self.cScene.aktif_arac_degistir(aktifArac=self.cScene.SecimAraci)  # bu finish_interactive_toolsu da cagiriyor.
 
         mposy = mPos.y()
 
@@ -6951,6 +7040,8 @@ class DefterAnaPencere(QMainWindow):
         items = self.cScene.selectedItems()
         undoRedo.undoableGroup(self.cScene.undoStack, self.tr("add single item to group"), items, self.cScene)
         self.cScene.undoStack.endMacro()
+        self.radioCizgi.setChecked(True)
+        self.act_radio_secim_degisti(self.radioCizgi)
         self.log(self.tr("Grouped"), 5000, toStatusBarOnly=True)
         self.lutfen_bekleyin_gizle()
 
@@ -7166,14 +7257,14 @@ class DefterAnaPencere(QMainWindow):
         if self.cScene.selectionQueue:
             if ilkHaleDondur:
                 for item in self.cScene.selectionQueue:
-                    if item.type() == shared.GROUP_ITEM_TYPE:
-                        continue
+                    # if item.type() == shared.GROUP_ITEM_TYPE:
+                    #     continue
                     item.setYaziRengi(item.gecici_degisken_eski_col)
                     del item.gecici_degisken_eski_col
             else:
                 for item in self.cScene.selectionQueue:
-                    if item.type() == shared.GROUP_ITEM_TYPE:
-                        continue
+                    # if item.type() == shared.GROUP_ITEM_TYPE:
+                    #     continue
                     if not hasattr(item, "gecici_degisken_eski_col"):
                         item.gecici_degisken_eski_col = item.yaziRengi
                     item.setYaziRengi(col)
@@ -7199,15 +7290,15 @@ class DefterAnaPencere(QMainWindow):
             if len(self.cScene.selectionQueue) > 1:
                 self.cScene.undoStack.beginMacro(self.tr("change items' text color"))
             for item in self.cScene.selectionQueue:
-                if item.type() == shared.GROUP_ITEM_TYPE:
-                    continue
+                # if item.type() == shared.GROUP_ITEM_TYPE:
+                #     continue
                 undoRedo.undoableSetTextColor(self.cScene.undoStack,
                                               self.tr("change item's text color"),
                                               item, col, renkSecicidenMi)
             if len(self.cScene.selectionQueue) > 1:
                 self.cScene.undoStack.endMacro()
         else:  # sahne icin degistir
-            self.yaziRengi = self.cScene.yaziRengi = col
+            self.cScene.aktifArac.yaziRengi = col
             self.degistir_yazi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=True,
                                            renkSecicidenMi=renkSecicidenMi)
 
@@ -7218,14 +7309,14 @@ class DefterAnaPencere(QMainWindow):
         if self.cScene.selectionQueue:
             if ilkHaleDondur:
                 for item in self.cScene.selectionQueue:
-                    if item.type() == shared.GROUP_ITEM_TYPE:
-                        continue
+                    # if item.type() == shared.GROUP_ITEM_TYPE:
+                    #     continue
                     item.setCizgiRengi(item.gecici_degisken_eski_col)
                     del item.gecici_degisken_eski_col
             else:
                 for item in self.cScene.selectionQueue:
-                    if item.type() == shared.GROUP_ITEM_TYPE:
-                        continue
+                    # if item.type() == shared.GROUP_ITEM_TYPE:
+                    #     continue
                     if not hasattr(item, "gecici_degisken_eski_col"):
                         item.gecici_degisken_eski_col = item.cizgiRengi
                     item.setCizgiRengi(col)
@@ -7235,7 +7326,7 @@ class DefterAnaPencere(QMainWindow):
     def act_set_item_line_color(self, col=None, eskiRenk=None, renkSecicidenMi=False):
 
         if not eskiRenk:
-            eskiRenk = self.cizgiRengi
+            eskiRenk = self.cScene.aktifArac.cizgiRengi
 
         if not col:
             col = self.renk_sec(eskiRenk=eskiRenk,
@@ -7250,17 +7341,15 @@ class DefterAnaPencere(QMainWindow):
             if len(self.cScene.selectionQueue) > 1:
                 self.cScene.undoStack.beginMacro(self.tr("change items' line color"))
             for item in self.cScene.selectionQueue:
-                if item.type() == shared.GROUP_ITEM_TYPE:
-                    continue
+                # if item.type() == shared.GROUP_ITEM_TYPE:
+                #     continue
                 undoRedo.undoableSetLineColor(self.cScene.undoStack,
                                               self.tr("change item's line color"),
                                               item, col, renkSecicidenMi)
             if len(self.cScene.selectionQueue) > 1:
                 self.cScene.undoStack.endMacro()
         else:  # sahne icin degistir
-            self.cizgiRengi = col
-            self._pen.setColor(col)
-            self.cScene.scenePen = QPen(self._pen)
+            self.cScene.aktifArac.cizgiRengi = col
             self.degistir_cizgi_rengi_ikonu(col, nesne_arkaplan_ikonu_guncelle=True,
                                             renkSecicidenMi=renkSecicidenMi)
 
@@ -7270,15 +7359,15 @@ class DefterAnaPencere(QMainWindow):
     def onizle_set_item_background_color(self, col, ilkHaleDondur=False):
         if ilkHaleDondur:
             for item in self.cScene.selectionQueue:
-                if item.type() == shared.GROUP_ITEM_TYPE or item.type() == shared.LINE_ITEM_TYPE:
-                    continue
+                # if item.type() == shared.GROUP_ITEM_TYPE or item.type() == shared.LINE_ITEM_TYPE:
+                #     continue
                 item.setArkaPlanRengi(item.gecici_degisken_eski_col)
                 del item.gecici_degisken_eski_col
 
         else:
             for item in self.cScene.selectionQueue:
-                if item.type() == shared.GROUP_ITEM_TYPE or item.type() == shared.LINE_ITEM_TYPE:
-                    continue
+                # if item.type() == shared.GROUP_ITEM_TYPE or item.type() == shared.LINE_ITEM_TYPE:
+                #     continue
                 if not hasattr(item, "gecici_degisken_eski_col"):
                     item.gecici_degisken_eski_col = item.arkaPlanRengi
                 item.setArkaPlanRengi(col)
@@ -7288,7 +7377,7 @@ class DefterAnaPencere(QMainWindow):
     def act_set_item_background_color(self, col=None, eskiRenk=None, renkSecicidenMi=False):
 
         if not eskiRenk:
-            eskiRenk = self.arkaPlanRengi
+            eskiRenk = self.cScene.aktifArac.arkaPlanRengi
 
         if not col:
             col = self.renk_sec(eskiRenk=eskiRenk,
@@ -7306,19 +7395,19 @@ class DefterAnaPencere(QMainWindow):
             if len(self.cScene.selectionQueue) > 1:
                 self.cScene.undoStack.beginMacro(self.tr("change items' background color"))
             for item in self.cScene.selectionQueue:
-                if item.type() == shared.GROUP_ITEM_TYPE or item.type() == shared.LINE_ITEM_TYPE:
-                    continue
-                    # for c in item.childItems():
-                    #     c.undoableSetItemBackgroundColor(self.cScene.undoStack,
-                    #                                             self.tr("change item's background color"), c, col)
-                if not item.type() == shared.LINE_ITEM_TYPE:
-                    undoRedo.undoableSetItemBackgroundColor(self.cScene.undoStack,
-                                                            self.tr("change item's background color"),
-                                                            item, col, renkSecicidenMi)
+                # if item.type() == shared.GROUP_ITEM_TYPE or item.type() == shared.LINE_ITEM_TYPE:
+                #     continue
+                #     # for c in item.childItems():
+                #     #     c.undoableSetItemBackgroundColor(self.cScene.undoStack,
+                #     #                                             self.tr("change item's background color"), c, col)
+                # if not item.type() == shared.LINE_ITEM_TYPE:
+                undoRedo.undoableSetItemBackgroundColor(self.cScene.undoStack,
+                                                        self.tr("change item's background color"),
+                                                        item, col, renkSecicidenMi)
             if len(self.cScene.selectionQueue) > 1:
                 self.cScene.undoStack.endMacro()
         else:  # sahne icin degistir
-            self.arkaPlanRengi = self.cScene.arkaPlanRengi = col
+            self.cScene.aktifArac.arkaPlanRengi = col
             self.degistir_nesne_arkaplan_rengi_ikonu(renkSecicidenMi=renkSecicidenMi)
 
         return col
@@ -7327,7 +7416,7 @@ class DefterAnaPencere(QMainWindow):
     def degistir_yazi_rengi_ikonu(self, yaziRengi=None, nesne_arkaplan_ikonu_guncelle=True,
                                   renkSecicidenMi=False):
         if not yaziRengi:
-            yaziRengi = self.yaziRengi
+            yaziRengi = self.cScene.aktifArac.yaziRengi
 
         pix = QPixmap(16, 16)
         # pix.fill(color)
@@ -7363,7 +7452,7 @@ class DefterAnaPencere(QMainWindow):
                                    renkSecicidenMi=False):
 
         if not cizgiRengi:
-            cizgiRengi = self.cizgiRengi
+            cizgiRengi = self.cScene.aktifArac.cizgiRengi
 
         pix = QPixmap(16, 16)
         # pix.fill(color)
@@ -7401,13 +7490,13 @@ class DefterAnaPencere(QMainWindow):
                                             renkSecicidenMi=False):
 
         if not arkaplanRengi:
-            arkaplanRengi = self.arkaPlanRengi
+            arkaplanRengi = self.cScene.aktifArac.arkaPlanRengi
 
         # if not yaziRengi:
-        #     yaziRengi = self.yaziRengi
+        #     yaziRengi = self.cScene.aktifArac.yaziRengi
         #
         # if not cizgiRengi:
-        #     cizgiRengi = self.cizgiRengi
+        #     cizgiRengi = self.cScene.aktifArac.cizgiRengi
 
         pix = QPixmap(16, 16)
         # pix.fill(color)
@@ -7478,8 +7567,7 @@ class DefterAnaPencere(QMainWindow):
                 self.cScene.undoStack.endMacro()
 
         else:
-            self._pen.setStyle(lineStyle)
-            self.cScene.scenePen = QPen(self._pen)
+            self.cScene.aktifArac.cizgiTipi = lineStyle
 
     # ---------------------------------------------------------------------
     @Slot(int)
@@ -7495,8 +7583,7 @@ class DefterAnaPencere(QMainWindow):
             if len(self.cScene.selectionQueue) > 1:
                 self.cScene.undoStack.endMacro()
         else:
-            self._pen.setJoinStyle(joinStyle)
-            self.cScene.scenePen = QPen(self._pen)
+            self.cScene.aktifArac.cizgiBirlesimTipi = joinStyle
 
     # ---------------------------------------------------------------------
     @Slot(int)
@@ -7513,31 +7600,24 @@ class DefterAnaPencere(QMainWindow):
                 self.cScene.undoStack.endMacro()
 
         else:
-            self._pen.setCapStyle(capStyle)
-            self.cScene.scenePen = QPen(self._pen)
+            self.cScene.aktifArac.cizgiUcuTipi = capStyle
 
     # ---------------------------------------------------------------------
     def fircaBuyult(self):
-        self._pen.setWidthF(self._pen.widthF() + 0.5)
-        self.cScene.scenePen = QPen(self._pen)
-        # self.act_cizgi_kalinligi_degistir(self._pen.widthF() + 0.5)
-        self.change_line_widthF(self._pen.widthF())
-        return self._pen.widthF()
+        self.cScene.aktifArac.cizgiKalinligi += 0.5
+        self.change_line_widthF(self.cScene.aktifArac.cizgiKalinligi)
+        return self.cScene.aktifArac.cizgiKalinligi
 
     # ---------------------------------------------------------------------
     def fircaKucult(self):
-        if self._pen.widthF() > 1:
-            self._pen.setWidthF(self._pen.widthF() - 0.5)
-            self.cScene.scenePen = QPen(self._pen)
-            # self.act_cizgi_kalinligi_degistir(self._pen.widthF() - 0.5)
-            self.change_line_widthF(self._pen.widthF())
-        return self._pen.widthF()
+        if self.cScene.aktifArac.cizgiKalinligi > 1:
+            self.cScene.aktifArac.cizgiKalinligi -= 0.5
+            self.change_line_widthF(self.cScene.aktifArac.kalem.widthF())
+        return self.cScene.aktifArac.cizgiKalinligi
 
     # ---------------------------------------------------------------------
     def fircaDirektDegerGir(self, direktDeger):
-        self._pen.setWidthF(direktDeger)
-        self.cScene.scenePen = QPen(self._pen)
-        # self.act_cizgi_kalinligi_degistir(self._pen.widthF() - 0.5)
+        self.cScene.aktifArac.cizgiKalinligi = direktDeger
         self.change_line_widthF(direktDeger)
 
     # ---------------------------------------------------------------------
@@ -7554,8 +7634,7 @@ class DefterAnaPencere(QMainWindow):
                 self.cScene.undoStack.endMacro()
 
         else:
-            self._pen.setWidthF(widthF)
-            self.cScene.scenePen = QPen(self._pen)
+            self.cScene.aktifArac.cizgiKalinligi = widthF
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -7579,12 +7658,11 @@ class DefterAnaPencere(QMainWindow):
             self.cizgiUcuTipiCBox.setCurrentIndex(0)
             self.change_line_widthF(0)
 
-            self._pen = QPen(self.cizgiRengi,
-                             0,
-                             Qt.SolidLine,
-                             Qt.FlatCap,
-                             Qt.RoundJoin)
-            self.cScene.scenePen = QPen(self._pen)
+            self.cScene.aktifArac.kalem = QPen(self.cScene.aktifArac.cizgiRengi,
+                                               0,
+                                               Qt.SolidLine,
+                                               Qt.FlatCap,
+                                               Qt.RoundJoin)
 
     # ---------------------------------------------------------------------
     @Slot(int)
@@ -7754,8 +7832,6 @@ class DefterAnaPencere(QMainWindow):
         self.change_line_widthF(pen.widthF())
         # self.cizgiKalinligiSlider.setValue(pen.width())
 
-        # self._pen = QPen(pen)
-        # self.cScene.scenePen = QPen(pen)
 
     # ---------------------------------------------------------------------
     def change_line_widthF(self, widthF):
@@ -7827,11 +7903,11 @@ class DefterAnaPencere(QMainWindow):
                 font = QFont(self.cScene.activeItem.font())
 
             else:
-                fg = self.yaziRengi
-                bg = self.arkaPlanRengi
-                cizgiRengi = self.cizgiRengi
-                pen = self._pen
-                font = QFont(self.currentFont)
+                fg = self.cScene.aktifArac.yaziRengi
+                bg = self.cScene.aktifArac.arkaPlanRengi
+                cizgiRengi = self.cScene.aktifArac.cizgiRengi
+                pen = self.cScene.aktifArac.kalem
+                font = QFont(self.cScene.aktifArac.yaziTipi)
 
             presetName = "  {}:  {}pt  {:.1f}px".format(text, font.pointSize(), pen.widthF())
 
@@ -7914,15 +7990,15 @@ class DefterAnaPencere(QMainWindow):
         else:
 
             undoRedo.undoableApplyStylePreset(self.cScene.undoStack, self.tr('apply style preset'),
-                                              eskiPen=self._pen,
+                                              eskiPen=self.cScene.aktifArac.kalem,
                                               yeniPen=style.pen(),
                                               yaziRengi=style.foreground().color(),
-                                              eskiYaziRengi=self.yaziRengi,
+                                              eskiYaziRengi=self.cScene.aktifArac.yaziRengi,
                                               cizgiRengi=style.cizgiRengi(),
-                                              eskiCizgiRengi=self.cizgiRengi,
-                                              eskiArkaPlanRengi=self.arkaPlanRengi,
+                                              eskiCizgiRengi=self.cScene.aktifArac.cizgiRengi,
+                                              eskiArkaPlanRengi=self.cScene.aktifArac.arkaPlanRengi,
                                               yeniArkaPlanRengi=style.background().color(),
-                                              eskiFont=self.currentFont,
+                                              eskiFont=self.cScene.aktifArac.yaziTipi,
                                               yeniFont=style.presetFont(),
                                               scene=self.cScene)
 
@@ -8071,6 +8147,45 @@ class DefterAnaPencere(QMainWindow):
                                                   cizgiRengi=savedPreset[5],
                                                   pen=savedPreset[3],
                                                   font=savedPreset[4])
+
+    # ---------------------------------------------------------------------
+    def act_secili_nesne_stilini_secili_araca_uygula(self):
+
+        self.cScene.aktifArac.font = self.cScene.activeItem.font()
+        self.cScene.aktifArac.kalem = QPen(self.cScene.activeItem._pen)
+        self.cScene.aktifArac.arkaPlanRengi = self.cScene.activeItem.arkaPlanRengi
+        self.cScene.aktifArac.yaziRengi = self.cScene.activeItem.yaziRengi
+        self.cScene.aktifArac.cizgiRengi = self.cScene.activeItem.cizgiRengi
+
+    # ---------------------------------------------------------------------
+    def act_secili_nesne_stilini_kendi_aracina_uygula(self):
+
+        tip = self.cScene.activeItem.type()
+
+        if tip == shared.TEXT_ITEM_TYPE:
+            arac = self.cScene.YaziAraci
+        elif tip == shared.RECT_ITEM_TYPE:
+            arac = self.cScene.DortgenAraci
+        elif tip == shared.PATH_ITEM_TYPE:
+            arac = self.cScene.KalemAraci
+        elif tip == shared.ELLIPSE_ITEM_TYPE:
+            arac = self.cScene.YuvarlakAraci
+        elif tip == shared.LINE_ITEM_TYPE:
+            arac = self.cScene.OkAraci
+        elif tip == shared.IMAGE_ITEM_TYPE:
+            arac = self.cScene.ResimAraci
+        elif tip == shared.VIDEO_ITEM_TYPE:
+            arac = self.cScene.VideoAraci
+        elif tip == shared.DOSYA_ITEM_TYPE:
+            arac = self.cScene.DosyaAraci
+        else:
+            arac = self.cScene.SecimAraci
+
+        arac.font = self.cScene.activeItem.font()
+        arac.kalem = QPen(self.cScene.activeItem._pen)
+        arac.arkaPlanRengi = self.cScene.activeItem.arkaPlanRengi
+        arac.yaziRengi = self.cScene.activeItem.yaziRengi
+        arac.cizgiRengi = self.cScene.activeItem.cizgiRengi
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -8569,9 +8684,11 @@ class DefterAnaPencere(QMainWindow):
         #                   self._pen,
         #                   self.currentFont)
 
-        webItem = Web(item.toHtml(), None, item.scenePos(), item.rect(), self.yaziRengi, self.arkaPlanRengi,
-                      self._pen,
-                      self.currentFont)
+        webItem = Web(item.toHtml(), None, item.scenePos(), item.rect(), 
+                      self.cScene.aktifArac.yaziRengi,
+                      self.cScene.aktifArac.arkaPlanRengi,
+                      self.cScene.aktifArac.kalem,
+                      self.cScene.aktifArac.yaziTip)
 
         undoRedo.undoableAddItem(self.cScene.undoStack, self.tr("convert to web item"), self.cScene, webItem)
 
@@ -10119,15 +10236,18 @@ class DefterAnaPencere(QMainWindow):
                 # imageSavePath = self.cScene.get_unique_path_for_embeded_image("screenshot.jpg")
                 # fmt = "jpg"
                 # originalPixmap.save(imageSavePath, fmt, quality=100)
-                #
+                # 
                 # self.log("Screenshot saved as: {}".format(imageSavePath))
-                #
+                # 
                 # rect = QRectF(originalPixmap.rect())
-                # imageItem = Image(imageSavePath, self.get_mouse_scene_pos(), rect, self.yaziRengi, self.arkaPlanRengi,
-                #                   self._pen, self.currentFont)
-                #
+                # imageItem = Image(imageSavePath, self.get_mouse_scene_pos(), rect, 
+                #                   self.cScene.ResimAraci.yaziRengi, 
+                #                   self.cScene.ResimAraci.arkaPlanRengi,
+                #                   self.cScene.ResimAraci.kalem, 
+                #                   self.cScene.ResimAraci.yaziTipi)
+                # 
                 # imageItem.isEmbeded = True
-                #
+                # 
                 # self.increase_zvalue(imageItem)
                 # undoRedo.undoableAddItem(self.cScene.undoStack, self.tr("_screenshot"), self.cScene, imageItem)
                 # imageItem.reload_image_after_scale()

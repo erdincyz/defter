@@ -390,22 +390,12 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def setYaziRengi(self, col):
-
-        # drawing text after drawing rect does not apply alpha
-        # we need to reconstruct the color with same values.
         self.yaziRengi = col
-        # self.textPen = QPen(QColor().fromRgb(col.red(), col.green(), col.blue(), col.alpha()))
-        # self.textPen = QPen(col)
         self.update()
 
     # ---------------------------------------------------------------------
     def setCizgiKalinligi(self, width):
         self._pen.setWidthF(width)
-        # self.textPen.setWidthF(width)
-
-        # self.selectionPenBottom.setWidthF(width)
-        # self.selectionPenBottomIfAlsoActiveItem.setWidthF(width)
-        # self.selectionPenTop.setWidthF(width)
 
         self.update()
 
