@@ -246,7 +246,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def olustur_nesne_ozellikleriDW(self):
 
-        self.nesneOzellikleriDW = DockWidget(self.tr("Item Properties"), self)
+        self.nesneOzellikleriDW = DockWidget(self.tr("Item & Tool Properties"), self)
         self.nesneOzellikleriDW.setObjectName("nesneOzellikleriDW")
         self.nesneOzellikleriDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.addDockWidget(Qt.RightDockWidgetArea, self.nesneOzellikleriDW)
@@ -4795,20 +4795,16 @@ class DefterAnaPencere(QMainWindow):
         grp = QActionGroup(self.fontToolBar)
         grp.triggered.connect(self.act_yazi_hizala_action)
 
-        self.actionYaziHizalaSola = QAction(QIcon.fromTheme('format-justify-left',
-                                                            QIcon(':icons/icons/format-justify-left.png')),
+        self.actionYaziHizalaSola = QAction(QIcon(':icons/yazi-hizala-sola.png'),
                                             self.tr("Align Left"), grp)
 
-        self.actionYaziHizalaOrtala = QAction(QIcon.fromTheme('format-justify-center',
-                                                              QIcon(':icons/icons/format-justify-center.png')),
+        self.actionYaziHizalaOrtala = QAction(QIcon(':icons/yazi-hizala-ortala.png'),
                                               self.tr("Centered"), grp)
 
-        self.actionYaziHizalaSaga = QAction(QIcon.fromTheme('format-justify-right',
-                                                            QIcon(':icons/icons/format-justify-right.png')),
+        self.actionYaziHizalaSaga = QAction(QIcon(':icons/yazi-hizala-saga.png'),
                                             self.tr("Align Right"), grp)
 
-        self.actionYaziHizalaSigdir = QAction(QIcon.fromTheme('format-justify-fill',
-                                                              QIcon(':icons/icons/format-justify-fill.png')),
+        self.actionYaziHizalaSigdir = QAction(QIcon(':icons/yazi-hizala-sigdir.png'),
                                               self.tr("Justify"), grp)
 
         self.actionYaziHizalaSola.setShortcut(Qt.CTRL + Qt.Key_L)
@@ -7424,11 +7420,11 @@ class DefterAnaPencere(QMainWindow):
         font = QFont("serif", 13, QFont.Bold)
 
         pix.fill(Qt.transparent)
-        pixFont = QPixmap(16, 16)
+        # ~ pixFont = QPixmap(16, 16)
         painterTC = QPainter(pix)
         painterTC.setFont(font)
         painterTC.setPen(yaziRengi)
-        painterTC.drawText(pixFont.rect(), Qt.AlignCenter, "A")
+        painterTC.drawText(pix.rect(), Qt.AlignCenter, "A")
         # painterTC.drawRect(0, 0, 15, 15)
         painterTC.end()
         painterTC = None

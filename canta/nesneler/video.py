@@ -626,8 +626,9 @@ class VideoItem(BaseItem):
         else:  # dosya html olarak baska bir yere kaydediliyor
             # kopyalanmazsa da, zaten embed olmayan video normal hddeki adresten yuklenecektir.
             if video_kopyalaniyor_mu:
-                if not self.isEmbeded:  # embed ise zaten tmp klasorden hedef klasore baska metodta kopylanıyor hepsi.
-                    video_adres = os.path.join(html_klasor_kayit_adres, "videos", video_adi)
+                # iptal: if not self.isEmbeded:  # embed ise zaten tmp klasorden hedef klasore baska metodta kopylanıyor hepsi.
+                # embed veya degil, yukarda bahsettigi gibi video kopyalansa da adresi de guncellemek lazim.
+                video_adres = os.path.join(html_klasor_kayit_adres, "videos", video_adi)
 
         # video_str = f'<video src="{self.filePathForSave}" width:{self.videoItem.size().width()};' \
         #             f' height{self.videoItem.size().height()}"></video>'

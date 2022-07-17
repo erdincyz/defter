@@ -590,8 +590,9 @@ class Image(BaseItem):
         else:  # dosya html olarak baska bir yere kaydediliyor
             # kopyalanmazsa da, zaten embed olmayan resim normal hddeki adresten yuklenecektir.
             if resim_kopyalaniyor_mu:
-                if not self.isEmbeded:  # embed ise zaten tmp klasorden hedef klasore baska metodta kopylanıyor hepsi.
-                    resim_adres = os.path.join(html_klasor_kayit_adres, "images", resim_adi)
+                # iptal: if not self.isEmbeded:  # embed ise zaten tmp klasorden hedef klasore baska metodta kopylanıyor hepsi.
+                # embed veya degil, yukarda bahsettigi gibi resim kopyalansa da adresi de guncellemek lazim.
+                resim_adres = os.path.join(html_klasor_kayit_adres, "images", resim_adi)
 
         img_str = f'<img src="{resim_adres}" style="width:100%; height:100%;"></img>'
 

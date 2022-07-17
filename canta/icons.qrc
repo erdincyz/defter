@@ -102,6 +102,10 @@
         <file>icons/ic-sayfa.png</file>
         <file>icons/ic-sayfa-yesil.png</file>
         <file>icons/sil-sayfa.png</file>
+        <file>icons/yazi-hizala-sola.png</file>
+        <file>icons/yazi-hizala-ortala.png</file>
+        <file>icons/yazi-hizala-saga.png</file>
+        <file>icons/yazi-hizala-sigdir.png</file>
         <file>icons/stylesheet/branch-closed.png</file>
         <file>icons/stylesheet/branch-end.png</file>
         <file>icons/stylesheet/branch-more.png</file>
