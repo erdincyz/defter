@@ -248,7 +248,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.nesneOzellikleriDW = DockWidget(self.tr("Item & Tool Properties"), self)
         self.nesneOzellikleriDW.setObjectName("nesneOzellikleriDW")
-        self.nesneOzellikleriDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        # self.nesneOzellikleriDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.addDockWidget(Qt.RightDockWidgetArea, self.nesneOzellikleriDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
@@ -766,7 +766,7 @@ class DefterAnaPencere(QMainWindow):
     def olustur_stillerDW(self):
         self.stillerDW = DockWidget(self.tr("Style Presets"), self)
         self.stillerDW.setObjectName("stillerDockWidget")
-        self.stillerDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        # self.stillerDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.addDockWidget(Qt.RightDockWidgetArea, self.stillerDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
@@ -1092,7 +1092,7 @@ class DefterAnaPencere(QMainWindow):
     def olustur_sayfalarDW(self):
         self.sayfalarDW = DockWidget(self.tr("Pages"), self)
         self.sayfalarDW.setObjectName("sayfalarDockWidget")
-        self.sayfalarDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        # self.sayfalarDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.addDockWidget(Qt.LeftDockWidgetArea, self.sayfalarDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
@@ -1174,7 +1174,7 @@ class DefterAnaPencere(QMainWindow):
     def olustur_kutuphaneDW(self):
         self.kutuphaneDW = DockWidget(self.tr("Library"), self)
         self.kutuphaneDW.setObjectName("kutuphaneDockWidget")
-        self.kutuphaneDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea | Qt.BottomDockWidgetArea)
+        # self.kutuphaneDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea | Qt.BottomDockWidgetArea)
         self.addDockWidget(Qt.LeftDockWidgetArea, self.kutuphaneDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
@@ -1432,7 +1432,8 @@ class DefterAnaPencere(QMainWindow):
                 # if not parentItem:
                 #     self.log(self.tr("Please select a page."))
                 #     return
-            satir = self.sayfalarDWTreeView.getSelectedItem().satir()
+            # satir = self.sayfalarDWTreeView.getSelectedItem().satir()
+            satir = parentItem.satirSayisi()-1
             sayfa = self.cModel.sayfa_ekle(satir=satir,
                                            scene=scene,
                                            view=view,
