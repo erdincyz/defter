@@ -6,6 +6,8 @@ __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
 import os
+from unicodedata import normalize
+from re import sub
 from uuid import uuid4
 
 from PySide6.QtCore import Qt
@@ -50,6 +52,26 @@ YUVARLAK_FIRCA_BOYUTU_ITEM_TYPE = userType + 15
 def kim(kac_basamak):
     # veya str(uuid.uuid4())[:5] yerine uuid.uuid4().hex[:5]
     return uuid4().hex[:kac_basamak]
+
+
+# ---------------------------------------------------------------------
+def slugify(value, allow_unicode=False):
+    # veya = "".join([x if x.isalnum() else "_" for x in value])
+    # return veya
+    """
+    Taken from https://github.com/django/django/blob/master/django/utils/text.py
+    Convert to ASCII if 'allow_unicode' is False. Convert spaces or repeated
+    dashes to single dashes. Remove characters that aren't alphanumerics,
+    underscores, or hyphens. Convert to lowercase. Also strip leading and
+    trailing whitespace, dashes, and underscores.
+    """
+    value = str(value)
+    if allow_unicode:
+        value = normalize('NFKC', value)
+    else:
+        value = normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+    value = sub(r'[^\w\s-]', '', value.lower())
+    return sub(r'[-\s]+', '-', value).strip('-_')
 
 
 # ---------------------------------------------------------------------

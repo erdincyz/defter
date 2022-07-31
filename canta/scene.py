@@ -443,14 +443,14 @@ class Scene(QGraphicsScene):
                     if ustuneCizilenResimNesnesi:
                         self.undoStack.beginMacro(self.tr("draw on image"))
                         undoRedo.undoableAddItem(self.undoStack, description=self.tr("add path"), scene=self,
-                                                 item=self.pathItem, sec=False)
+                                                 item=self.pathItem)
                         yeniPos = ustuneCizilenResimNesnesi.mapFromScene(self.pathItem.scenePos())
                         undoRedo.undoableParent(self.undoStack, self.tr("_parent"), self.pathItem,
                                                 ustuneCizilenResimNesnesi, yeniPos)
                         self.undoStack.endMacro()
                     else:
                         undoRedo.undoableAddItem(self.undoStack, description=self.tr("add path"), scene=self,
-                                                 item=self.pathItem, sec=False)
+                                                 item=self.pathItem)
 
                     self.pathItem = None
                 else:

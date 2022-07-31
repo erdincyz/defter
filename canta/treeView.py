@@ -43,7 +43,7 @@ class TreeView(QTreeView):
     def __init__(self, parent=None):
 
         super(TreeView, self).__init__(parent)
-        self.setAlternatingRowColors(True)
+        # self.setAlternatingRowColors(True)
         self.setAnimated(True)
         # self.setIndentation(20)
         # self.setSortingEnabled(False)
@@ -62,8 +62,9 @@ class TreeView(QTreeView):
         self.setItemsExpandable(True)
 
         # self.setRootIsDecorated(True)
-        # self.setUniformRowHeights(True)
-        self.setIconSize(QSize(128, 128))
+        self.setUniformRowHeights(True)
+        self.setIconSize(QSize(48, 48))
+        # print(self.indentation())  # 20
 
         # self.header().setStretchLastSection(False)
         # self.header().setSectionResizeMode(QHeaderView.Interactive)
@@ -87,123 +88,9 @@ class TreeView(QTreeView):
 
         # self.setContextMenuPolicy()
 
-        # ---------------------------------------------------------------------
-        # css_stil = """
-        # QTreeView::branch {
-        #         /* background: palette(base);*/
-        #        /* background: #99bbdd;*/
-        #        /* background: #deefff;*/
-        # }
-        # QTreeView::branch:has-siblings:!adjoins-item {
-        #     /*background: cyan;*/
-        #     background: lightgreen;
-        #     border-image: url(:icons/stylesheet/vline.png) 0;
-        #
-        #
-        # }
-        # QTreeView::branch:has-siblings:adjoins-item {
-        #     /*background: red;*/
-        #    /* background: #99bbdd;*/
-        #     background: #deefff;
-        #     border-image: url(:icons/stylesheet/branch-more.png) 0;
-        # }
-        #
-        # QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-        # /*background: blue;*/
-        # background: #deefff;
-        #     border-image: url(:icons/stylesheet/branch-end.png) 0;
-        # }
-        #
-        #
-        # /*kapali dal*/
-        # QTreeView::branch:has-children:!has-siblings:closed,
-        # QTreeView::branch:closed:has-children:has-siblings {
-        #         /*border-image: none;*/
-        #         border-image: url(:icons/stylesheet/vline.png) 0;
-        #         /*background: pink;*/
-        #         /*background: #777777;*/
-        #         image: url(:icons/stylesheet/branch-closed.png);
-        # }
-        #
-        # QTreeView::branch:open:has-children:!has-siblings,
-        # QTreeView::branch:open:has-children:has-siblings  {
-        #     background: #11dd11;
-        #     background: lightgreen;
-        #     /*border-image: none;*/
-        #     border-image: url(:icons/stylesheet/vline.png) 0;
-        #     image: url(:icons/stylesheet/branch-open.png);
-        # }
-        #
-        # /*dal acik, ic sayfa var ama kendi seviyesinde baska yok*/
-        # /*QTreeView::branch:open:has-children:!has-siblings {
-        # background: green;}*/
-        #
-        # /*dal kapali, ic sayfa var ama kendi seviyesinde baska yok*/
-        # /*QTreeView::branch:closed:has-children:!has-siblings {
-        #
-        #     background: gray;
-        # }*/
-        #
-        # """
-        # ---------------------------------------------------------------------
-
-        css_stil = """
-                QTreeView::branch {
-                background: #eeffdf;
-                }
-
-                QTreeView::branch:has-siblings:!adjoins-item {
-                    background: #eeffdf;
-                }
-
-                QTreeView::branch:has-siblings:adjoins-item {
-                    background: #efeffe;
-                }
-
-                QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-                    background: #efeffe;
-                }
-
-                /*kapali dal*/
-                QTreeView::branch:has-children:!has-siblings:closed,
-                QTreeView::branch:closed:has-children:has-siblings {
-                        background: #efeffe;
-                        image: url(:icons/stylesheet/branch-closed.png);
-                }
-
-                QTreeView::branch:open:has-children:!has-siblings,
-                QTreeView::branch:open:has-children:has-siblings  {
-                    background: #eeffdf;
-                    image: url(:icons/stylesheet/branch-open.png);
-                }
-
-                /*dal acik, ic sayfa var ama kendi seviyesinde baska yok*/
-                /*QTreeView::branch:open:has-children:!has-siblings {
-                    background: #eeffdf;
-                }*/
-
-                /*dal kapali, ic sayfa var ama kendi seviyesinde baska yok*/
-                /*QTreeView::branch:closed:has-children:!has-siblings {
-                    background: #eeffdf;
-                }*/
-
-                """
-
         self.setStyle(YeniStil())
-        self.setStyleSheet(css_stil)
-
-    # def resizeEvent(self, event):
-    #     self.boyut_degisti.emit()
-    #     self.itemDelegate().satirYuksekligi = event.size().width() /2
-    #     self.model().layoutChanged.emit()
-    #     return super(TreeView, self).resizeEvent(event)
-
-    # ---------------------------------------------------------------------
-    def get_properties_for_save(self):
-        properties = {"iconSize": self.iconSize(),
-                      "satirYuksekligi": self.itemDelegate().satirYuksekligi,
-                      }
-        return properties
+        # css_stil = 'QTreeView::item {margin-bottom: 20px;} QTreeView::item:!has-children {margin-bottom: 20px;}'
+        # self.setStyleSheet(css_stil)
 
     # ---------------------------------------------------------------------
     def contextMenuEvent(self, event):
@@ -223,32 +110,20 @@ class TreeView(QTreeView):
 
         if action == actionListe:
             size = QSize(20, 20)
-            satirYuksekligi = 20
             self.setIconSize(size)
-            self.itemDelegate().satirYuksekligi = satirYuksekligi
             self.model().treeViewIconSize = size
-            self.model().treeViewSatirYuksekligi = satirYuksekligi
         elif action == actionResimKucuk:
             size = QSize(48, 48)
-            satirYuksekligi = 48
             self.setIconSize(size)
-            self.itemDelegate().satirYuksekligi = satirYuksekligi
             self.model().treeViewIconSize = size
-            self.model().treeViewSatirYuksekligi = satirYuksekligi
         elif action == actionResimOrta:
             size = QSize(128, 128)
-            satirYuksekligi = 128
             self.setIconSize(size)
-            self.itemDelegate().satirYuksekligi = satirYuksekligi
             self.model().treeViewIconSize = size
-            self.model().treeViewSatirYuksekligi = satirYuksekligi
         elif action == actionResimBuyuk:
             size = QSize(256, 256)
-            satirYuksekligi = 256
             self.setIconSize(size)
-            self.itemDelegate().satirYuksekligi = satirYuksekligi
             self.model().treeViewIconSize = size
-            self.model().treeViewSatirYuksekligi = satirYuksekligi
 
     # # ---------------------------------------------------------------------
     # def mousePressEvent(self, e):
@@ -297,7 +172,7 @@ class TreeView(QTreeView):
         # self.secimDegisti.emit(self.model().itemFromIndex(QItemSelection),
         #                        self.model().itemFromIndex(QItemSelection_1))
         # TODO: burda niye yukardaki selected kullanamadık?
-        sayfa = self.getSelectedItem()
+        sayfa = self.get_selected_sayfa()
         if sayfa:
             self.secimDegisti.emit(sayfa)
             # TODO: performans optimize et, direkt inde mi kullanmak ,veya key pressed ile secilince scroll etmeceç
@@ -371,7 +246,6 @@ class TreeView(QTreeView):
     #     else:
     #         event.ignore()
     ########################################################################
-
     def dragEnteerEvent(self, event):
         # event.setDropAction(Qt.MoveAction)
         # event.acceptProposedAction()
@@ -384,7 +258,7 @@ class TreeView(QTreeView):
         else:
             event.ignore()
 
-    #
+    # ---------------------------------------------------------------------
     def dragMooveEvent(self, event):
         # print(event.mimeData().formats())
         event.setDropAction(Qt.MoveAction)
@@ -392,6 +266,7 @@ class TreeView(QTreeView):
         # print(dropIndicatorPos)
         event.accept()
 
+    # ---------------------------------------------------------------------
     def dropEvent(self, event):
         # if event.source():
         #     print(event.source())
@@ -496,14 +371,14 @@ class TreeView(QTreeView):
 
         for s in ustSayfa.ic_sayfalar():
             if s == sayfa:
-                self.itemi_sec_ve_current_index_yap(sayfa)
+                self.sayfayi_sec_ve_current_index_yap(sayfa)
                 break
             else:
                 if s.ic_sayfalar():
                     self._sayfa_bul_ve_sec(s, sayfa)
 
     # ---------------------------------------------------------------------
-    def itemi_sec_ve_current_index_yap(self, sayfa):
+    def sayfayi_sec_ve_current_index_yap(self, sayfa):
 
         # TODO: bu alttaki methodlarda cok biribiri arası zıplama var
         # optimize edemez miyiz acaba.. İnş. sonra tabi. ..
@@ -519,18 +394,18 @@ class TreeView(QTreeView):
         # print(self.model().enSonAktifSayfa.adi)
 
     # ---------------------------------------------------------------------
-    def current_index_yap(self, sayfa):
+    def sayfayi_current_index_yap(self, sayfa):
         # self.setCurrentIndex(self.model().indexFromItem(sayfa))
         idx = self.model().index_sayfadan(sayfa)
         self.selectionModel().setCurrentIndex(idx, QItemSelectionModel.ClearAndSelect)
 
-    # ---------------------------------------------------------------------
-    def itemi_secme(self, sayfa):
-        self.selectionModel().select(self.model().sayfada_index(sayfa),
-                                     self.selectionModel().Deselect)
+    # # ---------------------------------------------------------------------
+    # def sayfayi_secme(self, sayfa):
+    #     self.selectionModel().select(self.model().sayfada_index(sayfa),
+    #                                  self.selectionModel().Deselect)
 
     # ---------------------------------------------------------------------
-    def itemi_expand_et(self, sayfa, ackapa=True):
+    def sayfayi_expand_et(self, sayfa, ackapa=True):
         # print("expand")
         # idx = self.model().index_sayfadan(sayfa.parent())
         idx = self.model().index_sayfadan(sayfa)
@@ -539,7 +414,7 @@ class TreeView(QTreeView):
         # self.update()
 
     # ------------------------------------------------------------------------------
-    def getSelectedItem(self):
+    def get_selected_sayfa(self):
         # TODO: ana kodta selected index kontrollerini kaldir, gerci bu sefer if not none denecek..
         # bi standartlastiralim bunu.
         if self.selectedIndexes():
@@ -548,18 +423,18 @@ class TreeView(QTreeView):
             return sayfa
 
         # else:
-        #     return self.getCurrentItem()
+        #     return self.get_current_sayfa()
         # return None
         return self.model().kokSayfa
 
     # ------------------------------------------------------------------------------
-    def getCurrentItem(self):
+    def get_current_sayfa(self):
         sayfa = self.model().sayfa_indexten(self.currentIndex())
         return sayfa
 
     # ------------------------------------------------------------------------------
-    def getSelectedItemsParentItem(self):
-        sayfa = self.getSelectedItem()
+    def get_selected_sayfanin_parent_sayfasi(self):
+        sayfa = self.get_selected_sayfa()
         if sayfa:
             if sayfa.parent():
                 return sayfa.parent()

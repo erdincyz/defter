@@ -77,7 +77,6 @@ from canta.listWidgetItem import ListWidgetItem, ListWidgetItemDelegate
 from canta.threadWorkers import DownloadWorker
 from canta.htmlParsers import ImgSrcParser
 from canta.treeView import TreeView
-from canta.treeDelegate import TreeDelegate
 from canta.treeSayfa import Sayfa
 from canta.pushButton import PushButton, PushButtonRenk
 from canta.yuzenWidget import YuzenWidget
@@ -1120,8 +1119,6 @@ class DefterAnaPencere(QMainWindow):
         self.sayfalarDWTreeView = TreeView(base)
         # self.sayfalarDWTreeModel = TreeModel(self.sayfalarDWTreeView)
         # self.sayfalarDWTreeView.setModel(self.sayfalarDWTreeModel)
-        delegate = TreeDelegate(self.sayfalarDWTreeView)
-        self.sayfalarDWTreeView.setItemDelegate(delegate)
 
         # for column in range(self.sayfalarDWTreeModel.columnCount()):
         #     self.sayfalarDWTreeView.resizeColumnToContents(column)
@@ -1350,8 +1347,8 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def ekle_sil_butonlari_guncelle(self):
 
-        # secilenSayfa = self.sayfalarDWTreeView.getSelectedItem()
-        secilenSayfa = self.sayfalarDWTreeView.getCurrentItem()
+        # secilenSayfa = self.sayfalarDWTreeView.get_selected_sayfa()
+        secilenSayfa = self.sayfalarDWTreeView.get_current_sayfa()
         # self.tw_sayfa_sil_btn.setEnabled(True)
         if secilenSayfa.ic_sayfa_var_mi():
             self.tw_sayfa_sil_btn.setEnabled(False)
@@ -1425,26 +1422,25 @@ class DefterAnaPencere(QMainWindow):
 
         with signals_updates_blocked(self.sayfalarDWTreeView):
             scene, view = self.create_scene(self.cModel.tempDirPath)
-            # parentItem = self.sayfalarDWTreeView.getSelectedItemsParentItem()
+            # parentItem = self.sayfalarDWTreeView.get_selected_sayfanin_parent_sayfasi()
             if not parentItem:
-                parentItem = self.sayfalarDWTreeView.getSelectedItemsParentItem()
-                # parentItem = self.sayfalarDWTreeView.getCurrentItem()
+                parentItem = self.sayfalarDWTreeView.get_selected_sayfanin_parent_sayfasi()
+                # parentItem = self.sayfalarDWTreeView.get_current_sayfa()
                 # if not parentItem:
                 #     self.log(self.tr("Please select a page."))
                 #     return
-            # satir = self.sayfalarDWTreeView.getSelectedItem().satir()
+            # satir = self.sayfalarDWTreeView.get_selected_sayfa().satir()
             satir = parentItem.satirSayisi()-1
             sayfa = self.cModel.sayfa_ekle(satir=satir,
                                            scene=scene,
                                            view=view,
                                            ustSayfa=parentItem,
-                                           ikon_boyut=128,
                                            ikon=self.tw_get_page_as_icon()
                                            )
 
             # self.sayfalarDWTreeView.clearSelection()
             # root.setSelected(True)
-            self.sayfalarDWTreeView.itemi_sec_ve_current_index_yap(sayfa)
+            self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(sayfa)
             # self.sayfalarDWTreeView.scrollTo(self.cModel.index_sayfadan(sayfa),
             #                                  self.sayfalarDWTreeView.EnsureVisible)  # PositionAtCenter
 
@@ -1465,8 +1461,8 @@ class DefterAnaPencere(QMainWindow):
     def tw_alt_sayfa_ekle(self, parentItem=None):
 
         with signals_updates_blocked(self.sayfalarDWTreeView):
-            if not parentItem:
-                parentItem = self.sayfalarDWTreeView.getCurrentItem()
+            if not parentItem:  # arayuzden altsayfa ekliyoruz, yoksa dosya yuklenirken parentItem geliyor zaten
+                parentItem = self.sayfalarDWTreeView.get_current_sayfa()
                 if not parentItem:
                     self.log(self.tr("Please select a page."))
                     return
@@ -1477,20 +1473,19 @@ class DefterAnaPencere(QMainWindow):
             # self.cScene = scene
             # self.cView = view
 
-            # parentItem = self.sayfalarDWTreeView.getCurrentItem()
-            # parentItem = self.sayfalarDWTreeView.getSelectedItem()
-            # satir = self.sayfalarDWTreeView.getSelectedItem().satir()
+            # parentItem = self.sayfalarDWTreeView.get_current_sayfa()
+            # parentItem = self.sayfalarDWTreeView.get_selected_sayfa()
+            # satir = self.sayfalarDWTreeView.get_selected_sayfa().satir()
             sayfa = self.cModel.sayfa_ekle(scene=scene,
                                            view=view,
                                            ustSayfa=parentItem,
-                                           ikon_boyut=128,
                                            ikon=self.tw_get_page_as_icon())
 
-            # self.sayfalarDWTreeView.itemi_sec_ve_current_index_yap(sayfa.parent())
-            self.sayfalarDWTreeView.itemi_sec_ve_current_index_yap(sayfa)
+            # self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(sayfa.parent())
+            self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(sayfa)
 
-        self.sayfalarDWTreeView.itemi_expand_et(parentItem)
-        # self.sayfalarDWTreeView.itemi_expand_et(sayfa.parent())
+        self.sayfalarDWTreeView.sayfayi_expand_et(parentItem)
+        # self.sayfalarDWTreeView.sayfayi_expand_et(sayfa.parent())
         self.tv_sayfa_degistir(sayfa)
 
         self.ekle_sil_butonlari_guncelle()
@@ -1503,7 +1498,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def tw_sayfa_sil(self):
 
-        sayfa = self.sayfalarDWTreeView.getCurrentItem()
+        sayfa = self.sayfalarDWTreeView.get_current_sayfa()
 
         if sayfa == self.cModel.kokSayfa:  # hep bir sayfa donuyor yoksa kokSayfa donuyor, kok sayfa da gorunmez ya
             self.log(self.tr("Please select a page."))
@@ -1519,8 +1514,8 @@ class DefterAnaPencere(QMainWindow):
         self.cModel.enSonAktifSayfa = None
 
         # self.tv_sayfa_degistir(self.sayfalarDWTreeView.currentItem())
-        # self.sayfalarDWTreeView.itemi_sec_ve_current_index_yap(parentSayfa)
-        self.tv_sayfa_degistir(self.sayfalarDWTreeView.getCurrentItem())
+        # self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(parentSayfa)
+        self.tv_sayfa_degistir(self.sayfalarDWTreeView.get_current_sayfa())
 
         # silinen satirin(sayfanin scene ve viewi temizleniyor)
         scene.undoStack.clear()
@@ -1608,8 +1603,8 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def tw_sayfa_guncelle(self):
         # SelectedIndexes[0] yerine curentIndex() ten item donduren metodlari kullanmak bir tik daha iyi olabilir.
-        # self.sayfalarDWTreeView.getSelectedItem().ikon = QIcon(self.tw_get_page_as_pixmap(self.cView))
-        self.sayfalarDWTreeView.getCurrentItem().ikon = self.tw_get_page_as_icon()
+        # self.sayfalarDWTreeView.get_selected_sayfa().ikon = QIcon(self.tw_get_page_as_pixmap(self.cView))
+        self.sayfalarDWTreeView.get_current_sayfa().ikon = self.tw_get_page_as_icon()
         idx = self.sayfalarDWTreeView.currentIndex()
         self.sayfalarDWTreeView.dataChanged(idx, idx)
         # TODO: burda thumbnailleri preview olarak kaydetsek mi tmp klasore,
@@ -1628,7 +1623,6 @@ class DefterAnaPencere(QMainWindow):
         # pixmap = pixmap.scaled(128,128,Qt.KeepAspectRatioByExpanding, Qt.FastTransformation)
         # pixmap = pixmap.scaledToWidth(self.sayfalarDWTreeView.width(), Qt.FastTransformation)
         pixmap = pixmap.scaledToWidth(128, Qt.FastTransformation)
-
         return QIcon(pixmap)
 
     # ---------------------------------------------------------------------
@@ -1737,9 +1731,8 @@ class DefterAnaPencere(QMainWindow):
             with signals_blocked(self.actionAlwaysOnTopToggle):
                 self.actionAlwaysOnTopToggle.setChecked(int(self.settings.value("alwaysOnTop", False)))
             self.ekranKutuphane.setBackgroundBrush(self.settings.value("kutuphaneArkaPlanRengi", QColor(Qt.lightGray)))
-            self.sayfalarDWTreeView.setIconSize(self.settings.value("treeViewIconSize", QSize(48, 48)))
-            self.sayfalarDWTreeView.itemDelegate().satirYuksekligi = int(
-                self.settings.value("treeViewSatirYuksekligi", 48))
+            self.cModel.treeViewIkonBoyutu = self.settings.value("treeViewIkonBoyutu", QSize(48, 48))
+            self.sayfalarDWTreeView.setIconSize(self.cModel.treeViewIkonBoyutu)
 
         self.settings.endGroup()
 
@@ -1764,8 +1757,7 @@ class DefterAnaPencere(QMainWindow):
         self.settings.setValue("winState", self.saveState(0))  # version=0
         self.settings.setValue("alwaysOnTop", shared.unicode_to_bool(self.actionAlwaysOnTopToggle.isChecked()))
         self.settings.setValue("kutuphaneArkaPlanRengi", self.ekranKutuphane.backgroundBrush().color())
-        self.settings.setValue("treeViewIconSize", self.cModel.treeViewIconSize)
-        self.settings.setValue("treeViewSatirYuksekligi", self.cModel.treeViewSatirYuksekligi)
+        self.settings.setValue("treeViewIkonBoyutu", self.cModel.treeViewIkonBoyutu)
 
         self.settings.endGroup()
 
@@ -2070,7 +2062,6 @@ class DefterAnaPencere(QMainWindow):
                                        scene=scene,
                                        view=view,
                                        ustSayfa=parentItem,
-                                       ikon_boyut=128,
                                        ikon=self.tw_get_page_as_icon()
                                        )
 
@@ -2078,7 +2069,7 @@ class DefterAnaPencere(QMainWindow):
 
         # bu sayfa degistiri cagircak o da ilk widgeti ekeleycek.
         with signals_blocked(self.sayfalarDWTreeView):
-            self.sayfalarDWTreeView.itemi_sec_ve_current_index_yap(sayfa)
+            self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(sayfa)
 
         # print(self.tabWidget.currentIndex(), "iindexx")
         # self.sayfalarDWTreeView.setUpdatesEnabled(True)
@@ -2183,7 +2174,7 @@ class DefterAnaPencere(QMainWindow):
     # hale gelince durumunu unutmamak lazım
     def star_modified_scenes(self, temiz_mi):
         # self.sayfalarDWTreeView.blockSignals(True)
-        sayfa = self.sayfalarDWTreeView.getCurrentItem()
+        sayfa = self.sayfalarDWTreeView.get_current_sayfa()
         itemText = sayfa.adi
 
         if temiz_mi:
@@ -2218,7 +2209,7 @@ class DefterAnaPencere(QMainWindow):
     def pencere_ve_tab_yazilarini_guncelle(self):
         # TODO: ilk acilista 2 defa cagriliyor ard arda.
         idx = self.tabWidget.currentIndex()
-        yazi = "{} - {}".format(self.cModel.fileName, self.sayfalarDWTreeView.getCurrentItem().adi.replace("★ ", ""))
+        yazi = "{} - {}".format(self.cModel.fileName, self.sayfalarDWTreeView.get_current_sayfa().adi.replace("★ ", ""))
 
         self.setWindowTitle("%s %s  -  %s" % ("Defter", VERSION, yazi))
 
@@ -2250,13 +2241,12 @@ class DefterAnaPencere(QMainWindow):
             with signals_blocked(self.sayfalarDWTreeView):
                 self.sayfalarDWTreeView.setModel(self.cModel)
 
-                self.sayfalarDWTreeView.setIconSize(self.cModel.treeViewIconSize)
-                self.sayfalarDWTreeView.itemDelegate().satirYuksekligi = self.cModel.treeViewSatirYuksekligi
+                self.sayfalarDWTreeView.setIconSize(self.cModel.treeViewIkonBoyutu)
 
                 if self.cModel.enSonAktifSayfa:
-                    # self.sayfalarDWTreeView.itemi_sec_ve_current_index_yap(self.cModel.enSonAktifSayfa)
-                    self.sayfalarDWTreeView.current_index_yap(self.cModel.enSonAktifSayfa)
-                    self.sayfalarDWTreeView.itemi_expand_et(self.cModel.enSonAktifSayfa.parent())
+                    # self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(self.cModel.enSonAktifSayfa)
+                    self.sayfalarDWTreeView.sayfayi_current_index_yap(self.cModel.enSonAktifSayfa)
+                    self.sayfalarDWTreeView.sayfayi_expand_et(self.cModel.enSonAktifSayfa.parent())
 
             self.cView = self.tabWidget.currentWidget()
             self.cScene = self.cView.scene()
@@ -2419,8 +2409,8 @@ class DefterAnaPencere(QMainWindow):
                 # TODO : bu alltakine bak
                 self.cScene.unite_with_scene_rect(sceneDict["sceneRect"])
 
-            self.sayfalarDWTreeView.itemi_expand_et(self.cModel.enSonAktifSayfa)
-            # self.sayfalarDWTreeView.itemi_expand_et(sayfa.parent())
+            self.sayfalarDWTreeView.sayfayi_expand_et(self.cModel.enSonAktifSayfa)
+            # self.sayfalarDWTreeView.sayfayi_expand_et(sayfa.parent())
             # self.tv_sayfa_degistir(sayfa)
 
             self.ekle_sil_butonlari_guncelle()
@@ -2591,7 +2581,8 @@ class DefterAnaPencere(QMainWindow):
                 lineItem._kim = itemDict.get("kim")
                 lineItem.baglanmis_nesneler = itemDict.get("baglanmis_nesneler")
                 # self.cScene.addItem(lineItem)
-                undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, lineItem)
+                # undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, lineItem)
+                self.cScene.addItem(lineItem)
             return lineItem
 
         elif itemType == shared.RECT_ITEM_TYPE:
@@ -2615,7 +2606,8 @@ class DefterAnaPencere(QMainWindow):
             else:
                 rectItem._kim = itemDict.get("kim")
                 # self.cScene.addItem(rectItem)
-                undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, rectItem)
+                # undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, rectItem)
+                self.cScene.addItem(rectItem)
                 # rectItem.setPos(itemDict["pos"])
             return rectItem
 
@@ -2638,7 +2630,8 @@ class DefterAnaPencere(QMainWindow):
             else:
                 ellipseItem._kim = itemDict.get("kim")
                 # self.cScene.addItem(ellipseItem)
-                undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, ellipseItem)
+                # undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, ellipseItem)
+                self.cScene.addItem(ellipseItem)
             return ellipseItem
 
         elif itemType == shared.PATH_ITEM_TYPE:
@@ -2662,7 +2655,8 @@ class DefterAnaPencere(QMainWindow):
             else:
                 pathItem._kim = itemDict.get("kim")
                 # self.cScene.addItem(pathItem)
-                undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, pathItem)
+                # undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, pathItem)
+                self.cScene.addItem(pathItem)
 
             return pathItem
 
@@ -2708,7 +2702,8 @@ class DefterAnaPencere(QMainWindow):
             else:
                 imageItem._kim = itemDict.get("kim")
                 # self.cScene.addItem(imageItem)
-                undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, imageItem)
+                # undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, imageItem)
+                self.cScene.addItem(imageItem)
             imageItem.reload_image_after_scale()
             # pixMap = None
             return imageItem
@@ -2740,7 +2735,8 @@ class DefterAnaPencere(QMainWindow):
             else:
                 textItem._kim = itemDict.get("kim")
                 # self.cScene.addItem(textItem)
-                undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, textItem)
+                # undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, textItem)
+                self.cScene.addItem(textItem)
             textItem.setTextInteractionFlags(Qt.NoTextInteraction)
             cursor = textItem.textCursor()
             cursor.clearSelection()
@@ -2769,7 +2765,8 @@ class DefterAnaPencere(QMainWindow):
             else:
                 groupItem._kim = itemDict.get("kim")
                 # self.cScene.addItem(groupItem)
-                undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, groupItem)
+                # undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, groupItem)
+                self.cScene.addItem(groupItem)
             return groupItem
 
         elif itemType == shared.VIDEO_ITEM_TYPE:
@@ -2811,7 +2808,8 @@ class DefterAnaPencere(QMainWindow):
             else:
                 videoItem._kim = itemDict.get("kim")
                 # self.cScene.addItem(videoItem)
-                undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, videoItem)
+                # undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, videoItem)
+                self.cScene.addItem(videoItem)
             # videoItem.reload_image_after_scale()
             # pixMap = None
             return videoItem
@@ -2855,7 +2853,8 @@ class DefterAnaPencere(QMainWindow):
             else:
                 dosyaNesnesi._kim = itemDict.get("kim")
                 # self.cScene.addItem(dosyaNesnesi)
-                undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, dosyaNesnesi)
+                # undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, dosyaNesnesi)
+                self.cScene.addItem(dosyaNesnesi)
             # videoItem.reload_image_after_scale()
             # pixMap = None
             return dosyaNesnesi
@@ -2929,17 +2928,13 @@ class DefterAnaPencere(QMainWindow):
     def _dict_to_scene(self, sceneDict, parent, altSayfaSeklindeEkle):
         if altSayfaSeklindeEkle:
             sayfa = self.tw_alt_sayfa_ekle(parentItem=parent)
-            # self.sayfalarDWTreeView.itemi_sec_ve_current_index_yap(sayfa)
-            # parentItem = self.sayfalarDWTreeView.getSelectedItemsParentItem()
         else:
             sayfa = self.tw_sayfa_ekle(parentItem=parent)
 
-        # bu biraz hafif kaldi, secimi bozacak degistircek bi durumda ise yaramayabilir.
-        # sinyali blockluyoruz cunku, tv_nesne_degisti cagriliyor hemen ardindan orda da undoSayfaAdiDegistir cagriliyor
-        # dolayisi ile sayfa modifed oluyor ve de tab ta dolayisi ile modified oluyor ilk açılışta.
-        with signals_blocked(self.sayfalarDWTreeView):
-            # self.sayfalarDWTreeView.getSelectedItem().adi = sceneDict["sayfaAdi"]
-            self.sayfalarDWTreeView.getCurrentItem().adi = sceneDict["sayfaAdi"]
+        sayfa.adi = sceneDict["sayfaAdi"]
+        sayfa._kim = sceneDict.get("sayfaKim", None)
+        self.sayfalarDWTreeView.get_current_sayfa().adi = sceneDict["sayfaAdi"]
+        self.sayfalarDWTreeView.get_current_sayfa()._kim = sceneDict.get("sayfaKim", None)
 
         # self.tv_sayfa_degistir(self.sayfalarDWTreeView.currentItem(), 0)
 
@@ -2957,10 +2952,7 @@ class DefterAnaPencere(QMainWindow):
         self.cView.horizontalScrollBar().setValue(sceneDict["viewHorizontalScrollBarValue"])
         self.cView.verticalScrollBar().setValue(sceneDict["viewVerticalScrollBarValue"])
 
-        # self.dict_to_scene_recursive_parent(sceneDict)
-        # burda selected sebebi ile cscne degil de sayfa.scene ile parametre olarak gonderip,
-        # bir de sayfa ekle ve alt sayfa ekleye secmek konulu sec true vardi iptal ettitk gibi bi bakmak lazım.
-        self.cScene.undoStack.beginMacro(self.tr("load_page_{}".format(sceneDict["sayfaAdi"])))
+        # self.cScene.undoStack.beginMacro(self.tr("load_page_{}".format(sceneDict["sayfaAdi"])))
         for itemDict in sceneDict["itemList"]:
 
             if itemDict["type"] == shared.GROUP_ITEM_TYPE:
@@ -2976,7 +2968,8 @@ class DefterAnaPencere(QMainWindow):
                 item = self.add_item_to_scene_from_dict(itemDict)
                 if "children" in itemDict:
                     self.dict_to_scene_recursive_parent(itemDict["children"], item)
-        self.cScene.undoStack.endMacro()
+        # self.cScene.undoStack.endMacro()
+
         ustSayfa = sayfa
         self.oklari_bagla()
         self.tw_sayfa_guncelle()
@@ -3030,10 +3023,8 @@ class DefterAnaPencere(QMainWindow):
         self.cModel.embededVideoCounter = dokumanDict.get("embededVideoCounter", 10)
         self.cModel.embededFileCounter = dokumanDict.get("embededFileCounter", 0)
 
-        self.cModel.treeViewIconSize = dokumanDict.get("iconSize", QSize(128, 128))
-        self.cModel.satirYuksekligi = dokumanDict.get("satirYuksekligi", 128)
-        self.sayfalarDWTreeView.setIconSize(dokumanDict.get("iconSize", QSize(128, 128)))
-        self.sayfalarDWTreeView.itemDelegate().satirYuksekligi = dokumanDict.get("satirYuksekligi", 128)
+        self.cModel.treeViewIkonBoyutu = dokumanDict.get("treeViewIkonBoyutu", QSize(48, 48))
+        self.sayfalarDWTreeView.setIconSize(self.cModel.treeViewIkonBoyutu)
 
         # self.ekranKutuphane.setBackgroundBrush(dokumanDict["kutuphaneBackgroundBrush"])
         self.ekranKutuphane.setBackgroundBrush(dokumanDict.get("kutuphaneBackgroundBrush", Qt.lightGray))
@@ -3059,12 +3050,14 @@ class DefterAnaPencere(QMainWindow):
             # sinyalleri simdilik blocklamaya gerek yok selectionChanged signali kullanmiyoruz cunku.
             # self.sayfalarDWTreeView.blockSignals(True)
             # self.sayfalarDWTreeView.setCurrentItem(self.sayfalarDWTreeView.topLevelItem(0))
-            # self.sayfalarDWTreeView.itemi_sec_ve_current_index_yap(self.sayfalarDWTreeView.model().satirdaki_sayfa(0))
+            # self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(self.sayfalarDWTreeView.model().satirdaki_sayfa(0))
             # self.sayfalarDWTreeView.blockSignals(False)
             self._dict_to_scene(sceneDict, parent=self.cModel.kokSayfa, altSayfaSeklindeEkle=False)
-            # TODO: sayfalar unduable yuklendigi icin sayfa isimleri basinda yildiz var.
-            # simdilik burda sifirliyoruz.
-            self.cScene.undoStack.setClean()
+
+        sayfa_kim = dokumanDict.get("enSonAktifSayfaKim", None)
+        sayfa = self.cModel.kimlikten_sayfa(sayfa_kim)
+        if sayfa:
+            self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(sayfa)
 
         tempWidgetViewYerine.deleteLater()
         del tempWidgetViewYerine
@@ -3079,6 +3072,7 @@ class DefterAnaPencere(QMainWindow):
         for ic_sayfa in sayfa.ic_sayfalar():
             ic_sayfa_sceneDict = self.scene_to_dict_binary(ic_sayfa.scene)
             ic_sayfa_sceneDict["sayfaAdi"] = ic_sayfa.adi
+            ic_sayfa_sceneDict["sayfaKim"] = ic_sayfa._kim
             ic_sayfa_list.append(ic_sayfa_sceneDict)
 
             # sayfalarDict[sayfa.adi]["ic_sayfalar"] ={"{}".format(ic_sayfa.adi): ic_sayfa_sceneDict}
@@ -3089,9 +3083,9 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def dokuman_to_dokumanDict(self):
-        # dokumanDict =elf.cModel.get_properties_for_save()
+        # dokumanDict =self.cModel.get_properties_for_save()
         # z = {**x, 'foo': 1, 'bar': 2, **y}  # sozlukleri birlestirmek icin
-        dokumanDict = {**self.cModel.get_properties_for_save(), **self.sayfalarDWTreeView.get_properties_for_save()}
+        dokumanDict = self.cModel.get_properties_for_save()
 
         # kutuphane ekrani arkaplan rengi
         dokumanDict["kutuphaneBackgroundBrush"] = self.ekranKutuphane.backgroundBrush()
@@ -3099,6 +3093,7 @@ class DefterAnaPencere(QMainWindow):
         for ic_sayfa in self.cModel.kokSayfa.ic_sayfalar():
             sceneDict = self.scene_to_dict_binary(ic_sayfa.scene)
             sceneDict["sayfaAdi"] = ic_sayfa.adi
+            sceneDict["sayfaKim"] = ic_sayfa._kim
             if ic_sayfa.ic_sayfa_var_mi():
                 # return etmeye gerek yok, ama explicit olmasi acisindan belki dondursek mi
                 # sceneDict = self.eveet(sceneDict, sayfa)
@@ -3348,9 +3343,8 @@ class DefterAnaPencere(QMainWindow):
         filtre = self.tr("*.def files (*.def);;All Files (*)")
         fn = QFileDialog.getSaveFileName(self,
                                          self.tr("Save as"),
-                                         "",  # baseName
-                                         filtre,
-                                         self.sonKlasor
+                                         self.sonKlasor,  # hem sonklasor hem dosyaadi
+                                         filtre
                                          )
 
         path = fn[0]
@@ -8005,9 +7999,8 @@ class DefterAnaPencere(QMainWindow):
         filtre = self.tr('*.defstyles files (*.defstyles)')
         fn = QFileDialog.getSaveFileName(self,
                                          self.tr('Save style presets'),
-                                         "",  # baseName
-                                         filtre,
-                                         self.sonKlasor
+                                         self.sonKlasor,  # hem sonklasor hem dosyaadi
+                                         filtre
                                          )
 
         filePath = fn[0]
@@ -8794,9 +8787,8 @@ class DefterAnaPencere(QMainWindow):
             filtre = self.tr("All Files (*)")
             fn = QFileDialog.getSaveFileName(self,
                                              self.tr("Save image(s) as"),
-                                             "",  # baseName
-                                             filtre,
-                                             self.sonKlasorDisaAktar
+                                             self.sonKlasorDisaAktar,  # hem sonKlasor hem dosya adi
+                                             filtre
                                              )
 
             userPath = fn[0]
@@ -8830,9 +8822,8 @@ class DefterAnaPencere(QMainWindow):
             filtre = self.tr("*{} files (*{});;All Files (*)".format(ext, ext))
             fn = QFileDialog.getSaveFileName(self,
                                              self.tr("Save image(s) as"),
-                                             baseName,
-                                             filtre,
-                                             self.sonKlasorDisaAktar
+                                             os.path.join(self.sonKlasorDisaAktar, baseName),
+                                             filtre
                                              )
             userPath = fn[0]
             if userPath:
@@ -8939,9 +8930,8 @@ class DefterAnaPencere(QMainWindow):
             filtre = self.tr("All Files (*)")
             fn = QFileDialog.getSaveFileName(self,
                                              self.tr("Save video(s) as"),
-                                             "",  # baseName
-                                             filtre,
-                                             self.sonKlasorDisaAktar
+                                             self.sonKlasorDisaAktar,  # hem sonklasor hem dosyaadi
+                                             filtre
                                              )
 
             userPath = fn[0]
@@ -8978,9 +8968,8 @@ class DefterAnaPencere(QMainWindow):
             filtre = self.tr("*{} files (*{});;All Files (*)".format(ext, ext))
             fn = QFileDialog.getSaveFileName(self,
                                              self.tr("Save video(s) as"),
-                                             baseName,
-                                             filtre,
-                                             self.sonKlasorDisaAktar
+                                             os.path.join(self.sonKlasorDisaAktar, baseName),
+                                             filtre
                                              )
 
             userPath = fn[0]
@@ -9061,9 +9050,8 @@ class DefterAnaPencere(QMainWindow):
             filtre = self.tr("All Files (*)")
             fn = QFileDialog.getSaveFileName(self,
                                              self.tr("Save file(s) as"),
-                                             "",  # baseName
-                                             filtre,
-                                             self.sonKlasorDisaAktar
+                                             self.sonKlasorDisaAktar,  # hem sonklasor hem dosyaadi
+                                             filtre
                                              )
 
             userPath = fn[0]
@@ -9100,9 +9088,8 @@ class DefterAnaPencere(QMainWindow):
             filtre = self.tr("*{} files (*{});;All Files (*)".format(ext, ext))
             fn = QFileDialog.getSaveFileName(self,
                                              self.tr("Save file(s) as"),
-                                             baseName,
-                                             filtre,
-                                             self.sonKlasorDisaAktar
+                                             os.path.join(self.sonKlasorDisaAktar, baseName),
+                                             filtre
                                              )
 
             userPath = fn[0]
@@ -10121,13 +10108,12 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def act_export_page_as_image(self):
-        # sayfa = self.sayfalarDWTreeView.getCurrentItem()
+        # sayfa = self.sayfalarDWTreeView.get_current_sayfa()
         # baseName = sayfa.adi
         fn = QFileDialog.getSaveFileName(self,
                                          self.tr('Save Image as'),
-                                         "",  # baseName
-                                         self.supportedImageFormats,
-                                         self.sonKlasorDisaAktar
+                                         self.sonKlasorDisaAktar,  # hem sonklasor hem dosyaadi
+                                         self.supportedImageFormats
                                          )
         path = fn[0]
         if path:

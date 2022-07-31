@@ -75,11 +75,10 @@ class UndoableAddItem(QUndoCommand):
     """ """
 
     # ---------------------------------------------------------------------
-    def __init__(self, description, scene, item, sec=False, parent=None):
+    def __init__(self, description, scene, item, parent=None):
         super(UndoableAddItem, self).__init__(description, parent)
         self.scene = scene
         self.item = item
-        self.sec = sec
 
     # ---------------------------------------------------------------------
     def redo(self):

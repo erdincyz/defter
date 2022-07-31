@@ -40,8 +40,7 @@ class DokumanAgacModel(QAbstractItemModel):
         self.embededVideoCounter = 0
         self.embededFileCounter = 0
 
-        self.treeViewIconSize = QSize(128, 128)
-        self.treeViewSatirYuksekligi = 128
+        self.treeViewIkonBoyutu = QSize(48, 48)
 
         # self.sayfalar = []
         Sayfa.sayfa_no = 0  # her dokuman icin sayfa sayisini sifirliyoruz
@@ -144,9 +143,18 @@ class DokumanAgacModel(QAbstractItemModel):
                       "embededImageCounter": self.embededImageCounter,
                       "embededVideoCounter": self.embededVideoCounter,
                       "embededFileCounter": self.embededFileCounter,
-                      # "enSonAktifSayfa": self.enSonAktifSayfa,
+                      "enSonAktifSayfaKim": self.enSonAktifSayfa._kim,
+                      "treeViewIkonBoyutu": self.treeViewIkonBoyutu
                       }
         return properties
+
+    # ---------------------------------------------------------------------
+    def kimlikten_sayfa(self, kim):
+        for sayfa in self.sayfalar():
+            if kim == sayfa._kim:
+                # break
+                return sayfa
+        return None
 
     # ---------------------------------------------------------------------
     def sayfa_indexten(self, index):
@@ -232,6 +240,7 @@ class DokumanAgacModel(QAbstractItemModel):
 }
     """
 
+    # ---------------------------------------------------------------------
     def parent(self, index=None):
         """bu tamam olmasi lazım"""
         if not index.isValid():
@@ -536,6 +545,8 @@ class DokumanAgacModel(QAbstractItemModel):
                 sayfa.yaziRengi = renk_degismis_nesne_yazi_rengi
             else:
                 return sayfa.yaziRengi
+        elif role == Qt.SizeHintRole:
+            return self.treeViewIkonBoyutu
 
         # elif role == Qt.BackgroundRole:
         #
@@ -723,10 +734,10 @@ class DokumanAgacModel(QAbstractItemModel):
 }"""
 
     # ---------------------------------------------------------------------
-    def sayfa_ekle(self, satir=None, scene=None, view=None, ikon=None, ikon_boyut=128, ustSayfa=None):
+    def sayfa_ekle(self, satir=None, scene=None, view=None, ikon=None, ustSayfa=None):
 
         adi = self.tr("Untitled")
-        sayfa = Sayfa(adi=adi, scene=scene, view=view, ikon=ikon, ikon_boyut=ikon_boyut, parent=ustSayfa)
+        sayfa = Sayfa(adi=adi, scene=scene, view=view, ikon=ikon, parent=ustSayfa)
 
         # parentIndex = self.index_sayfadan(ustSayfa)
 
@@ -854,6 +865,7 @@ class DokumanAgacModel(QAbstractItemModel):
 
         return True
 
+    # ---------------------------------------------------------------------
     def removeRows(self, row, count, parent: QModelIndex = None, *args, **kwargs):
         if row < 0 or row > self.rowCount():
             return False

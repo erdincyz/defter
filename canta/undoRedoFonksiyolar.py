@@ -32,8 +32,8 @@ def undoableSayfaAdiDegistir(undoStack, description, sayfa, sayfa_eski_adi):
 
 
 # ---------------------------------------------------------------------
-def undoableAddItem(undoStack, description, scene, item, sec=True):
-    command = UndoableAddItem(description, scene, item, sec)
+def undoableAddItem(undoStack, description, scene, item):
+    command = UndoableAddItem(description, scene, item)
     undoStack.push(command)
 
 

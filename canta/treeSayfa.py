@@ -7,6 +7,7 @@ __author__ = 'Erdinç Yılmaz'
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
+from canta.shared import kim, slugify
 
 
 ########################################################################
@@ -15,7 +16,7 @@ class Sayfa(object):
     sayfa_no = 0  # 0 kok sayfaya gidiyor
 
     # ---------------------------------------------------------------------
-    def __init__(self, adi=None, ikon=None, ikon_boyut=128, scene=None, view=None, parent=None):
+    def __init__(self, adi=None, ikon=None, scene=None, view=None, parent=None):
         # super(Sayfa, self).__init__(parent)
         # self.setParent(parent)
         self._ic_sayfalar = []
@@ -29,8 +30,12 @@ class Sayfa(object):
         self._view = view
         self._ikon = ikon
 
+        self._kim = kim(kac_basamak=16)
+
         self._no = Sayfa.sayfa_no
         self._adi = "{} - {}".format(adi, self._no)
+        # @adi.setter da temizleniyor, bu ilk olusturma
+        self._kayit_adi = "{} - {}".format(slugify(self._adi, False), self._kim)
 
         self._yaziRengi = QColor(Qt.black)
 
@@ -51,6 +56,7 @@ class Sayfa(object):
     @adi.setter
     def adi(self, adi):
         self._adi = adi
+        self._kayit_adi = "{} - {}".format(slugify(self._adi, False), self._kim)
 
     # @pyqtProperty(str)
     @property
