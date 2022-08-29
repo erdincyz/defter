@@ -73,6 +73,7 @@ class PathItem(QGraphicsItem):
         self.cosmeticSelect = False
         self.isActiveItem = False
         self._isPinned = False
+        self.ustGrup = None
 
         self._text = ""
         self._command = {}
@@ -88,7 +89,6 @@ class PathItem(QGraphicsItem):
         self.painterTextOption.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
         self.painterTextOption.setAlignment(Qt.AlignCenter)
 
-        self.painterTextScale = 1
         self.painterTextRect = QRectF(self.boundingRect())
 
         self.oklar_dxdy_nokta = {}
@@ -106,7 +106,6 @@ class PathItem(QGraphicsItem):
                       "isPathClosed": self.isPathClosed(),
                       "pos": self.pos(),
                       "rotation": self.rotation(),
-                      "scale": self.scale(),
                       "zValue": self.zValue(),
                       "pen": self._pen,
                       "font": self._font,
@@ -179,7 +178,7 @@ class PathItem(QGraphicsItem):
         return None
 
     # ---------------------------------------------------------------------
-    def update_resize_handles(self, force=False):
+    def update_resize_handles(self):
         # dummy method
         # while zooming, view, updates activeItem's resize handles.
         # filtering out pathItem type is an another option but,
@@ -226,6 +225,8 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def sceneCenter(self):
+        if self.parentItem():
+            return self.mapToParent(self.path().controlPointRect().center())
         return self.mapToScene(self.path().controlPointRect().center())
 
     # ---------------------------------------------------------------------
@@ -301,33 +302,6 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def setVerticalCenter(self, vcenter):
         self.setX(vcenter + self.scenePos().x() - self.sceneCenter().x())
-
-    # ---------------------------------------------------------------------
-    def _update_scene_rect_recursively(self, items, rect):
-
-        for c in items:
-            rect = rect.united(c.sceneBoundingRect())
-            if c.type() == shared.GROUP_ITEM_TYPE:
-                if c.parentedWithParentOperation:
-                    rect = self._update_scene_rect_recursively(c.parentedWithParentOperation, rect)
-            else:
-                if c.childItems():
-                    rect = self._update_scene_rect_recursively(c.childItems(), rect)
-        return rect
-
-    # ---------------------------------------------------------------------
-    def sceneBoundingRectWithChildren(self):
-        # rect = QRectF(self.sceneBoundingRect())
-        rect = self.sceneBoundingRect()
-        for c in self.childItems():
-            rect = rect.united(c.sceneBoundingRect())
-            if c.type() == shared.GROUP_ITEM_TYPE:
-                if c.parentedWithParentOperation:
-                    rect = self._update_scene_rect_recursively(c.parentedWithParentOperation, rect)
-            else:
-                if c.childItems():
-                    rect = self._update_scene_rect_recursively(c.childItems(), rect)
-        return rect
 
     # ---------------------------------------------------------------------
     def path(self):
@@ -441,13 +415,13 @@ class PathItem(QGraphicsItem):
         return self._font
 
     # ---------------------------------------------------------------------
-    def setFontPointSize(self, fontPointSize):
-        self._font.setPointSize(fontPointSize)
+    def setFontPointSizeF(self, fontPointSizeF):
+        self._font.setPointSizeF(fontPointSizeF)
         self.update()
 
     # ---------------------------------------------------------------------
-    def fontPointSize(self):
-        return self._font.pointSize()
+    def fontPointSizeF(self):
+        return self._font.pointSizeF()
 
     # ---------------------------------------------------------------------
     def ver_yazi_hizasi(self):
@@ -785,46 +759,20 @@ class PathItem(QGraphicsItem):
         return self.qt_graphicsItem_shapeFromPath(QPainterPath(self.path()), self.pen())
         # return self.qt_graphicsItem_shapeFromPath(self._path, self.pen())
 
-    # # ---------------------------------------------------------------------
-    # def update_painter_text_scale(self):
-    #     if self.parentItem():
-    #         a = self.parentItem().scale()
-    #     else:
-    #         a = 1
-    #     self.painterTextScale = 1 / self.scale() / a
-    #
-    # # ---------------------------------------------------------------------
-    # def update_painter_text_rect(self):
-    #     r = QRectF(self._rect)
-    #     size = self._rect.size()
-    #     size.setWidth(self.sceneWidth() - self.textPadding)
-    #     # r.setSize(self._rect.size() / scale)
-    #     r.setSize(size / self.painterTextScale)
-    #     r.moveCenter(self._rect.center())
-    #     self.painterTextRect = r
-
-    # ---------------------------------------------------------------------
-    def update_painter_text_scale(self):
-        if self.parentItem():
-            a = self.parentItem().scale()
-        else:
-            a = 1
-        self.painterTextScale = 1 / self.scale() / a
-
     # ---------------------------------------------------------------------
     def update_painter_text_rect(self):
         r = QRectF(self.boundingRect())
         size = self.boundingRect().size()
         size.setWidth(self.sceneWidth() - self.textPadding)
-        # r.setSize(self._rect.size() / scale)
-        r.setSize(size / self.painterTextScale)
         r.moveCenter(self.boundingRect().center())
         self.painterTextRect = r
 
     # ---------------------------------------------------------------------
     def wheelEvent(self, event):
         # factor = 1.41 ** (event.delta() / 240.0)
-        # self.scale(factor, factor)
+
+        if self.ustGrup:
+            return QGraphicsItem.wheelEvent(self, event)
 
         toplam = int(event.modifiers())
 
@@ -839,7 +787,7 @@ class PathItem(QGraphicsItem):
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
-            self.scaleItem(event.delta())
+            self.scaleItemByScalingPath(event.delta())
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
@@ -853,7 +801,7 @@ class PathItem(QGraphicsItem):
             self.changeTextColorAlpha(event.delta())
 
         elif toplam == ctrlAltShift:
-            self.changeFontSize(event.delta())
+            self.changeFontSizeF(event.delta())
 
         elif toplam == altShift:
             # self.changeImageItemTextBackgroundColorAlpha(event.delta())
@@ -869,18 +817,18 @@ class PathItem(QGraphicsItem):
             super(PathItem, self).wheelEvent(event)
 
     # ---------------------------------------------------------------------
-    def changeFontSize(self, delta):
+    def changeFontSizeF(self, delta):
 
         # font = self.font()
-        size = self.fontPointSize()
+        size = self.fontPointSizeF()
 
         if delta > 0:
-            # font.setPointSize(size + 1)
+            # font.setPointSizeF(size + 1)
             size += 1
 
         else:
             if size > 10:
-                # font.setPointSize(size - 1)
+                # font.setPointSizeF(size - 1)
                 size -= 1
             else:
                 # undolari biriktermesin diye donuyoruz,
@@ -890,89 +838,30 @@ class PathItem(QGraphicsItem):
         # self.setFont(font)
         if self.childItems():
             self.scene().undoStack.beginMacro("change text size")
-            self.scene().undoRedo.undoableSetFontSize(self.scene().undoStack, "change text size", self, size)
+            self.scene().undoRedo.undoableSetFontSizeF(self.scene().undoStack, "change text size", self, size)
             for c in self.childItems():
-                c.changeFontSize(delta)
+                c.changeFontSizeF(delta)
             self.scene().undoStack.endMacro()
         else:
-            self.scene().undoRedo.undoableSetFontSize(self.scene().undoStack, "change text size", self, size)
+            self.scene().undoRedo.undoableSetFontSizeF(self.scene().undoStack, "change text size", self, size)
 
     # ---------------------------------------------------------------------
     def scaleItemByScalingPath(self, delta):
 
-        # self.setTransformOriginPoint(self.boundingRect().center())
-
-        # TODO : size sıfır olmasin kontrolu
-
-        # scaleFactor = 1.1 * self.scale()
-        # center = self.boundingRect().center()
-        if delta > 0:
-            # scaleFactor = 1.1 * self.scale()
-            scaleFactor = 1.1 * self.transform().m11()  # m11:vertical scale factor , m:22 horizontal scale factor
-            # self.setTransform(QTransform.fromScale(sx, sy), true)
-            # self.setTransform(QTransform.fromScale(scaleFactor, scaleFactor))
-            # self.setScale(scaleFactor)
-            # self.scene().undoableScale("Scale", self, scaleFactor)
-
-            # scaleMatrix = QMatrix()
-            scaleMatrix = QTransform()
-            scaleMatrix.scale(scaleFactor, scaleFactor)
-            scaledPath = self.path() * scaleMatrix
-            # self.setPath(scaledPath)
-            self.scene().undoRedo.undoableScalePathItemByScalingPath(self.scene().undoStack, "scale", self,
-                                                                     scaledPath)
-            self.scene().unite_with_scene_rect(self.sceneBoundingRect())
-        else:
-            if self.path().controlPointRect().width() < 5:
-                return
-            # TODO: bounding rect degismiyor, o yuzden asagidaki if kontrolu anlamsiz
-            # if not self.boundingRect().width() < 0.1 or not self.boundingRect().height() < 0.1:
-            # scaleFactor = 1 / 1.1 * self.scale()
-            scaleFactor = 1 / 1.1 * self.transform().m11()  # m11:vertical scale factor , m22: horizontal scale factor
-            # self.setTransform(QTransform.fromScale(scaleFactor, scaleFactor))
-            # self.setScale(scaleFactor)
-            # self.scene().undoableScale("Scale", self, scaleFactor)
-            # scaleMatrix = QMatrix()
-            scaleMatrix = QTransform()
-            scaleMatrix.scale(scaleFactor, scaleFactor)
-            scaledPath = self.path() * scaleMatrix
-            # self.setPath(scaledPath)
-            self.scene().undoRedo.undoableScalePathItemByScalingPath(self.scene().undoStack, "scale", self,
-                                                                     scaledPath)
-
-            # bunu undoableScalePathItemByScalingPath icinden cagiriyoruz
-            # self.item.update_painter_text_rect()
-
-        # self.setTransformOriginPoint(self.boundingRect().center())
-
-    # ---------------------------------------------------------------------
-    def scaleItem(self, delta):
-        # TODO : size sıfır olmasin kontrolu
-
         scaleFactor = 1.1
-        if delta > 0:
-            scaleFactor = self.scale() * scaleFactor
-            self.scene().unite_with_scene_rect(self.sceneBoundingRect())
+        if delta < 0:
+            scaleFactor = 1 / scaleFactor
 
-        else:
-            scaleFactor = self.scale() / scaleFactor
+        scaleMatrix = QTransform()
+        scaleMatrix.scale(scaleFactor, scaleFactor)
+        scaledPath = self.path() * scaleMatrix
+        # self.setPath(scaledPath)
+        self.scene().undoRedo.undoableScalePathItemByScalingPath(self.scene().undoStack, "scale", self,
+                                                                 scaledPath, scaleFactor)
 
-        self.scene().undoRedo.undoableScale(self.scene().undoStack, "scale", self, scaleFactor)
+        # self.scene().unite_with_scene_rect(self.sceneBoundingRect())
 
-        # undoableScale  scaleWithOffset i cagiriyor. orda guncelliyoruz alttakileri.
-        # self.update_painter_text_scale()
-        # self.update_painter_text_rect()
-
-    # ---------------------------------------------------------------------
-    def scaleWithOffset(self, scale):
-        cEski = self.sceneCenter()
-        self.setScale(scale)
-        cYeni = self.sceneCenter()
-        diff = cEski - cYeni
-        self.moveBy(diff.x(), diff.y())
-        # self.updateBoundingRect()
-        self.update_painter_text_scale()
-        self.update_painter_text_rect()
+        # self.setTransformOriginPoint(self.boundingRect().center())
 
     # ---------------------------------------------------------------------
     def rotateWithOffset(self, angle):
@@ -995,7 +884,7 @@ class PathItem(QGraphicsItem):
         else:
             # self.setRotation(self.rotation() - 5)
             self.scene().undoRedo.undoableRotate(self.scene().undoStack, "Rotate", self, self.rotation() - 5)
-        self.update_painter_text_rect()
+        # self.update_painter_text_rect()
         # self.update()
 
     # ---------------------------------------------------------------------
@@ -1099,7 +988,6 @@ class PathItem(QGraphicsItem):
             self.tempEskiText = self.text()
             self.setText("")
             self.tempTextItem.setRotation(360 - self.rotation())
-            # self.tempTextItem.scaleWithOffset(1 / self.scale())
             # self.tempTextItem.rotateWithOffset(360 - self.rotation())
             self.tempTextItem.setCenter(self.boundingRect().center())
             self.tempTextItem.setFocus()
@@ -1211,7 +1099,6 @@ class PathItem(QGraphicsItem):
             painter.setPen(self.yaziRengi)
             painter.translate(self.boundingRect().center())
             painter.rotate(-self.rotation())
-            painter.scale(self.painterTextScale, self.painterTextScale)
             painter.translate(-self.boundingRect().center())
             # metrics = painter.fontMetrics()
             # text = metrics.elidedText(self.text(), Qt.ElideRight, self.boundingRect().width())
@@ -1329,7 +1216,6 @@ class PathItem(QGraphicsItem):
             painter.setPen(self.yaziRengi)
             painter.translate(self.boundingRect().center())
             painter.rotate(-self.rotation())
-            painter.scale(self.painterTextScale, self.painterTextScale)
             painter.translate(-self.boundingRect().center())
             painter.drawText(self.painterTextRect, self._text, self.painterTextOption)
             painter.restore()

@@ -386,7 +386,7 @@ class View(QGraphicsView):
         # self.scene().parent().zoomSBox.setValue(scale*100)
         self.scale(scale, scale)
         if self.scene().selectedItems():
-            self.scene().activeItem.update_resize_handles(force=True)
+            self.scene().activeItem.update_resize_handles()
 
         QApplication.restoreOverrideCursor()
 
@@ -403,7 +403,7 @@ class View(QGraphicsView):
             # else:
             #     self.setSceneRect(ir)
             if self.scene().selectedItems():
-                self.scene().activeItem.update_resize_handles(force=True)
+                self.scene().activeItem.update_resize_handles()
 
             self.scene().parent().zoomSBox.setValue(self.transform().m11() * 100)
 
@@ -421,7 +421,7 @@ class View(QGraphicsView):
                 self.setSceneRect(self.get_visible_rect())
 
             if self.scene().selectedItems():
-                self.scene().activeItem.update_resize_handles(force=True)
+                self.scene().activeItem.update_resize_handles()
 
             self.scene().parent().zoomSBox.setValue(self.transform().m11() * 100)
             QApplication.restoreOverrideCursor()
@@ -439,7 +439,7 @@ class View(QGraphicsView):
         # self.setSceneRect(self.get_visible_rect())
 
         if self.scene().selectedItems():
-            self.scene().activeItem.update_resize_handles(force=True)
+            self.scene().activeItem.update_resize_handles()
 
         self.scene().parent().zoomSBox.setValue(self.transform().m11() * 100)
         QApplication.restoreOverrideCursor()
@@ -469,7 +469,7 @@ class View(QGraphicsView):
             # self.centerOn(0, 0)
 
             # if self.scene().selectedItems():
-            self.scene().activeItem.update_resize_handles(force=True)
+            self.scene().activeItem.update_resize_handles()
 
             self.scene().parent().zoomSBox.setValue(self.transform().m11() * 100)
         QApplication.restoreOverrideCursor()
@@ -488,7 +488,7 @@ class View(QGraphicsView):
             self.setSceneRect(ir)
 
         if self.scene().selectedItems():
-            self.scene().activeItem.update_resize_handles(force=True)
+            self.scene().activeItem.update_resize_handles()
 
         self.scene().parent().zoomSBox.setValue(self.transform().m11() * 100)
         QApplication.restoreOverrideCursor()

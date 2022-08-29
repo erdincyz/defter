@@ -26,8 +26,8 @@ class Rect(BaseItem):
     # ---------------------------------------------------------------------
     def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
 
-        w = self._rect.width() * self.scale()
-        h = self._rect.height() * self.scale()
+        w = self._rect.width()
+        h = self._rect.height()
 
         c = self.sceneBoundingRect().center()
 
@@ -97,7 +97,7 @@ class Rect(BaseItem):
                    fill-opacity:{self.arkaPlanRengi.alpha() / 255};
                    stroke:rgba{self.cizgiRengi.toTuple()};
                    stroke-opacity:{self.cizgiRengi.alpha() / 255};
-                   stroke-width:{self._pen.widthF() * 2 * self.scale()};
+                   stroke-width:{self._pen.widthF() * 2};
                    stroke-linecap:round; stroke-dasharray:none; stroke-linejoin:round;
                    paint-order:markers fill stroke;"/>
         """
@@ -122,4 +122,3 @@ class Rect(BaseItem):
         """
         # return svg_str
         return div_str
-

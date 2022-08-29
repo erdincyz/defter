@@ -9,9 +9,9 @@ __date__ = '3/27/16'
 import os
 import shutil
 
-from PySide6.QtCore import (Qt, QRectF, QPointF, Slot, Signal, QThread, QLineF, QObject)
-from PySide6.QtGui import (QPixmap, QCursor, QPen, QImage, QUndoStack, QColor)
-from PySide6.QtWidgets import (QApplication, QGraphicsScene)
+from PySide6.QtCore import Qt, QRectF, QPointF, Slot, Signal, QThread, QLineF, QObject
+from PySide6.QtGui import QPixmap, QPen, QImage, QUndoStack, QColor
+from PySide6.QtWidgets import QApplication, QGraphicsScene
 # from sub.items.base import BaseItem
 # TODO: bunu sadece dragEnterEvent kaynagi belirlemek icin kullaniyoruz, bi inceleyelim
 from canta.arac import Arac
@@ -34,8 +34,8 @@ from canta import undoRedoFonksiyolar as undoRedo, shared
 
 ########################################################################
 class Scene(QGraphicsScene):
-    # itemMoved = Signal(QGraphicsItem, QPointF)
-    itemMoved = Signal(object, QPointF)
+    # nesneTasindi = Signal(QGraphicsItem, QPointF)
+    nesneTasindi = Signal(object, QPointF)
 
     # textItemSelected = Signal(QGraphicsTextItem)
 
@@ -103,10 +103,9 @@ class Scene(QGraphicsScene):
         # self.actionUndo = self.undoStack.createUndoAction(self)
         # self.actionRedo = self.undoStack.createRedoAction(self)
 
-        self.movingItem = None
-        self.movedItemsList = []
-        self.isMovingItems = False
-        self.itemMoved.connect(self.when_item_moved)
+        self.tasinanNesne = None
+        self.tasinanNesnelerinListesi = []
+        self.nesneTasindi.connect(self.sinyal_nesne_tasindi)
 
         self.activeItem = None
         self._acceptDrops = True
@@ -161,7 +160,7 @@ class Scene(QGraphicsScene):
 
         self.parent().degistir_yazi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
         self.parent().degistir_nesne_arkaplan_rengi_ikonu()
-        self.parent().change_text_size_spinbox_value(self.aktifArac.yaziBoyutu)
+        self.parent().change_font_point_sizef_spinbox_value(self.aktifArac.yaziBoyutu)
         self.parent().change_line_style_options(self.aktifArac.kalem)
         # self.parent().change_font_combobox_value(self.aktifArac.yaziTipi)
 
@@ -252,7 +251,8 @@ class Scene(QGraphicsScene):
 
     # ---------------------------------------------------------------------
     def unite_with_scene_rect(self, rect):
-        unitedRect = self.sceneRect().united(rect)
+        # unitedRect = self.sceneRect().united(rect)
+        unitedRect = rect | self.sceneRect()
         visRect = self.views()[0].get_visible_rect()
         if unitedRect.size().width() * unitedRect.size().height() > visRect.size().width() * visRect.size().height():
             # self.setSceneRect(visRect.united(unitedRect))
@@ -404,7 +404,7 @@ class Scene(QGraphicsScene):
     # ---------------------------------------------------------------------
     # @Slot(QGraphicsItem, QPointF)
     @Slot(object, QPointF)
-    def when_item_moved(self, movedItem, eskiPosition):
+    def sinyal_nesne_tasindi(self, movedItem, eskiPosition):
         # self.undoStack.push(UndoableMove(self.tr("Item moved"), movedItem, eskiPosition))
         undoRedo.undoableMove(self.undoStack, self.tr("Item moved"), movedItem, eskiPosition)
 
@@ -584,7 +584,7 @@ class Scene(QGraphicsScene):
         # if devam:
         #     eskiPos = self.activeItem.pos()
         #     self.activeItem.moveBy(x, y)
-        #     self.when_item_moved(self.activeItem, eskiPos)
+        #     self.sinyal_nesne_tasindi(self.activeItem, eskiPos)
 
         # butun secili nesneler icin
         if devam:
@@ -595,7 +595,7 @@ class Scene(QGraphicsScene):
             for item in items:
                 eskiPos = item.pos()
                 item.moveBy(x, y)
-                self.when_item_moved(item, eskiPos)
+                self.sinyal_nesne_tasindi(item, eskiPos)
 
             self.undoStack.endMacro()
 
@@ -655,34 +655,39 @@ class Scene(QGraphicsScene):
                 #     self.set_modified(True)
 
                 mousePos = event.buttonDownScenePos(Qt.LeftButton)
-                # self.movingItem = self.itemAt(mousePos)
-                self.movingItem = self.itemAt(mousePos, self.views()[0].transform())
-                if self.movingItem:  # and event.button() == Qt.LeftButton
-                    if self.movingItem.topLevelItem().type() == shared.GROUP_ITEM_TYPE:
-                        if self.movingItem in self.movingItem.topLevelItem().allNonGroupGroupChildren:
-                            self.movingItem = self.movingItem.topLevelItem()
-                    self.eskiPosOfMovingItem = self.movingItem.pos()
-                    self.movedItemsList = []
+                self.tasinanNesne = self.itemAt(mousePos, self.views()[0].transform())
+                if self.tasinanNesne:  # and event.button() == Qt.LeftButton
+
+                    while self.tasinanNesne.ustGrup:
+                        self.tasinanNesne = self.tasinanNesne.ustGrup
+
+                    # ustNesne = self.tasinanNesne.parentItem()
+                    # if ustNesne:
+                    #     if ustNesne.type() == shared.GROUP_ITEM_TYPE:
+                    #         if self.tasinanNesne in ustNesne.allNonGroupGroupChildren:
+                    #             self.tasinanNesne = ustNesne
+                    self.eskiPosTasinanNesne = self.tasinanNesne.pos()
+                    self.tasinanNesnelerinListesi = []
                     selectedItems = self.selectedItems()
                     # hic birsey secili degil iken, tek itema tiklayip tasiyinca, self.selectedItems
                     # bos donuyor. birden fazla item tasimak icin zaten onlar secili olmak durumunda.
                     # dolayisi ile normal calisiyor. bu yuzden manual ekliyoruz
-                    # eger sahnede secili item yok ve de self.movingItem var is demek ki,
+                    # eger sahnede secili item yok ve de self.tasinanNesne var is demek ki,
                     # daha selection guncellenmemis oldugundan. gibi. neden guncellenmiyor
                     # cunku event daha yeni basliyor. qt itemlari secmek icin gerekli islemleri yapmamis oluyor.
                     # super kullandigimizda da problem oldu.
                     #  !!! bu safer de iki tane baska item secili mesela secili olmayan bir itemi tutup tasiyinca,
                     # hali hazirda secili olanlar undo edildi onlar da hareket ettirilmedikleri icin
                     # sahnede bir sey olmadi. yine dolayisi ile bir kontrol daha ekledik
-                    # eger self.movingItem selectedItemslar iceresinde yoksa diye.
+                    # eger self.tasinanNesne selectedItemslar iceresinde yoksa diye.
                     if selectedItems:
-                        if self.movingItem in selectedItems:
+                        if self.tasinanNesne in selectedItems:
                             for item in selectedItems:
-                                self.movedItemsList.append([item, item.pos()])
+                                self.tasinanNesnelerinListesi.append([item, item.pos()])
                         else:
-                            self.movedItemsList.append([self.movingItem, self.movingItem.pos()])
+                            self.tasinanNesnelerinListesi.append([self.tasinanNesne, self.tasinanNesne.pos()])
                     else:
-                        self.movedItemsList.append([self.movingItem, self.movingItem.pos()])
+                        self.tasinanNesnelerinListesi.append([self.tasinanNesne, self.tasinanNesne.pos()])
 
                 return QGraphicsScene.mousePressEvent(self, event)
 
@@ -1015,23 +1020,24 @@ class Scene(QGraphicsScene):
                 # return QGraphicsScene.mousePressEvent(self, event)
                 return QGraphicsScene.mouseReleaseEvent(self, event)
 
-            # if self.movingItem:  # and event.button() == Qt.LeftButton:
-            #     if not self.eskiPosOfMovingItem == self.movingItem.pos():
-            #         self.itemMoved.emit(self.movingItem, self.eskiPosOfMovingItem)
-            #     self.movingItem = None
+            # if self.tasinanNesne:  # and event.button() == Qt.LeftButton:
+            #     if not self.eskiPosTasinanNesne == self.tasinanNesne.pos():
+            #         self.nesneTasindi.emit(self.tasinanNesne, self.eskiPosTasinanNesne)
+            #     self.tasinanNesne = None
 
             # this one also handles, sceneRect adaptation for repositioned items.
-            if self.movingItem:  # and event.button() == Qt.LeftButton:
-                if not self.eskiPosOfMovingItem == self.movingItem.pos():
-                    movedItemsBoundingRect = QRectF()  # sceneRect adaptation
-                    self.undoStack.beginMacro("move {} item(s)".format(len(self.movedItemsList)))
-                    for itemAndEskiPos in self.movedItemsList:
-                        self.itemMoved.emit(itemAndEskiPos[0], itemAndEskiPos[1])
+            if self.tasinanNesne:  # and event.button() == Qt.LeftButton:
+                if not self.eskiPosTasinanNesne == self.tasinanNesne.pos():
+                    tasinanNesnelerinBoundingRect = QRectF()  # sceneRect adaptation
+                    self.undoStack.beginMacro("move {} item(s)".format(len(self.tasinanNesnelerinListesi)))
+                    for nesneVeEskiPos in self.tasinanNesnelerinListesi:
+                        self.nesneTasindi.emit(nesneVeEskiPos[0], nesneVeEskiPos[1])
                         # v - sceneRect adaptation - v
-                        movedItemsBoundingRect = movedItemsBoundingRect.united(itemAndEskiPos[0].sceneBoundingRect())
+                        tasinanNesnelerinBoundingRect = tasinanNesnelerinBoundingRect.united(
+                            nesneVeEskiPos[0].sceneBoundingRect())
                     self.undoStack.endMacro()
-                    self.unite_with_scene_rect(movedItemsBoundingRect)
-                self.movingItem = None
+                    self.unite_with_scene_rect(tasinanNesnelerinBoundingRect)
+                self.tasinanNesne = None
 
         super(Scene, self).mouseReleaseEvent(event)
         # print(self.selectionQueue)

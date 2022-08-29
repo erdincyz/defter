@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 # .
 
-# الحمد لله
-
 __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '25/03/16'
@@ -55,7 +53,7 @@ from canta.ekranKutuphane import EkranKutuphane
 from canta.sahneKutuphane import SahneKutuphane
 from canta.tabWidget import TabWidget
 from canta.tabBar import TabBar
-from canta.spinBoxlar import SpinBox, SpinBoxForRotation
+from canta.spinBoxlar import SpinBox, SpinBoxForRotation, DoubleSpinBox
 from canta.sliderDoubleWithDoubleSpinBox import SliderDoubleWithDoubleSpinBox
 from canta.komutPenceresi import CommandDialog
 from canta.nesneler.base import BaseItem
@@ -157,8 +155,8 @@ class DefterAnaPencere(QMainWindow):
 
         self.itemSize = QSizeF(25, 25)
 
-        # TODO: self.textSize iptal edilebilir . font uzerinden devam edilebilir.
-        self.textSize = 10
+        # TODO: self.fontPointSizeF iptal edilebilir . font uzerinden devam edilebilir.
+        self.fontPointSizeF = 10
 
         self.yazi_hizasi = Qt.AlignLeft
 
@@ -380,20 +378,20 @@ class DefterAnaPencere(QMainWindow):
         # fontCBox_tbar atamasini burda yapiyoruz.
         self.fontCBox_tbar.currentFontChanged.connect(self.fontCBox_yazidw.setCurrentFont)
 
-        self.textSizeSBox_yazidw = SpinBox(self.yaziGrupW)
-        self.textSizeSBox_yazidw.setSuffix(" pt")
-        self.textSizeSBox_yazidw.setValue(self.textSize)
-        self.textSizeSBox_yazidw.setMaximumWidth(85)
-        self.textSizeSBox_yazidw.setMinimum(5)
-        self.textSizeSBox_yazidw.setMaximum(999)
-        self.textSizeSBox_yazidw.setSingleStep(1)
-        # self.textSizeSBox_yazidw.valueChanged[int].connect(self.act_change_item_size)
-        self.textSizeSBox_yazidw.valueChangedFromSpinBoxGuiNotBySetValue.connect(self.act_change_text_size)
-        self.textSizeSBox_yazidw.valueChanged.connect(self.textSizeSBox_tbar.setValue)
-        # bu metod daha sonra cagrildigi ve textSizeSBox_yazidw daha sonra olusturuldugu icin
-        # textSizeSBox_tbar atamasini burda yapiyoruz.
-        self.textSizeSBox_tbar.valueChanged.connect(self.textSizeSBox_yazidw.setValue)
-        self.textSizeSBox_yazidw.setToolTip(self.tr("Text Size"))
+        self.fontPointSizeFDSBox_yazidw = DoubleSpinBox(self.yaziGrupW)
+        self.fontPointSizeFDSBox_yazidw.setSuffix(" pt")
+        self.fontPointSizeFDSBox_yazidw.setValue(self.fontPointSizeF)
+        self.fontPointSizeFDSBox_yazidw.setMaximumWidth(85)
+        self.fontPointSizeFDSBox_yazidw.setMinimum(3)
+        self.fontPointSizeFDSBox_yazidw.setMaximum(999)
+        self.fontPointSizeFDSBox_yazidw.setSingleStep(1)
+        # self.fontPointSizeFDSBox_yazidw.valueChanged[int].connect(self.act_change_item_size)
+        self.fontPointSizeFDSBox_yazidw.valueChangedFromDoubleSpinBoxGuiNotBySetValue.connect(self.act_change_font_point_sizef)
+        self.fontPointSizeFDSBox_yazidw.valueChanged.connect(self.fontPointSizeFDSBox_tbar.setValue)
+        # bu metod daha sonra cagrildigi ve fontPointSizeFDSBox_yazidw daha sonra olusturuldugu icin
+        # fontPointSizeFDSBox_tbar atamasini burda yapiyoruz.
+        self.fontPointSizeFDSBox_tbar.valueChanged.connect(self.fontPointSizeFDSBox_yazidw.setValue)
+        self.fontPointSizeFDSBox_yazidw.setToolTip(self.tr("Text Size"))
 
         self.yaziListeBicimiCBox = QComboBox(self.yaziGrupW)
         self.yaziListeBicimiCBox.setMaximumWidth(135)
@@ -525,7 +523,7 @@ class DefterAnaPencere(QMainWindow):
         btnBicimlerLay.addStretch(1)
 
         lay = QHBoxLayout()
-        lay.addWidget(self.textSizeSBox_yazidw)
+        lay.addWidget(self.fontPointSizeFDSBox_yazidw)
         lay.addWidget(self.yaziListeBicimiCBox)
         lay.addStretch()
 
@@ -1299,7 +1297,7 @@ class DefterAnaPencere(QMainWindow):
     # @Slot('QStandardItem*')
     @Slot(Sayfa, str)
     def tv_nesne_degisti(self, sayfa, sayfa_eski_adi):
-        print("nesne_degisti")
+        # print("nesne_degisti")
         # bu her degisiklikte cagriliyor !! , ufak resim guncellemeden dolayi..
         # resim guncellemeye -Hamd Olsun- block signals eklemek suretiyle cozuldu.
         # print(item, column)
@@ -1671,11 +1669,11 @@ class DefterAnaPencere(QMainWindow):
             self.sonKlasorDisaAktar = self.settings.value("sonKlasorDisaAktar", KULLANICI_KLASORU)
             self.sonKlasorHTML = self.settings.value("sonKlasorHTML", KULLANICI_KLASORU)
             self.itemSize = self.settings.value("itemSize", QSizeF(25, 25))
-            self.textSize = int(self.settings.value("textSize", 10))
+            self.fontPointSizeF = float(self.settings.value("fontPointSizeF", 10))
             self.baskiCerceveRengi = self.settings.value("baskiCerceveRengi", QColor(0, 0, 0))
 
             font = QFont(self.settings.value("currentFont", QApplication.font().family()))
-            font.setPointSize(self.textSize)
+            font.setPointSizeF(self.fontPointSizeF)
             self.currentFont = font
 
             self.karakter_bicimi_sozluk = {"b": self.currentFont.bold(),
@@ -1692,7 +1690,7 @@ class DefterAnaPencere(QMainWindow):
             # self.sonKlasorDisaAktar = os.path.expanduser("~")
 
             font = QFont(QApplication.font().family())
-            font.setPointSize(10)
+            font.setPointSizeF(10)
             self.currentFont = font
 
         self.settings.endGroup()
@@ -1769,7 +1767,7 @@ class DefterAnaPencere(QMainWindow):
         self.settings.setValue("sonKlasorDisaAktar", self.sonKlasorDisaAktar)
         self.settings.setValue("sonKlasorHTML", self.sonKlasorHTML)
         self.settings.setValue("itemSize", self.itemSize)
-        self.settings.setValue("textSize", self.textSize)
+        self.settings.setValue("fontPointSizeF", self.fontPointSizeF)
         self.settings.setValue("baskiCerceveRengi", self.baskiCerceveRengi)
         self.settings.setValue("currentFont", self.fontCBox_tbar.currentFont())
         # self.settings.setValue("currentFont", self.fontCBox_tbar.currentText())
@@ -2423,7 +2421,6 @@ class DefterAnaPencere(QMainWindow):
             #         if "children" in itemDict:
             #             self.dict_to_scene_recursive_parent(itemDict["children"], group)
             #         group.updateBoundingRect()
-            #         group.setScale(itemDict["scale"])
             #
             #     else:
             #         item = self.add_item_to_scene_from_dict(itemDict)
@@ -2569,7 +2566,6 @@ class DefterAnaPencere(QMainWindow):
             lineItem.setText(itemDict.get("text", ""))
             if itemDict.get("yaziHiza", None):
                 lineItem.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
-            lineItem.setScale(itemDict["scale"])
             lineItem.setZValue(itemDict["zValue"])
             lineItem.isPinned = itemDict["isPinned"]
             lineItem._command = itemDict["command"]
@@ -2591,7 +2587,6 @@ class DefterAnaPencere(QMainWindow):
             # rectItem.setRect(rectItem.mapRectFromScene(item["rect"]))
             # rectItem.setPos(itemDict["pos"])
             rectItem.setRotation(itemDict["rotation"])
-            rectItem.setScale(itemDict["scale"])
             rectItem.setZValue(itemDict["zValue"])
             rectItem.isPinned = itemDict["isPinned"]
             if itemDict.get("yaziHiza", None):
@@ -2616,7 +2611,6 @@ class DefterAnaPencere(QMainWindow):
                                   itemDict["pen"], itemDict["font"])
             ellipseItem.setPos(itemDict["pos"])
             ellipseItem.setRotation(itemDict["rotation"])
-            ellipseItem.setScale(itemDict["scale"])
             ellipseItem.setZValue(itemDict["zValue"])
             ellipseItem.isPinned = itemDict["isPinned"]
             if itemDict.get("yaziHiza", None):
@@ -2644,7 +2638,6 @@ class DefterAnaPencere(QMainWindow):
             pathItem.setText(itemDict["text"])
             if itemDict.get("yaziHiza", None):
                 pathItem.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
-            pathItem.setScale(itemDict["scale"])
             pathItem.setZValue(itemDict["zValue"])
             pathItem.isPinned = itemDict["isPinned"]
             pathItem._command = itemDict["command"]
@@ -2684,7 +2677,6 @@ class DefterAnaPencere(QMainWindow):
             imageItem.isEmbeded = itemDict["isEmbeded"]
             imageItem.setPos(itemDict["pos"])
             imageItem.setRotation(itemDict["rotation"])
-            imageItem.setScale(itemDict["scale"])
             imageItem.setZValue(itemDict["zValue"])
             imageItem.imageOpacity = itemDict["imageOpacity"]
             imageItem.isPinned = itemDict["isPinned"]
@@ -2724,7 +2716,6 @@ class DefterAnaPencere(QMainWindow):
             textItem.textItemFocusedOut.connect(lambda: self.cScene.is_text_item_empty(textItem))
             textItem.setPos(itemDict["pos"])
             textItem.setRotation(itemDict["rotation"])
-            textItem.setScale(itemDict["scale"])
             textItem.setZValue(itemDict["zValue"])
             textItem.isPinned = itemDict["isPinned"]
             textItem._command = itemDict["command"]
@@ -2754,8 +2745,6 @@ class DefterAnaPencere(QMainWindow):
 
             groupItem.setPos(itemDict["pos"])
             groupItem.setRotation(itemDict["rotation"])
-            # we set scale later. after group re-populated.
-            # groupItem.setScale(itemDict["scale"])
             groupItem.setZValue(itemDict["zValue"])
             groupItem.isPinned = itemDict["isPinned"]
 
@@ -2789,7 +2778,6 @@ class DefterAnaPencere(QMainWindow):
             videoItem.isEmbeded = itemDict["isEmbeded"]
             videoItem.setPos(itemDict["pos"])
             videoItem.setRotation(itemDict["rotation"])
-            videoItem.setScale(itemDict["scale"])
             videoItem.setZValue(itemDict["zValue"])
             # videoItem.imageOpacity = itemDict["imageOpacity"]
             videoItem.isPinned = itemDict["isPinned"]
@@ -2835,7 +2823,6 @@ class DefterAnaPencere(QMainWindow):
             dosyaNesnesi.isEmbeded = itemDict["isEmbeded"]
             dosyaNesnesi.setPos(itemDict["pos"])
             dosyaNesnesi.setRotation(itemDict["rotation"])
-            dosyaNesnesi.setScale(itemDict["scale"])
             dosyaNesnesi.setZValue(itemDict["zValue"])
             # dosyaNesnesi.imageOpacity = itemDict["imageOpacity"]
             dosyaNesnesi.isPinned = itemDict["isPinned"]
@@ -2868,9 +2855,8 @@ class DefterAnaPencere(QMainWindow):
                 group = self.add_item_to_scene_from_dict(childDict)
                 self.dict_to_scene_recursive_group(childDict["group_children"], group)
                 group.setParentItem(parentItem)
-
-                # before parented scale / after parented scale
-                group.scaleWithOffset(childDict["scale"] / group.scale())
+                #TODO: bir bak
+                group.setPos(parentItem.mapFromScene(group.pos()))
 
                 if parentItem.type() == shared.GROUP_ITEM_TYPE:
                     parentItem.parentedWithParentOperation.append(group)
@@ -2884,9 +2870,6 @@ class DefterAnaPencere(QMainWindow):
             else:
                 c = self.add_item_to_scene_from_dict(childDict)
                 c.setParentItem(parentItem)
-
-                # before parented scale / after parented scale
-                # c.scaleWithOffset(childDict["scale"] / c.scale())
 
                 if parentItem.type() == shared.GROUP_ITEM_TYPE:
                     parentItem.parentedWithParentOperation.append(c)
@@ -2962,7 +2945,6 @@ class DefterAnaPencere(QMainWindow):
                 if "children" in itemDict:
                     self.dict_to_scene_recursive_parent(itemDict["children"], group)
                 group.updateBoundingRect()
-                group.setScale(itemDict["scale"])
 
             else:
                 item = self.add_item_to_scene_from_dict(itemDict)
@@ -4723,16 +4705,16 @@ class DefterAnaPencere(QMainWindow):
         self.fontCBox_tbar.setCurrentFont(self.currentFont)
         self.fontCBox_tbar.valueChangedFromFontComboBoxGuiNotByCode.connect(self.act_set_current_font)
 
-        # self.textSizeSBox_tbar = QSpinBox(self.fontToolBar)
-        self.textSizeSBox_tbar = SpinBox(self.fontToolBar)
-        self.textSizeSBox_tbar.setSuffix(" pt")
-        self.textSizeSBox_tbar.setValue(self.textSize)
-        self.textSizeSBox_tbar.setMinimum(5)
-        self.textSizeSBox_tbar.setMaximum(999)
-        self.textSizeSBox_tbar.setSingleStep(1)
-        # self.textSizeSBox_tbar.valueChanged[int].connect(self.act_change_item_size)
-        self.textSizeSBox_tbar.valueChangedFromSpinBoxGuiNotBySetValue.connect(self.act_change_text_size)
-        self.textSizeSBox_tbar.setToolTip(self.tr("Text Size"))
+        # self.fontPointSizeFDSBox_tbar = QSpinBox(self.fontToolBar)
+        self.fontPointSizeFDSBox_tbar = DoubleSpinBox(self.fontToolBar)
+        self.fontPointSizeFDSBox_tbar.setSuffix(" pt")
+        self.fontPointSizeFDSBox_tbar.setValue(self.fontPointSizeF)
+        self.fontPointSizeFDSBox_tbar.setMinimum(3)
+        self.fontPointSizeFDSBox_tbar.setMaximum(999)
+        self.fontPointSizeFDSBox_tbar.setSingleStep(1)
+        # self.fontPointSizeFDSBox_tbar.valueChanged[int].connect(self.act_change_item_size)
+        self.fontPointSizeFDSBox_tbar.valueChangedFromDoubleSpinBoxGuiNotBySetValue.connect(self.act_change_font_point_sizef)
+        self.fontPointSizeFDSBox_tbar.setToolTip(self.tr("Text Size"))
 
         self.actionBold = QAction(QIcon(':icons/bold.png'),
                                   self.tr("Bold"),
@@ -4821,7 +4803,7 @@ class DefterAnaPencere(QMainWindow):
 
         # self.fontToolBar.addSeparator()
         self.fontCBox_tbarAction = self.fontToolBar.addWidget(self.fontCBox_tbar)
-        self.textSizeSBox_tbarAction = self.fontToolBar.addWidget(self.textSizeSBox_tbar)
+        self.fontPointSizeFDSBox_tbarAction = self.fontToolBar.addWidget(self.fontPointSizeFDSBox_tbar)
 
         self.fontToolBar.addActions((
             self.fontToolBar.addSeparator(),
@@ -5609,13 +5591,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_switch_to_selection_tool(self):
-        # print(self.theme)
-        # print(self.theme.user_preferences.themes[0])
-        # print(self.theme"user_preferences".themes[0])
-        # self.itemWidthSBoxAction.setVisible(False)
-        # self.itemHeightSBoxAction.setVisible(False)
-        # self.itemRotationSBoxAction.setVisible(False)
-        # self.textSizeSBox_tbarAction.setVisible(False)
+
         self.cScene.aktif_arac_degistir(aktifArac=self.cScene.SecimAraci)
         self.actionSwitchToSelectionTool.setChecked(True)
         self.cScene.clearSelection()
@@ -5625,13 +5601,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_draw_line_item(self):
-        # print(self.theme)
-        # print(self.theme.user_preferences.themes[0])
-        # print(self.theme"user_preferences".themes[0])
-        # self.itemWidthSBoxAction.setVisible(False)
-        # self.itemHeightSBoxAction.setVisible(False)
-        # self.itemRotationSBoxAction.setVisible(False)
-        # self.textSizeSBox_tbarAction.setVisible(False)
+
         if self.cScene.OkAraci.kalem.style() == Qt.PenStyle.NoPen:
             self.act_cizgi_tipi_degistir(Qt.SolidLine)
             self.change_line_style_options(self.cScene.OkAraci.kalem)
@@ -5644,10 +5614,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_add_rect_item(self):
-        # self.itemWidthSBoxAction.setVisible(True)
-        # self.itemHeightSBoxAction.setVisible(True)
-        # self.itemRotationSBoxAction.setVisible(True)
-        # self.textSizeSBox_tbarAction.setVisible(False)
+
         self.cScene.aktif_arac_degistir(aktifArac=self.cScene.DortgenAraci)
         self.actionAddRectItem.setChecked(True)
         self.cScene.clearSelection()
@@ -5657,10 +5624,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_add_ellipse_item(self):
-        # self.itemWidthSBoxAction.setVisible(True)
-        # self.itemHeightSBoxAction.setVisible(True)
-        # self.itemRotationSBoxAction.setVisible(True)
-        # self.textSizeSBox_tbarAction.setVisible(False)
+
         self.cScene.aktif_arac_degistir(aktifArac=self.cScene.YuvarlakAraci)
         self.actionAddEllipseItem.setChecked(True)
         self.cScene.clearSelection()
@@ -5670,10 +5634,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_draw_path_item(self):
-        # self.itemWidthSBoxAction.setVisible(False)
-        # self.itemHeightSBoxAction.setVisible(False)
-        # self.itemRotationSBoxAction.setVisible(True)
-        # self.textSizeSBox_tbarAction.setVisible(False)
+
         if self.cScene.KalemAraci.kalem.style() == Qt.PenStyle.NoPen:
             self.act_cizgi_tipi_degistir(Qt.SolidLine)
             self.change_line_style_options(self.cScene.KalemAraci.kalem)
@@ -5686,10 +5647,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_add_text_item(self):
-        # self.itemWidthSBoxAction.setVisible(False)
-        # self.itemHeightSBoxAction.setVisible(False)
-        # self.itemRotationSBoxAction.setVisible(True)
-        # self.textSizeSBox_tbarAction.setVisible(True)
+
         self.cScene.aktif_arac_degistir(aktifArac=self.cScene.YaziAraci, itemText="text")
         self.actionAddTextItem.setChecked(True)
         self.cScene.clearSelection()
@@ -5701,7 +5659,7 @@ class DefterAnaPencere(QMainWindow):
     #     self.itemWidthSBoxAction.setVisible(True)
     #     self.itemHeightSBoxAction.setVisible(True)
     #     self.itemRotationSBoxAction.setVisible(True)
-    #     self.textSizeSBox_tbarAction.setVisible(False)
+    #     self.fontPointSizeFDSBox_tbarAction.setVisible(False)
 
     # ---------------------------------------------------------------------
     @Slot(Image)
@@ -5718,7 +5676,7 @@ class DefterAnaPencere(QMainWindow):
         # self.itemWidthSBoxAction.setVisible(True)
         # self.itemHeightSBoxAction.setVisible(True)
         # self.itemRotationSBoxAction.setVisible(True)
-        # self.textSizeSBox_tbarAction.setVisible(False)
+        # self.fontPointSizeFDSBox_tbarAction.setVisible(False)
         fn = QFileDialog.getOpenFileName(self,
                                          self.tr("Open Image File..."),
                                          self.sonKlasorResimler,
@@ -6163,13 +6121,10 @@ class DefterAnaPencere(QMainWindow):
                     itemDict["pos"] = item.scenePos()
                     # to get actual sceneRotation
                     yeniRot = 0
-                    # yeniScale = 1
                     while parentItem:
                         yeniRot += parentItem.rotation()
-                        # yeniScale /= parentItem.scale()
                         parentItem = parentItem.parentItem()
                     itemDict["rotation"] += yeniRot
-                    # itemDict["scale"] *= yeniScale
                     stream.writeQVariant(itemDict)
             else:
                 # hiyerarsi self.selected_to_dict_for_copy de kuruluyor.
@@ -6373,12 +6328,10 @@ class DefterAnaPencere(QMainWindow):
                 # parentItem() == None her zaman.
                 # self.increase_zvalue(group)
                 self.dict_to_scene_recursive_group(itemDict["group_children"], group)
-                # group.setScale(itemDict["scale"])
                 if "children" in itemDict:
                     self.dict_to_scene_recursive_parent(itemDict["children"], group)
 
                 group.updateBoundingRect()
-                group.setScale(itemDict["scale"])
                 group.setParentItem(paste_group)
                 paste_group.allFirstLevelGroupChildren.append(group)
 
@@ -6586,7 +6539,6 @@ class DefterAnaPencere(QMainWindow):
                 self.dict_to_scene_recursive_group(itemDict["group_children"], item)
                 if "children" in itemDict:
                     self.dict_to_scene_recursive_parent(itemDict["children"], item)
-                item.setScale(itemDict["scale"])
                 item.updateBoundingRect()
                 # irect = item.boundingRect()
 
@@ -6599,9 +6551,9 @@ class DefterAnaPencere(QMainWindow):
             item.flipHorizontal(mposx)
 
             # v - sceneRect adaptation - v
-            mirroredItemsBoundingRect = mirroredItemsBoundingRect.united(item.sceneBoundingRectWithChildren())
+            mirroredItemsBoundingRect |= shared.sceneBoundingRectWithChildren(item)
+            # mirroredItemsBoundingRect |= item.childrenBoundingRect()
         self.cScene.unite_with_scene_rect(mirroredItemsBoundingRect)
-
         self.cScene.undoStack.endMacro()
         # restore old copy mimedata
         self.clipboard.setMimeData(self.beforeMirrorCopyMimeData)
@@ -6639,7 +6591,6 @@ class DefterAnaPencere(QMainWindow):
                 self.dict_to_scene_recursive_group(itemDict["group_children"], item)
                 if "children" in itemDict:
                     self.dict_to_scene_recursive_parent(itemDict["children"], item)
-                item.setScale(itemDict["scale"])
                 item.updateBoundingRect()
                 # irect = item.boundingRect()
 
@@ -6651,7 +6602,8 @@ class DefterAnaPencere(QMainWindow):
 
             item.flipVertical(mposy)
             # v - sceneRect adaptation - v
-            mirroredItemsBoundingRect = mirroredItemsBoundingRect.united(item.sceneBoundingRectWithChildren())
+            mirroredItemsBoundingRect |= shared.sceneBoundingRectWithChildren(item)
+            # mirroredItemsBoundingRect |= item.childrenBoundingRect()
         self.cScene.unite_with_scene_rect(mirroredItemsBoundingRect)
 
         self.cScene.undoStack.endMacro()
@@ -6678,7 +6630,7 @@ class DefterAnaPencere(QMainWindow):
         for item in items:
             eskiPos = item.scenePos()
             item.setSceneLeft(yeniLeft)
-            self.cScene.when_item_moved(item, eskiPos)
+            self.cScene.sinyal_nesne_tasindi(item, eskiPos)
         self.cScene.undoStack.endMacro()
         self.lutfen_bekleyin_gizle()
 
@@ -6701,7 +6653,7 @@ class DefterAnaPencere(QMainWindow):
         for item in items:
             eskiPos = item.scenePos()
             item.setSceneRight(yeniRight)
-            self.cScene.when_item_moved(item, eskiPos)
+            self.cScene.sinyal_nesne_tasindi(item, eskiPos)
         self.cScene.undoStack.endMacro()
         self.lutfen_bekleyin_gizle()
 
@@ -6724,7 +6676,7 @@ class DefterAnaPencere(QMainWindow):
         for item in items:
             eskiPos = item.scenePos()
             item.setSceneTop(yeniTop)
-            self.cScene.when_item_moved(item, eskiPos)
+            self.cScene.sinyal_nesne_tasindi(item, eskiPos)
         self.cScene.undoStack.endMacro()
         self.lutfen_bekleyin_gizle()
 
@@ -6747,7 +6699,7 @@ class DefterAnaPencere(QMainWindow):
         for item in items:
             eskiPos = item.scenePos()
             item.setSceneBottom(yeniBottom)
-            self.cScene.when_item_moved(item, eskiPos)
+            self.cScene.sinyal_nesne_tasindi(item, eskiPos)
         self.cScene.undoStack.endMacro()
         self.lutfen_bekleyin_gizle()
 
@@ -6770,7 +6722,7 @@ class DefterAnaPencere(QMainWindow):
         for item in items:
             eskiPos = item.scenePos()
             item.setHorizontalCenter(hcenter)
-            self.cScene.when_item_moved(item, eskiPos)
+            self.cScene.sinyal_nesne_tasindi(item, eskiPos)
         self.cScene.undoStack.endMacro()
         self.lutfen_bekleyin_gizle()
 
@@ -6793,7 +6745,7 @@ class DefterAnaPencere(QMainWindow):
         for item in items:
             eskiPos = item.pos()
             item.setVerticalCenter(vcenter)
-            self.cScene.when_item_moved(item, eskiPos)
+            self.cScene.sinyal_nesne_tasindi(item, eskiPos)
         self.cScene.undoStack.endMacro()
         self.lutfen_bekleyin_gizle()
 
@@ -6839,7 +6791,7 @@ class DefterAnaPencere(QMainWindow):
             eskiPos = item.pos()
             item.setSceneLeft(prevItemRightX + equalizedGap)
             prevItemRightX = item.sceneRight()
-            self.cScene.when_item_moved(item, eskiPos)
+            self.cScene.sinyal_nesne_tasindi(item, eskiPos)
         self.cScene.undoStack.endMacro()
         self.lutfen_bekleyin_gizle()
 
@@ -6874,7 +6826,7 @@ class DefterAnaPencere(QMainWindow):
             eskiPos = item.pos()
             item.setSceneTop(prevItemBottomY + equalizedGap)
             prevItemBottomY = item.sceneBottom()
-            self.cScene.when_item_moved(item, eskiPos)
+            self.cScene.sinyal_nesne_tasindi(item, eskiPos)
         self.cScene.undoStack.endMacro()
         self.lutfen_bekleyin_gizle()
 
@@ -6899,7 +6851,7 @@ class DefterAnaPencere(QMainWindow):
             eskiPos = item.pos()
             item.setSceneTop(prevItemBottomY + 5)
             prevItemBottomY = item.sceneBottom()
-            self.cScene.when_item_moved(item, eskiPos)
+            self.cScene.sinyal_nesne_tasindi(item, eskiPos)
             self.cScene.unite_with_scene_rect(item.sceneBoundingRect())
         self.cScene.undoStack.endMacro()
         self.lutfen_bekleyin_gizle()
@@ -6925,7 +6877,7 @@ class DefterAnaPencere(QMainWindow):
             eskiPos = item.pos()
             item.setSceneLeft(prevItemRightX + 5)
             prevItemRightX = item.sceneRight()
-            self.cScene.when_item_moved(item, eskiPos)
+            self.cScene.sinyal_nesne_tasindi(item, eskiPos)
             self.cScene.unite_with_scene_rect(item.sceneBoundingRect())
         self.cScene.undoStack.endMacro()
         self.lutfen_bekleyin_gizle()
@@ -7503,7 +7455,7 @@ class DefterAnaPencere(QMainWindow):
         # font = QFont("serif", 14, QFont.Bold)
         # font = QFont("serif")
         # font.setBold(True)
-        # font.setPointSize(14)
+        # font.setPointSizeF(14)
 
         # font = QFont("serif", 8)
         # painter.setFont(font)
@@ -7529,7 +7481,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def kur_sahne_arac_degerleri(self):
-        self.change_text_size_spinbox_value(self.currentFont.pointSize())
+        self.change_font_point_sizef_spinbox_value(self.currentFont.pointSizeF())
         self.change_font_combobox_value(self.currentFont)
         # self.itemRotationSBox_tbar.setValue(item.rotation())
         # self.itemRotationSBox_nesnedw.setValue(item.rotation())
@@ -7671,7 +7623,7 @@ class DefterAnaPencere(QMainWindow):
                     undoRedo.undoableResizeBaseItem(self.cScene.undoStack,
                                                     self.tr("change width"),
                                                     item,
-                                                    QRectF(item.rect().topLeft(), self.itemSize / item.scale()),
+                                                    QRectF(item.rect().topLeft(), self.itemSize),
                                                     item.rect(),
                                                     item.pos())
 
@@ -7712,7 +7664,7 @@ class DefterAnaPencere(QMainWindow):
                     undoRedo.undoableResizeBaseItem(self.cScene.undoStack,
                                                     self.tr("change height"),
                                                     item,
-                                                    QRectF(item.rect().topLeft(), self.itemSize / item.scale()),
+                                                    QRectF(item.rect().topLeft(), self.itemSize),
                                                     item.rect(),
                                                     item.pos())
             if startedMacro:
@@ -7722,7 +7674,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot(QFont)
     def act_set_current_font(self, font):
         font = QFont(font)
-        font.setPointSize(self.textSize)
+        font.setPointSizeF(self.fontPointSizeF)
         if self.cScene.selectionQueue:
             startedMacro = False
             for item in self.cScene.selectionQueue:
@@ -7739,9 +7691,9 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.setFont(QFont(font))
 
     # ---------------------------------------------------------------------
-    @Slot(int)
-    def act_change_text_size(self, value):
-        self.textSize = value
+    @Slot(float)
+    def act_change_font_point_sizef(self, value):
+        self.fontPointSizeF = value
 
         if self.cScene.selectionQueue:
             startedMacro = False
@@ -7750,11 +7702,11 @@ class DefterAnaPencere(QMainWindow):
                     if not startedMacro:
                         self.cScene.undoStack.beginMacro(self.tr("change text size"))
                         startedMacro = True
-                    undoRedo.undoableSetFontSize(self.cScene.undoStack, self.tr("change text size"), item, value)
+                    undoRedo.undoableSetFontSizeF(self.cScene.undoStack, self.tr("change text size"), item, value)
             if startedMacro:
                 self.cScene.undoStack.endMacro()
         else:
-            self.currentFont.setPointSize(value)
+            self.currentFont.setPointSizeF(value)
             self.cScene.setFont(QFont(self.currentFont))
 
     # ---------------------------------------------------------------------
@@ -7778,17 +7730,17 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def change_transform_box_values(self, item):
         if item.type() == shared.LINE_ITEM_TYPE:
-            self.itemWidthSBox_tbar.setValue(item._line.length() * item.scale())
-            self.itemWidthSBox_nesnedw.setValue(item._line.length() * item.scale())
+            self.itemWidthSBox_tbar.setValue(item._line.length())
+            self.itemWidthSBox_nesnedw.setValue(item._line.length())
 
             self.itemRotationSBox_tbar.setValue(item.rotation())
             self.itemRotationSBox_nesnedw.setValue(item.rotation())
         else:
-            self.itemWidthSBox_tbar.setValue(item.rect().width() * item.scale())
-            self.itemWidthSBox_nesnedw.setValue(item.rect().width() * item.scale())
+            self.itemWidthSBox_tbar.setValue(item.rect().width())
+            self.itemWidthSBox_nesnedw.setValue(item.rect().width())
 
-            self.itemHeightSBox_tbar.setValue(item.rect().height() * item.scale())
-            self.itemHeightSBox_nesnedw.setValue(item.rect().height() * item.scale())
+            self.itemHeightSBox_tbar.setValue(item.rect().height())
+            self.itemHeightSBox_nesnedw.setValue(item.rect().height())
 
             self.itemRotationSBox_tbar.setValue(item.rotation())
             self.itemRotationSBox_nesnedw.setValue(item.rotation())
@@ -7796,12 +7748,12 @@ class DefterAnaPencere(QMainWindow):
             self.itemSize = QSizeF(self.itemWidthSBox_tbar.value(), self.itemHeightSBox_tbar.value())
 
     # ---------------------------------------------------------------------
-    def change_text_size_spinbox_value(self, sizeVal):
+    def change_font_point_sizef_spinbox_value(self, sizeVal):
 
-        self.textSizeSBox_tbar.setValue(sizeVal)
-        self.textSizeSBox_yazidw.setValue(sizeVal)
-        # self.textSize = sizeVal
-        # self.currentFont.setPointSize(sizeVal)
+        self.fontPointSizeFDSBox_tbar.setValue(sizeVal)
+        self.fontPointSizeFDSBox_yazidw.setValue(sizeVal)
+        # self.fontPointSizeF = sizeVal
+        # self.currentFont.setPointSizeF(sizeVal)
         # self.cScene.setFont(self.currentFont)
 
     # ---------------------------------------------------------------------
@@ -7842,9 +7794,9 @@ class DefterAnaPencere(QMainWindow):
         preset.setPen(QPen(pen))
         preset.setPresetFont(font)
         font2 = QFont(font)
-        font2.setPointSize(9)
+        font2.setPointSizeF(9)
         preset.setFont(font2)
-        # preset.setText("{}: {}pt - {}px".format(presetName, self.textSize, self._pen.widthF()))
+        # preset.setText("{}: {}pt - {}px".format(presetName, self.fontPointSizeF, self._pen.widthF()))
 
         self.stylePresetsListWidget.addItem(preset)
 
@@ -7900,7 +7852,7 @@ class DefterAnaPencere(QMainWindow):
                 pen = self.cScene.aktifArac.kalem
                 font = QFont(self.cScene.aktifArac.yaziTipi)
 
-            presetName = "  {}:  {}pt  {:.1f}px".format(text, font.pointSize(), pen.widthF())
+            presetName = "  {}:  {}pt  {:.1f}px".format(text, font.pointSizeF(), pen.widthF())
 
             self._add_style_preset_to_list_widget(presetName, fg, bg, cizgiRengi, pen, font)
 
@@ -9141,14 +9093,14 @@ class DefterAnaPencere(QMainWindow):
         self.degistir_yazi_rengi_ikonu(item.yaziRengi, nesne_arkaplan_ikonu_guncelle=False)
         self.degistir_cizgi_rengi_ikonu(item.pen().color(), nesne_arkaplan_ikonu_guncelle=False)
         self.degistir_nesne_arkaplan_rengi_ikonu(item.arkaPlanRengi, item.yaziRengi, item.pen().color())
-        self.change_text_size_spinbox_value(item.font().pointSize())
+        self.change_font_point_sizef_spinbox_value(item.font().pointSizeF())
         self.change_font_combobox_value(item.font())
         self.change_transform_box_values(item)
         self.yazi_hizalama_degisti()
         self.karakter_bicimi_degisti()
         if self.cizgiTipiCBox.isVisible():
             self.change_line_style_options(item._pen)
-        item.update_resize_handles(force=True)
+        item.update_resize_handles()
 
     # ---------------------------------------------------------------------
     def item_deselected(self, item):
@@ -9184,7 +9136,7 @@ class DefterAnaPencere(QMainWindow):
         self.degistir_yazi_rengi_ikonu(item.yaziRengi, nesne_arkaplan_ikonu_guncelle=False)
         self.degistir_cizgi_rengi_ikonu(item._pen.color(), nesne_arkaplan_ikonu_guncelle=False)
         self.degistir_nesne_arkaplan_rengi_ikonu(item.arkaPlanRengi, item.yaziRengi, item._pen.color())
-        self.change_text_size_spinbox_value(item.font().pointSize())
+        self.change_font_point_sizef_spinbox_value(item.font().pointSizeF())
         self.change_font_combobox_value(item.font())
         self.itemRotationSBox_tbar.setValue(item.rotation())
         self.itemRotationSBox_nesnedw.setValue(item.rotation())
@@ -9211,7 +9163,7 @@ class DefterAnaPencere(QMainWindow):
         self.degistir_yazi_rengi_ikonu(item.yaziRengi, nesne_arkaplan_ikonu_guncelle=False)
         self.degistir_cizgi_rengi_ikonu(item._pen.color(), nesne_arkaplan_ikonu_guncelle=False)
         self.degistir_nesne_arkaplan_rengi_ikonu(item.arkaPlanRengi, item.yaziRengi, item._pen.color())
-        self.change_text_size_spinbox_value(item.font().pointSize())
+        self.change_font_point_sizef_spinbox_value(item.font().pointSizeF())
         self.change_font_combobox_value(item.font())
         self.itemRotationSBox_tbar.setValue(item.rotation())
         self.itemRotationSBox_nesnedw.setValue(item.rotation())
@@ -9219,7 +9171,7 @@ class DefterAnaPencere(QMainWindow):
         self.karakter_bicimi_degisti()
         if self.cizgiTipiCBox.isVisible():
             self.change_line_style_options(item._pen)
-        item.update_resize_handles(force=True)
+        item.update_resize_handles()
 
     # ---------------------------------------------------------------------
     def group_item_selected(self, group):

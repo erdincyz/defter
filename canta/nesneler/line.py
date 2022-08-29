@@ -6,7 +6,7 @@ __date__ = '02/Nov/2018'
 __author__ = 'Erdinç Yılmaz'
 
 import math
-from PySide6.QtCore import Qt, QRectF, QSizeF, QPointF, QLineF, QBuffer, QIODevice, QSize
+from PySide6.QtCore import Qt, QRectF, QSizeF, QPointF, QLineF, QBuffer, QIODevice
 from PySide6.QtGui import QPainterPath, QPainterPathStroker, QPen, QColor, QTransform, QPolygonF, QTextOption, QBrush, \
     QPainter
 from PySide6.QtSvg import QSvgGenerator
@@ -72,12 +72,12 @@ class LineItem(QGraphicsItem):
         self.painterTextOption.setAlignment(Qt.AlignCenter)
         self.painterTextOption.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
 
-        self.painterTextScale = 1
         self.painterTextRect = QRectF()
 
         self.cosmeticSelect = False
         self.isActiveItem = False
         self._isPinned = False
+        self.ustGrup = None
 
         self._text = ""
         self._command = {}
@@ -99,7 +99,6 @@ class LineItem(QGraphicsItem):
                       "line": self._line,
                       "pos": self.pos(),
                       "rotation": self.rotation(),
-                      "scale": self.scale(),
                       "zValue": self.zValue(),
                       "pen": self._pen,
                       "font": self._font,
@@ -188,36 +187,8 @@ class LineItem(QGraphicsItem):
         # self.bottomLeftHandle.moveBottomLeft(self.rect().bottomLeft())
 
     # ---------------------------------------------------------------------
-    def update_resize_handles(self, force=False):
+    def update_resize_handles(self):
         self.prepareGeometryChange()
-
-        # for future ref, (if we enable ingroup or inparent scaling)
-        # a = 1
-        # if self.parentItem():
-        #     a = self.parentItem().scale()
-        # scale = 1 / self.scale() / a
-
-        # we need force parameter  because of possible undo of add item. then , if user redos item.scale() will be 1
-        # and handles wont resize, this is a problem if item was scaled in the next redos before first undo.
-        # self.handleSize = self.handleSize / self.scene().views()[0]
-        # print(self.handleSize)
-        if self.scale() != 1 or force:
-            hsize = self.handleSize
-            # hsize = hsize / self.scale()
-            # hsize = hsize / self.scale() * self.scene().views()[0].transform().scale()
-            # TODO: buna tamamen bi bakmak lazim.
-            # bu if kontrolu konup alt satir tablandi if icine,
-            # kaydedilmis dosya acilirken, daha sahnesi olusmadigindan, (daha dosya acilmadigi icin.)
-            # self.scene().views()[0].transform().m11() cagrilamiyor.
-            if self.scene():
-                hsize = hsize / self.scale() / self.scene().views()[
-                    0].transform().m11()  # horz. scale, m22 vertical scale
-            else:
-                hsize = hsize / self.scale()
-            self.resizeHandleSize.scale(hsize, hsize, Qt.KeepAspectRatioByExpanding)
-
-            self.p1Handle.setSize(self.resizeHandleSize)
-            self.p2Handle.setSize(self.resizeHandleSize)
 
         self.p1Handle.moveCenter(self._line.p1())
         self.p2Handle.moveCenter(self._line.p2())
@@ -274,7 +245,6 @@ class LineItem(QGraphicsItem):
             self.tempEskiText = self.text()
             self.setText("")
             self.tempTextItem.setRotation(360 - self.rotation())
-            # self.tempTextItem.scaleWithOffset(1 / self.scale())
             # self.tempTextItem.rotateWithOffset(360 - self.rotation())
             self.tempTextItem.setCenter(self.boundingRect().center())
             self.tempTextItem.setFocus()
@@ -450,18 +420,19 @@ class LineItem(QGraphicsItem):
         # cursor = self.scene().parent().cursor()
 
         # if self.isSelected():
-        if self.scene().aktifArac == self.scene().SecimAraci:
-            if self.p1Handle.contains(event.pos()) or self.p2Handle.contains(event.pos()):
-                self.scene().parent().setCursor(Qt.SizeAllCursor, gecici_mi=True)
-            else:
-                self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
+        if not self.ustGrup:
+            if self.scene().aktifArac == self.scene().SecimAraci:
+                if self.p1Handle.contains(event.pos()) or self.p2Handle.contains(event.pos()):
+                    self.scene().parent().setCursor(Qt.SizeAllCursor, gecici_mi=True)
+                else:
+                    self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
 
         super(LineItem, self).hoverMoveEvent(event)
 
     # ---------------------------------------------------------------------
     def hoverLeaveEvent(self, event):
-
-        self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
+        if not self.ustGrup:
+            self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
 
         super(LineItem, self).hoverLeaveEvent(event)
 
@@ -519,6 +490,8 @@ class LineItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def sceneCenter(self):
+        if self.parentItem():
+            return self.mapToParent(self.line().center())
         return self.mapToScene(self.line().center())
 
     # ---------------------------------------------------------------------
@@ -594,33 +567,6 @@ class LineItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def setVerticalCenter(self, vcenter):
         self.setX(vcenter + self.scenePos().x() - self.sceneCenter().x())
-
-    # ---------------------------------------------------------------------
-    def _update_scene_rect_recursively(self, items, rect):
-
-        for c in items:
-            rect = rect.united(c.sceneBoundingRect())
-            if c.type() == shared.GROUP_ITEM_TYPE:
-                if c.parentedWithParentOperation:
-                    rect = self._update_scene_rect_recursively(c.parentedWithParentOperation, rect)
-            else:
-                if c.childItems():
-                    rect = self._update_scene_rect_recursively(c.childItems(), rect)
-        return rect
-
-    # ---------------------------------------------------------------------
-    def sceneBoundingRectWithChildren(self):
-        # rect = QRectF(self.sceneBoundingRect())
-        rect = self.sceneBoundingRect()
-        for c in self.childItems():
-            rect = rect.united(c.sceneBoundingRect())
-            if c.type() == shared.GROUP_ITEM_TYPE:
-                if c.parentedWithParentOperation:
-                    rect = self._update_scene_rect_recursively(c.parentedWithParentOperation, rect)
-            else:
-                if c.childItems():
-                    rect = self._update_scene_rect_recursively(c.childItems(), rect)
-        return rect
 
     # ---------------------------------------------------------------------
     def length(self):
@@ -734,13 +680,13 @@ class LineItem(QGraphicsItem):
         return self._font
 
     # ---------------------------------------------------------------------
-    def setFontPointSize(self, fontPointSize):
-        self._font.setPointSize(fontPointSize)
+    def setFontPointSizeF(self, fontPointSizeF):
+        self._font.setPointSizeF(fontPointSizeF)
         self.update()
 
     # ---------------------------------------------------------------------
-    def fontPointSize(self):
-        return self._font.pointSize()
+    def fontPointSizeF(self):
+        return self._font.pointSizeF()
 
     # ---------------------------------------------------------------------
     def ver_yazi_hizasi(self):
@@ -772,23 +718,14 @@ class LineItem(QGraphicsItem):
         self.update()
 
     # ---------------------------------------------------------------------
-    def update_painter_text_scale(self):
-        if self.parentItem():
-            a = self.parentItem().scale()
-        else:
-            a = 1
-        self.painterTextScale = 1 / self.scale() / a
-
-    # ---------------------------------------------------------------------
     def update_painter_text_rect(self):
         r = QRectF()
         r.setWidth(self._line.length())
-        # r.setWidth(max(self._line.length(), self.fontPointSize()))
-        # r.setHeight(self.fontPointSize()- self.textPadding)
-        # r.setHeight(self.fontPointSize() + 30)
-        # fontPixelSize = self.fontPointSize() / 72 * self.scene().parent().dpi
-        r.setHeight(self.fontPointSize())
-        # r.setSize(size / self.painterTextScale)
+        # r.setWidth(max(self._line.length(), self.fontPointSizeF()))
+        # r.setHeight(self.fontPointSizeF()- self.textPadding)
+        # r.setHeight(self.fontPointSizeF() + 30)
+        # fontPixelSize = self.fontPointSizeF() / 72 * self.scene().parent().dpi
+        r.setHeight(self.fontPointSizeF())
         # r.moveCenter(self.boundingRect().center())
         yeniOrtaNokta = self._line.center()
         yeniOrtaNokta.setY(yeniOrtaNokta.y() - self._pen.widthF())
@@ -836,7 +773,6 @@ class LineItem(QGraphicsItem):
             # dolayısı ile burda grubun pos u ile ilgili baska bir isleme gerek kalmiyor.
             # ya da grup icersinde. yani grubu icerige giydiriyoruz. islem bitince.
 
-            # self.setScale(self.parentItem().scale())
             # ipos = (ipos - self.parentItem().scenePos())
             # pass
             ipos = (self.parentItem().mapFromScene(ipos))
@@ -965,7 +901,9 @@ class LineItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def wheelEvent(self, event):
         # factor = 1.41 ** (event.delta() / 240.0)
-        # self.scale(factor, factor)
+
+        if self.ustGrup:
+            return QGraphicsItem.wheelEvent(self, event)
 
         toplam = int(event.modifiers())
 
@@ -980,7 +918,7 @@ class LineItem(QGraphicsItem):
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
-            self.scaleItem(event.delta())
+            self.scaleItemByScalingLine(event.delta())
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
@@ -995,7 +933,7 @@ class LineItem(QGraphicsItem):
             self.changeTextColorAlpha(event.delta())
 
         elif toplam == ctrlAltShift:
-            self.changeFontSize(event.delta())
+            self.changeFontSizeF(event.delta())
 
         elif toplam == altShift:
             if self.isDrawingFinished:
@@ -1007,24 +945,24 @@ class LineItem(QGraphicsItem):
             self.scene().tekerlek_ile_firca_boyu_degistir(event.delta())
 
         # elif toplam == ctrlAltShift:
-        #     self.scaleItemByScalingPath(event.delta())
+        #     self.scaleItemByScalingLine(event.delta())
 
         else:
             super(LineItem, self).wheelEvent(event)
 
     # ---------------------------------------------------------------------
-    def changeFontSize(self, delta):
+    def changeFontSizeF(self, delta):
 
         # font = self.font()
-        size = self.fontPointSize()
+        size = self.fontPointSizeF()
 
         if delta > 0:
-            # font.setPointSize(size + 1)
+            # font.setPointSizeF(size + 1)
             size += 1
 
         else:
             if size > 10:
-                # font.setPointSize(size - 1)
+                # font.setPointSizeF(size - 1)
                 size -= 1
             else:
                 # undolari biriktermesin diye donuyoruz,
@@ -1034,74 +972,32 @@ class LineItem(QGraphicsItem):
         # self.setFont(font)
         if self.childItems():
             self.scene().undoStack.beginMacro("change text size")
-            self.scene().undoRedo.undoableSetFontSize(self.scene().undoStack, "change text size", self, size)
+            self.scene().undoRedo.undoableSetFontSizeF(self.scene().undoStack, "change text size", self, size)
             for c in self.childItems():
-                c.changeFontSize(delta)
+                c.changeFontSizeF(delta)
             self.scene().undoStack.endMacro()
         else:
-            self.scene().undoRedo.undoableSetFontSize(self.scene().undoStack, "change text size", self, size)
+            self.scene().undoRedo.undoableSetFontSizeF(self.scene().undoStack, "change text size", self, size)
 
     # ---------------------------------------------------------------------
-    def scaleItemByScalingPath(self, delta):
-
-        # self.setTransformOriginPoint(self.boundingRect().center())
-
-        # TODO : size sıfır olmasin kontrolu
-
-        # scaleFactor = 1.1 * self.scale()
-        # center = self.boundingRect().center()
-        if delta > 0:
-            # scaleFactor = 1.1 * self.scale()
-            scaleFactor = 1.1 * self.transform().m11()  # m11:vertical scale factor , m:22 horizontal scale factor
-            # self.setTransform(QTransform.fromScale(sx, sy), true)
-            # self.setTransform(QTransform.fromScale(scaleFactor, scaleFactor))
-            # self.setScale(scaleFactor)
-            # self.scene().undoableScale("Scale", self, scaleFactor)
-
-            # scaleMatrix = QMatrix()
-            scaleMatrix = QTransform()
-            scaleMatrix.scale(scaleFactor, scaleFactor)
-            scaledPath = self.path() * scaleMatrix
-            # self.setPath(scaledPath)
-            self.scene().undoableScaleLineItemByScalingPath("scale", self, scaledPath)
-            self.scene().unite_with_scene_rect(self.sceneBoundingRect())
-        else:
-            if self.path().controlPointRect().width() < 5:
-                return
-            # TODO: bounding rect degismiyor, o yuzden asagidaki if kontrolu anlamsiz
-            # if not self.boundingRect().width() < 0.1 or not self.boundingRect().height() < 0.1:
-            # scaleFactor = 1 / 1.1 * self.scale()
-            scaleFactor = 1 / 1.1 * self.transform().m11()  # m11:vertical scale factor , m22: horizontal scale factor
-            # self.setTransform(QTransform.fromScale(scaleFactor, scaleFactor))
-            # self.setScale(scaleFactor)
-            # self.scene().undoableScale("Scale", self, scaleFactor)
-            # scaleMatrix = QMatrix()
-            scaleMatrix = QTransform()
-            scaleMatrix.scale(scaleFactor, scaleFactor)
-            scaledPath = self.path() * scaleMatrix
-            # self.setPath(scaledPath)
-            self.scene().undoableScaleLineItemByScalingPath("scale", self, scaledPath)
-
-            # bunu undoableScaleLineItemByScalingPath icinden cagiriyoruz
-
-        # self.setTransformOriginPoint(self.boundingRect().center())
-
-    # ---------------------------------------------------------------------
-    def scaleItem(self, delta):
-        # TODO : size sıfır olmasin kontrolu
+    def scaleItemByScalingLine(self, delta):
 
         scaleFactor = 1.1
-        if delta > 0:
-            scaleFactor = self.scale() * scaleFactor
-            self.scene().unite_with_scene_rect(self.sceneBoundingRect())
+        if delta < 0:
+            scaleFactor = 1 / scaleFactor
 
-        else:
-            scaleFactor = self.scale() / scaleFactor
+        scaleMatrix = QTransform()
+        scaleMatrix.scale(scaleFactor, scaleFactor)
+        scaledLine = self.line() * scaleMatrix
+        # if scaledLine.length() < 5:
+        #     return
+        self.scene().undoRedo.undoableScaleLineItemByScalingLine(self.scene().undoStack,
+                                                                 "scale",
+                                                                 self, scaledLine,
+                                                                 scaleFactor)
 
-        self.scene().undoRedo.undoableScale(self.scene().undoStack, "scale", self, scaleFactor)
-
-        # undoableScale  scaleWithOffset i cagiriyor. orda guncelliyoruz alttakileri.
-        # self.update_painter_text_scale()
+        # self.scene().unite_with_scene_rect(self.sceneBoundingRect())
+        # self.setTransformOriginPoint(self.boundingRect().center())
 
     # ---------------------------------------------------------------------
     def repositionChildItems(self, diff):
@@ -1110,22 +1006,13 @@ class LineItem(QGraphicsItem):
             c.moveBy(-diff.x(), -diff.y())
 
     # ---------------------------------------------------------------------
-    def scaleWithOffset(self, scale):
-        cEski = self.sceneCenter()
-        self.setScale(scale)
-        cYeni = self.sceneCenter()
-        diff = cEski - cYeni
-        self.moveBy(diff.x(), diff.y())
-        # self.updateBoundingRect()
-        self.update_painter_text_scale()
-
-    # ---------------------------------------------------------------------
     def rotateWithOffset(self, angle):
         cEski = self.sceneCenter()
         self.setRotation(angle)
         cYeni = self.sceneCenter()
         diff = cEski - cYeni
         self.moveBy(diff.x(), diff.y())
+        self.update_painter_text_rect()
 
     # ---------------------------------------------------------------------
     def rotateItem(self, delta):
@@ -1144,7 +1031,7 @@ class LineItem(QGraphicsItem):
             # self.scene().undoableRotate("Rotate", self, self.rotation() - 5)
             self.scene().undoRedo.undoableRotateWithOffset(self.scene().undoStack, "rotate", self, self.rotation() - 5)
         # self.update()
-        self.update_painter_text_rect()
+        # self.update_painter_text_rect()
 
     # # ---------------------------------------------------------------------
     # def changeBackgroundColorAlpha(self, delta):
@@ -1259,7 +1146,6 @@ class LineItem(QGraphicsItem):
             # aci = aci * 180 / math.pi
             # painter.rotate(- aci)
             painter.rotate(- self._line.angle())
-            painter.scale(self.painterTextScale, self.painterTextScale)
             painter.translate(-self.line().center())
             # painter.drawText(self.boundingRect(), Qt.AlignCenter | Qt.AlignVCenter, self._text)
             # painter.drawText(self.boundingRect(), self._text, self.painterTextOption)
@@ -1382,7 +1268,6 @@ class LineItem(QGraphicsItem):
             painter.translate(-diff)
             painter.rotate((self.rotation() - self._line.angle()) % 360)
             painter.translate(diff)
-            painter.scale(self.painterTextScale, self.painterTextScale)
             # painter.drawText(cizilecekLine.p1(), self._text)
             painter.drawText(cizilecekTextRect, self._text, self.painterTextOption)
 

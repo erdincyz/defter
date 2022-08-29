@@ -11,7 +11,7 @@ import os
 import platform
 import subprocess
 
-from PySide6.QtCore import Qt, QSize, QFileInfo, QBuffer, QIODevice, QByteArray
+from PySide6.QtCore import Qt, QSize, QFileInfo, QBuffer, QIODevice
 from PySide6.QtGui import QPixmap, QColor
 from PySide6.QtWidgets import QStyle, QFileIconProvider
 
@@ -69,7 +69,6 @@ class DosyaNesnesi(BaseItem):
                       "rect": self.rect(),
                       "pos": self.pos(),
                       "rotation": self.rotation(),
-                      "scale": self.scale(),
                       "zValue": self.zValue(),
                       "yaziRengi": self.yaziRengi,
                       "arkaPlanRengi": self.arkaPlanRengi,
@@ -184,7 +183,6 @@ class DosyaNesnesi(BaseItem):
         painter.setPen(self.textPen)
         painter.translate(self._rect.center())
         painter.rotate(-self.rotation())
-        painter.scale(self.painterTextScale, self.painterTextScale)
         painter.translate(-self._rect.center())
         painter.drawText(self.painterTextRect, self.filePathForSave, self.painterTextOption)
         painter.restore()

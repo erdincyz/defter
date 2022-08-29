@@ -21,9 +21,10 @@ class Group(QGraphicsItem):
 
         self._kim = shared.kim(kac_basamak=16)
 
+        self.ustGrup = None
         self._itemsBoundingRect = QRectF()
 
-        self.setHandlesChildEvents(True)
+        self.setHandlesChildEvents(False)
         self.setFlags(self.ItemIsSelectable
                       | self.ItemIsMovable
                       # | self.ItemIsFocusable
@@ -115,7 +116,7 @@ class Group(QGraphicsItem):
         return None
 
     # ---------------------------------------------------------------------
-    def update_resize_handles(self, force=False):
+    def update_resize_handles(self):
         # dummy method
         # while zooming, view, updates activeItem's resize handles.
         # filtering out group type is an another option but,
@@ -129,7 +130,6 @@ class Group(QGraphicsItem):
                       "kim": self._kim,
                       "pos": self.pos(),
                       "rotation": self.rotation(),
-                      "scale": self.scale(),
                       "zValue": self.zValue(),
                       "yaziRengi": self.yaziRengi,  # yaziRengi grup nesnesinde aktik olarak kullanilmiyor
                       "arkaPlanRengi": self.arkaPlanRengi,  # arkaPlanRengi grup nesnesinde aktik olarak kullanilmiyor
@@ -156,6 +156,8 @@ class Group(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def sceneCenter(self):
+        if self.parentItem():
+            return self.mapToParent(self.boundingRect().center())
         return self.mapToScene(self.boundingRect().center())
 
     # ---------------------------------------------------------------------
@@ -215,33 +217,6 @@ class Group(QGraphicsItem):
         self.setPos(scenePos - self._itemsBoundingRect.center())
 
     # ---------------------------------------------------------------------
-    def _update_scene_rect_recursively(self, items, rect):
-        for c in items:
-            rect = rect.united(c.sceneBoundingRect())
-            if c.type() == Group.Type:
-                if c.parentedWithParentOperation:
-                    rect = self._update_scene_rect_recursively(c.parentedWithParentOperation, rect)
-            else:
-                if c.childItems():
-                    rect = self._update_scene_rect_recursively(c.childItems(), rect)
-
-        return rect
-
-    # ---------------------------------------------------------------------
-    def sceneBoundingRectWithChildren(self):
-        # rect = QRectF(self.sceneBoundingRect())
-        rect = self.sceneBoundingRect()
-        for c in self.parentedWithParentOperation:
-            rect = rect.united(c.sceneBoundingRect())
-            if c.type() == Group.Type:
-                if c.parentedWithParentOperation:
-                    rect = self._update_scene_rect_recursively(c.parentedWithParentOperation, rect)
-            else:
-                if c.childItems():
-                    rect = self._update_scene_rect_recursively(c.childItems(), rect)
-        return rect
-
-    # ---------------------------------------------------------------------
     def flipHorizontal(self, mposx):
 
         eskiRot = self.rotation()
@@ -282,7 +257,8 @@ class Group(QGraphicsItem):
     def _update_rect_recursively(self, items, rect):
 
         for c in items:
-            rect = rect.united(self.mapRectFromItem(c, c.boundingRect()))
+            # rect = rect.united(self.mapRectFromItem(c, c.boundingRect()))
+            rect |= self.mapRectFromItem(c, c.boundingRect())
             # burda sub item grup olsa bile ayirmaya gerek yok "allFirstLevelGroupChildren" diye childitemlari
             # cunku asıl grup hepsini kapsamak zorunda
             if c.childItems():
@@ -293,47 +269,37 @@ class Group(QGraphicsItem):
     # ---------------------------------------------------------------------
     def updateBoundingRect(self):
         self.prepareGeometryChange()  # TODO: bunu debug et acaip uzun suruyor
-        # self._itemsBoundingRect = self.childrenBoundingRect()
+        # rect = self.childrenBoundingRect()
+
         rect = QRectF()
         # for item in self.childItems():
         for item in self.allFirstLevelGroupChildren:
-            rect = rect.united(self.mapRectFromItem(item, item.boundingRect()))
+            # rect = rect.united(self.mapRectFromItem(item, item.boundingRect()))
+            rect |= self.mapRectFromItem(item, item.boundingRect())
             # burda sub item grup olsa bile ayirmaya gerek yok "allFirstLevelGroupChildren" diye childitemlari
             # cunku asıl grup hepsini kapsamak zorunda
             if item.childItems():
                 rect = self._update_rect_recursively(item.childItems(), rect)
 
-        # # pozisyonu shane koordinatlarında topLefte almak icin,
-        # # ama scaled group mirrorunu bozuyor.
-        # diff = self.scenePos() - self.mapToScene(rect.topLeft())
-        # self.setPos(self.mapToScene(rect.topLeft()))
-        # rect.moveTo(0, 0)
-        # for c in self.childItems():
-        #     # c.setPos(c.pos()+diff)
-        #     c.moveBy(diff.x(), diff.y())
+        # self._itemsBoundingRect = rect
 
+        # TODO: bir bak
+        # pozisyonu sahne koordinatlarında topLefte almak icin,
+        # ama scaled group mirrorunu bozuyor.
+        diff = self.scenePos() - self.mapToScene(rect.topLeft())
+        self.setPos(self.mapToScene(rect.topLeft()))
+        rect.moveTo(0, 0)
         self._itemsBoundingRect = rect
+        for c in self.allFirstLevelGroupChildren:
+            # c.setPos(c.pos()+diff)
+            c.moveBy(diff.x(), diff.y())
+
+        # self.tumElemanlariEkleyincePozisyonGuncelle()
 
     # # ---------------------------------------------------------------------
-    # def addItemsToGroup(self, items):
-    #     # TODO: if item == this !!
-    #     if not items:
-    #             return
-    #
-    #     for item in items:
-    #         item.setParentItem(self)
-    #         item.setFlag(item.ItemIsSelectable, False)
-    #         item.setFlag(item.ItemIsMovable, False)
-    #         item.setFlag(item.ItemIsFocusable, False)
-    #         item.isPinned = True
-    #         if item.type() == self.type():
-    #             # TODO: set ve daha sonra destroy mu kullansak, ungroup ederken.
-    #             self.allNonGroupGroupChildren.extend(item.allNonGroupGroupChildren)
-    #         else:
-    #             self.allNonGroupGroupChildren.append(item)
-    #         self.allFirstLevelGroupChildren.append(item)
-    #
-    #     self.updateBoundingRect()
+    # def tumElemanlariEkleyincePozisyonGuncelle(self):
+    #     # self.updateBoundingRect()
+    #     self.setPos(self.mapToScene(self._itemsBoundingRect.topLeft()))
 
     # ---------------------------------------------------------------------
     def addSingleItemToGroup(self, item):
@@ -341,10 +307,9 @@ class Group(QGraphicsItem):
             return
         # self.prepareGeometryChange()
         eskiItemRot = item.rotation()
-        eskiScale = item.scale()
         item.setParentItem(self)
+        item.ustGrup = self
         item.rotateWithOffset(eskiItemRot - self.rotation())
-        item.scaleWithOffset(eskiScale / self.scale())
         item.isPinned = True  # !! bunun yeri onemli , asagidaki flagleri set edisimizin altında bunu set edersek,
         # isPinned bir property oldugundan, set kisminda her halukarda  "ItemIsSelectable ,True"oldugundan override
         # ediyor ve gruplanmis item secilebilir oluyor.
@@ -363,24 +328,6 @@ class Group(QGraphicsItem):
         # we re adding directly because, if an item and its parent is selected, we don't add item to a group,
         # we re adding only its parent.
         self.allFirstLevelGroupChildren.append(item)
-
-    # # ---------------------------------------------------------------------
-    # def removeItemFromGroup(self, item):
-    #     if not item:
-    #         return
-    #     parent = self.parentItem()
-    #     pos = self.mapToScene(item.pos())
-    #     # item.setParentItem(None)
-    #     item.setParentItem(parent)
-    #     item.isPinned = False
-    #     item.setPos(pos)
-    #     item.setFlags(self.ItemIsSelectable
-    #                   | self.ItemIsMovable
-    #                   | self.ItemIsFocusable
-    #                   )
-    #     # self.update()
-    #     self.prepareGeometryChange()
-    #     self._itemsBoundingRect = self.childrenBoundingRect()
 
     # ---------------------------------------------------------------------
     def destroyGroupForPaste(self):
@@ -425,13 +372,13 @@ class Group(QGraphicsItem):
                     parent.parentedWithParentOperation.append(item)
 
             item.isPinned = False
+            item.ustGrup = None
             if not item.type() == shared.LINE_ITEM_TYPE:
                 item.rotateWithOffset(self.rotation() + item.rotation())
             else:
                 item.rotateWithOffset(self.rotation() - item.rotation())
                 # item._line.setAngle(item._line.angle() - self.rotation())
                 # item.update_arrow()
-            item.scaleWithOffset(self.scale() * item.scale())
             item.setPos(pos)
             item.setFlags(self.ItemIsSelectable | self.ItemIsMovable | self.ItemIsFocusable)
             # TODO: info: gruplanmiş parentlarin childlerini grupta tutmuyoruz. dolayisi ile
@@ -457,23 +404,15 @@ class Group(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def boundingRect(self):
-        # rect = QRectF()
-        # # for item in self.childItems():
-        # for item in self.allFirstLevelGroupChildren:
-        #     rect = rect.unite(self.mapRectFromItem(item, item.boundingRect()))
-        # return rect
         return self._itemsBoundingRect
-        # TODO: icindeki itemleer scale ve rotate edilince bbox degismiyor.
-        # itemlardan bir signal mi gondersek, grup icinde de degillerse o zaman bosa kaynak harcanmasin.
-        # alttaki satir biraz cozuyor gibi ama o da yine surekli hesap
-        # return self.childrenBoundingRect()
 
     # # ---------------------------------------------------------------------
     # def shape(self):
     #     path = QPainterPath()
     #     # path.addRect(self.rect)
-    #     path.addRect(self._rect)
-    #     return self.qt_graphicsItem_shapeFromPath(path, self._pen)
+    #     path.addRect(self._itemsBoundingRect)
+    #     # return self.qt_graphicsItem_shapeFromPath(path, self._pen)
+    #     return path
 
     # ---------------------------------------------------------------------
     def itemChange(self, change, value):
@@ -587,6 +526,9 @@ class Group(QGraphicsItem):
     # ---------------------------------------------------------------------
     def wheelEvent(self, event):
 
+        if self.ustGrup:
+            return QGraphicsItem.wheelEvent(self, event)
+
         toplam = int(event.modifiers())
 
         # ctrl = int(Qt.ControlModifier)
@@ -601,7 +543,8 @@ class Group(QGraphicsItem):
         # if event.modifiers() & Qt.ControlModifier:
 
         if toplam == ctrlShift:
-            self.scaleItem(event.delta())
+            # self.scaleItem(event.delta())
+            self.scaleItemByResizing(event.delta())
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
@@ -626,27 +569,29 @@ class Group(QGraphicsItem):
             super(Group, self).wheelEvent(event)
 
     # ---------------------------------------------------------------------
-    def scaleItem(self, delta):
-
-        # TODO : size sıfır olmasin kontrolu
+    def scaleItemByResizing(self, delta):
 
         scaleFactor = 1.1
-        if delta > 0:
-            scaleFactor = self.scale() * scaleFactor
-            self.scene().unite_with_scene_rect(self.sceneBoundingRect())
+        if delta < 0:
+            scaleFactor = 1 / scaleFactor
 
-        else:
-            scaleFactor = self.scale() / scaleFactor
+        # eskiTamCerceve = self.boundingRect() | self.childrenBoundingRect()
+        # rect = self.childrenBoundingRect()
+        rect = self._itemsBoundingRect
+        center = rect.center()
 
-        self.scene().undoRedo.undoableScale(self.scene().undoStack, "scale", self, scaleFactor)
+        rect = QRectF(rect.topLeft(), rect.size() * scaleFactor)
+        rect.moveCenter(center)
+        yeniPos = self.mapToScene(rect.topLeft())
+        if self.parentItem():
+            yeniPos = self.mapToParent(rect.topLeft())
+        rect.moveTo(0, 0)
 
-    # ---------------------------------------------------------------------
-    def scaleWithOffset(self, scale):
-        cEski = self.sceneCenter()
-        self.setScale(scale)
-        cYeni = self.sceneCenter()
-        diff = cEski - cYeni
-        self.moveBy(diff.x(), diff.y())
+        self.scene().undoRedo.undoableScaleGroupItemByResizing(self.scene().undoStack,
+                                                               "_scale by resizing",
+                                                               self, rect, scaleFactor,
+                                                               yeniPos)
+
         # self.updateBoundingRect()
 
     # ---------------------------------------------------------------------
@@ -656,10 +601,10 @@ class Group(QGraphicsItem):
         cYeni = self.sceneCenter()
         diff = cEski - cYeni
         self.moveBy(diff.x(), diff.y())
+        # self.updateBoundingRect()
 
     # ---------------------------------------------------------------------
     def rotateItem(self, delta):
-
         if delta > 0:
             # self.setRotation(self.rotation() + 5)
             # self.rotateWithOffset(self.rotation() + 5)
@@ -708,22 +653,29 @@ class Group(QGraphicsItem):
                 selectionPenBottom = self.selectionPenBottom
 
             painter.setPen(selectionPenBottom)
-            painter.drawRect(self.boundingRect())
+            # painter.drawRect(self.boundingRect())
+            painter.drawRect(self._itemsBoundingRect)
 
             # painter.setPen(self.selectionPenTop)
             # painter.drawRect(self.boundingRect())
 
         else:
             painter.setPen(self._pen)
-            painter.drawRect(self.boundingRect())
+            # painter.drawRect(self.boundingRect())
+            painter.drawRect(self._itemsBoundingRect)
 
         # # # # # debug start - pos() # # # # #
         # p = self.pos()
         # s = self.scenePos()
         # painter.drawText(self.boundingRect(),
         #                  "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
-        # painter.setPen(QPen(Qt.green,12))
+        # painter.setPen(QPen(Qt.green, 8))
         # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
+        # painter.drawPoint(0, 0)
+        # painter.setPen(QPen(Qt.red, 16))
+        # painter.drawPoint(self.mapFromScene(self.scenePos()))
+        # painter.setPen(QPen(Qt.blue, 12))
+        # painter.drawPoint(self.mapFromScene(self.scenePos()))
         # t = self.transformOriginPoint()
         # painter.drawRect(t.x()-12, t.y()-12,24,24)
         # mapped = self.mapToScene(self.boundingRect().topLeft())
@@ -732,6 +684,8 @@ class Group(QGraphicsItem):
         # painter.drawText(self.boundingRect().center().x(), self.boundingRect().center().y(),
         #                  "{0:.3f}".format(self.scale()))
         # painter.drawRect(self.boundingRect())
+        # painter.setPen(QPen(Qt.yellow, 1))
+        # painter.drawRect(QRectF(0, 0, 50, 50))
         # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
         # # # # # debug end - pos() # # # # #
 

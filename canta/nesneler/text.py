@@ -6,8 +6,10 @@ __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
 # from math import fabs
+from math import ceil
+
 from PySide6.QtCore import Qt, Signal, QSizeF, QRectF, QPointF, Slot, QUrl
-from PySide6.QtGui import QBrush, QPen, QColor, QPainterPath
+from PySide6.QtGui import QBrush, QPen, QColor, QPainterPath, QFontMetricsF
 from PySide6.QtWidgets import QGraphicsTextItem, QStyle
 from canta import shared
 
@@ -108,6 +110,7 @@ class Text(QGraphicsTextItem):
         self.cosmeticSelect = False
         self.isActiveItem = False
         self._isPinned = False
+        self.ustGrup = None
         self._command = {}
 
         self.isPlainText = True
@@ -145,7 +148,6 @@ class Text(QGraphicsTextItem):
                       "rect": self.rect(),
                       "pos": self.pos(),
                       "rotation": self.rotation(),
-                      "scale": self.scale(),
                       "zValue": self.zValue(),
                       "pen": self._pen,
                       "font": self.font(),
@@ -254,45 +256,8 @@ class Text(QGraphicsTextItem):
         self.bottomLeftHandle.moveBottomLeft(self._rect.bottomLeft())
 
     # ---------------------------------------------------------------------
-    def update_resize_handles(self, force=False):
+    def update_resize_handles(self):
         self.prepareGeometryChange()
-
-        # for future ref, (if we enable ingroup or inparent scaling)
-        # a = 1
-        # if self.parentItem():
-        #     a = self.parentItem().scale()
-        # scale = 1 / self.scale() / a
-
-        # we need force parameter  because of possible undo of add item. then , if user redos item.scale() will be 1
-        # and handles wont resize, this is a problem if item was scaled in the next redos before first undo.
-        # self.handleSize = self.handleSize / self.scene().views()[0]
-        # print(self.handleSize)
-        if self.scale() != 1 or force:
-            hsize = self.handleSize
-            # hsize = hsize / self.scale()
-            # hsize = hsize / self.scale() * self.scene().views()[0].transform().scale()
-
-            # TODO: buna tamamen bi bakmak lazim.
-            # bu if kontrolu konup alt satir tablandi if icine,
-            # kaydedilmis dosya acilirken, daha sahnesi olusmadigindan, (daha dosya acilmadigi icin.)
-            # self.scene().views()[0].transform().m11() cagrilamiyor.
-            if self.scene():
-                hsize = hsize / self.scale() / self.scene().views()[
-                    0].transform().m11()  # horz. scale, m22 vertical scale
-            else:
-                hsize = hsize / self.scale()
-
-            self.resizeHandleSize.scale(hsize, hsize, Qt.KeepAspectRatioByExpanding)
-
-            self.topLeftHandle.setSize(self.resizeHandleSize)
-            self.topRightHandle.setSize(self.resizeHandleSize)
-            self.bottomRightHandle.setSize(self.resizeHandleSize)
-            self.bottomLeftHandle.setSize(self.resizeHandleSize)
-
-        # self.topLeftHandle.moveTopLeft(self._rect.topLeft())
-        # self.topRightHandle.moveTopRight(self._rect.topRight())
-        # self.bottomRightHandle.moveBottomRight(self._rect.bottomRight())
-        # self.bottomLeftHandle.moveBottomLeft(self._rect.bottomLeft())
 
         self.topLeftHandle.moveTopLeft(self.boundingRect().topLeft())
         self.topRightHandle.moveTopRight(self.boundingRect().topRight())
@@ -301,6 +266,8 @@ class Text(QGraphicsTextItem):
 
     # ---------------------------------------------------------------------
     def sceneCenter(self):
+        if self.parentItem():
+            return self.mapToParent(self.boundingRect().center())
         return self.mapToScene(self.boundingRect().center())
 
     # ---------------------------------------------------------------------
@@ -354,33 +321,6 @@ class Text(QGraphicsTextItem):
     # ---------------------------------------------------------------------
     def setVerticalCenter(self, vcenter):
         self.setX(vcenter + self.scenePos().x() - self.sceneCenter().x())
-
-    # ---------------------------------------------------------------------
-    def _update_scene_rect_recursively(self, items, rect):
-
-        for c in items:
-            rect = rect.united(c.sceneBoundingRect())
-            if c.type() == shared.GROUP_ITEM_TYPE:
-                if c.parentedWithParentOperation:
-                    rect = self._update_scene_rect_recursively(c.parentedWithParentOperation, rect)
-            else:
-                if c.childItems():
-                    rect = self._update_scene_rect_recursively(c.childItems(), rect)
-        return rect
-
-    # ---------------------------------------------------------------------
-    def sceneBoundingRectWithChildren(self):
-        # rect = QRectF(self.sceneBoundingRect())
-        rect = self.sceneBoundingRect()
-        for c in self.childItems():
-            rect = rect.united(c.sceneBoundingRect())
-            if c.type() == shared.GROUP_ITEM_TYPE:
-                if c.parentedWithParentOperation:
-                    rect = self._update_scene_rect_recursively(c.parentedWithParentOperation, rect)
-            else:
-                if c.childItems():
-                    rect = self._update_scene_rect_recursively(c.childItems(), rect)
-        return rect
 
     # ---------------------------------------------------------------------
     def flipHorizontal(self, mposx):
@@ -461,29 +401,21 @@ class Text(QGraphicsTextItem):
         return self._command
 
     # ---------------------------------------------------------------------
-    def yazi_kutusunu_daralt(self):
-        # self._rect.setSize(QSizeF(self.doc.size()))
-        r = QRectF(self._rect)
-        # r.setSize(QSizeF(self.textWidth(), self.doc.size().height()))
-        r.setSize(QSizeF(self.doc.size()))
-        self.setRect(r)
-
-    # ---------------------------------------------------------------------
     def setFont(self, font):
         super(Text, self).setFont(font)
         if self.parentItem():
             self.yazi_kutusunu_daralt()
 
     # ---------------------------------------------------------------------
-    def setFontPointSize(self, fontPointSize):
+    def setFontPointSizeF(self, fontPointSizeF):
         font = self.font()
-        font.setPointSize(fontPointSize)
+        font.setPointSizeF(fontPointSizeF)
         self.setFont(font)
         self.update()
 
     # ---------------------------------------------------------------------
-    def fontPointSize(self):
-        return self.font().pointSize()
+    def fontPointSizeF(self):
+        return self.font().pointSizeF()
 
     # ---------------------------------------------------------------------
     def ver_yazi_hizasi(self):
@@ -660,15 +592,16 @@ class Text(QGraphicsTextItem):
         # cursor = self.scene().parent().cursor()
 
         # if self.isSelected() and self.scene().aktifArac == self.scene().SecimAraci:
-        if self.scene().aktifArac == self.scene().SecimAraci:
-            if self.topLeftHandle.contains(event.pos()) or self.bottomRightHandle.contains(event.pos()):
-                self.scene().parent().setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
-                # self.setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
-            elif self.topRightHandle.contains(event.pos()) or self.bottomLeftHandle.contains(event.pos()):
-                self.scene().parent().setCursor(Qt.SizeBDiagCursor, gecici_mi=True)
-                # self.setCursor(Qt.SizeBDiagCursor, gecici_mi=True)
-            else:
-                self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
+        if not self.ustGrup:
+            if self.scene().aktifArac == self.scene().SecimAraci:
+                if self.topLeftHandle.contains(event.pos()) or self.bottomRightHandle.contains(event.pos()):
+                    self.scene().parent().setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
+                    # self.setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
+                elif self.topRightHandle.contains(event.pos()) or self.bottomLeftHandle.contains(event.pos()):
+                    self.scene().parent().setCursor(Qt.SizeBDiagCursor, gecici_mi=True)
+                    # self.setCursor(Qt.SizeBDiagCursor, gecici_mi=True)
+                else:
+                    self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
 
         super(Text, self).hoverMoveEvent(event)
 
@@ -676,12 +609,16 @@ class Text(QGraphicsTextItem):
     def hoverLeaveEvent(self, event):
         # if self.isSelected():
         # self.setCursor(self.saved_cursor)
-        self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
+        if not self.ustGrup:
+            self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
 
         super(Text, self).hoverLeaveEvent(event)
 
     # ---------------------------------------------------------------------
     def wheelEvent(self, event):
+
+        if self.ustGrup:
+            return QGraphicsTextItem.wheelEvent(self, event)
 
         toplam = int(event.modifiers())
 
@@ -696,7 +633,8 @@ class Text(QGraphicsTextItem):
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
-            self.scaleItem(event.delta())
+            # self.scaleItem(event.delta())
+            self.scaleItemWithFontSizeF(event.delta())
             # self.scaleItem(event.angleDelta().y())
 
         # elif event.modifiers() & Qt.ShiftModifier:
@@ -711,79 +649,65 @@ class Text(QGraphicsTextItem):
             self.changeTextColorAlpha(event.delta())
 
         elif toplam == ctrlAltShift:
-            self.changeFontSize(event.delta())
+            self.changeFontSizeF(event.delta())
 
         elif toplam == altShift:
             # self.changeImageItemTextBackgroundColorAlpha(event.delta())
             self.changeLineColorAlpha(event.delta())
 
         # elif toplam == ctrlAltShift:
-        #     self.scaleItemWithFontSize(event.delta())
+        #     self.scaleItemWithFontSizeF(event.delta())
 
         else:
             super(Text, self).wheelEvent(event)
 
     # ---------------------------------------------------------------------
-    def scaleItemWithFontSize(self, delta):
-        self.changeFontSize(delta)
+    def scaleItemWithFontSizeF2(self, delta):
+        self.changeFontSizeF(delta)
 
     # ---------------------------------------------------------------------
-    def changeFontSize(self, delta):
+    def scaleItemWithFontSizeF(self, delta):
+
+        scaleFactor = 1.1
+        if delta < 0:
+            scaleFactor = 1 / scaleFactor
+            # scaleFactor = 0.91
+
+        # self.setTransformOriginPoint(self.boundingRect().center())
+        # fontPointSizeF = max(3, (self.fontPointSizeF() * scaleFactor))
+        fontPointSizeF = self.fontPointSizeF() * scaleFactor
+
+        # eskiTamCerceve = self.boundingRect() | self.childrenBoundingRect()
+        # yeniTamCerceveSize = eskiTamCerceve.size() * scaleFactor
+
+        self.scene().undoRedo.undoableScaleTextItemByResizing(self.scene().undoStack,
+                                                              "_scale by resizing",
+                                                              self, scaleFactor, fontPointSizeF
+                                                              )
+
+        self.yazi_kutusunu_daralt()
+
+    # ---------------------------------------------------------------------
+    def changeFontSizeF(self, delta):
         # font = self.font()
-        size = self.fontPointSize()
+        size = self.fontPointSizeF()
 
         if delta > 0:
-            # font.setPointSize(size + 1)
+            # font.setPointSizeF(size + 1)
             size += 1
 
         else:
-            if size > 5:
-                # font.setPointSize(size - 1)
+            if size > 3:
+                # font.setPointSizeF(size - 1)
                 size -= 1
             else:
                 # undolari biriktermesin diye donuyoruz,
                 # yoksa zaten ayni size de yeni bir undolu size komutu veriyor.
                 return
 
-        self.scene().undoRedo.undoableSetFontSize(self.scene().undoStack, "change text size", self, size)
-
-        # # ---------------------------------------------------------------------
-        # if self.childItems():
-        #     self.scene().undoStack.beginMacro("change text size")
-        #     # self.scene().undoableSetFontSize("change text size", self, size)
-        #     for c in self.childItems():
-        #         c.changeFontSize(delta)
-        #     self.scene().undoStack.endMacro()
-        # # ---------------------------------------------------------------------
-        # # else:
-        # #     self.scene().undoableSetFontSize("change text size", self, size)
-
-    # ---------------------------------------------------------------------
-    def scaleItem(self, delta):
-        # TODO : size sıfır olmasin kontrolu
-
-        scaleFactor = 1.1
-        if delta > 0:
-            scaleFactor = self.scale() * scaleFactor
-            self.scene().unite_with_scene_rect(self.sceneBoundingRect())
-
-        else:
-            scaleFactor = self.scale() / scaleFactor
-
-        self.scene().undoRedo.undoableScale(self.scene().undoStack, "scale", self, scaleFactor)
-
-    # ---------------------------------------------------------------------
-    def scaleWithOffset(self, scale):
-        cEski = self.sceneCenter()
-        self.setScale(scale)
-        cYeni = self.sceneCenter()
-        diff = cEski - cYeni
-        self.moveBy(diff.x(), diff.y())
-
-    # ---------------------------------------------------------------------
-    def setScale(self, scale):
-        super(Text, self).setScale(scale)
-        self.update_resize_handles()
+        self.scene().undoRedo.undoableSetFontSizeF(self.scene().undoStack, "change text size", self, size)
+        self.yazi_kutusunu_daralt()
+        # TODO: child items baseden bak
 
     # ---------------------------------------------------------------------
     def rotateWithOffset(self, angle):
@@ -1001,6 +925,22 @@ class Text(QGraphicsTextItem):
             super(Text, self).mouseMoveEvent(event)
 
         # super(BaseItem, self).mouseMoveEvent(event)
+
+    # ---------------------------------------------------------------------
+    def yazi_kutusunu_daralt(self):
+        # self._rect.setSize(QSizeF(self.doc.size()))
+        r = QRectF(self._rect)
+        # r.setSize(QSizeF(self.textWidth(), self.doc.size().height()))
+
+        fm = QFontMetricsF(self.font())
+        yaziGenislik = fm.horizontalAdvance(self.text())
+        # yaziYukseklik = fm.height()
+        # self.doc.adjustSize()
+        # self.doc.setTextWidth(yaziGenislik + 10)
+        r.setWidth(yaziGenislik + 10)
+        r.setHeight(self.doc.size().height())
+        # r.setSize(QSizeF(self.doc.size()))
+        self.setRect(r)
 
     # ---------------------------------------------------------------------
     def setRect(self, rect):
@@ -1224,7 +1164,7 @@ class Text(QGraphicsTextItem):
         div_str = f"""
                     <article style="
 
-                     font-size:{self.fontPointSize()}pt; 
+                     font-size:{self.fontPointSizeF()}pt; 
                      font-family:{self.font().family()};
                      text-align: {yazi_hiza};
                      {bicimler1}

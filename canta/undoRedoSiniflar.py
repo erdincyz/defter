@@ -84,7 +84,7 @@ class UndoableAddItem(QUndoCommand):
     def redo(self):
         self.scene.addItem(self.item)
         if isinstance(self.item, BaseItem):
-            self.item.update_resize_handles(force=True)
+            self.item.update_resize_handles()
         self.scene.clearSelection()
         # setSelected iptal edildi. Nesne sayisi cok olan dosyalarin acilis hizi yari yariyadan fazla dusuyor.
         # self.item.setSelected(self.sec)
@@ -420,13 +420,10 @@ class UndoableParent(QUndoCommand):
         self.item = item
         self.parentItem = parentItem
         self.parentRot = 0
-        self.parentScale = 1  # TODO: bu parentItem.scale() olsa daha iyi degil mi?. aslinda 1 iken calsiyor. bi bakilabilir yine de.
-        self.itemInitialScale = item.scale()
         while parentItem:
             # cunku itemRot mesela 40 derece ise, yeni parentRot 10 derece ise, item parent edilince 40-10 = 30 oluyor.
             # dolayısı ile ne kadar parent icinde ise hepsinin rotation toplami asil sceneRotation unu veriyor.
             self.parentRot += parentItem.rotation()
-            self.parentScale *= parentItem.scale()
             parentItem = parentItem.parentItem()
         self.eskiParentItem = item.parentItem()
         self.yeniPos = yeniPos
@@ -438,10 +435,9 @@ class UndoableParent(QUndoCommand):
         self.item.setParentItem(self.parentItem)
         self.item.setPos(self.yeniPos)
         self.item.setRotation(self.item.rotation() - self.parentRot)
-        self.item.setScale(self.itemInitialScale / self.parentScale)
-        if self.parentItem:
-            if self.parentItem.type() == shared.GROUP_ITEM_TYPE:
-                self.parentItem.parentedWithParentOperation.append(self.item)
+        # if self.parentItem:
+        if self.parentItem.type() == shared.GROUP_ITEM_TYPE:
+            self.parentItem.parentedWithParentOperation.append(self.item)
         self.item.scene().unGroupedRootItems.discard(self.item)
 
     # ---------------------------------------------------------------------
@@ -456,7 +452,6 @@ class UndoableParent(QUndoCommand):
 
         self.item.setPos(self.eskiPos)
         self.item.setRotation(self.eskiRot)
-        self.item.setScale(self.itemInitialScale)
 
 
 ########################################################################
@@ -476,10 +471,8 @@ class UndoableUnParent(QUndoCommand):
         self.eskiParentItem = item.parentItem()
         eskiParentItem = self.eskiParentItem
         self.eskiParentRot = 0
-        self.eskiParentScale = 1
         while eskiParentItem:
             self.eskiParentRot += eskiParentItem.rotation()
-            self.eskiParentScale *= eskiParentItem.scale()
             eskiParentItem = eskiParentItem.parentItem()
 
     # ---------------------------------------------------------------------
@@ -487,7 +480,6 @@ class UndoableUnParent(QUndoCommand):
         self.item.scene().unGroupedRootItems.add(self.item)
         self.item.setPos(self.yeniPos)
         self.item.setRotation(self.item.rotation() + self.eskiParentRot)
-        self.item.setScale(self.eskiParentScale * self.item.scale())
         self.item.setParentItem(self.yeniParentItem)
         # eger self.eskiParentItem grupsa, parentedWithParentOperation dan silmeye gerek yok cunku
         # onu grupta hallediyoruz.
@@ -497,10 +489,9 @@ class UndoableUnParent(QUndoCommand):
         self.item.setParentItem(self.eskiParentItem)
         self.item.setPos(self.eskiPos)
         self.item.setRotation(self.item.rotation() - self.eskiParentRot)
-        self.item.setScale(self.item.scale() / self.eskiParentScale)
-        if self.eskiParentItem:
-            if self.eskiParentItem.type() == shared.GROUP_ITEM_TYPE:
-                self.eskiParentItem.parentedWithParentOperation.append(self.item)
+        # if self.eskiParentItem:
+        if self.eskiParentItem.type() == shared.GROUP_ITEM_TYPE:
+            self.eskiParentItem.parentedWithParentOperation.append(self.item)
         self.item.scene().unGroupedRootItems.discard(self.item)
 
 
@@ -538,15 +529,15 @@ class UndoableSetFont(QUndoCommand):
 
 
 ########################################################################
-class UndoableSetFontSize(QUndoCommand):
+class UndoableSetFontSizeF(QUndoCommand):
     """ """
 
     # ---------------------------------------------------------------------
-    def __init__(self, description, item, fontPointSize, parent=None):
-        super(UndoableSetFontSize, self).__init__(description, parent)
+    def __init__(self, description, item, fontPointSizeF, parent=None):
+        super(UndoableSetFontSizeF, self).__init__(description, parent)
         self.item = item
-        self.fontPointSize = fontPointSize
-        self.eskiFontPointSize = item.font().pointSize()
+        self.fontPointSizeF = fontPointSizeF
+        self.eskiFontPointSizeF = item.font().pointSizeF()
 
     # ---------------------------------------------------------------------
     def id(self):
@@ -558,22 +549,18 @@ class UndoableSetFontSize(QUndoCommand):
         # which are called from a macro.
         if not enSonUndo.id() == self.id() or self.item is not enSonUndo.item:
             return False
-        self.fontPointSize = enSonUndo.fontPointSize
+        self.fontPointSizeF = enSonUndo.fontPointSizeF
         return True
 
     # ---------------------------------------------------------------------
     def redo(self):
-        self.item.setFontPointSize(self.fontPointSize)
-        if self.item.type() == shared.TEXT_ITEM_TYPE:
-            self.item.setTransformOriginPoint(self.item.boundingRect().center())
-        self.item.scene().parent().change_text_size_spinbox_value(self.fontPointSize)
+        self.item.setFontPointSizeF(self.fontPointSizeF)
+        self.item.scene().parent().change_font_point_sizef_spinbox_value(self.fontPointSizeF)
 
     # ---------------------------------------------------------------------
     def undo(self):
-        self.item.setFontPointSize(self.eskiFontPointSize)
-        if self.item.type() == shared.TEXT_ITEM_TYPE:
-            self.item.setTransformOriginPoint(self.item.boundingRect().center())
-        self.item.scene().parent().change_text_size_spinbox_value(self.eskiFontPointSize)
+        self.item.setFontPointSizeF(self.eskiFontPointSizeF)
+        self.item.scene().parent().change_font_point_sizef_spinbox_value(self.eskiFontPointSizeF)
 
 
 ########################################################################
@@ -671,8 +658,8 @@ class UndoableResizeBaseItem(QUndoCommand):
     def redo(self):
         self.item.setPos(self.yeniPos)
         self.item.setRect(self.yeniRect)
-        if not self.item.type() == shared.TEXT_ITEM_TYPE:
-            self.item.repositionChildItems(self.eskiPos - self.yeniPos)
+        # if not self.item.type() == shared.TEXT_ITEM_TYPE:
+        #     self.item.repositionChildItems(self.eskiPos - self.yeniPos)
         self.item.update_resize_handles()
         self.item.scene().parent().change_transform_box_values(self.item)
         if self.item.type() == shared.IMAGE_ITEM_TYPE:
@@ -682,8 +669,8 @@ class UndoableResizeBaseItem(QUndoCommand):
     def undo(self):
         self.item.setPos(self.eskiPos)
         self.item.setRect(self.eskiRect)
-        if not self.item.type() == shared.TEXT_ITEM_TYPE:
-            self.item.repositionChildItems(self.yeniPos - self.eskiPos)
+        # if not self.item.type() == shared.TEXT_ITEM_TYPE:
+        #     self.item.repositionChildItems(self.yeniPos - self.eskiPos)
         self.item.update_resize_handles()
         self.item.scene().parent().change_transform_box_values(self.item)
         if self.item.type() == shared.IMAGE_ITEM_TYPE:
@@ -842,18 +829,59 @@ class UndoableResizeLineItem(QUndoCommand):
 
 
 ########################################################################
-class UndoableScaleBaseItemByResizing(QUndoCommand):
+class UndoableScaleTextItemByResizing(QUndoCommand):
     """ """
 
     # ---------------------------------------------------------------------
-    def __init__(self, description, item, yeniRect, parent=None):
-        super(UndoableScaleBaseItemByResizing, self).__init__(description, parent)
+    def __init__(self, description, item, scaleFactor, fontPointSizeF, parent=None):
+        super(UndoableScaleTextItemByResizing, self).__init__(description, parent)
         self.item = item
-        self.eskiPos = self.item.pos()
-        self.eskiRect = item.rect()
+        self.scaleFactor = scaleFactor
+        self.fontPointSizeF = fontPointSizeF
+        self.eskiFontPointSizeF = self.item.fontPointSizeF()
+
+    # ---------------------------------------------------------------------
+    def id(self):
+        return 7
+
+    # ---------------------------------------------------------------------
+    def mergeWith(self, enSonUndo):
+        if not enSonUndo.id() == self.id() or self.item is not enSonUndo.item:
+            return False
+
+        self.scaleFactor *= enSonUndo.scaleFactor  # dikkat *=
+        return True
+
+    # ---------------------------------------------------------------------
+    def redo(self):
+        self.item.setFontPointSizeF(self.fontPointSizeF)
+        self.item.scene().parent().change_font_point_sizef_spinbox_value(self.fontPointSizeF)
+        shared._scaleChildItemsByResizing(self.item, self.scaleFactor)
+        self.item.update_resize_handles()
+        self.item.scene().parent().change_transform_box_values(self.item)
+
+    # ---------------------------------------------------------------------
+    def undo(self):
+        self.item.setFontPointSizeF(self.eskiFontPointSizeF)
+        self.item.scene().parent().change_font_point_sizef_spinbox_value(self.eskiFontPointSizeF)
+        shared._scaleChildItemsByResizing(self.item, 1 / self.scaleFactor)
+        self.item.update_resize_handles()
+        self.item.scene().parent().change_transform_box_values(self.item)
+
+
+########################################################################
+class UndoableScaleGroupItemByResizing(QUndoCommand):
+    """ """
+
+    # ---------------------------------------------------------------------
+    def __init__(self, description, item, yeniRect, scaleFactor, yeniPos, parent=None):
+        super(UndoableScaleGroupItemByResizing, self).__init__(description, parent)
+        self.item = item
+        self.eskiRect = item._itemsBoundingRect
         self.yeniRect = yeniRect
-        # self.yeniPos = self.yeniRect.topLeft() + self.eskiPos
-        self.yeniPos = self.item.mapToScene(self.yeniRect.topLeft())
+        self.scaleFactor = scaleFactor
+        self.yeniPos = yeniPos
+        self.eskiPos = item.pos()
 
     # ---------------------------------------------------------------------
     def id(self):
@@ -866,14 +894,55 @@ class UndoableScaleBaseItemByResizing(QUndoCommand):
 
         self.yeniRect = enSonUndo.yeniRect
         self.yeniPos = enSonUndo.yeniPos
+        self.scaleFactor *= enSonUndo.scaleFactor  # dikkat *=
         return True
 
     # ---------------------------------------------------------------------
     def redo(self):
+        self.item._itemsBoundingRect = self.yeniRect
         self.item.setPos(self.yeniPos)
-        self.yeniRect.moveTo(0, 0)
+        shared._scaleChildItemsByResizing(self.item, self.scaleFactor)
+
+    # ---------------------------------------------------------------------
+    def undo(self):
+        self.item._itemsBoundingRect = self.eskiRect
+        self.item.setPos(self.eskiPos)
+        shared._scaleChildItemsByResizing(self.item, 1 / self.scaleFactor)
+
+
+########################################################################
+class UndoableScaleBaseItemByResizing(QUndoCommand):
+    """ """
+
+    # ---------------------------------------------------------------------
+    def __init__(self, description, item, yeniRect, scaleFactor, yeniPos, parent=None):
+        super(UndoableScaleBaseItemByResizing, self).__init__(description, parent)
+        self.item = item
+        self.eskiRect = item.rect()
+        self.yeniRect = yeniRect
+        self.scaleFactor = scaleFactor
+        self.eskiPos = item.pos()
+        self.yeniPos = yeniPos
+
+    # ---------------------------------------------------------------------
+    def id(self):
+        return 7
+
+    # ---------------------------------------------------------------------
+    def mergeWith(self, enSonUndo):
+        if not enSonUndo.id() == self.id() or self.item is not enSonUndo.item:
+            return False
+
+        self.yeniRect = enSonUndo.yeniRect
+        self.yeniPos = enSonUndo.yeniPos
+        self.scaleFactor *= enSonUndo.scaleFactor  # dikkat *=
+        return True
+
+    # ---------------------------------------------------------------------
+    def redo(self):
         self.item.setRect(self.yeniRect)
-        self.item.repositionChildItems(self.yeniPos - self.eskiPos)
+        self.item.setPos(self.yeniPos)
+        shared._scaleChildItemsByResizing(self.item, self.scaleFactor)
         self.item.update_resize_handles()
         self.item.scene().parent().change_transform_box_values(self.item)
         self.item.update_painter_text_rect()
@@ -882,10 +951,9 @@ class UndoableScaleBaseItemByResizing(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def undo(self):
-        self.item.setPos(self.eskiPos)
-        self.eskiRect.moveTo(0, 0)
         self.item.setRect(self.eskiRect)
-        self.item.repositionChildItems(self.eskiPos - self.yeniPos)
+        self.item.setPos(self.eskiPos)
+        shared._scaleChildItemsByResizing(self.item, 1 / self.scaleFactor)
         self.item.update_resize_handles()
         self.item.scene().parent().change_transform_box_values(self.item)
         self.item.update_painter_text_rect()
@@ -898,11 +966,12 @@ class UndoableScalePathItemByScalingPath(QUndoCommand):
     """ """
 
     # ---------------------------------------------------------------------
-    def __init__(self, description, item, path, parent=None):
+    def __init__(self, description, item, path, scaleFactor, parent=None):
         super(UndoableScalePathItemByScalingPath, self).__init__(description, parent)
         self.item = item
         self.path = path
         self.eskiPath = item.path()
+        self.scaleFactor = scaleFactor
 
     # ---------------------------------------------------------------------
     def id(self):
@@ -913,61 +982,57 @@ class UndoableScalePathItemByScalingPath(QUndoCommand):
         if not enSonUndo.id() == self.id() or self.item is not enSonUndo.item:
             return False
         self.path = enSonUndo.path
+        self.scaleFactor *= enSonUndo.scaleFactor  # dikkat *=
         return True
 
     # ---------------------------------------------------------------------
     def redo(self):
         self.item.setPath(self.path)
+        shared._scaleChildItemsByResizing(self.item, self.scaleFactor)
         self.item.update_painter_text_rect()
 
     # ---------------------------------------------------------------------
     def undo(self):
         self.item.setPath(self.eskiPath)
+        shared._scaleChildItemsByResizing(self.item, 1 / self.scaleFactor)
         self.item.update_painter_text_rect()
 
 
 ########################################################################
-class UndoableScale(QUndoCommand):
+class UndoableScaleLineItemByScalingLine(QUndoCommand):
     """ """
 
     # ---------------------------------------------------------------------
-    def __init__(self, description, item, scaleFactor, parent=None):
-        super(UndoableScale, self).__init__(description, parent)
+    def __init__(self, description, item, line, scaleFactor, parent=None):
+        super(UndoableScaleLineItemByScalingLine, self).__init__(description, parent)
         self.item = item
+        self.eskiLine = item.line()
+        self.line = line
         self.scaleFactor = scaleFactor
-        self.eskiScaleFactor = item.scale()
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 9
+        return 8
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
         if not enSonUndo.id() == self.id() or self.item is not enSonUndo.item:
             return False
-        self.scaleFactor = enSonUndo.scaleFactor
-        # self.eskiScaleFactor = enSonUndo.eskiScaleFactor
+        self.line = enSonUndo.line
+        self.scaleFactor *= enSonUndo.scaleFactor  # dikkat *=
         return True
 
     # ---------------------------------------------------------------------
     def redo(self):
-        # self.item.setScale(self.scaleFactor)
-        self.item.scaleWithOffset(self.scaleFactor)
-        if isinstance(self.item, BaseItem):
-            # self.item.update_resize_handles()
-            self.item.scene().parent().change_transform_box_values(self.item)
-            if self.item.type() == shared.IMAGE_ITEM_TYPE:  # Image is a subclass of BaseItem
-                self.item.reload_image_after_scale()
+        self.item.setLine(self.line)
+        shared._scaleChildItemsByResizing(self.item, self.scaleFactor)
+        self.item.update_painter_text_rect()
 
     # ---------------------------------------------------------------------
     def undo(self):
-        # self.item.setScale(self.eskiScaleFactor)
-        self.item.scaleWithOffset(self.eskiScaleFactor)
-        if isinstance(self.item, BaseItem):
-            # self.item.update_resize_handles()
-            self.item.scene().parent().change_transform_box_values(self.item)
-            if self.item.type() == shared.IMAGE_ITEM_TYPE:  # Image is a subclass of BaseItem
-                self.item.reload_image_after_scale()
+        self.item.setLine(self.eskiLine)
+        shared._scaleChildItemsByResizing(self.item, self.scaleFactor)
+        self.item.update_painter_text_rect()
 
 
 ########################################################################
@@ -1496,7 +1561,7 @@ class UndoableApplyStylePreset(QUndoCommand):
         self.scene.parent().degistir_yazi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
         self.scene.parent().degistir_cizgi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
         self.scene.parent().degistir_nesne_arkaplan_rengi_ikonu()
-        self.scene.parent().change_text_size_spinbox_value(self.font.pointSize())
+        self.scene.parent().change_font_point_sizef_spinbox_value(self.font.pointSizeF())
         self.scene.parent().change_line_style_options(self.pen)
         self.scene.parent().change_font_combobox_value(self.font)
 
@@ -1515,7 +1580,7 @@ class UndoableApplyStylePreset(QUndoCommand):
         self.scene.parent().degistir_yazi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
         self.scene.parent().degistir_cizgi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
         self.scene.parent().degistir_nesne_arkaplan_rengi_ikonu()
-        self.scene.parent().change_text_size_spinbox_value(self.eskiFont.pointSize())
+        self.scene.parent().change_font_point_sizef_spinbox_value(self.eskiFont.pointSizeF())
         self.scene.parent().change_line_style_options(self.eskiPen)
         self.scene.parent().change_font_combobox_value(self.eskiFont)
 
@@ -1575,7 +1640,7 @@ class UndoableApplyStylePresetToItem(QUndoCommand):
             self.item.scene().parent().degistir_cizgi_rengi_ikonu(self.cizgiRengi, nesne_arkaplan_ikonu_guncelle=False)
             self.item.scene().parent().degistir_nesne_arkaplan_rengi_ikonu(self.brush.color(), self.yaziRengi,
                                                                            self.cizgiRengi)
-            self.item.scene().parent().change_text_size_spinbox_value(self.font.pointSize())
+            self.item.scene().parent().change_font_point_sizef_spinbox_value(self.font.pointSizeF())
             self.item.scene().parent().change_line_style_options(self.pen)
             self.item.scene().parent().change_font_combobox_value(self.font)
 
@@ -1597,7 +1662,7 @@ class UndoableApplyStylePresetToItem(QUndoCommand):
                                                                   nesne_arkaplan_ikonu_guncelle=False)
             self.item.scene().parent().degistir_nesne_arkaplan_rengi_ikonu(self.eskiBrush.color(), self.eskiYaziRengi,
                                                                            self.eskiCizgiRengi)
-            self.item.scene().parent().change_text_size_spinbox_value(self.eskiFont.pointSize())
+            self.item.scene().parent().change_font_point_sizef_spinbox_value(self.eskiFont.pointSizeF())
             self.item.scene().parent().change_line_style_options(self.eskiPen)
             self.item.scene().parent().change_font_combobox_value(self.eskiFont)
 

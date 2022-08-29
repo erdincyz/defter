@@ -7,7 +7,7 @@ __date__ = '04/Sep/2016'
 
 import os
 
-from PySide6.QtCore import Qt, QUrl, QSizeF, QRectF, QPointF, QPoint, QLine
+from PySide6.QtCore import Qt, QUrl, QSizeF, QRectF, QPointF, QPoint, QLine, QTimer
 from PySide6.QtGui import QPen, QPixmap, QPixmapCache, QPainterPath
 from PySide6.QtWidgets import QStyle
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
@@ -51,6 +51,11 @@ class VideoItem(BaseItem):
         # self.videoItem = GraphicsVideoItem(self)
         # self.videoItem.setFlag(QGraphicsVideoItem.ItemStacksBehindParent)
 
+        self.videoItem.nativeSizeChanged.connect(self.act_native_size_changed)
+        # resolution = media.canonicalResource().resolution()
+        # self.videoItem.nativeSizeChanged.connect(self._rect.setSize)
+        self.videoItem.setAspectRatioMode(Qt.KeepAspectRatio)
+
         self.video_hazir_mi = False
 
         self.videoItem.setParentItem(self)
@@ -82,17 +87,18 @@ class VideoItem(BaseItem):
             # print(media.canonicalResource().channelCount())
 
             # self.player.setMedia(media)
+            self.video_poziyon_sure_str = self.video_toplam_sure_str = "00:00:00"
             self.player.hasVideoChanged.connect(self.act_video_changed)
+            self.player.positionChanged.connect(self.act_player_position_changed)
+            self.player.durationChanged.connect(self.act_player_duration_changed)
+            self.player.mediaStatusChanged.connect(self.act_player_media_status_changed)
+            self.player.errorOccurred.connect(self.act_player_error_occured)
+            self.player.errorChanged.connect(self.act_player_error_changed)
+            self.player.seekableChanged.connect(self.act_seekable_changed)
             self.player.setSource(url)
-            # resolution = media.canonicalResource().resolution()
 
-            self.videoItem.nativeSizeChanged.connect(self.act_native_size_changed)
-            # self.videoItem.nativeSizeChanged.connect(self._rect.setSize)
-
-            self.videoItem.setAspectRatioMode(Qt.KeepAspectRatio)
-
-            # self.playControlsY = self._rect.bottom() - 50
-            self.playControlsY = self.videoItem.size().height() / 2
+            self.playControlsY = self._rect.bottom() - 50
+            # self.playControlsY = self.videoItem.size().height() / 2
             self.ikonBoyutu = 20
             self.yariIkonBoyutu = self.ikonBoyutu / 2
             self.boundingRectTasmaDegeri = max(self.handleSize, self._pen.widthF() / 2, self.yariIkonBoyutu)
@@ -102,8 +108,6 @@ class VideoItem(BaseItem):
                                     self.playControlsY,
                                     self.videoItem.size().width(),
                                     self.playControlsY)
-
-            self.player.positionChanged.connect(self.act_player_position_changed)
 
             self.videoSliderEllipseRect = QRectF(0, self.playControlsY,
                                                  self.ikonBoyutu,
@@ -143,6 +147,55 @@ class VideoItem(BaseItem):
             self.hoverMoveEvent = super(VideoItem, self).hoverMoveEvent
 
     # ---------------------------------------------------------------------
+    def setRect(self, rect):
+        if self._rect == rect:
+            return
+        self.prepareGeometryChange()
+        self._rect = rect
+        self._boundingRect = QRectF()
+        self.update()
+        # self.videoItem.setSize(rect.size())
+
+    # ---------------------------------------------------------------------
+    def keyPressEvent(self, event) -> None:
+        if event.key() == Qt.Key_Right:
+            self.player.setPosition(self.player.position() + 10000)
+        elif event.key() == Qt.Key_Left:
+            self.player.setPosition(self.player.position() - 10000)
+        elif event.key() == Qt.Key_Space:
+            if self.player.playbackState() == QMediaPlayer.PlaybackState.StoppedState \
+                    or self.player.playbackState() == QMediaPlayer.PlaybackState.PausedState:
+                self.player.play()
+            else:
+                # self.player.stop()
+                self.player.pause()
+
+        event.accept()
+
+    # super(VideoItem, self).keyPressEvent(event)
+
+    # ---------------------------------------------------------------------
+    def act_player_media_status_changed(self, status):
+        # print(status)
+        pass
+
+    # ---------------------------------------------------------------------
+    def act_player_error_occured(self, error, errorString):
+        # print(error)
+        # print(errorString)
+        pass
+
+    # ---------------------------------------------------------------------
+    def act_player_error_changed(self):
+        # print("degisti error")
+        pass
+
+    # ---------------------------------------------------------------------
+    def act_seekable_changed(self, seekable):
+        # print(seekable, "seekable")
+        pass
+
+    # ---------------------------------------------------------------------
     def type(self):
         # Enable the use of qgraphicsitem_cast with this item.
         return VideoItem.Type
@@ -157,7 +210,6 @@ class VideoItem(BaseItem):
                       "rect": self.rect(),
                       "pos": self.pos(),
                       "rotation": self.rotation(),
-                      "scale": self.scale(),
                       "zValue": self.zValue(),
                       "yaziRengi": self.yaziRengi,
                       "arkaPlanRengi": self.arkaPlanRengi,
@@ -302,7 +354,7 @@ class VideoItem(BaseItem):
 
     # ---------------------------------------------------------------------
     # @Slot(int)  # qint64 # hata oluyor su an, bug varmis.
-    def act_player_position_changed(self, pos):
+    def act_player_position_changed(self, pos_ms):
         # yuzde = pos / self.player.duration() * 100
         # self.sliderEllipseCenterX = self.videoItem.size().width() / 100 * yuzde
         # self.sliderEllipseCenter = QPointF(self.videoItem.size().width() * pos / self.player.duration(), 100)
@@ -317,9 +369,19 @@ class VideoItem(BaseItem):
         # return
         if self.player.duration():
             self.videoSliderEllipseRect.moveCenter(
-                QPointF(self.videoItem.pos().x() + (self.videoItem.size().width() * pos / self.player.duration()),
+                QPointF(self.videoItem.pos().x() + (self.videoItem.size().width() * pos_ms / self.player.duration()),
                         self.playControlsY))
             # print(self.playControlsY)
+
+        dk, sn = divmod((pos_ms // 1000), 60)
+        saat, dk = divmod(dk, 60)
+        self.video_poziyon_sure_str = f"{saat:02}:{dk:02}:{sn:02}"
+
+    # ---------------------------------------------------------------------
+    def act_player_duration_changed(self, toplam_sure_ms):
+        dk, sn = divmod((toplam_sure_ms // 1000), 60)
+        saat, dk = divmod(dk, 60)
+        self.video_toplam_sure_str = f"{saat:02}:{dk:02}:{sn:02}"
 
     # ---------------------------------------------------------------------
     def childItems(self):
@@ -332,13 +394,16 @@ class VideoItem(BaseItem):
         super(VideoItem, self).mousePressEvent(event)
 
         if self.videoSliderEllipseRect.contains(event.pos()):
+            # print(self.player.playbackState(), 1)
             if self.player.playbackState() == QMediaPlayer.PlaybackState.StoppedState \
                     or self.player.playbackState() == QMediaPlayer.PlaybackState.PausedState:
                 self.player.play()
+                # print(self.player.playbackState(), 2)
             else:
                 # self.player.stop()
                 self.player.pause()
             self.videoSliderEllipseStartDrag = True
+            self.yeniPlayerPosition = None
             self.videoSliderEllipseFirstClickPos = event.pos()
 
         if self.audioSliderEllipseRect.contains(event.pos()):
@@ -349,17 +414,26 @@ class VideoItem(BaseItem):
 
         if self.videoSliderEllipseStartDrag:
             if abs(self.videoSliderEllipseFirstClickPos.manhattanLength() - event.pos().manhattanLength()) > 0:
-                # self.videoSliderEllipseRect.moveCenter(QPointF(event.pos().x(), self.playControlsY))
-                self.videoSliderEllipseRect.moveCenter(event.pos())
+                self.player.pause()
+                x = min(max(event.pos().x(), 0), self.videoItem.size().width())
+                self.videoSliderEllipseRect.moveCenter(QPointF(x, self.playControlsY))
+                # ~ self.videoSliderEllipseRect.moveCenter(event.pos())
                 # yuzde = pos / self.player.duration() * 100
                 # self.sliderEllipseCenterX = self.videoItem.size().width() / 100 * yuzde
 
-                yuzde = event.pos().x() / self.videoItem.size().width() * 100
-                yeniPlayerPosition = yuzde * self.player.duration() / 100
+                oran = x / self.videoItem.size().width()
+                self.yeniPlayerPosition = int(oran * self.player.duration())
                 # print(duration, "/", self.player.duration())
-                self.player.setPosition(int(yeniPlayerPosition))
-                self.player.play()
+
+                # self.player.setPosition(int(self.yeniPlayerPosition))
+                # self.player.play()
+
+                # print(self.player.position(), self.yeniPlayerPosition)
+                dk, sn = divmod((self.yeniPlayerPosition // 1000), 60)
+                saat, dk = divmod(dk, 60)
+                self.video_poziyon_sure_str = f"{saat:02}:{dk:02}:{sn:02}"
                 self.update()
+
                 # self.playControlsY = event.pos().y()
 
                 # self.player.setPosition(event.pos().x()/self.videoItem.size().width() * 100 * self.player.duration())
@@ -455,6 +529,12 @@ class VideoItem(BaseItem):
         self.videoItem.setPos(self._rect.topLeft())
         # if self.videoSliderEllipseRect.contains(event.pos()):
         if self.videoSliderEllipseStartDrag:
+            if self.yeniPlayerPosition:
+                self.player.blockSignals(True)
+                self.player.setPosition(int(self.yeniPlayerPosition))
+                self.player.blockSignals(False)
+                self.update()
+                self.player.play()
             self.videoSliderEllipseStartDrag = False
 
         # if self.audioSliderEllipseRect.contains(event.pos()):
@@ -513,7 +593,9 @@ class VideoItem(BaseItem):
     # ---------------------------------------------------------------------
     def wheelEvent(self, event):
         # factor = 1.41 ** (event.delta() / 240.0)
-        # self.scale(factor, factor)
+
+        if self.ustGrup:
+            return BaseItem.wheelEvent(self, event)
 
         toplam = int(event.modifiers())
 
@@ -528,8 +610,7 @@ class VideoItem(BaseItem):
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
-            self.scaleItem(event.delta())
-            # self.scaleItem(event.angleDelta().y())
+            self.scaleItemByResizing(event.delta())
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
@@ -585,7 +666,7 @@ class VideoItem(BaseItem):
             painter.translate(self.videoSliderEllipseRect.topLeft())
             painter.drawPath(self.videoIkonu)
             painter.restore()
-            painter.drawText(self._rect, Qt.AlignLeft, "{}/{}".format(self.player.position(), self.player.duration()))
+            painter.drawText(self._rect, Qt.AlignLeft, f"{self.video_poziyon_sure_str} - {self.video_toplam_sure_str}")
             painter.setPen(QPen(Qt.blue))
             painter.setOpacity(0.7)
             if self.isAudioSliderHovered:
@@ -642,8 +723,8 @@ class VideoItem(BaseItem):
         # x = xr - xs
         # y = yr - ys
 
-        w = self._rect.width() * self.scale()
-        h = self._rect.height() * self.scale()
+        w = self._rect.width()
+        h = self._rect.height()
         c = self.sceneBoundingRect().center()
         xr = c.x() - w / 2
         yr = c.y() - h / 2
@@ -690,8 +771,8 @@ class VideoItem(BaseItem):
                      {bicimler2}
                      position:absolute;
                      z-index:{int(self.zValue() * 10) if self.zValue() else 0};
-                     width:{self._rect.width() * self.scale()}px;
-                     height:{self._rect.height() * self.scale()}px;
+                     width:{self._rect.width()}px;
+                     height:{self._rect.height()}px;
                      top:{y}px;
                      left:{x}px;
                      transform-box: fill-box;

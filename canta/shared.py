@@ -10,8 +10,8 @@ from unicodedata import normalize
 from re import sub
 from uuid import uuid4
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor, QPixmap, QPainter, QBrush
+from PySide6.QtCore import Qt, QRectF
+from PySide6.QtGui import QColor, QPixmap, QPainter, QBrush, QTransform
 from PySide6.QtWidgets import QGraphicsItem
 
 DEFTER_KLASOR_ADRES = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -117,3 +117,75 @@ def kutulu_arkaplan_olustur(widget, kareBoyutu=10):
     palette.setBrush(widget.backgroundRole(), QBrush(pMap))
     widget.setAutoFillBackground(True)
     widget.setPalette(palette)
+
+
+# ---------------------------------------------------------------------
+def _scaleChildItemsByResizing(nesne, scaleFactor):
+    for c in nesne.childItems():
+        if c.childItems():
+            _scaleChildItemsByResizing(c, scaleFactor)
+
+        if c.type() == TEXT_ITEM_TYPE:
+
+            # c.setTransformOriginPoint(c.boundingRect().center())
+            fontPointSizeF = c.fontPointSizeF() * scaleFactor
+            c.setFontPointSizeF(fontPointSizeF)
+            c.yazi_kutusunu_daralt()
+
+        elif c.type() == GROUP_ITEM_TYPE:
+            rect = QRectF(c._itemsBoundingRect.topLeft(), c._itemsBoundingRect.size() * scaleFactor)
+            rect.moveTo(0, 0)
+            c._itemsBoundingRect = rect
+
+        elif c.type() == PATH_ITEM_TYPE:
+            scaleMatrix = QTransform()
+            scaleMatrix.scale(scaleFactor, scaleFactor)
+            scaledPath = c.path() * scaleMatrix
+            c.setPath(scaledPath)
+
+        elif c.type() == LINE_ITEM_TYPE:
+            scaleMatrix = QTransform()
+            scaleMatrix.scale(scaleFactor, scaleFactor)
+            scaledLine = c.line() * scaleMatrix
+            c.setLine(scaledLine)
+
+        else:
+            rect = QRectF(c.rect().topLeft(), c.rect().size() * scaleFactor)
+            rect.moveTo(0, 0)
+            c.setRect(rect)
+
+        c.setX(c.x() * scaleFactor)
+        c.setY(c.y() * scaleFactor)
+
+
+# ---------------------------------------------------------------------
+def _update_scene_rect_recursively(items, rect):
+    for c in items:
+        rect = rect.united(c.sceneBoundingRect())
+        if c.type() == GROUP_ITEM_TYPE:
+            if c.parentedWithParentOperation:
+                rect = _update_scene_rect_recursively(c.parentedWithParentOperation, rect)
+        else:
+            if c.childItems():
+                rect = _update_scene_rect_recursively(c.childItems(), rect)
+
+    return rect
+
+
+# ---------------------------------------------------------------------
+def sceneBoundingRectWithChildren(nesne):
+    # rect = QRectF(self.sceneBoundingRect())
+    rect = nesne.sceneBoundingRect()
+    if nesne.type() == GROUP_ITEM_TYPE:
+        ic_nesneler = nesne.parentedWithParentOperation
+    else:
+        ic_nesneler = nesne.childItems()
+    for c in ic_nesneler:
+        rect = rect.united(c.sceneBoundingRect())
+        if c.type() == GROUP_ITEM_TYPE:
+            if c.parentedWithParentOperation:
+                rect = _update_scene_rect_recursively(c.parentedWithParentOperation, rect)
+        else:
+            if c.childItems():
+                rect = _update_scene_rect_recursively(c.childItems(), rect)
+    return rect

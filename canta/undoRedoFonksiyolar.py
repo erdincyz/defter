@@ -7,7 +7,7 @@ __author__ = 'Erdinç Yılmaz'
 
 from canta.undoRedoSiniflar import UndoableSayfaAdiDegistir, UndoableAddItem, UndoableRemoveItem, UndoableGroup, \
     UndoableUnGroup, UndoableParent, UndoableUnParent, UndoableResizeBaseItem, UndoableScaleBaseItemByResizing, \
-    UndoableScalePathItemByScalingPath, UndoableScale, UndoableSetFont, UndoableSetFontSize, UndoableRotate, \
+    UndoableScalePathItemByScalingPath, UndoableSetFont, UndoableSetFontSizeF, UndoableRotate, \
     UndoableRotateWithOffset, UndoableSetZValue, UndoableSetLineStyle, UndoableSetLineJoinStyle, \
     UndoableSetLineCapStyle, UndoableSetLineColor, UndoableSetTextColor, \
     UndoableSetLineColorAlpha, UndoableSetTextColorAlpha, UndoableSetItemBackgroundColor, \
@@ -16,7 +16,8 @@ from canta.undoRedoSiniflar import UndoableSayfaAdiDegistir, UndoableAddItem, Un
     UndoableEmbedSceneBackgroundImage, UndoableSetPinStatus, UndoableItemSetText, UndoableItemCustomCommand, \
     UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, UndoableResizeLineItem, \
     UndoableMovePathPoint, UndoableSetTextAlignment, UndoableSetCharacterFormat, UndoableSetLineWidthF, \
-    UndoableConvertToPlainText, UndoRedoBaglantisiYaziNesnesiDocuna
+    UndoableConvertToPlainText, UndoRedoBaglantisiYaziNesnesiDocuna, UndoableScaleLineItemByScalingLine, \
+    UndoableScaleTextItemByResizing, UndoableScaleGroupItemByResizing
 
 
 # ---------------------------------------------------------------------
@@ -80,20 +81,32 @@ def undoableResizeLineItem(undoStack, description, item, yeniLine, eskiLine, esk
 
 
 # ---------------------------------------------------------------------
-def undoableScaleBaseItemByResizing(undoStack, description, item, yeniRect):
-    command = UndoableScaleBaseItemByResizing(description, item, yeniRect)
+def undoableScaleGroupItemByResizing(undoStack, description, item, yeniRect, scaleFactor, yeniPos):
+    command = UndoableScaleGroupItemByResizing(description, item, yeniRect, scaleFactor, yeniPos)
     undoStack.push(command)
 
 
 # ---------------------------------------------------------------------
-def undoableScalePathItemByScalingPath(undoStack, description, item, path):
-    command = UndoableScalePathItemByScalingPath(description, item, path)
+def undoableScaleBaseItemByResizing(undoStack, description, item, yeniRect, scaleFactor, yeniPos):
+    command = UndoableScaleBaseItemByResizing(description, item, yeniRect, scaleFactor, yeniPos)
     undoStack.push(command)
 
 
 # ---------------------------------------------------------------------
-def undoableScale(undoStack, description, item, scaleFactor):
-    command = UndoableScale(description, item, scaleFactor)
+def undoableScaleTextItemByResizing(undoStack, description, item, scaleFactor, fontPointSizeF):
+    command = UndoableScaleTextItemByResizing(description, item, scaleFactor, fontPointSizeF)
+    undoStack.push(command)
+
+
+# ---------------------------------------------------------------------
+def undoableScalePathItemByScalingPath(undoStack, description, item, path, scaleFactor):
+    command = UndoableScalePathItemByScalingPath(description, item, path, scaleFactor)
+    undoStack.push(command)
+
+
+# ---------------------------------------------------------------------
+def undoableScaleLineItemByScalingLine(undoStack, description, item, line, scaleFactor):
+    command = UndoableScaleLineItemByScalingLine(description, item, line, scaleFactor)
     undoStack.push(command)
 
 
@@ -104,8 +117,8 @@ def undoableSetFont(undoStack, description, item, font):
 
 
 # ---------------------------------------------------------------------
-def undoableSetFontSize(undoStack, description, item, fontPointSize):
-    command = UndoableSetFontSize(description, item, fontPointSize)
+def undoableSetFontSizeF(undoStack, description, item, fontPointSizeF):
+    command = UndoableSetFontSizeF(description, item, fontPointSizeF)
     undoStack.push(command)
 
 

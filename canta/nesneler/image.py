@@ -88,7 +88,6 @@ class Image(BaseItem):
                       "rect": self.rect(),
                       "pos": self.pos(),
                       "rotation": self.rotation(),
-                      "scale": self.scale(),
                       "zValue": self.zValue(),
                       "yaziRengi": self.yaziRengi,
                       "arkaPlanRengi": self.arkaPlanRengi,
@@ -384,6 +383,9 @@ class Image(BaseItem):
         # factor = 1.41 ** (event.delta() / 240.0)
         # self.scale(factor, factor)
 
+        if self.ustGrup:
+            return BaseItem.wheelEvent(self, event)
+
         toplam = int(event.modifiers())
 
         # ctrl = int(Qt.ControlModifier)
@@ -397,7 +399,8 @@ class Image(BaseItem):
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
-            self.scaleItem(event.delta())
+            # self.scaleItem(event.delta())
+            self.scaleItemByResizing(event.delta())
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
@@ -413,7 +416,7 @@ class Image(BaseItem):
             self.changeTextColorAlpha(event.delta())
 
         elif toplam == ctrlAltShift:
-            self.changeFontSize(event.delta())
+            self.changeFontSizeF(event.delta())
 
         elif toplam == altShift:
             # self.changeTextBackgroundColorAlpha(event.delta())
@@ -478,18 +481,18 @@ class Image(BaseItem):
                                                       self.imageOpacity)
 
     # ---------------------------------------------------------------------
-    def changeFontSize(self, delta):
+    def changeFontSizeF(self, delta):
 
         # font = self.font()
-        size = self.fontPointSize()
+        size = self.fontPointSizeF()
 
         if delta > 0:
-            # font.setPointSize(size + 1)
+            # font.setPointSizeF(size + 1)
             size += 1
 
         else:
             if size > 10:
-                # font.setPointSize(size - 1)
+                # font.setPointSizeF(size - 1)
                 size -= 1
             else:
                 # undolari biriktermesin diye donuyoruz,
@@ -499,12 +502,12 @@ class Image(BaseItem):
         # self.setFont(font)
         if self.childItems():
             self.scene().undoStack.beginMacro("change text")
-            self.scene().undoRedo.undoableSetFontSize(self.scene().undoStack, "change text size", self, size)
+            self.scene().undoRedo.undoableSetFontSizeF(self.scene().undoStack, "change text size", self, size)
             for c in self.childItems():
-                c.changeFontSize(delta)
+                c.changeFontSizeF(delta)
             self.scene().undoStack.endMacro()
         else:
-            self.scene().undoRedo.undoableSetFontSize(self.scene().undoStack, "change text size", self, size)
+            self.scene().undoRedo.undoableSetFontSizeF(self.scene().undoStack, "change text size", self, size)
 
     # ---------------------------------------------------------------------
     def update_painter_text_rect(self):
@@ -596,8 +599,8 @@ class Image(BaseItem):
 
         img_str = f'<img src="{resim_adres}" style="width:100%; height:100%;"></img>'
 
-        w = self._rect.width() * self.scale()
-        h = self._rect.height() * self.scale()
+        w = self._rect.width()
+        h = self._rect.height()
 
         c = self.sceneBoundingRect().center()
 
@@ -627,14 +630,14 @@ class Image(BaseItem):
                     <div style="
                      background:rgba{renk_arkaPlan};
                      color:rgba{renk_yazi};
-                     font-size:{self.fontPointSize()}pt; 
+                     font-size:{self.fontPointSizeF()}pt; 
                      font-family:{self.font().family()};
                      {bicimler1}
                      {bicimler2}
                      position:absolute;
                      z-index:{int(self.zValue() * 10) if self.zValue() else 0};
-                     width:{self._rect.width() * self.scale()}px;
-                     height:{self._rect.height() * self.scale()}px;
+                     width:{self._rect.width()}px;
+                     height:{self._rect.height()}px;
                      top:{y}px;
                      left:{x}px;
                      opacity:{self.imageOpacity};
