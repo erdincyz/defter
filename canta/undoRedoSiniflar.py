@@ -10,6 +10,8 @@ import os
 import shutil
 
 from PySide6.QtGui import QUndoCommand
+from PySide6.QtWidgets import QGraphicsItem
+
 from canta.nesneler.group import Group
 from canta.nesneler.base import BaseItem
 from canta import shared
@@ -301,9 +303,9 @@ class UndoableGroup(QUndoCommand):
 
         self.group = Group()
         # group = QGraphicsItemGroup(None)
-        self.group.setFlags(self.group.ItemIsSelectable
-                            | self.group.ItemIsMovable
-                            # | group.ItemIsFocusable
+        self.group.setFlags(QGraphicsItem.ItemIsSelectable
+                            | QGraphicsItem.ItemIsMovable
+                            # | QGraphicsItem.ItemIsFocusable
                             )
 
         self.items = items
@@ -316,9 +318,9 @@ class UndoableGroup(QUndoCommand):
         for item in self.items:
             if item.parentItem():
                 if item.parentItem() in self.items:  # o zaman bunu gruplamaya gerek yok cunku parenti gruplanacak zaten.
-                    item.setFlag(item.ItemIsSelectable, False)
-                    item.setFlag(item.ItemIsMovable, False)
-                    item.setFlag(item.ItemIsFocusable, False)
+                    item.setFlag(QGraphicsItem.ItemIsSelectable, False)
+                    item.setFlag(QGraphicsItem.ItemIsMovable, False)
+                    item.setFlag(QGraphicsItem.ItemIsFocusable, False)
                     # muhtemelen parentta da sorun var
                     # continue
                 else:
@@ -331,9 +333,9 @@ class UndoableGroup(QUndoCommand):
             else:
                 if item.childItems():  # sadece parent secilmis iken alt nesneleri secilemez hale getiriyoruz.
                     for c in item.childItems():
-                        c.setFlag(item.ItemIsSelectable, False)
-                        c.setFlag(item.ItemIsMovable, False)
-                        c.setFlag(item.ItemIsFocusable, False)
+                        c.setFlag(QGraphicsItem.ItemIsSelectable, False)
+                        c.setFlag(QGraphicsItem.ItemIsMovable, False)
+                        c.setFlag(QGraphicsItem.ItemIsFocusable, False)
                 self.group.addSingleItemToGroup(item)
                 # TODO: if ile kontrol etsek once daha mi hizli olur, time complexity ye bakmak lazim.
                 # gruplandigi icin referansi parentta olacak ayrica tutmaya gerek yok
@@ -373,9 +375,9 @@ class UndoableUnGroup(QUndoCommand):
 
         # group = Group()
         # # group = QGraphicsItemGroup(None)
-        # group.setFlags(group.ItemIsSelectable
-        #                |group.ItemIsMovable
-        #                # | group.ItemIsFocusable
+        # group.setFlags(QGraphicsItem.ItemIsSelectable
+        #                |QGraphicsItem.ItemIsMovable
+        #                # | QGraphicsItem.ItemIsFocusable
         #                )
 
         self.scene.addItem(self.group)
@@ -383,9 +385,9 @@ class UndoableUnGroup(QUndoCommand):
         for item, itemEskiPos in self.itemsListWithPos:
             if item.parentItem():
                 if item.parentItem() in self.itemsList:  # o zaman bunu gruplamaya gerek yok cunku parenti gruplanacak zaten.
-                    item.setFlag(item.ItemIsSelectable, False)
-                    item.setFlag(item.ItemIsMovable, False)
-                    item.setFlag(item.ItemIsFocusable, False)
+                    item.setFlag(QGraphicsItem.ItemIsSelectable, False)
+                    item.setFlag(QGraphicsItem.ItemIsMovable, False)
+                    item.setFlag(QGraphicsItem.ItemIsFocusable, False)
                     # muhtemelen parentta da sorun var
                     # continue
                 else:
@@ -398,9 +400,9 @@ class UndoableUnGroup(QUndoCommand):
             else:
                 if item.childItems():  # sadece parent secilmis iken alt nesneleri secilemez hale getiriyoruz.
                     for c in item.childItems():
-                        c.setFlag(item.ItemIsSelectable, False)
-                        c.setFlag(item.ItemIsMovable, False)
-                        c.setFlag(item.ItemIsFocusable, False)
+                        c.setFlag(QGraphicsItem.ItemIsSelectable, False)
+                        c.setFlag(QGraphicsItem.ItemIsMovable, False)
+                        c.setFlag(QGraphicsItem.ItemIsFocusable, False)
                 self.group.addSingleItemToGroup(item)
                 # TODO: if ile kontrol etsek once daha mi hizli olur, time complexity ye bakmak lazim.
                 # gruplandigi icin referansi parentta olacak ayrica tutmaya gerek yok

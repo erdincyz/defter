@@ -25,9 +25,9 @@ class Group(QGraphicsItem):
         self._itemsBoundingRect = QRectF()
 
         self.setHandlesChildEvents(False)
-        self.setFlags(self.ItemIsSelectable
-                      | self.ItemIsMovable
-                      # | self.ItemIsFocusable
+        self.setFlags(QGraphicsItem.ItemIsSelectable
+                      | QGraphicsItem.ItemIsMovable
+                      # | QGraphicsItem.ItemIsFocusable
                       )
 
         self.secili_nesne_kalem_kalinligi = 0
@@ -65,15 +65,15 @@ class Group(QGraphicsItem):
     @isPinned.setter
     def isPinned(self, value):
         if value:
-            self.setFlags(self.ItemIsSelectable
-                          # | self.ItemIsMovable
-                          #  | item.ItemIsFocusable
+            self.setFlags(QGraphicsItem.ItemIsSelectable
+                          # | QGraphicsItem.ItemIsMovable
+                          #  | QGraphicsItem.ItemIsFocusable
                           )
 
         else:
-            self.setFlags(self.ItemIsSelectable
-                          | self.ItemIsMovable
-                          | self.ItemIsFocusable)
+            self.setFlags(QGraphicsItem.ItemIsSelectable
+                          | QGraphicsItem.ItemIsMovable
+                          | QGraphicsItem.ItemIsFocusable)
         self._isPinned = value
 
     # ---------------------------------------------------------------------
@@ -313,9 +313,9 @@ class Group(QGraphicsItem):
         item.isPinned = True  # !! bunun yeri onemli , asagidaki flagleri set edisimizin altında bunu set edersek,
         # isPinned bir property oldugundan, set kisminda her halukarda  "ItemIsSelectable ,True"oldugundan override
         # ediyor ve gruplanmis item secilebilir oluyor.
-        item.setFlag(item.ItemIsSelectable, False)
-        item.setFlag(item.ItemIsMovable, False)
-        item.setFlag(item.ItemIsFocusable, False)
+        item.setFlag(QGraphicsItem.ItemIsSelectable, False)
+        item.setFlag(QGraphicsItem.ItemIsMovable, False)
+        item.setFlag(QGraphicsItem.ItemIsFocusable, False)
         # TODO: ispinned e niye gerek duyduk.. destroy groupta da false ediliyor
 
         if item.type() == self.type():
@@ -380,16 +380,16 @@ class Group(QGraphicsItem):
                 # item._line.setAngle(item._line.angle() - self.rotation())
                 # item.update_arrow()
             item.setPos(pos)
-            item.setFlags(self.ItemIsSelectable | self.ItemIsMovable | self.ItemIsFocusable)
+            item.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsFocusable)
             # TODO: info: gruplanmiş parentlarin childlerini grupta tutmuyoruz. dolayisi ile
             # burda manual ayarliyoruz flaglari. yoksa secilemez oluyrolar. manual false etmistik zaten act_groupta.
             if not item.type() == self.type():  # grubun iceriginin secilemezligi korunsun diye
                 for c in item.childItems():
-                    c.setFlags(self.ItemIsSelectable | self.ItemIsMovable | self.ItemIsFocusable)
+                    c.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsFocusable)
                     c.setSelected(True)
             else:
                 for c in item.parentedWithParentOperation:
-                    c.setFlags(self.ItemIsSelectable | self.ItemIsMovable | self.ItemIsFocusable)
+                    c.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsFocusable)
                     c.setSelected(True)
             item.setSelected(True)
         self.scene().unGroupedRootItems.update(unGroupedRootItems)
@@ -419,7 +419,7 @@ class Group(QGraphicsItem):
         # if change == self.ItemPositionChange:
         # if change == self.ItemSelectedChange:
         # if change == self.ItemSelectedHasChanged:
-        if change == self.ItemSelectedChange:
+        if change == QGraphicsItem.ItemSelectedChange:
             if value:
                 self.scene().parent().group_item_selected(self)
                 # self.selectAllChildren()
@@ -427,7 +427,7 @@ class Group(QGraphicsItem):
                 self.scene().parent().group_item_deselected(self)
                 # self.deSelectAllChildren()
 
-        if change == self.ItemChildRemovedChange:  # sahneden delete ile mesela remove edince, bir de unparent edince
+        if change == QGraphicsItem.ItemChildRemovedChange:  # sahneden delete ile mesela remove edince, bir de unparent edince
             # TODO: allNonGroupGroupChildren yerine bu changed kullanilabilir mi acaba.
             if value in self.parentedWithParentOperation:
                 self.parentedWithParentOperation.remove(value)
@@ -529,16 +529,16 @@ class Group(QGraphicsItem):
         if self.ustGrup:
             return QGraphicsItem.wheelEvent(self, event)
 
-        toplam = int(event.modifiers())
+        toplam = event.modifiers().value
 
         # ctrl = int(Qt.ControlModifier)
-        shift = int(Qt.ShiftModifier)
-        alt = int(Qt.AltModifier)
+        shift = Qt.ShiftModifier.value
+        alt = Qt.AltModifier.value
 
-        ctrlAlt = int(Qt.ControlModifier) + int(Qt.AltModifier)
-        ctrlShift = int(Qt.ControlModifier) + int(Qt.ShiftModifier)
-        altShift = int(Qt.AltModifier) + int(Qt.ShiftModifier)
-        ctrlAltShift = int(Qt.ControlModifier) + int(Qt.AltModifier) + int(Qt.ShiftModifier)
+        ctrlAlt = Qt.ControlModifier.value + Qt.AltModifier.value
+        ctrlShift = Qt.ControlModifier.value + Qt.ShiftModifier.value
+        altShift = Qt.AltModifier.value + Qt.ShiftModifier.value
+        ctrlAltShift = Qt.ControlModifier.value + Qt.AltModifier.value + Qt.ShiftModifier.value
 
         # if event.modifiers() & Qt.ControlModifier:
 
@@ -646,7 +646,7 @@ class Group(QGraphicsItem):
     def paint(self, painter, option, widget=None):
         # painter.setBrush(self.arkaPlanRengi)
 
-        if option.state & QStyle.State_Selected or self.cosmeticSelect:
+        if option.state & QStyle.StateFlag.State_Selected or self.cosmeticSelect:
             if self.isActiveItem:
                 selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
             else:

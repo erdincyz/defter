@@ -27,7 +27,7 @@ class TempTextItem(QGraphicsTextItem):
         super(TempTextItem, self).__init__(text, parent)
 
         self._kim = shared.kim(kac_basamak=16)
-        self.setFlags(self.ItemIsFocusable)
+        self.setFlags(QGraphicsTextItem.ItemIsFocusable)
 
         self.setTextInteractionFlags(Qt.TextEditorInteraction)
 

@@ -5,7 +5,7 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
-from PySide6.QtGui import QPen, QBrush, QPainterPath, QPainterPathStroker, QColor, QTextOption, QTransform
+from PySide6.QtGui import QPen, QBrush, QPainterPath, QPainterPathStroker, QColor, QTextOption
 from PySide6.QtWidgets import QGraphicsItem, QStyle
 from PySide6.QtCore import QRectF, Qt, QSizeF, QPointF, Slot
 from canta.nesneler.tempTextItem import TempTextItem
@@ -38,9 +38,9 @@ class BaseItem(QGraphicsItem):
         self.resizeHandleSize = QSizeF(self.handleSize, self.handleSize)
         self.create_resize_handles()
 
-        self.setFlags(self.ItemIsSelectable |
-                      self.ItemIsMovable |
-                      self.ItemIsFocusable)
+        self.setFlags(QGraphicsItem.ItemIsSelectable |
+                      QGraphicsItem.ItemIsMovable |
+                      QGraphicsItem.ItemIsFocusable)
 
         # self.setFiltersChildEvents(True)
         # self.setHandlesChildEvents(True)
@@ -94,15 +94,15 @@ class BaseItem(QGraphicsItem):
     @isPinned.setter
     def isPinned(self, value):
         if value:
-            self.setFlags(self.ItemIsSelectable
+            self.setFlags(QGraphicsItem.ItemIsSelectable
                           # | self.ItemIsMovable
                           #  | item.ItemIsFocusable
                           )
 
         else:
-            self.setFlags(self.ItemIsSelectable
-                          | self.ItemIsMovable
-                          | self.ItemIsFocusable)
+            self.setFlags(QGraphicsItem.ItemIsSelectable
+                          | QGraphicsItem.ItemIsMovable
+                          | QGraphicsItem.ItemIsFocusable)
         self._isPinned = value
 
     # ---------------------------------------------------------------------
@@ -649,7 +649,7 @@ class BaseItem(QGraphicsItem):
             # painter.setWorldMatrixEnabled(True)
 
         # if option.state & QStyle.State_MouseOver:
-        if option.state & QStyle.State_Selected or self.cosmeticSelect:
+        if option.state & QStyle.StateFlag.State_Selected or self.cosmeticSelect:
             # painter.setPen(QPen(option.palette.windowText(), 0, Qt.DashLine))
             # painter.setPen(QPen(option.palette.highlight(), 0, Qt.DashLine))
 
@@ -736,7 +736,7 @@ class BaseItem(QGraphicsItem):
         # if change == self.ItemPositionChange:
         # if change == self.ItemSelectedChange:
         # if change == self.ItemSelectedHasChanged:
-        if change == self.ItemSelectedChange:
+        if change == QGraphicsItem.ItemSelectedChange:
             if value:
                 self.scene().parent().item_selected(self)
             else:
@@ -1027,16 +1027,16 @@ class BaseItem(QGraphicsItem):
         if self.ustGrup:
             return QGraphicsItem.wheelEvent(self, event)
 
-        toplam = int(event.modifiers())
+        toplam = event.modifiers().value
 
         # ctrl = int(Qt.ControlModifier)
-        shift = int(Qt.ShiftModifier)
-        alt = int(Qt.AltModifier)
+        shift = Qt.ShiftModifier.value
+        alt = Qt.AltModifier.value
 
-        ctrlAlt = int(Qt.ControlModifier) + int(Qt.AltModifier)
-        ctrlShift = int(Qt.ControlModifier) + int(Qt.ShiftModifier)
-        altShift = int(Qt.AltModifier) + int(Qt.ShiftModifier)
-        ctrlAltShift = int(Qt.ControlModifier) + int(Qt.AltModifier) + int(Qt.ShiftModifier)
+        ctrlAlt = Qt.ControlModifier.value + Qt.AltModifier.value
+        ctrlShift = Qt.ControlModifier.value + Qt.ShiftModifier.value
+        altShift = Qt.AltModifier.value + Qt.ShiftModifier.value
+        ctrlAltShift = Qt.ControlModifier.value + Qt.AltModifier.value + Qt.ShiftModifier.value
 
         # if event.modifiers() & Qt.ControlModifier:
 

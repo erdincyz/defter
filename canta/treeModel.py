@@ -78,6 +78,15 @@ class DokumanAgacModel(QAbstractItemModel):
         return var_mi
 
     # ---------------------------------------------------------------------
+    def degismis_sayfalarin_listesi(self):
+        liste = []
+        for sayfa in self.sayfalar():
+            if not sayfa.scene.undoStack.isClean():
+                liste.append(sayfa)
+
+        return liste
+
+    # ---------------------------------------------------------------------
     def iterItems(self, root):
         if root is not None:
             stack = [root]

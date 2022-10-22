@@ -9,7 +9,7 @@ __date__ = '3/28/16'
 from math import ceil
 
 from PySide6.QtCore import Qt, Signal, QSizeF, QRectF, QPointF, Slot, QUrl
-from PySide6.QtGui import QBrush, QPen, QColor, QPainterPath, QFontMetricsF
+from PySide6.QtGui import QBrush, QPen, QColor, QPainterPath, QFontMetricsF, QTextCursor
 from PySide6.QtWidgets import QGraphicsTextItem, QStyle
 from canta import shared
 
@@ -71,9 +71,9 @@ class Text(QGraphicsTextItem):
         # self.setCacheMode(Text.DeviceCoordinateCache)
         # self.setCacheMode(Text.ItemCoordinateCache)
         self.setCacheMode(Text.NoCache)
-        self.setFlags(self.ItemIsSelectable |
-                      self.ItemIsMovable |
-                      self.ItemIsFocusable)
+        self.setFlags(QGraphicsTextItem.ItemIsSelectable |
+                      QGraphicsTextItem.ItemIsMovable |
+                      QGraphicsTextItem.ItemIsFocusable)
 
         # self.setTextInteractionFlags(Qt.TextEditable)
         self.setTextInteractionFlags(Qt.TextEditorInteraction)
@@ -85,7 +85,7 @@ class Text(QGraphicsTextItem):
         # fmt = QTextBlockFormat()
         # fmt.setAlignment(Qt.AlignCenter)
         cursor = self.textCursor()
-        cursor.select(cursor.Document)
+        cursor.select(QTextCursor.Document)
         # cursor.mergeBlockFormat(fmt)
         # cursor.clearSelection()
         self.setTextCursor(cursor)
@@ -130,15 +130,15 @@ class Text(QGraphicsTextItem):
     @isPinned.setter
     def isPinned(self, value):
         if value:
-            self.setFlags(self.ItemIsSelectable
-                          # | self.ItemIsMovable
-                          #  | item.ItemIsFocusable
+            self.setFlags(QGraphicsTextItem.ItemIsSelectable
+                          # | QGraphicsTextItem.ItemIsMovable
+                          #  | QGraphicsTextItem.ItemIsFocusable
                           )
 
         else:
-            self.setFlags(self.ItemIsSelectable
-                          | self.ItemIsMovable
-                          | self.ItemIsFocusable)
+            self.setFlags(QGraphicsTextItem.ItemIsSelectable
+                          | QGraphicsTextItem.ItemIsMovable
+                          | QGraphicsTextItem.ItemIsFocusable)
         self._isPinned = value
 
     # ---------------------------------------------------------------------
@@ -523,7 +523,7 @@ class Text(QGraphicsTextItem):
     # ---------------------------------------------------------------------
     def itemChange(self, change, value):
 
-        if change == self.ItemSelectedChange:
+        if change == QGraphicsTextItem.ItemSelectedChange:
             if value:
                 self.scene().parent().text_item_selected(self)
             else:
@@ -620,16 +620,16 @@ class Text(QGraphicsTextItem):
         if self.ustGrup:
             return QGraphicsTextItem.wheelEvent(self, event)
 
-        toplam = int(event.modifiers())
+        toplam = event.modifiers().value
 
         # ctrl = int(Qt.ControlModifier)
-        shift = int(Qt.ShiftModifier)
-        alt = int(Qt.AltModifier)
+        shift = Qt.ShiftModifier.value
+        alt = Qt.AltModifier.value
 
-        ctrlAlt = int(Qt.ControlModifier) + int(Qt.AltModifier)
-        ctrlShift = int(Qt.ControlModifier) + int(Qt.ShiftModifier)
-        altShift = int(Qt.AltModifier) + int(Qt.ShiftModifier)
-        ctrlAltShift = int(Qt.ControlModifier) + int(Qt.AltModifier) + int(Qt.ShiftModifier)
+        ctrlAlt = Qt.ControlModifier.value + Qt.AltModifier.value
+        ctrlShift = Qt.ControlModifier.value + Qt.ShiftModifier.value
+        altShift = Qt.AltModifier.value + Qt.ShiftModifier.value
+        ctrlAltShift = Qt.ControlModifier.value + Qt.AltModifier.value + Qt.ShiftModifier.value
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
@@ -1191,7 +1191,7 @@ class Text(QGraphicsTextItem):
         # painter.fillRect(option.rect, self.arkaPlanRengi)
         painter.fillRect(option.rect, self.brush())
 
-        if option.state & QStyle.State_Selected or self.cosmeticSelect:
+        if option.state & QStyle.StateFlag.State_Selected or self.cosmeticSelect:
             if self.isActiveItem:
                 selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
             else:

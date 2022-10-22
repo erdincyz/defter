@@ -25,7 +25,7 @@ class View(QGraphicsView):
         # self.setRubberBandSelectionMode(Qt.ItemSelectionModelaraBak)
 
         # TODO !!
-        self.setViewportUpdateMode(self.SmartViewportUpdate)
+        self.setViewportUpdateMode(QGraphicsView.SmartViewportUpdate)
         # self.setViewportUpdateMode(self.MinimalViewportUpdate)  # default
         # https: // doc.qt.io / qt - 5 / qgraphicsview.html  # ViewportUpdateMode-enum
         # self.setViewportUpdateMode(self.BoundingRectViewportUpdate)
@@ -44,7 +44,7 @@ class View(QGraphicsView):
         self.backgroundImagePathIsEmbeded = False
         self.setCacheMode(QGraphicsView.CacheBackground)
 
-        self.setTransformationAnchor(self.AnchorUnderMouse)
+        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.baski_cerceve_kalemi = QPen(Qt.black)
         self.baskiRectler = []
 

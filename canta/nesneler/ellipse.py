@@ -105,7 +105,7 @@ class Ellipse(BaseItem):
             painter.restore()
         # painter.setWorldMatrixEnabled(True)
 
-        if option.state & QStyle.State_Selected or self.cosmeticSelect:
+        if option.state & QStyle.StateFlag.State_Selected or self.cosmeticSelect:
 
             if self.isActiveItem:
                 selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem

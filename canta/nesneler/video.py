@@ -339,12 +339,12 @@ class VideoItem(BaseItem):
 
     # ---------------------------------------------------------------------
     def itemChange(self, change, value):
-        if change == self.ItemSelectedChange:
+        if change == BaseItem.ItemSelectedChange:
             if value:
                 self.scene().parent().item_selected(self)
             else:
                 self.scene().parent().item_deselected(self)
-        elif change == self.ItemSceneChange:
+        elif change == BaseItem.ItemSceneChange:
             # The value argument is the new scene or a null pointer if the item is removed from a scene.
             # When item removed from the scene, we stop the player, to prevent stream errors.
             if not value:
@@ -597,16 +597,16 @@ class VideoItem(BaseItem):
         if self.ustGrup:
             return BaseItem.wheelEvent(self, event)
 
-        toplam = int(event.modifiers())
+        toplam = event.modifiers().value
 
         # ctrl = int(Qt.ControlModifier)
-        shift = int(Qt.ShiftModifier)
-        alt = int(Qt.AltModifier)
+        shift = Qt.ShiftModifier.value
+        alt = Qt.AltModifier.value
 
-        ctrlAlt = int(Qt.ControlModifier) + int(Qt.AltModifier)
-        ctrlShift = int(Qt.ControlModifier) + int(Qt.ShiftModifier)
-        altShift = int(Qt.AltModifier) + int(Qt.ShiftModifier)
-        ctrlAltShift = int(Qt.ControlModifier) + int(Qt.AltModifier) + int(Qt.ShiftModifier)
+        ctrlAlt = Qt.ControlModifier.value + Qt.AltModifier.value
+        ctrlShift = Qt.ControlModifier.value + Qt.ShiftModifier.value
+        altShift = Qt.AltModifier.value + Qt.ShiftModifier.value
+        ctrlAltShift = Qt.ControlModifier.value + Qt.AltModifier.value + Qt.ShiftModifier.value
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
@@ -652,7 +652,7 @@ class VideoItem(BaseItem):
         # painter.drawEllipse(self.videoSliderEllipseRect)
         # painter.drawRect(self.boundingRect())
 
-        if option.state & QStyle.State_MouseOver:
+        if option.state & QStyle.StateFlag.State_MouseOver:
             painter.setOpacity(0.7)
             painter.setPen(QPen(Qt.red))
             # if self.isSelected():

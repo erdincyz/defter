@@ -60,7 +60,7 @@ class Image(BaseItem):
 
         # self.pixmap = QPixmap(self.filePathForDraw)
 
-        self.setFlags(self.ItemIsMovable | self.ItemIsSelectable)
+        self.setFlags(BaseItem.ItemIsMovable | BaseItem.ItemIsSelectable)
 
         self.imageOpacity = 1.0
         self.isMirrorX = False
@@ -369,7 +369,7 @@ class Image(BaseItem):
         # if change == self.ItemPositionChange:
         # if change == self.ItemSelectedChange:
         # if change == self.ItemSelectedHasChanged:
-        if change == self.ItemSelectedChange:
+        if change == BaseItem.ItemSelectedChange:
             if value:
                 self.scene().parent().item_selected(self)
             else:  # yani deselected
@@ -386,16 +386,16 @@ class Image(BaseItem):
         if self.ustGrup:
             return BaseItem.wheelEvent(self, event)
 
-        toplam = int(event.modifiers())
+        toplam = event.modifiers().value
 
         # ctrl = int(Qt.ControlModifier)
-        shift = int(Qt.ShiftModifier)
-        alt = int(Qt.AltModifier)
+        shift = Qt.ShiftModifier.value
+        alt = Qt.AltModifier.value
 
-        ctrlShift = int(Qt.ControlModifier) + int(Qt.ShiftModifier)
-        ctrlAlt = int(Qt.ControlModifier) + int(Qt.AltModifier)
-        altShift = int(Qt.AltModifier) + int(Qt.ShiftModifier)
-        ctrlAltShift = int(Qt.ControlModifier) + int(Qt.AltModifier) + int(Qt.ShiftModifier)
+        ctrlAlt = Qt.ControlModifier.value + Qt.AltModifier.value
+        ctrlShift = Qt.ControlModifier.value + Qt.ShiftModifier.value
+        altShift = Qt.AltModifier.value + Qt.ShiftModifier.value
+        ctrlAltShift = Qt.ControlModifier.value + Qt.AltModifier.value + Qt.ShiftModifier.value
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
@@ -527,7 +527,7 @@ class Image(BaseItem):
         painter.drawPixmap(rect, self.pixmap)
         painter.setOpacity(1)
 
-        if option.state & QStyle.State_Selected or self.cosmeticSelect:
+        if option.state & QStyle.StateFlag.State_Selected or self.cosmeticSelect:
 
             if self.isActiveItem:
                 selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem

@@ -27,7 +27,7 @@ class EkranKutuphane(QGraphicsView):
 
         # TODO !!
         # self.setViewportUpdateMode(self.SmartViewportUpdate)
-        self.setViewportUpdateMode(self.MinimalViewportUpdate)  # default
+        self.setViewportUpdateMode(QGraphicsView.MinimalViewportUpdate)  # default
         # https: // doc.qt.io / qt - 5 / qgraphicsview.html  # ViewportUpdateMode-enum
         # self.setViewportUpdateMode(self.BoundingRectViewportUpdate)
         # self.setViewportUpdateMode(self.FullViewportUpdate)
@@ -44,7 +44,7 @@ class EkranKutuphane(QGraphicsView):
         self.backgroundImagePath = None
         self.setCacheMode(QGraphicsView.CacheBackground)
 
-        self.setTransformationAnchor(self.AnchorUnderMouse)
+        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         # gercek sahnede "if event.source().objectName() == "kev": " ile
         # kutuphanede drag drop edildi ise nesneyi embeded isaretleyebilmek icin.
         self.viewport().setObjectName("kev")

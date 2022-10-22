@@ -43,13 +43,13 @@ class RenkSecilenKareW(QWidget):
     # ---------------------------------------------------------------------
     def renkleriAyarla(self):
         self.renkGrad = QLinearGradient(0, 0, 1, 0)
-        self.renkGrad.setCoordinateMode(self.renkGrad.ObjectMode)
+        self.renkGrad.setCoordinateMode(QLinearGradient.ObjectMode)
         self.renkGrad.setSpread(QGradient.PadSpread)
         self.renkGrad.setColorAt(0, QColor(255, 255, 255))
         self.renkGrad.setColorAt(1, QColor.fromHsv(self.renkTon, 255, 255))
 
         self.beyazlikGrad = QLinearGradient(0, 0, 0, 1)
-        self.beyazlikGrad.setCoordinateMode(self.beyazlikGrad.ObjectMode)
+        self.beyazlikGrad.setCoordinateMode(QLinearGradient.ObjectMode)
         self.beyazlikGrad.setSpread(QGradient.PadSpread)
         self.beyazlikGrad.setColorAt(0, QColor(0, 0, 0, 0))
         self.beyazlikGrad.setColorAt(1, QColor(0, 0, 0, 255))
@@ -182,7 +182,7 @@ class RenkSeciciWidget(QWidget):
 
         # ########  TON ARKAPLAN  ################
         gradient = QLinearGradient(0, 0, 1, 0)
-        gradient.setCoordinateMode(gradient.ObjectMode)
+        gradient.setCoordinateMode(QLinearGradient.ObjectMode)
         gradient.setColorAt(0, QColor.fromHsv(0, 255, 255))
         gradient.setColorAt(0.16105497, QColor.fromHsv(60, 255, 255))
         gradient.setColorAt(0.35173747, QColor.fromHsv(120, 255, 255))
@@ -266,7 +266,7 @@ class RenkSeciciWidget(QWidget):
     def seffalik_cubugu_arkaplan_degistir(self, renk_tonu):
         # ########  SEFFAFLIK ARKAPLAN  ################
         gradient = QLinearGradient(0, 0, 1, 0)
-        gradient.setCoordinateMode(gradient.ObjectMode)
+        gradient.setCoordinateMode(QLinearGradient.ObjectMode)
 
         gradient.setColorAt(0, QColor.fromHsv(renk_tonu, 255, 255, 0))
         gradient.setColorAt(1, QColor.fromHsv(renk_tonu, 255, 255, 255))

@@ -8,7 +8,7 @@ __author__ = 'Erdinç Yılmaz'
 import os
 
 from PySide6.QtCore import Qt, Slot, Signal, QCoreApplication, QSettings, QSize, QLocale
-from PySide6.QtGui import QIcon, QKeySequence, QDoubleValidator, QIntValidator, QActionGroup, QAction,\
+from PySide6.QtGui import QIcon, QKeySequence, QDoubleValidator, QIntValidator, QActionGroup, QAction, \
     QPageLayout
 from PySide6.QtPrintSupport import QPrintPreviewWidget, QPrinter, QPrintDialog, QPageSetupDialog
 from PySide6.QtWidgets import QVBoxLayout, QToolBar, QMainWindow, QLineEdit, QLabel, \
@@ -38,39 +38,39 @@ class ZoomValidator(QDoubleValidator):
         if replacePercent:
             text += '%'
         num_size = 4
-        if state == QDoubleValidator.Intermediate:
+        if state == QDoubleValidator.State.Intermediate:
             idx = text.find("{}".format(QLocale.system().decimalPoint()))
             if (idx == -1 and len(text) > num_size) or (idx != -1 and idx > num_size):
-                return QDoubleValidator.Invalid
+                return QDoubleValidator.State.Invalid
 
         # print(state)
         return state
 
 
-########################################################################
-class LineEdit(QLineEdit):
-
-    # ---------------------------------------------------------------------
-    def __init__(self, parent=None):
-        super(LineEdit, self).__init__(parent)
-        self.setContextMenuPolicy(Qt.NoContextMenu)
-        self.returnPressed.connect(self.act_return_pressed)
-        self.originalText = ""
-
-    # ---------------------------------------------------------------------
-    def act_return_pressed(self):
-        self.originalText = self.text()
-
-    # ---------------------------------------------------------------------
-    def focusInEvent(self, QFocusEvent):
-        self.originalText = self.text()
-        QLineEdit.focusInEvent(QFocusEvent)
-
-    # ---------------------------------------------------------------------
-    def focusOutEvent(self, QFocusEvent):
-        if self.isModified() and not self.hasAcceptableInput():
-            self.setText(self.originalText)
-        QLineEdit.focusOutEvent(QFocusEvent)
+# ########################################################################
+# class LineEdit(QLineEdit):
+#
+#     # ---------------------------------------------------------------------
+#     def __init__(self, parent=None):
+#         super(LineEdit, self).__init__(parent)
+#         self.setContextMenuPolicy(Qt.NoContextMenu)
+#         self.returnPressed.connect(self.act_return_pressed)
+#         self.originalText = ""
+#
+#     # ---------------------------------------------------------------------
+#     def act_return_pressed(self):
+#         self.originalText = self.text()
+#
+#     # ---------------------------------------------------------------------
+#     def focusInEvent(self, QFocusEvent):
+#         self.originalText = self.text()
+#         QLineEdit.focusInEvent(self, QFocusEvent)
+#
+#     # ---------------------------------------------------------------------
+#     def focusOutEvent(self, QFocusEvent):
+#         if self.isModified() and not self.hasAcceptableInput():
+#             self.setText(self.originalText)
+#         QLineEdit.focusOutEvent(self, QFocusEvent)
 
 
 ########################################################################
@@ -140,7 +140,7 @@ class PrintPreviewDialog(QMainWindow):
         # self.preview.setFont(QFont('Sans', 9, QFont.Bold))
 
         # self.preview.setSinglePageViewMode()
-        self.preview.setViewMode(QPrintPreviewWidget.SinglePageView)
+        # self.preview.setViewMode(QPrintPreviewWidget.SinglePageView)
 
         # self.preview.paintRequested.connect(lambda: self.paint_requested(printer))
         self.preview.paintRequested.connect(self.paintRequested.emit)
@@ -156,10 +156,10 @@ class PrintPreviewDialog(QMainWindow):
         self.optionsDW.setWindowTitle(self.tr("Print Options"))
         self.optionsDW.setObjectName("printOptionsDockWidget")
         self.optionsDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.optionsDW.setFeatures(QDockWidget.DockWidgetMovable |
-                                   QDockWidget.DockWidgetClosable |
-                                   # QDockWidget.DockWidgetVerticalTitleBar|
-                                   QDockWidget.DockWidgetFloatable
+        self.optionsDW.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetMovable |
+                                   QDockWidget.DockWidgetFeature.DockWidgetClosable |
+                                   # QDockWidget.DockWidgetFeature.DockWidgetVerticalTitleBar|
+                                   QDockWidget.DockWidgetFeature.DockWidgetFloatable
                                    )
 
         baseWidget = QWidget(self.optionsDW)
@@ -351,7 +351,7 @@ class PrintPreviewDialog(QMainWindow):
         self.zoomCBox = QComboBox(self.toolBar)
         self.zoomCBox.setEditable(True)
         self.zoomCBox.setMinimumContentsLength(7)
-        self.zoomCBox.setInsertPolicy(QComboBox.NoInsert)
+        self.zoomCBox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
 
         zoomEditorLineEdit = QLineEdit(self.toolBar)
         zoomEditorLineEdit.setValidator(ZoomValidator(1, 1000, 1, zoomEditorLineEdit))
@@ -649,7 +649,7 @@ class PrintPreviewDialog(QMainWindow):
     # ---------------------------------------------------------------------
     def act_set_mode(self, action):
         if action == self.actionOverviewMode:
-            self.preview.setViewMode(QPrintPreviewWidget.AllPagesView)
+            self.preview.setViewMode(QPrintPreviewWidget.ViewMode.AllPagesView)
             self.set_fitting(False)
             self.fitGroup.setEnabled(False)
             self.navGroup.setEnabled(False)
@@ -657,10 +657,10 @@ class PrintPreviewDialog(QMainWindow):
             self.pageNumberLabel.setEnabled(False)
 
         elif action == self.actionFacingMode:
-            self.preview.setViewMode(QPrintPreviewWidget.FacingPagesView)
+            self.preview.setViewMode(QPrintPreviewWidget.ViewMode.FacingPagesView)
 
         elif action == self.actionSingleMode:
-            self.preview.setViewMode(QPrintPreviewWidget.SinglePageView)
+            self.preview.setViewMode(QPrintPreviewWidget.ViewMode.SinglePageView)
 
         if action == self.actionFacingMode or action == self.actionSingleMode:
             self.fitGroup.setEnabled(True)
@@ -675,7 +675,7 @@ class PrintPreviewDialog(QMainWindow):
 
         fn = QFileDialog.getSaveFileName(self,
                                          self.tr('Export to PDF'),
-                                         self.parent().lastDirForExport,
+                                         self.parent().sonKlasorDisaAktar,
                                          self.tr("*.pdf files (*.pdf);;All Files (*)"))
 
         path = fn[0]
@@ -685,11 +685,11 @@ class PrintPreviewDialog(QMainWindow):
             self.printer.setOutputFileName(path)
 
             if self.printer.outputFileName():
-                self.preview.print()
+                self.preview.print_()
 
             self.parent().log(self.tr("File succesfully saved! {}".format(path)), 7000)
 
-            self.parent().lastDirForExport = os.path.dirname(path)
+            self.parent().sonKlasorDisaAktar = os.path.dirname(path)
 
             self.close()
             return
@@ -720,14 +720,14 @@ class PrintPreviewDialog(QMainWindow):
         if not self.printDialog:
             self.printDialog = QPrintDialog(self.printer, self)
             # self.printDialog.set
-        if self.printDialog.exec() == QPrintDialog.Accepted:
-            self.preview.print()
+        if self.printDialog.exec() == QPrintDialog.DialogCode.Accepted:
+            self.preview.print_()
             self.close()
 
     # ---------------------------------------------------------------------
     def act_page_setup(self):
         pageSetupDialog = QPageSetupDialog(self.printer, self)
-        if pageSetupDialog.exec() == QPageSetupDialog.Accepted:
+        if pageSetupDialog.exec() == QPageSetupDialog.DialogCode.Accepted:
             if self.preview.orientation() == QPageLayout.Portrait:
                 self.actionPortrait.setChecked(True)
                 self.preview.setPortraitOrientation()
@@ -735,22 +735,6 @@ class PrintPreviewDialog(QMainWindow):
                 self.actionLandscape.setChecked(True)
                 self.preview.setLandscapeOrientation()
 
-    # # ---------------------------------------------------------------------
-    # def _get_pdf_file_save_path(self):
-    #
-    #     fn = QFileDialog.getSaveFileName(self,
-    #                                      "Export as PDF",
-    #                                      self.lastDir,
-    #                                      "*.pdf files (*.pdf);;All Files (*)")
-    #
-    #     path = fn[0]
-    #     if path:
-    #         if not path.endswith(".pdf"):
-    #             path = '%s.pdf' % path
-    #         self.lastDir = os.path.dirname(path)
-    #         return path
-    #
-    #     return None
 
     # ---------------------------------------------------------------------
     def keyPressEvent(self, event):

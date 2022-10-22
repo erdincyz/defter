@@ -27,9 +27,9 @@ class YuvarlakFircaBoyutu(QGraphicsItem):
 
         self.secili_nesne_kalem_kalinligi = 0
 
-        self.setFlags(self.ItemIsSelectable |
-                      self.ItemIsMovable |
-                      self.ItemIsFocusable)
+        self.setFlags(QGraphicsItem.ItemIsSelectable |
+                      QGraphicsItem.ItemIsMovable |
+                      QGraphicsItem.ItemIsFocusable)
 
         self._pen = pen
         self._brush = QBrush()

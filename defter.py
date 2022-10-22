@@ -33,7 +33,7 @@ from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, Q
                                QStatusBar, QSizePolicy, QLabel, QPushButton, QScrollArea,
                                QDialog, QTextEdit, QInputDialog, QListWidget, QListWidgetItem,
                                QLineEdit, QToolButton, QComboBox, QButtonGroup, QGroupBox, QRadioButton, QProgressBar,
-                               QCheckBox)
+                               QCheckBox, QGraphicsItem)
 
 from PySide6.QtCore import (Qt, QRectF, QCoreApplication, QSettings, QPoint, Slot, QSizeF, QSize, QFile, QSaveFile,
                             QIODevice, QDataStream, QMimeData, QByteArray, QPointF, qCompress, qUncompress, QLocale,
@@ -922,8 +922,8 @@ class DefterAnaPencere(QMainWindow):
         self.baskiKagitBoyutuCBox.setMaximumWidth(135)
         printerInfo = QPrinterInfo(self.printer)
         desteklenenSayfaBoyutlari = printerInfo.supportedPageSizes()
-        simdikiId = self.printer.pageLayout().pageSize().id()
-        for i in range(int(QPageSize.LastPageSize)):
+        simdikiId = self.printer.pageLayout().pageSize().id().value
+        for i in range(QPageSize.LastPageSize.value):
             psize = QPageSize((QPageSize.PageSizeId(i)))
             if psize.isValid():
                 desteklenenSayfaBoyutlari.append(psize)
@@ -1081,7 +1081,7 @@ class DefterAnaPencere(QMainWindow):
         else:
             self.printer.setPageOrientation(QPageLayout.Portrait)
             # self.printer.pageLayout().setOrientation(QPageLayout.Portrait)
-        # printer.setOutputFormat(QPrinter.PdfFormat)
+        # printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
         # printer.setOutputFileName("deneme.pdf")
         self.act_yazici_sayfa_kenar_cizdir()
 
@@ -2557,8 +2557,8 @@ class DefterAnaPencere(QMainWindow):
         if itemType == shared.LINE_ITEM_TYPE:
             lineItem = LineItem(pos=itemDict["pos"],
                                 pen=itemDict["pen"],
-                                yaziRengi=itemDict.get("yaziRengi", QColor(0,0,0)),
-                                arkaPlanRengi=itemDict.get("arkaPlanRengi", QColor(255,255,255)),
+                                yaziRengi=itemDict.get("yaziRengi", QColor(0, 0, 0)),
+                                arkaPlanRengi=itemDict.get("arkaPlanRengi", QColor(255, 255, 255)),
                                 line=itemDict["line"],
                                 font=itemDict.get("font", self.font()))
             # TODO: renkler bir sekilde sistem rengine donuyor.
@@ -2738,9 +2738,9 @@ class DefterAnaPencere(QMainWindow):
         elif itemType == shared.GROUP_ITEM_TYPE:
             groupItem = Group(itemDict["arkaPlanRengi"], itemDict.get("yaziRengi", QColor(0, 0, 0)), itemDict["pen"])
             # group = QGraphicsItemGroup(None)
-            groupItem.setFlags(groupItem.ItemIsSelectable
-                               | groupItem.ItemIsMovable
-                               # | groupItem.ItemIsFocusable
+            groupItem.setFlags(Group.ItemIsSelectable
+                               | Group.ItemIsMovable
+                               # | Group.ItemIsFocusable
                                )
 
             groupItem.setPos(itemDict["pos"])
@@ -2855,15 +2855,15 @@ class DefterAnaPencere(QMainWindow):
                 group = self.add_item_to_scene_from_dict(childDict)
                 self.dict_to_scene_recursive_group(childDict["group_children"], group)
                 group.setParentItem(parentItem)
-                #TODO: bir bak
+                # TODO: bir bak
                 group.setPos(parentItem.mapFromScene(group.pos()))
 
                 if parentItem.type() == shared.GROUP_ITEM_TYPE:
                     parentItem.parentedWithParentOperation.append(group)
                 if isInGroup:
-                    group.setFlag(group.ItemIsSelectable, False)
-                    group.setFlag(group.ItemIsMovable, False)
-                    group.setFlag(group.ItemIsFocusable, False)
+                    group.setFlag(QGraphicsItem.ItemIsSelectable, False)
+                    group.setFlag(QGraphicsItem.ItemIsMovable, False)
+                    group.setFlag(QGraphicsItem.ItemIsFocusable, False)
 
                 if "children" in childDict:
                     self.dict_to_scene_recursive_parent(childDict["children"], group)
@@ -2874,9 +2874,9 @@ class DefterAnaPencere(QMainWindow):
                 if parentItem.type() == shared.GROUP_ITEM_TYPE:
                     parentItem.parentedWithParentOperation.append(c)
                 if isInGroup:
-                    c.setFlag(c.ItemIsSelectable, False)
-                    c.setFlag(c.ItemIsMovable, False)
-                    c.setFlag(c.ItemIsFocusable, False)
+                    c.setFlag(QGraphicsItem.ItemIsSelectable, False)
+                    c.setFlag(QGraphicsItem.ItemIsMovable, False)
+                    c.setFlag(QGraphicsItem.ItemIsFocusable, False)
 
                 if "children" in childDict:
                     self.dict_to_scene_recursive_parent(childDict["children"], c)
@@ -4025,9 +4025,9 @@ class DefterAnaPencere(QMainWindow):
             self.act_secili_nesne_stilini_secili_araca_uygula)
 
         self.actionSeciliNesneStiliniKendiAracinaUygula = QAction(QIcon(':icons/icons/text-html.png'),
-                                                                 self.tr(
-                                                                     "Set selected item's style as tool default"),
-                                                                 self.itemContextMenu)
+                                                                  self.tr(
+                                                                      "Set selected item's style as tool default"),
+                                                                  self.itemContextMenu)
         self.actionSeciliNesneStiliniKendiAracinaUygula.triggered.connect(
             self.act_secili_nesne_stilini_kendi_aracina_uygula)
 
@@ -4531,7 +4531,7 @@ class DefterAnaPencere(QMainWindow):
 
         # self.arkaPlanRengi vs iptal edilince, nesneye bile tiklasak, secim aracina geciyor, sahneye tiklasa yine ayni
         # kalemde iken de kalem secili zaten
-        self.nesneOzellikleriYW = NesneOzellikleriYuzenWidget(self.cScene.aktifArac.arkaPlanRengi, # secim toolu
+        self.nesneOzellikleriYW = NesneOzellikleriYuzenWidget(self.cScene.aktifArac.arkaPlanRengi,  # secim toolu
                                                               self.cScene.aktifArac.yaziRengi, 
                                                               self.cScene.aktifArac.cizgiRengi,
                                                               self.cScene.aktifArac.cizgiKalinligi, self)
@@ -4718,8 +4718,8 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionBold = QAction(QIcon(':icons/bold.png'),
                                   self.tr("Bold"),
-                                  self, priority=QAction.LowPriority,
-                                  shortcut=Qt.CTRL + Qt.Key_B,
+                                  self,
+                                  shortcut="Ctrl+B",
                                   triggered=self.act_bold,
                                   checkable=True)
         # bold = QFont()
@@ -4728,8 +4728,8 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionItalic = QAction(QIcon(':icons/italic.png'),
                                     self.tr("Italic"),
-                                    self, priority=QAction.LowPriority,
-                                    shortcut=Qt.CTRL + Qt.Key_I,
+                                    self,
+                                    shortcut="Ctrl+I",
                                     triggered=self.act_italic,
                                     checkable=True)
         # italic = QFont()
@@ -4739,8 +4739,7 @@ class DefterAnaPencere(QMainWindow):
         self.actionUnderline = QAction(QIcon(':icons/underline.png'),
                                        self.tr("Underline"),
                                        self,
-                                       priority=QAction.LowPriority,
-                                       shortcut=Qt.CTRL + Qt.Key_U,
+                                       shortcut="Ctrl+U",
                                        triggered=self.act_underline,
                                        checkable=True)
         # underline = QFont()
@@ -4751,7 +4750,7 @@ class DefterAnaPencere(QMainWindow):
                                        self.tr("Strike Out"),
                                        self,
                                        priority=QAction.LowPriority,
-                                       shortcut=Qt.CTRL + Qt.Key_U,
+                                       # shortcut="Ctrl+U",
                                        triggered=self.act_strikeout,
                                        checkable=True)
         # strikeout = QFont()
@@ -4762,7 +4761,7 @@ class DefterAnaPencere(QMainWindow):
                                       self.tr("Overline"),
                                       self,
                                       priority=QAction.LowPriority,
-                                      shortcut=Qt.CTRL + Qt.Key_U,
+                                      # shortcut="Ctrl+U",
                                       triggered=self.act_overline,
                                       checkable=True)
         # overline = QFont()
@@ -4784,20 +4783,20 @@ class DefterAnaPencere(QMainWindow):
         self.actionYaziHizalaSigdir = QAction(QIcon(':icons/yazi-hizala-sigdir.png'),
                                               self.tr("Justify"), grp)
 
-        self.actionYaziHizalaSola.setShortcut(Qt.CTRL + Qt.Key_L)
+        self.actionYaziHizalaSola.setShortcut("Ctrl+L")
         self.actionYaziHizalaSola.setCheckable(True)
         self.actionYaziHizalaSola.setPriority(QAction.LowPriority)
         # self.actionYaziHizalaSola.hovered.connect(lambda: self._statusBar.showMessage("sola yanastir", 500))
 
-        self.actionYaziHizalaOrtala.setShortcut(Qt.CTRL + Qt.Key_E)
+        self.actionYaziHizalaOrtala.setShortcut("Ctrl+E")
         self.actionYaziHizalaOrtala.setCheckable(True)
         self.actionYaziHizalaOrtala.setPriority(QAction.LowPriority)
 
-        self.actionYaziHizalaSaga.setShortcut(Qt.CTRL + Qt.Key_R)
+        self.actionYaziHizalaSaga.setShortcut("Ctrl+R")
         self.actionYaziHizalaSaga.setCheckable(True)
         self.actionYaziHizalaSaga.setPriority(QAction.LowPriority)
 
-        self.actionYaziHizalaSigdir.setShortcut(Qt.CTRL + Qt.Key_J)
+        self.actionYaziHizalaSigdir.setShortcut("Ctrl+J")
         self.actionYaziHizalaSigdir.setCheckable(True)
         self.actionYaziHizalaSigdir.setPriority(QAction.LowPriority)
 
@@ -5854,7 +5853,7 @@ class DefterAnaPencere(QMainWindow):
 
         item = VideoItem(dosyaYolu, pos, QRectF(0, 0, 320, 240),
                          self.cScene.VideoAraci.yaziRengi,
-                         self.cScene.VideoAraci.arkaPlanRengi, #QColor.fromRgbF(0, 0, 0, 0),
+                         self.cScene.VideoAraci.arkaPlanRengi,  # QColor.fromRgbF(0, 0, 0, 0),
                          self.cScene.VideoAraci.kalem,
                          self.cScene.VideoAraci.yaziTipi)
         self.increase_zvalue(item)
@@ -6311,8 +6310,8 @@ class DefterAnaPencere(QMainWindow):
         self.cScene.clearSelection()
 
         paste_group = Group()
-        paste_group.setFlags(paste_group.ItemIsSelectable
-                             | paste_group.ItemIsMovable
+        paste_group.setFlags(Group.ItemIsSelectable
+                             | Group.ItemIsMovable
                              # | group.ItemIsFocusable
                              )
         self.cScene.addItem(paste_group)
@@ -6994,9 +6993,9 @@ class DefterAnaPencere(QMainWindow):
     # 
     #     group = Group()
     #     # group = QGraphicsItemGroup(None)
-    #     group.setFlags(group.ItemIsSelectable
-    #                    | group.ItemIsMovable
-    #                    # | group.ItemIsFocusable
+    #     group.setFlags(Group.ItemIsSelectable
+    #                    | Group.ItemIsMovable
+    #                    # | Group.ItemIsFocusable
     #                    )
     # 
     #     self.cScene.undoStack.beginMacro(self.tr("group"))
@@ -7774,7 +7773,6 @@ class DefterAnaPencere(QMainWindow):
         self.cizgiUcuTipiCBox.setCurrentIndex(self.cizgiUcuTipiCBox.findData(pen.capStyle(), Qt.UserRole))
         self.change_line_widthF(pen.widthF())
         # self.cizgiKalinligiSlider.setValue(pen.width())
-
 
     # ---------------------------------------------------------------------
     def change_line_widthF(self, widthF):
@@ -9638,12 +9636,12 @@ class DefterAnaPencere(QMainWindow):
             self.printer = QPrinter()
             self.printer.setPageSize(QPageSize(QPageSize.A4))
             pLayout = self.printer.pageLayout()
-            pLayout.setUnits(pLayout.Millimeter)
+            pLayout.setUnits(QPageLayout.Millimeter)
             pLayout.setPageSize(QPageSize(QPageSize.A4))
             # self.printer.setPageLayout(QPageSize(QPageSize.A4))
             self.printer.setPageLayout(pLayout)
             self.printer.setPageOrientation(QPageLayout.Portrait)
-            # printer.setOutputFormat(QPrinter.PdfFormat)
+            # printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
             # printer.setOutputFileName("deneme.pdf")
             # return printer
 
@@ -10006,7 +10004,7 @@ class DefterAnaPencere(QMainWindow):
         # printer = self._get_printer()
 
         # printer.setResolution(QPrinter.ScreenResolution)
-        self.printer.setOutputFormat(QPrinter.NativeFormat)
+        self.printer.setOutputFormat(QPrinter.OutputFormat.NativeFormat)
         # "document" "page" "view" "selection" "content"
         self.pDialog = PrintPreviewDialog(self.printer, "document", self)
         self.pDialog.paintRequested.connect(self._paint_document)
@@ -10030,7 +10028,7 @@ class DefterAnaPencere(QMainWindow):
     def act_export_selected_text_item_content_as_pdf(self):
 
         # printer = self._get_printer()
-        self.printer.setOutputFormat(QPrinter.PdfFormat)
+        self.printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
         self.pDialog = PrintPreviewDialog(self.printer, "content", self)
         self.pDialog.paintRequested.connect(self._paint_text_item_content)
         self.pDialog.paintRequestTypeChanged.connect(self._change_preview_mode)
@@ -10046,7 +10044,7 @@ class DefterAnaPencere(QMainWindow):
         # printer = self._get_printer()
 
         # printer.setResolution(QPrinter.ScreenResolution)
-        self.printer.setOutputFormat(QPrinter.NativeFormat)
+        self.printer.setOutputFormat(QPrinter.OutputFormat.NativeFormat)
         # "document"  "page" "view" "selection" "content"
         self.pDialog = PrintPreviewDialog(self.printer, "content", self)
         self.pDialog.paintRequested.connect(self._paint_text_item_content)

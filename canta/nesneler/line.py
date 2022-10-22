@@ -50,9 +50,9 @@ class LineItem(QGraphicsItem):
             self.setLine(line)
 
         self.initialFlags = self.flags()
-        self.setFlags(self.ItemIsSelectable |
-                      self.ItemIsMovable |
-                      self.ItemIsFocusable)
+        self.setFlags(QGraphicsItem.ItemIsSelectable |
+                      QGraphicsItem.ItemIsMovable |
+                      QGraphicsItem.ItemIsFocusable)
 
         self._pen = pen
         self._font = font
@@ -445,15 +445,15 @@ class LineItem(QGraphicsItem):
     @isPinned.setter
     def isPinned(self, value):
         if value:
-            self.setFlags(self.ItemIsSelectable
-                          # | self.ItemIsMovable
-                          #  | item.ItemIsFocusable
+            self.setFlags(QGraphicsItem.ItemIsSelectable
+                          # | QGraphicsItem.ItemIsMovable
+                          #  | QGraphicsItem.ItemIsFocusable
                           )
 
         else:
-            self.setFlags(self.ItemIsSelectable
-                          | self.ItemIsMovable
-                          | self.ItemIsFocusable)
+            self.setFlags(QGraphicsItem.ItemIsSelectable
+                          | QGraphicsItem.ItemIsMovable
+                          | QGraphicsItem.ItemIsFocusable)
         self._isPinned = value
 
     # ---------------------------------------------------------------------
@@ -461,7 +461,7 @@ class LineItem(QGraphicsItem):
         # if change == self.ItemPositionChange:
         # if change == self.ItemSelectedChange:
         # if change == self.ItemSelectedHasChanged:
-        if change == self.ItemSelectedChange:
+        if change == QGraphicsItem.ItemSelectedChange:
             if value:
                 self.scene().parent().line_item_selected(self)
             else:
@@ -905,16 +905,16 @@ class LineItem(QGraphicsItem):
         if self.ustGrup:
             return QGraphicsItem.wheelEvent(self, event)
 
-        toplam = int(event.modifiers())
+        toplam = event.modifiers().value
 
         # ctrl = int(Qt.ControlModifier)
-        shift = int(Qt.ShiftModifier)
-        alt = int(Qt.AltModifier)
+        shift = Qt.ShiftModifier.value
+        alt = Qt.AltModifier.value
 
-        ctrlAlt = int(Qt.ControlModifier) + int(Qt.AltModifier)
-        ctrlShift = int(Qt.ControlModifier) + int(Qt.ShiftModifier)
-        altShift = int(Qt.AltModifier) + int(Qt.ShiftModifier)
-        ctrlAltShift = int(Qt.ControlModifier) + int(Qt.AltModifier) + int(Qt.ShiftModifier)
+        ctrlAlt = Qt.ControlModifier.value + Qt.AltModifier.value
+        ctrlShift = Qt.ControlModifier.value + Qt.ShiftModifier.value
+        altShift = Qt.AltModifier.value + Qt.ShiftModifier.value
+        ctrlAltShift = Qt.ControlModifier.value + Qt.AltModifier.value + Qt.ShiftModifier.value
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
@@ -1153,7 +1153,7 @@ class LineItem(QGraphicsItem):
             painter.restore()
             # painter.setWorldMatrixEnabled(True)
 
-        if option.state & QStyle.State_Selected or self.cosmeticSelect:
+        if option.state & QStyle.StateFlag.State_Selected or self.cosmeticSelect:
 
             if self.isActiveItem:
                 selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem

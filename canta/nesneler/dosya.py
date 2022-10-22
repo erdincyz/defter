@@ -189,7 +189,7 @@ class DosyaNesnesi(BaseItem):
         # painter.setWorldMatrixEnabled(True)
 
         # if option.state & QStyle.State_MouseOver:
-        if option.state & QStyle.State_Selected or self.cosmeticSelect:
+        if option.state & QStyle.StateFlag.State_Selected or self.cosmeticSelect:
             # painter.setPen(QPen(option.palette.windowText(), 0, Qt.DashLine))
             # painter.setPen(QPen(option.palette.highlight(), 0, Qt.DashLine))
 

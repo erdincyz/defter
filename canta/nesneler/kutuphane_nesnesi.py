@@ -70,11 +70,11 @@ class KutuphaneNesnesi(QGraphicsItem):
 
         self.setAcceptHoverEvents(True)
 
-        self.setFlags(self.ItemIsSelectable)
+        self.setFlags(QGraphicsItem.ItemIsSelectable)
 
-        # self.setFlags(self.ItemIsSelectable |
-        #               # self.ItemIsMovable |
-        #               self.ItemIsFocusable)
+        # self.setFlags(QGraphicsItem.ItemIsSelectable |
+        #               # QGraphicsItem.ItemIsMovable |
+        #               QGraphicsItem.ItemIsFocusable)
 
         # self.setFiltersChildEvents(True)
         # self.setHandlesChildEvents(True)
@@ -487,7 +487,7 @@ class KutuphaneNesnesi(QGraphicsItem):
         # painter.restore()
         # # painter.setWorldMatrixEnabled(True)
 
-        if option.state & QStyle.State_Selected:
+        if option.state & QStyle.StateFlag.State_Selected:
             selectionPenBottom = self.selectionPenBottom
 
             painter.setBrush(Qt.NoBrush)

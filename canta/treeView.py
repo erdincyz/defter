@@ -75,11 +75,11 @@ class TreeView(QTreeView):
         # self.setEditTriggers(QAbstractItemView.EditKeyPressed)
         self.setEditTriggers(QAbstractItemView.DoubleClicked)
         # self.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.setSelectionMode(self.SingleSelection)
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
 
-        self.setSelectionBehavior(self.SelectRows)
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        self.setVerticalScrollMode(self.ScrollPerPixel)
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.verticalScrollBar().setSingleStep(7)
 
         self.setAutoScroll(True)
@@ -178,7 +178,7 @@ class TreeView(QTreeView):
             # TODO: performans optimize et, direkt inde mi kullanmak ,veya key pressed ile secilince scroll etmeceç
             # bi de gerek ok ztaen
             self.scrollTo(self.model().index_sayfadan(sayfa),
-                          self.EnsureVisible)  # PositionAtCenter
+                          QTreeView.EnsureVisible)  # PositionAtCenter
 
     # # ---------------------------------------------------------------------
     # def mouseDoubleClickEvent(self, QMouseEvent):
@@ -387,9 +387,9 @@ class TreeView(QTreeView):
         self.model().enSonAktifSayfa = sayfa
         idx = self.model().index_sayfadan(sayfa)
         # self.setCurrentIndex(idx) # bu ayni isi yapiyor alt iki satirin.
-        self.selectionModel().select(idx, self.selectionModel().ClearAndSelect)
+        self.selectionModel().select(idx, QItemSelectionModel.ClearAndSelect)
         self.selectionModel().setCurrentIndex(idx, QItemSelectionModel.ClearAndSelect)
-        self.scrollTo(self.model().index_sayfadan(sayfa), self.EnsureVisible)  # PositionAtCenter
+        self.scrollTo(self.model().index_sayfadan(sayfa), QTreeView.EnsureVisible)  # PositionAtCenter
 
         # print(self.model().enSonAktifSayfa.adi)
 

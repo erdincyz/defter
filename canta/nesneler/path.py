@@ -49,9 +49,9 @@ class PathItem(QGraphicsItem):
         self.cizgi_basitlestirme_miktari = 10  # moveCenterda kullanildigi icin yarisi aslinda
 
         self.initialFlags = self.flags()
-        self.setFlags(self.ItemIsSelectable |
-                      self.ItemIsMovable |
-                      self.ItemIsFocusable)
+        self.setFlags(QGraphicsItem.ItemIsSelectable |
+                      QGraphicsItem.ItemIsMovable |
+                      QGraphicsItem.ItemIsFocusable)
 
         self.secili_nesne_kalem_kalinligi = 0
 
@@ -127,15 +127,15 @@ class PathItem(QGraphicsItem):
     @isPinned.setter
     def isPinned(self, value):
         if value:
-            self.setFlags(self.ItemIsSelectable
-                          # | self.ItemIsMovable
-                          #  | item.ItemIsFocusable
+            self.setFlags(QGraphicsItem.ItemIsSelectable
+                          # | QGraphicsItem.ItemIsMovable
+                          #  | QGraphicsItem.ItemIsFocusable
                           )
 
         else:
-            self.setFlags(self.ItemIsSelectable
-                          | self.ItemIsMovable
-                          | self.ItemIsFocusable)
+            self.setFlags(QGraphicsItem.ItemIsSelectable
+                          | QGraphicsItem.ItemIsMovable
+                          | QGraphicsItem.ItemIsFocusable)
         self._isPinned = value
 
     # ---------------------------------------------------------------------
@@ -196,7 +196,7 @@ class PathItem(QGraphicsItem):
         # if change == self.ItemPositionChange:
         # if change == self.ItemSelectedChange:
         # if change == self.ItemSelectedHasChanged:
-        if change == self.ItemSelectedChange:
+        if change == QGraphicsItem.ItemSelectedChange:
             if value:
                 self.scene().parent().path_item_selected(self)
             else:
@@ -619,9 +619,9 @@ class PathItem(QGraphicsItem):
         self.basitlestir()
         # basitlestir() -> self.setPath yapiyor
         # self.setPath(self.lastPath)
-        self.setFlags(self.ItemIsSelectable |
-                      self.ItemIsMovable |
-                      self.ItemIsFocusable)
+        self.setFlags(QGraphicsItem.ItemIsSelectable |
+                      QGraphicsItem.ItemIsMovable |
+                      QGraphicsItem.ItemIsFocusable)
         self.intersects = False
         # self.setSelected(True)
 
@@ -774,16 +774,16 @@ class PathItem(QGraphicsItem):
         if self.ustGrup:
             return QGraphicsItem.wheelEvent(self, event)
 
-        toplam = int(event.modifiers())
+        toplam = event.modifiers().value
 
         # ctrl = int(Qt.ControlModifier)
-        shift = int(Qt.ShiftModifier)
-        alt = int(Qt.AltModifier)
+        shift = Qt.ShiftModifier.value
+        alt = Qt.AltModifier.value
 
-        ctrlAlt = int(Qt.ControlModifier) + int(Qt.AltModifier)
-        ctrlShift = int(Qt.ControlModifier) + int(Qt.ShiftModifier)
-        altShift = int(Qt.AltModifier) + int(Qt.ShiftModifier)
-        ctrlAltShift = int(Qt.ControlModifier) + int(Qt.AltModifier) + int(Qt.ShiftModifier)
+        ctrlAlt = Qt.ControlModifier.value + Qt.AltModifier.value
+        ctrlShift = Qt.ControlModifier.value + Qt.ShiftModifier.value
+        altShift = Qt.AltModifier.value + Qt.ShiftModifier.value
+        ctrlAltShift = Qt.ControlModifier.value + Qt.AltModifier.value + Qt.ShiftModifier.value
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
@@ -1117,7 +1117,7 @@ class PathItem(QGraphicsItem):
             # self.startPointRect.setSize(self.startPointRect.size() * self._pen.width())
             painter.drawEllipse(self.startPointRect)
 
-        if option.state & QStyle.State_Selected or self.cosmeticSelect:
+        if option.state & QStyle.StateFlag.State_Selected or self.cosmeticSelect:
 
             if self.isActiveItem:
                 selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem

@@ -65,7 +65,7 @@ class Scene(QGraphicsScene):
                         self.YaziAraci, self.ResimAraci, self.VideoAraci, self.DosyaAraci, self.AynalaXAraci,
                         self.AynalaYAraci, self.ResimKirpAraci)
 
-        self.setItemIndexMethod(self.NoIndex)
+        self.setItemIndexMethod(QGraphicsScene.NoIndex)
 
         self.tempDirPath = tempDirPath
         self.setFont(yaziTipi)
