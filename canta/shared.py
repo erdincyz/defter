@@ -23,10 +23,10 @@ DEFTER_APP_NAME = "Defter"
 
 renk_degismis_nesne_yazi_rengi = QColor(232, 50, 120)
 # renk_degismis_nesne_yazi_rengi = QColor(0,0,255)
-renk_kirmizi = QColor(Qt.red)
-renk_siyah = QColor(Qt.black)
-renk_mavi = QColor(Qt.blue)
-activeItemLineColor = QColor(Qt.red)
+renk_kirmizi = QColor(Qt.GlobalColor.red)
+renk_siyah = QColor(Qt.GlobalColor.black)
+renk_mavi = QColor(Qt.GlobalColor.blue)
+activeItemLineColor = QColor(Qt.GlobalColor.red)
 
 # bunlarin degerleri degismesin, cunku nesneler kaydedilirken bu degerler de kaydediliyor.
 # sonra eski dosyalar acilmaz, degisiklik yapilirsa
