@@ -186,7 +186,7 @@ class DokumanAgacModel(QAbstractItemModel):
 
         parent = item.parent()
         if not parent:
-            parent = self.rootItem
+            parent = self.kokSayfa
 
         if len(parent.children()) == 0:
             return None

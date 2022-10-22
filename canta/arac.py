@@ -9,7 +9,7 @@ from PySide6.QtGui import QPen, QFont, QColor, Qt, QPixmap, QCursor
 
 
 def ver_arac_ikon_tipi(tip):
-    tipIkonAdresSozluk = {'secimAraci': Qt.ArrowCursor,
+    tipIkonAdresSozluk = {'secimAraci': Qt.CursorShape.ArrowCursor,
                           'okAraci': ':icons/cursor-line.png',
                           'dortgenAraci': ':icons/cursor-rectangle.png',
                           'yuvarlakAraci': ':icons/cursor-circle.png',
@@ -18,9 +18,9 @@ def ver_arac_ikon_tipi(tip):
                           'resimAraci': ':icons/cursor-image.png',
                           'videoAraci': ":icons/cursor-pen.png",
                           'dosyaAraci': ":icons/cursor-pen.png",
-                          'aynalaXAraci': Qt.ArrowCursor,
-                          'aynalaYAraci': Qt.ArrowCursor,
-                          'resimKirpAraci': Qt.CrossCursor,
+                          'aynalaXAraci': Qt.CursorShape.ArrowCursor,
+                          'aynalaYAraci': Qt.CursorShape.ArrowCursor,
+                          'resimKirpAraci': Qt.CursorShape.CrossCursor,
                           }
     return tipIkonAdresSozluk[tip]
 
@@ -39,9 +39,9 @@ class Arac(object):
 
         self.kalem = QPen(QColor(0, 0, 0),
                           0,
-                          Qt.SolidLine,
-                          Qt.FlatCap,
-                          Qt.RoundJoin)
+                          Qt.PenStyle.SolidLine,
+                          Qt.PenCapStyle.FlatCap,
+                          Qt.PenJoinStyle.RoundJoin)
 
         self.arkaPlanRengi = QColor(71, 177, 213)
         self.yaziRengi = QColor(0, 0, 0)
@@ -49,7 +49,7 @@ class Arac(object):
         # self.cizgiRengi = kalem.color()
 
         self.yaziTipi = QFont()
-        self.yaziHiza = Qt.AlignLeft
+        self.yaziHiza = Qt.AlignmentFlag.AlignLeft
         self.karakter_bicimi_sozluk = {"b": False,
                                        "i": False,
                                        "u": False,
@@ -76,7 +76,7 @@ class Arac(object):
         self.arkaPlanRengi = aracOzellikleriSozluk["arkaPlanRengi"]
         self.yaziRengi = aracOzellikleriSozluk["yaziRengi"]
         self.cizgiRengi = aracOzellikleriSozluk["cizgiRengi"]
-        self.yaziHiza = Qt.Alignment(int(aracOzellikleriSozluk["yaziHiza"]))
+        self.yaziHiza = Qt.AlignmentFlag(int(aracOzellikleriSozluk["yaziHiza"]))
         self.karakter_bicimi_sozluk = aracOzellikleriSozluk["karakter_bicimi_sozluk"]
 
     # ---------------------------------------------------------------------

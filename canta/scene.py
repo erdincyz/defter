@@ -65,7 +65,7 @@ class Scene(QGraphicsScene):
                         self.YaziAraci, self.ResimAraci, self.VideoAraci, self.DosyaAraci, self.AynalaXAraci,
                         self.AynalaYAraci, self.ResimKirpAraci)
 
-        self.setItemIndexMethod(QGraphicsScene.NoIndex)
+        self.setItemIndexMethod(QGraphicsScene.ItemIndexMethod.NoIndex)
 
         self.tempDirPath = tempDirPath
         self.setFont(yaziTipi)
@@ -916,8 +916,8 @@ class Scene(QGraphicsScene):
                 # fark = math.hypot(x2 - x1, y2 - y1)
                 self.shift_drag_ile_firca_boyu_degistir(fark / 2)
             else:
-                # or'laniyor -> 0x00000000 = hicbiri , 0x00000001 sol , 0x00000002 sag  0x00000004 orta
-                if event.buttons() == 1:  # mouse sol tus basili
+                # (eski bilgi) or'laniyor -> 0x00000000 = hicbiri , 0x00000001 sol , 0x00000002 sag  0x00000004 orta
+                if event.buttons() == Qt.MouseButton.LeftButton:  # mouse sol tus basili
                     # self.pathItem.replace_last(event.scenePos())
                     self.pathItem.append(event.scenePos())
                     # self.pathItem.check_if_at_start(event.scenePos())

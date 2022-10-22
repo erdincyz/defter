@@ -7978,6 +7978,9 @@ class DefterAnaPencere(QMainWindow):
                 toFileStream.writeInt16(DEFSTYLES_FILE_VERSION)
                 toFileStream.writeQVariant(self.get_style_presets_list_for_saving_binary())
                 _file.commit()
+                self.log(self.tr(f"Presets saved succesfully.  {filePath}"), 5000, toStatusBarOnly=True)
+
+                self.lutfen_bekleyin_gizle()
 
             except Exception as e:
                 self.lutfen_bekleyin_gizle()
@@ -8037,6 +8040,7 @@ class DefterAnaPencere(QMainWindow):
             presetList = fromFileStream.readQVariant()
             # _file.flush()
             _file.close()
+            self.lutfen_bekleyin_gizle()
 
             return presetList
 
@@ -8046,6 +8050,7 @@ class DefterAnaPencere(QMainWindow):
         presetList = self.load_style_presets_file_and_return_a_list()
         if presetList:
             self.populate_style_presets_from_saved_file(presetList, clearAll=True)
+            self.log(self.tr("Presets loaded succesfully."), 5000, toStatusBarOnly=True)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -8053,6 +8058,7 @@ class DefterAnaPencere(QMainWindow):
         presetList = self.load_style_presets_file_and_return_a_list()
         if presetList:
             self.populate_style_presets_from_saved_file(presetList, clearAll=False)
+            self.log(self.tr("Presets loaded succesfully."), 5000, toStatusBarOnly=True)
 
     # ---------------------------------------------------------------------
     @Slot()

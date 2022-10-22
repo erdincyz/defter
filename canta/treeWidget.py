@@ -23,12 +23,12 @@ class TreeWidget(QTreeWidget):
         # self.setHeaderLabel("Sayfalar")
         # headerView = self.header()  # PyQt5.QtWidgets.QHeaderView
         self.header().hide()
-        self.setSelectionBehavior(self.SelectRows)
-        self.setSelectionMode(self.SingleSelection)
+        self.setSelectionBehavior(self.SelectionBehavior.SelectRows)
+        self.setSelectionMode(self.SelectionMode.SingleSelection)
         self.setIconSize(QSize(128, 128))
         self.setUniformRowHeights(True)
         # self.setAnimated(True)
-        self.setVerticalScrollMode(self.ScrollPerPixel)
+        self.setVerticalScrollMode(self.ScrollMode.ScrollPerPixel)
         self.verticalScrollBar().setSingleStep(15)
 
         # self.setStyleSheet("")
@@ -67,7 +67,7 @@ class TreeWidget(QTreeWidget):
         self.setAcceptDrops(True)
         # asagidaki varken yukardakilere gerek yok, diger widgetler ile olan iliskiler ile ilgili yukardakiler.
         # TODO: liste elemani disari tasinabiliyor.
-        self.setDragDropMode(self.InternalMove)
+        self.setDragDropMode(self.DragDropMode.InternalMove)
         # pal = QPalette()
 
         # pal.setColor(QPalette.Background, Qt.white)

@@ -15,7 +15,7 @@ from PySide6.QtCore import Qt, QRectF, Slot
 class View(QGraphicsView):
     def __init__(self, scene, parent=None):
         super(View, self).__init__(scene, parent)
-        self.setDragMode(QGraphicsView.RubberBandDrag)
+        self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
         # self.setRenderHint(QPainter.Antialiasing)
         # self.setRenderHint(QPainter.TextAntialiasing)
         self.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
@@ -25,7 +25,7 @@ class View(QGraphicsView):
         # self.setRubberBandSelectionMode(Qt.ItemSelectionModelaraBak)
 
         # TODO !!
-        self.setViewportUpdateMode(QGraphicsView.SmartViewportUpdate)
+        self.setViewportUpdateMode(QGraphicsView.ViewportUpdateMode.SmartViewportUpdate)
         # self.setViewportUpdateMode(self.MinimalViewportUpdate)  # default
         # https: // doc.qt.io / qt - 5 / qgraphicsview.html  # ViewportUpdateMode-enum
         # self.setViewportUpdateMode(self.BoundingRectViewportUpdate)
@@ -42,9 +42,9 @@ class View(QGraphicsView):
         self.backgroundImagePixmap = None
         self.backgroundImagePath = None
         self.backgroundImagePathIsEmbeded = False
-        self.setCacheMode(QGraphicsView.CacheBackground)
+        self.setCacheMode(QGraphicsView.CacheModeFlag.CacheBackground)
 
-        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+        self.setTransformationAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
         self.baski_cerceve_kalemi = QPen(Qt.black)
         self.baskiRectler = []
 
@@ -68,11 +68,11 @@ class View(QGraphicsView):
 
     # ---------------------------------------------------------------------
     def setDragModeRubberBandDrag(self):
-        self.setDragMode(QGraphicsView.RubberBandDrag)
+        self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
 
     # ---------------------------------------------------------------------
     def setDragModeNoDrag(self):
-        self.setDragMode(QGraphicsView.NoDrag)
+        self.setDragMode(QGraphicsView.DragMode.NoDrag)
 
     # ---------------------------------------------------------------------
     def contextMenuEvent(self, event):
@@ -280,7 +280,7 @@ class View(QGraphicsView):
     def mouseReleaseEvent(self, event):
 
         if event.button() == Qt.MiddleButton:
-            self.setDragMode(QGraphicsView.RubberBandDrag)
+            self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
             self.panStartPos = None
             self.setCursor(Qt.ArrowCursor)
             self.setSceneRect(self.sceneRect().united(self.scene().itemsBoundingRect()))
@@ -300,7 +300,7 @@ class View(QGraphicsView):
             # normal gezinme , sahne boyutlarini degistirmez. scroll bar sonlari sinirdir.
             # alt kisim eklenince, islevi biraz degisti, bu olmazsa sadece alt kisim varsa ve sahnede scrollbar varsa
             # sahnede gezinirken scrollbarlar bitene kadar sahne sabit kaliyor sonra gezinme basliyor.
-            self.setDragMode(QGraphicsView.ScrollHandDrag)
+            self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
             self.horizontalScrollBar().setValue(
                 self.horizontalScrollBar().value() - (event.x() - self.panStartPos.x()))
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() - (event.y() - self.panStartPos.y()))

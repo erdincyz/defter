@@ -17,7 +17,7 @@ class YeniStil(QProxyStyle):
 
     def drawPrimitive(self, element, option, painter, widget=None):
         """ """
-        if element == self.PE_IndicatorItemViewItemDrop and not option.rect.isNull():
+        if element == QProxyStyle.PrimitiveElement.PE_IndicatorItemViewItemDrop and not option.rect.isNull():
             painter.setPen(QPen(Qt.blue, 3, Qt.DotLine))
             # option_new = QStyleOption(option)
             # option_new.rect.setLeft(0)
@@ -55,8 +55,8 @@ class TreeView(QTreeView):
         self.setAcceptDrops(True)
         self.setDropIndicatorShown(True)
         # self.setDragDropMode(QAbstractItemView.InternalMove)
-        self.setDefaultDropAction(Qt.MoveAction)
-        self.setDragDropMode(QAbstractItemView.DragDrop)
+        self.setDefaultDropAction(Qt.DropAction.MoveAction)
+        self.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop)
         self.setDragDropOverwriteMode(False)
         # self.setAutoExpandDelay()
         self.setItemsExpandable(True)
@@ -68,18 +68,18 @@ class TreeView(QTreeView):
 
         # self.header().setStretchLastSection(False)
         # self.header().setSectionResizeMode(QHeaderView.Interactive)
-        self.header().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.header().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         # self.header().setSectionResizeMode(QHeaderView.Stretch)
 
         # doubleclick editi yoketmek icin
         # self.setEditTriggers(QAbstractItemView.EditKeyPressed)
-        self.setEditTriggers(QAbstractItemView.DoubleClicked)
+        self.setEditTriggers(QAbstractItemView.EditTrigger.DoubleClicked)
         # self.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
-        self.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
-        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.verticalScrollBar().setSingleStep(7)
 
         self.setAutoScroll(True)
@@ -281,9 +281,9 @@ class TreeView(QTreeView):
             hedefParentIndex = self.rootIndex()
 
         # if not hedefIndex.parent().isValid() and  hedefIndex.row() != -1:
-        if dropIndicatorPos == self.OnItem:
+        if dropIndicatorPos == self.DropIndicatorPosition.OnItem:
             hedefRow = -11
-        elif dropIndicatorPos == self.BelowItem:
+        elif dropIndicatorPos == self.DropIndicatorPosition.BelowItem:
             # bu ikisinde item hedef degil aslinda, (AboveItem, BelowItem)
             # hedefParentIndex demek anlam karmasasi yaratmasin, bu durumda parent bunun parenti
             # asagida var zaten.
@@ -293,10 +293,10 @@ class TreeView(QTreeView):
             # sira degisebilir. bu silinmeden onceki ham hal.
             hedefRow = hedefParentIndex.row()
             hedefParentIndex = hedefParentIndex.parent()
-        elif dropIndicatorPos == self.AboveItem:
+        elif dropIndicatorPos == self.DropIndicatorPosition.AboveItem:
             hedefRow = hedefParentIndex.row() - 1
             hedefParentIndex = hedefParentIndex.parent()
-        elif dropIndicatorPos == self.OnViewport:
+        elif dropIndicatorPos == self.DropIndicatorPosition.OnViewport:
             hedefRow = -22
 
         # m = event.mimeData()
