@@ -20,7 +20,7 @@
 **Bilinen hataları ve eklenmek niyetinde olunan özellikleri (şu an güncel olmamakla beraber)** bu sayfadaki **[Issues](https://github.com/erdincyz/defter/issues)** kısmından takip edebilirsiniz.
 
 ### KURULUM
-Sisteminizde Python 3 ve PySide6 yüklü olması gerekiyor.
+Sisteminizde Python 3 ve PySide6 (>= 6.4) yüklü olması gerekiyor.
 
 Python 3' ü [https://www.python.org/downloads/](https://www.python.org/downloads/) adresinden indirebilirsiniz.
 
@@ -62,7 +62,7 @@ It can bu used for;
 * You can follow the known bugs and features that are intended to be added (although not up-to-date at the moment) from the [Issues](https://github.com/erdincyz/defter/issues) section on this page.
 
 ### INSTALLING
-It works on Python3 and needs PySide6 module.
+It works on Python3 and needs PySide6 (>= 6.4) module.
 
 You can download Python 3 from [https://www.python.org/downloads/](https://www.python.org/downloads/)
 

@@ -52,7 +52,7 @@ class YuvarlakFircaBoyutu(QGraphicsItem):
     # ---------------------------------------------------------------------
     def wheelEvent(self, event):
         # shift ile firca boyutu degistirirken, altta cizilen nesneyi dondurebiliyordu
-        if event.modifiers() & Qt.ShiftModifier:
+        if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
             event.accept()
         # else:
         #     super(BaseItem, self).wheelEvent(event)

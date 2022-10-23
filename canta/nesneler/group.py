@@ -145,7 +145,7 @@ class Group(QGraphicsItem):
         # mesela birden fazla nesne secili ve de gruplayacagız diyelim sag menu ile
         # ctrl basılı degil ise tikladigimiz secili kaliyor digerleri siliniyordu
         # uygunsuz bir kullanıcı deneyimi, niye yaptık acaba boyleyi hatırlayana kadar kalsın burda :)
-        # if not event.modifiers() & Qt.ControlModifier:
+        # if not event.modifiers() == Qt.KeyboardModifier.ControlModifier:
         #     self.scene().clearSelection()
         self.setSelected(True)
 

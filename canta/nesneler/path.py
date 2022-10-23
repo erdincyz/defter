@@ -213,7 +213,7 @@ class PathItem(QGraphicsItem):
         # mesela birden fazla nesne secili ve de gruplayacagız diyelim sag menu ile
         # ctrl basılı degil ise tikladigimiz secili kaliyor digerleri siliniyordu
         # uygunsuz bir kullanıcı deneyimi, niye yaptık acaba boyleyi hatırlayana kadar kalsın burda :)
-        # if not event.modifiers() & Qt.ControlModifier:
+        # if not event.modifiers() == Qt.KeyboardModifier.ControlModifier:
         #     self.scene().clearSelection()
         self.setSelected(True)
 
@@ -965,7 +965,7 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
 
-        if event.modifiers() & Qt.ControlModifier:
+        if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
             self.editMode = not self.editMode
             self.update()
             # super(PathItem, self).mouseDoubleClickEvent(event)

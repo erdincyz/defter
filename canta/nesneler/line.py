@@ -331,7 +331,7 @@ class LineItem(QGraphicsItem):
             eski_aci = self._eskiLineBeforeResize.angle()
 
             # Alt Key - to resize around center.
-            if event.modifiers() & Qt.AltModifier:
+            if event.modifiers() == Qt.KeyboardModifier.AltModifier:
                 # burda da orta nokta sabit
                 # c = self.line().center() # ile
                 # ve de eski aci ile, belki bir cizgi hareket eden noktadan merkeze
@@ -340,7 +340,7 @@ class LineItem(QGraphicsItem):
 
             # ---------------------------------------------------------------------
             #  Ctrl Key - 45 derece ve katlarina kilitlemek icin
-            if event.modifiers() & Qt.ControlModifier:
+            if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 if self._resizingFrom == 1:
                     line = QLineF(line.p2(), line.p1())
 
@@ -377,7 +377,7 @@ class LineItem(QGraphicsItem):
 
             # ---------------------------------------------------------------------
             # Shift Key - cizgi uzunlugu değiştiriken açıyı değiştirmek için
-            if event.modifiers() & Qt.ShiftModifier:
+            if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
                 if self._resizingFrom == 1:
                     line = QLineF(line.p2(), line.p1())
                     line.setAngle(180 + eski_aci)
@@ -478,7 +478,7 @@ class LineItem(QGraphicsItem):
         # mesela birden fazla nesne secili ve de gruplayacagız diyelim sag menu ile
         # ctrl basılı degil ise tikladigimiz secili kaliyor digerleri siliniyordu
         # uygunsuz bir kullanıcı deneyimi, niye yaptık acaba boyleyi hatırlayana kadar kalsın burda :)
-        # if not event.modifiers() & Qt.ControlModifier:
+        # if not event.modifiers() == Qt.KeyboardModifier.ControlModifier:
         #     self.scene().clearSelection()
         self.setSelected(True)
 
@@ -916,15 +916,15 @@ class LineItem(QGraphicsItem):
         altShift = Qt.AltModifier.value + Qt.ShiftModifier.value
         ctrlAltShift = Qt.ControlModifier.value + Qt.AltModifier.value + Qt.ShiftModifier.value
 
-        # if event.modifiers() & Qt.ControlModifier:
+        # if event.modifiers() & == Qt.KeyboardModifier.ControlModifier:
         if toplam == ctrlShift:
             self.scaleItemByScalingLine(event.delta())
 
-        # elif event.modifiers() & Qt.ShiftModifier:
+        # elif event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
         elif toplam == shift:
             self.rotateItem(event.delta())
 
-        # elif event.modifiers() & Qt.AltModifier:
+        # elif event.modifiers() == Qt.KeyboardModifier.AltModifier:
         elif toplam == alt:
             # self.changeBackgroundColorAlpha(event.delta())
             self.changeLineColorAlpha(event.delta())

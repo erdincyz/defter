@@ -373,7 +373,7 @@ class Text(QGraphicsTextItem):
         # mesela birden fazla nesne secili ve de gruplayacagız diyelim sag menu ile
         # ctrl basılı degil ise tikladigimiz secili kaliyor digerleri siliniyordu
         # uygunsuz bir kullanıcı deneyimi, niye yaptık acaba boyleyi hatırlayana kadar kalsın burda :)
-        # if not event.modifiers() & Qt.ControlModifier:
+        # if not event.modifiers() == Qt.KeyboardModifier.ControlModifier:
         #     self.scene().clearSelection()
         self.setSelected(True)
 
@@ -563,11 +563,11 @@ class Text(QGraphicsTextItem):
 
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
-        # if event.modifiers() == Qt.ControlModifier:
+        # if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
         #     self.scene().parent().web_browser_ac(self.text())
-        # elif event.modifiers() == Qt.ControlModifier | Qt.ShiftModifier:
+        # elif event.modifiers() == Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier:
         #     self.scene().parent().web_browser_ac("https://www.google.com/search?q=" + self.text())
-        if event.modifiers() == Qt.ControlModifier:
+        if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
             self.yazi_kutusunu_daralt()
 
         else:
@@ -1094,13 +1094,13 @@ class Text(QGraphicsTextItem):
             if self.toPlainText() or self.childItems():
                 self.setSelected(False)
 
-        if event.modifiers() & Qt.ControlModifier:
+        if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
             if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
                 self.clearFocus()
                 if self.toPlainText() or self.childItems():
                     self.setSelected(False)
 
-        if event.modifiers() & Qt.ShiftModifier:
+        if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
             if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
                 self.clearFocus()
                 if self.toPlainText() or self.childItems():

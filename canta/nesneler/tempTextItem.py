@@ -96,7 +96,7 @@ class TempTextItem(QGraphicsTextItem):
             self.clearFocus()
             self.setSelected(False)
 
-        if event.modifiers() & Qt.ControlModifier:
+        if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
             if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
                 self.clearFocus()
                 self.setSelected(False)

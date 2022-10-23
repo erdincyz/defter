@@ -182,12 +182,13 @@ class Image(BaseItem):
             c = self.rect().center()
 
             # Alt Key - to resize around center.
-            if event.modifiers() & Qt.AltModifier:
+            # if event.modifiers() & Qt.AltModifier:
+            if event.modifiers() == Qt.KeyboardModifier.AltModifier:
                 rect.moveCenter(c)
 
             # ---------------------------------------------------------------------
             #  Ctrl Key - to keep aspect ratio while resizing.
-            if event.modifiers() & Qt.ControlModifier:
+            if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 tl = self.rect().topLeft()
                 tr = self.rect().topRight()
                 br = self.rect().bottomRight()
@@ -225,12 +226,12 @@ class Image(BaseItem):
                     rect.moveBottomLeft(QPointF(tr.x() - w, tr.y() + h))
 
                 # Alt Key - to resize around center
-                if event.modifiers() & Qt.AltModifier:
+                if event.modifiers() == Qt.KeyboardModifier.AltModifier:
                     rect.moveCenter(c)
 
             # ---------------------------------------------------------------------
             # Shift Key - to make square (equals width and height)
-            if event.modifiers() & Qt.ShiftModifier:
+            if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
                 height = my - py
                 if self._resizingFrom == 1:
                     rect.setCoords(px + height, py + height, px, py)
@@ -249,7 +250,7 @@ class Image(BaseItem):
                     rect = rect.normalized()
 
                 # Alt Key - to resize around center
-                if event.modifiers() & Qt.AltModifier:
+                if event.modifiers() == Qt.KeyboardModifier.AltModifier:
                     rect.moveCenter(c)
 
             self.setRect(self.mapRectFromItem(self, rect))  # mouse release eventten gonderiyoruz undoya

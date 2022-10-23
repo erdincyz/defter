@@ -77,7 +77,7 @@ class View(QGraphicsView):
     # ---------------------------------------------------------------------
     def contextMenuEvent(self, event):
 
-        if event.modifiers() == Qt.ControlModifier:
+        if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
             self.scene().parent().nesne_ozellikleriYW_goster_gizle()
             return
 
@@ -206,7 +206,7 @@ class View(QGraphicsView):
             if self.scene().activeItem:
                 self.horizontalScrollBar().setSingleStep(0)
                 self.verticalScrollBar().setSingleStep(0)
-                # if event.modifiers() & Qt.ControlModifier:
+                # if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 #     self.horizontalScrollBar().setPageStep(0)
                 #     self.verticalScrollBar().setPageStep(0)
                 # else:
@@ -323,13 +323,13 @@ class View(QGraphicsView):
         # factor = 1.41 ** (event.delta() / 240.0)
         # self.scale(factor, factor)
 
-        if event.modifiers() & Qt.ControlModifier:
+        if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
             # alt 2 satir olmazsa ctrl+shift nesnelere gecmiyor.
-            if event.modifiers() & Qt.ShiftModifier:
+            if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
                 return QGraphicsView.wheelEvent(self, event)
 
             # alt 2 satir olmazsa ctrl+alt nesnelere gecmiyor.
-            if event.modifiers() & Qt.AltModifier:
+            if event.modifiers() == Qt.KeyboardModifier.AltModifier:
                 return QGraphicsView.wheelEvent(self, event)
 
             if event.angleDelta().y() > 0:
@@ -338,7 +338,7 @@ class View(QGraphicsView):
                 self.zoomOut()
             # return ediyoruz ki normal view ctrl hizli scroll iptal olsun
             return
-        if event.modifiers() & Qt.ShiftModifier:
+        if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
             #     # self.scene().tekerlek_ile_firca_boyu_degistir(event.angleDelta().y())
             #     # print(event.isAccepted())
             #     # if (event.isAccepted()):
@@ -357,7 +357,7 @@ class View(QGraphicsView):
     #     # factor = 1.41 ** (event.delta() / 240.0)
     #     # self.scale(factor, factor)
     #
-    #     if event.modifiers() & Qt.ControlModifier:
+    #     if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
     #         # alt satir olmazsa ctrl basili iken event nesnelere gecmiyor.
     #         if self.items(event.pos()):
     #             # for item in self.items(event.pos()):

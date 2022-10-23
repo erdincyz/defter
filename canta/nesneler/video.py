@@ -471,7 +471,7 @@ class VideoItem(BaseItem):
             c = self.rect().center()
 
             # Alt Key - to resize around center.
-            if event.modifiers() & Qt.AltModifier:
+            if event.modifiers() == Qt.KeyboardModifier.AltModifier:
                 rect.moveCenter(c)
 
             # ---------------------------------------------------------------------
@@ -511,7 +511,7 @@ class VideoItem(BaseItem):
                 rect.moveBottomLeft(QPointF(tr.x() - w, tr.y() + h))
 
             # Alt Key - to resize around center
-            if event.modifiers() & Qt.AltModifier:
+            if event.modifiers() == Qt.KeyboardModifier.AltModifier:
                 rect.moveCenter(c)
 
             self.setRect(rect)  # mouse release eventten gonderiyoruz undoya

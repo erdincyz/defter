@@ -510,7 +510,7 @@ class Scene(QGraphicsScene):
     #     # factor = 1.41 ** (event.delta() / 240.0)
     #     # self.scale(factor, factor)
     #     if self.aktifArac == self.KalemAraci:
-    #         if event.modifiers() & Qt.ShiftModifier:
+    #         if event.modifiers()== Qt.KeyboardModifier.ShiftModifier:
     #             if self.fircaBoyutuItem:
     #
     #                 if event.delta() > 0:
@@ -628,7 +628,8 @@ class Scene(QGraphicsScene):
 
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
+
             # drawlnetool kontrolune gerek yok esasen cunku ilktiklamada cizgiyi bitirip sahneye ekliyor.
             # ama coklu cizgi eklenirse hatirlatma olsun diye..
             if not self.aktifArac == self.KalemAraci and not self.aktifArac == self.OkAraci:
@@ -636,19 +637,18 @@ class Scene(QGraphicsScene):
                     # modifier yoksa olustur. cunku mesela ctrl basili ise yaiNesnesi olusturup,hemen yazi nesnesine
                     # gidiyor ciftTiklama o da miniWebGezgini aciyor ve yazi bos oldugu ici siliniyor
                     # sahneye ctrl veya ctrl+shift ile cift tiklayina miniWebGezgini acmis oluyoruz.
-                    if event.modifiers() == 0:  # 0x00000000
+                    if event.modifiers() == Qt.KeyboardModifier.NoModifier:  # 0x00000000
                         self.create_empty_text_object_with_double_click(event.scenePos())
-        elif event.button() == Qt.MiddleButton:
+        elif event.button() == Qt.MouseButton.MiddleButton:
             self.views()[0].zoomToFit()
         super(Scene, self).mouseDoubleClickEvent(event)
 
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):
-
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
 
             if self.aktifArac == self.SecimAraci:
-                # if event.modifiers() & Qt.AltModifier:
+                # if event.modifiers() == Qt.KeyboardModifier.AltModifier:
                 #     duplicateItem = self.itemAt(event.scenePos())
                 #     self.parent().act_copy()
                 #     self.parent().act_paste()
@@ -703,7 +703,7 @@ class Scene(QGraphicsScene):
                             self.font())
                 self.parent().increase_zvalue(item)
 
-                # if event.modifiers() & Qt.ShiftModifier:
+                # if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
                 item.hide_resize_handles()
                 self.lastItem = item
                 # self.addItem(item)
@@ -799,7 +799,8 @@ class Scene(QGraphicsScene):
                     self.addItem(self.pathItem)
                 else:
                     if not self.pathItem.intersects:
-                        if event.modifiers() & Qt.ControlModifier:
+                        # if event.modifiers() & Qt.ControlModifier:
+                        if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
                             self.pathItem.append(event.scenePos())
                             return
                         else:
@@ -891,8 +892,8 @@ class Scene(QGraphicsScene):
             elif self.aktifArac == self.AynalaYAraci:
                 self.parent().act_mirror_y(event.scenePos())  # bu finish_interactive_toolsu da cagiriyor.
 
-            # if not event.modifiers() & Qt.ShiftModifier:
-            # if not event.modifiers() & Qt.AltModifier:
+            # if not event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
+            # if not event.modifiers() == Qt.KeyboardModifier.AltModifier:
             #     if not self.aktifArac == self.KalemAraci:
             #         self.aktifArac = self.SecimAraci
             #         self.parent().setCursor(Qt.ArrowCursor)
@@ -906,7 +907,7 @@ class Scene(QGraphicsScene):
             self.fircaSonPos = event.scenePos()
 
         if self.pathItem and self.aktifArac == self.KalemAraci:
-            if event.modifiers() & Qt.ShiftModifier and self.fircaBoyutuItem:
+            if event.modifiers() == Qt.KeyboardModifier.ShiftModifier and self.fircaBoyutuItem:
 
                 # self.fircaBoyutuItem.setPos(QPointF(event.scenePos().x(), event.scenePos().y()))
                 fark = QLineF(self.fircaBoyutuItem.pos(), event.scenePos()).length()
@@ -917,6 +918,7 @@ class Scene(QGraphicsScene):
                 self.shift_drag_ile_firca_boyu_degistir(fark / 2)
             else:
                 # (eski bilgi) or'laniyor -> 0x00000000 = hicbiri , 0x00000001 sol , 0x00000002 sag  0x00000004 orta
+                # burda event.button NoButton diyor , buttons lazim
                 if event.buttons() == Qt.MouseButton.LeftButton:  # mouse sol tus basili
                     # self.pathItem.replace_last(event.scenePos())
                     self.pathItem.append(event.scenePos())
@@ -926,7 +928,7 @@ class Scene(QGraphicsScene):
                     event.ignore()
 
                 else:
-                    if event.modifiers() & Qt.ControlModifier:
+                    if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
                         # self.pathItem.replace_last(event.scenePos())
                         self.pathItem.temp_append_and_replace_last(event.scenePos())
                         self.pathItem.check_if_at_start(event.scenePos())
@@ -985,22 +987,22 @@ class Scene(QGraphicsScene):
 
         self.parent().tw_sayfa_guncelle()
 
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.views()[0].setDragModeRubberBandDrag()
-            # if event.modifiers() & Qt.AltModifier:
+            # if event.modifiers() == Qt.KeyboardModifier.AltModifier:
             #     if self.aktifArac == self.DortgenAraci or self.aktifArac == self.YuvarlakAraci:
             #         self.aktifArac = self.SecimAraci
             #         self.parent().setCursor(Qt.ArrowCursor)
             if self.aktifArac == self.KalemAraci:
                 # # return QGraphicsScene.mousePressEvent(self, event)
-                # if event.modifiers() & Qt.ControlModifier:
+                # if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 #     return QGraphicsScene.mouseReleaseEvent(self, event)
                 # else:
                 #     if self.pathItem:
                 #         self.finish_interactive_tools(kapat=False)
                 #     return QGraphicsScene.mouseReleaseEvent(self, event)
 
-                if not event.modifiers() & Qt.ControlModifier:
+                if not event.modifiers() == Qt.KeyboardModifier.ControlModifier:
                     self.finish_interactive_tools(kapat=False)
                 return QGraphicsScene.mouseReleaseEvent(self, event)
                 # return
@@ -1010,7 +1012,7 @@ class Scene(QGraphicsScene):
 
             elif self.aktifArac == self.DortgenAraci or self.aktifArac == self.YuvarlakAraci:
                 self.lastItem.show_resize_handles()
-                # if not event.modifiers() & Qt.AltModifier:
+                # if not event.modifiers() == Qt.KeyboardModifier.AltModifier:
                 if not self.space_tusu_su_an_basili:
                     # self.aktifArac = self.SecimAraci
                     # self.parent().setCursor(Qt.ArrowCursor)
@@ -1092,7 +1094,7 @@ class Scene(QGraphicsScene):
         # # TODO: movelara undo , ayrica sahnede diger nesneye gecmek muhtemelen modifersiz olsun.
         # # dolayisiyla tek birim hareket de alt tusuna falan mi atasak.
 
-        if event.modifiers() & Qt.ShiftModifier:
+        if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
             if event.key() == Qt.Key_Up:
                 self.yazi_yazilmiyorsa_nesneyi_kaydir(0, -10)
             if event.key() == Qt.Key_Down:
@@ -1108,7 +1110,8 @@ class Scene(QGraphicsScene):
                     if not self.fircaBoyutuItem:
                         self._fircaBoyutuItem_olustur()
 
-        elif event.modifiers() & Qt.ControlModifier:
+        # elif event.modifiers() & Qt.ControlModifier:
+        elif event.modifiers() == Qt.KeyboardModifier.ControlModifier:
             # ctrl ok ve ctrl + shift oklar kisa yol olarak ana pencerede atanmis durumda
             # burda tum ctrl hareketlerini iptal ediyoruz
             return QGraphicsScene.keyPressEvent(self, event)
@@ -1150,7 +1153,7 @@ class Scene(QGraphicsScene):
     def dragEnterEvent(self, event):
         # self.parent().tabWidget.currentWidget().setFocus()
         # !! burda bir onceki eventin modifierini dikkate aliyor.
-        # if event.modifiers() & Qt.ShiftModifier:
+        # if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
         #     print("shift")
         self.parent().raise_()
         self.parent().activateWindow()
@@ -1181,7 +1184,7 @@ class Scene(QGraphicsScene):
 
     # ---------------------------------------------------------------------
     def dragMoveEvent(self, event):
-        # if event.modifiers() & Qt.ShiftModifier:
+        # if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
         #     print("shift")
         # if event.mimeData().hasUrls() or event.mimeData().hasText() or event.mimeData().hasHtml():
         #     event.accept()
@@ -1332,9 +1335,9 @@ class Scene(QGraphicsScene):
             textItem.set_document_url(self.tempDirPath)
             self.parent().increase_zvalue(textItem)
             # bu ikisi bir onceki eventtek kalan modifieri donduruyor. o yuzden query kullaniyoruz.
-            # if event.modifiers() & Qt.ShiftModifier:
+            # if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
             # if QApplication.keyboardModifiers() == Qt.ShiftModifier:
-            if QApplication.queryKeyboardModifiers() == Qt.ShiftModifier:
+            if QApplication.queryKeyboardModifiers() == Qt.KeyboardModifier.ShiftModifier:
                 textItem.setPlainText(event.mimeData().text())
                 textItem.textItemFocusedOut.connect(lambda: self.is_text_item_empty(textItem))
                 self.parent().increase_zvalue(textItem)

@@ -760,7 +760,7 @@ class BaseItem(QGraphicsItem):
         # mesela birden fazla nesne secili ve de gruplayacagız diyelim sag menu ile
         # ctrl basılı degil ise tikladigimiz secili kaliyor digerleri siliniyordu
         # uygunsuz bir kullanıcı deneyimi, niye yaptık acaba boyleyi hatırlayana kadar kalsın burda :)
-        # if not event.modifiers() & Qt.ControlModifier:
+        # if not event.modifiers() == Qt.KeyboardModifier.ControlModifier:
         #     self.scene().clearSelection()
         self.setSelected(True)
 
@@ -900,12 +900,13 @@ class BaseItem(QGraphicsItem):
             c = self.rect().center()
 
             # Alt Key - to resize around center.
-            if event.modifiers() & Qt.AltModifier:
+            # if event.modifiers() & Qt.AltModifier:
+            if event.modifiers() == Qt.KeyboardModifier.AltModifier:
                 rect.moveCenter(c)
 
             # ---------------------------------------------------------------------
             #  Ctrl Key - to keep aspect ratio while resizing.
-            if event.modifiers() & Qt.ControlModifier:
+            if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 tl = self.rect().topLeft()
                 tr = self.rect().topRight()
                 br = self.rect().bottomRight()
@@ -942,12 +943,12 @@ class BaseItem(QGraphicsItem):
                     rect.moveBottomLeft(QPointF(tr.x() - w, tr.y() + h))
 
                 # Alt Key - to resize around center
-                if event.modifiers() & Qt.AltModifier:
+                if event.modifiers() == Qt.KeyboardModifier.AltModifier:
                     rect.moveCenter(c)
 
             # ---------------------------------------------------------------------
             # Shift Key - to make square (equals width and height)
-            if event.modifiers() & Qt.ShiftModifier:
+            if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
                 height = my - py
                 if self._resizingFrom == 1:
                     rect.setCoords(px + height, py + height, px, py)
@@ -966,7 +967,7 @@ class BaseItem(QGraphicsItem):
                     rect = rect.normalized()
 
                 # Alt Key - to resize around center
-                if event.modifiers() & Qt.AltModifier:
+                if event.modifiers() == Qt.KeyboardModifier.AltModifier:
                     rect.moveCenter(c)
 
             self.setRect(rect)  # mouse release eventten gonderiyoruz undoya
