@@ -299,7 +299,7 @@ class DosyaNesnesi(BaseItem):
                      background-repeat:no-repeat;
                      background-position:center;
                      color:rgba{renk_yazi};
-                     font-size:{self.fontPointSize()}pt; 
+                     font-size:{self.fontPointSizeF()}pt; 
                      font-family:{self.font().family()};
                      {bicimler1}
                      {bicimler2}
