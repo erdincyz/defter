@@ -135,8 +135,8 @@ class RenkSecilenKareW(QWidget):
         p.fillRect(self.rect(), QBrush(self.renkGrad))
         p.fillRect(self.rect(), QBrush(self.beyazlikGrad))
 
-        p.setBrush(Qt.NoBrush)
-        p.setPen(QPen(Qt.white, 1))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.setPen(QPen(Qt.GlobalColor.white, 1))
         p.drawEllipse(self.halkaKoordiant, 7, 7)
 
         p.end()
@@ -176,7 +176,7 @@ class RenkSeciciWidget(QWidget):
         self.eskiRenk = eskiRenk.toHsv()
 
         # --------------------
-        self.rTonVeSayiKutusu = RenkCubuguVeSayiKutusu(self.tr("H"), Qt.Horizontal, self)
+        self.rTonVeSayiKutusu = RenkCubuguVeSayiKutusu(self.tr("H"), Qt.Orientation.Horizontal, self)
         # self.rTonVeSayiKutusu.setFixedWidth(150)
         self.rTonVeSayiKutusu.setRange(0, 359)
 
@@ -195,7 +195,7 @@ class RenkSeciciWidget(QWidget):
         self.rTonVeSayiKutusu.degerDegisti.connect(self.renk_ton_degisti_slider)
 
         # --------------------
-        self.rSeffaflikVeSayiKutusu = RenkCubuguVeSayiKutusu(self.tr("A"), Qt.Horizontal, self)
+        self.rSeffaflikVeSayiKutusu = RenkCubuguVeSayiKutusu(self.tr("A"), Qt.Orientation.Horizontal, self)
         # self.rSeffaflikVeSayiKutusu.setFixedWidth(150)
         self.rSeffaflikVeSayiKutusu.setRange(0, 255)
         kutulu_arkaplan_olustur(self.rSeffaflikVeSayiKutusu)

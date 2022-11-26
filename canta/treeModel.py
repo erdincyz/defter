@@ -117,7 +117,7 @@ class DokumanAgacModel(QAbstractItemModel):
             itemText = sayfa.adi
             if itemText[0] == "★":
                 sayfa.adi = itemText[2:]
-                sayfa.yaziRengi = QColor(Qt.black)
+                sayfa.yaziRengi = QColor(Qt.GlobalColor.black)
 
             idx = self.index_sayfadan(sayfa)
             self.dataChanged.emit(idx, idx)
@@ -304,11 +304,11 @@ class DokumanAgacModel(QAbstractItemModel):
     # ---------------------------------------------------------------------
     def supportedDropActions(self):
         # return Qt.CopyAction | Qt.MoveAction
-        return Qt.MoveAction
+        return Qt.DropAction.MoveAction
 
     # ---------------------------------------------------------------------
     def supportedDragActions(self):
-        return Qt.MoveAction
+        return Qt.DropAction.MoveAction
 
     # def flags(self, index):
     #     defaultFlags = QAbstractItemModel.flags(self, index)
@@ -388,7 +388,7 @@ class DokumanAgacModel(QAbstractItemModel):
 
         # print('dropMimeData %s %s %s %s' % (data.data('text/xml').decode("utf-8"), action, row, parent))
 
-        if action == Qt.IgnoreAction:
+        if action == Qt.DropAction.IgnoreAction:
             return True
         if not data.hasFormat('text/xml'):
             return False
@@ -505,7 +505,9 @@ class DokumanAgacModel(QAbstractItemModel):
         # if not index.isValid():
         #     return 0
 
-        return Qt.ItemIsEditable | Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
+        return Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsEnabled | \
+               Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsDragEnabled | \
+               Qt.ItemFlag.ItemIsDropEnabled
         # return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
     # ---------------------------------------------------------------------
@@ -534,37 +536,37 @@ class DokumanAgacModel(QAbstractItemModel):
         # !!! delege kullandigimiz icin burda buyuk ihtimalle sadece qt.editrole kismi kullaniliyor.
         # o da cift tiklayinca mesela
 
-        if role == Qt.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
             # return self.items[index.row()]
             return sayfa.adi
 
-        if role == Qt.EditRole:
+        if role == Qt.ItemDataRole.EditRole:
             if sayfa.adi[0] == "★":
                 return sayfa.adi[2:]
             return sayfa.adi
 
-        elif role == Qt.ToolTipRole:
+        elif role == Qt.ItemDataRole.ToolTipRole:
             return sayfa.adi
 
-        elif role == Qt.DecorationRole:
+        elif role == Qt.ItemDataRole.DecorationRole:
             return sayfa.ikon
 
-        elif role == Qt.ForegroundRole:
+        elif role == Qt.ItemDataRole.ForegroundRole:
             if sayfa.scene.isModified():
                 sayfa.yaziRengi = renk_degismis_nesne_yazi_rengi
             else:
                 return sayfa.yaziRengi
-        elif role == Qt.SizeHintRole:
+        elif role == Qt.ItemDataRole.SizeHintRole:
             return self.treeViewIkonBoyutu
 
-        # elif role == Qt.BackgroundRole:
+        # elif role == Qt.ItemDataRole.BackgroundRole:
         #
         #     if self.items[index.row()][:2] == "!!":
         #         return QColor(50, 50, 50)
         #         # return self.colorPathAlternateA
         #     else:
-        #         # if self.data(index, QtCore.Qt.ToolTipRole) in self.openPaths:
-        #         if index.data(Qt.DisplayRole) == self.activePath:
+        #         # if self.data(index, QtCore.Qt.ItemDataRole.ToolTipRole) in self.openPaths:
+        #         if index.data(Qt.ItemDataRole.DisplayRole) == self.activePath:
         #             # return QtGui.QColor(100,100,255)
         #             return self.colorActivePathBg
         #         else:
@@ -575,27 +577,27 @@ class DokumanAgacModel(QAbstractItemModel):
         #                 # return QtGui.QColor(80,80,80)
         #                 return self.colorPathAlternateB
 
-        # elif role == Qt.ForegroundRole:
+        # elif role == Qt.ItemDataRole.ForegroundRole:
         #
         #     if self.items[index.row()][:2] == "!!":
         #         return QColor(100, 100, 100)
         #     else:
-        #         if index.data(Qt.DisplayRole) == self.activePath:
+        #         if index.data(Qt.ItemDataRole.DisplayRole) == self.activePath:
         #             # return QtGui.QColor(100,255,100)
         #             return self.colorActivePathText
         #         else:
         #             # return QtGui.QColor(200,200,200)
         #             return self.colorPathsText
 
-        # elif role == Qt.FontRole:
+        # elif role == Qt.ItemDataRole.FontRole:
         #     font = QFont()
-        #     if index.data(Qt.DisplayRole) == self.activePath:
+        #     if index.data(Qt.ItemDataRole.DisplayRole) == self.activePath:
         #
         #         font.setBold(True)
         #     else:
         #         font.setBold(False)
         #
-        #     if index.data(Qt.DisplayRole) in self.openPaths:
+        #     if index.data(Qt.ItemDataRole.DisplayRole) in self.openPaths:
         #         font.setItalic(True)
         #     else:
         #         font.setItalic(False)
@@ -609,7 +611,7 @@ class DokumanAgacModel(QAbstractItemModel):
     def headerData(self, section, orientation, role=None):
         """her modelde mutlaka lazım"""
         # if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-        if (orientation, role) == (Qt.Horizontal, Qt.DisplayRole):
+        if (orientation, role) == (Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole):
             # return self.root.data(section)
             return "Sayfalar"
         return "Sayfalar"
@@ -653,7 +655,7 @@ class DokumanAgacModel(QAbstractItemModel):
         # return self._root.columnCount()
 
     # ---------------------------------------------------------------------
-    def setData(self, index: QModelIndex, value: Any, role=Qt.DisplayRole):
+    def setData(self, index: QModelIndex, value: Any, role=Qt.ItemDataRole.DisplayRole):
         if not index.isValid():
             return False
 
@@ -667,13 +669,13 @@ class DokumanAgacModel(QAbstractItemModel):
     return false;"""
 
         sayfa = self.sayfa_indexten(index)
-        # if role == Qt.DisplayRole:
+        # if role == Qt.ItemDataRole.DisplayRole:
         #     sayfa.adi = value
         #     # print(value)
         #     self.dataChanged.emit(index, index)
         #     return True
 
-        if role == Qt.EditRole:
+        if role == Qt.ItemDataRole.EditRole:
             # self.items[index.row()] = value
             if sayfa.adi == value:  # cift tiklayip mesela hic bir sey degistirmeyince degisimis diye isaretlenmesin..
                 return False

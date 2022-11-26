@@ -16,7 +16,7 @@ class ProxyStyle(QProxyStyle):
     def styleHint(self, hint, opt=None, widget=None, returnData=None):
         res = super().styleHint(hint, opt, widget, returnData)
         if hint == QProxyStyle.StyleHint.SH_Slider_AbsoluteSetButtons:
-            res |= Qt.LeftButton.value
+            res |= Qt.MouseButton.LeftButton.value
         return res
 
 

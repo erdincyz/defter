@@ -15,10 +15,10 @@ class MyRubberBand(QRubberBand):
     rubberBandHidden = Signal()
 
     # ---------------------------------------------------------------------
-    def __init__(self, shape=QRubberBand.Rectangle, parent=None):
+    def __init__(self, shape=QRubberBand.Shape.Rectangle, parent=None):
         super(MyRubberBand, self).__init__(shape, parent)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         # defaultFlags = self.windowFlags()
         # self.setWindowFlags(defaultFlags | Qt.ToolTip)
         # self.setWindowFlags(Qt.ToolTip)
@@ -41,11 +41,11 @@ class TamEkranWidget_CM_Off(QLabel):
     def __init__(self, parent=None):
 
         super(TamEkranWidget_CM_Off, self).__init__(parent)
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
 
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
 
-        self.setAttribute(Qt.WA_TranslucentBackground, True)
         # self.setAttribute(Qt.WA_PaintOnScreen, True)
         self.setAutoFillBackground(True)
         # self.setStyleSheet("background-color:none;")
@@ -53,7 +53,7 @@ class TamEkranWidget_CM_Off(QLabel):
 
         # self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
         # self.rubberBand = MyRubberBand(QRubberBand.Rectangle, self)
-        self.rubberBand = MyRubberBand(QRubberBand.Rectangle)
+        self.rubberBand = MyRubberBand(QRubberBand.Shape.Rectangle)
         self.rubberBand.rubberBandHidden.connect(self.act_rubberband_hidden)
 
         self.alan = QRect()
@@ -108,7 +108,7 @@ class TamEkranWidget_CM_Off(QLabel):
     # ---------------------------------------------------------------------
     def keyPressEvent(self, event):
 
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             self.esc_key_pressed.emit()
         super(TamEkranWidget_CM_Off, self).keyPressEvent(event)
         self.close()

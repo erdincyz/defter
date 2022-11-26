@@ -75,7 +75,7 @@ class Ellipse(BaseItem):
     def paint(self, painter, option, widget=None):
 
         if not self._pen.width():
-            painter.setPen(Qt.NoPen)
+            painter.setPen(Qt.PenStyle.NoPen)
         else:
             painter.setPen(self._pen)
         painter.setBrush(self._brush)
@@ -112,7 +112,7 @@ class Ellipse(BaseItem):
             else:
                 selectionPenBottom = self.selectionPenBottom
 
-            painter.setBrush(Qt.NoBrush)
+            painter.setBrush(Qt.BrushStyle.NoBrush)
 
             painter.setPen(selectionPenBottom)
             painter.drawEllipse(self.rect())
@@ -187,13 +187,13 @@ class Ellipse(BaseItem):
             bicimler2 = ''
 
         hiza = self.ver_yazi_hizasi()
-        # if hiza == Qt.AlignLeft or hiza == Qt.AlignLeft | Qt.AlignVCenter:
+        # if hiza == Qt.AlignmentFlag.AlignLeft or hiza == Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter:
         #     yazi_hiza = "left"
-        if hiza == Qt.AlignCenter or hiza == Qt.AlignCenter | Qt.AlignVCenter:
+        if hiza == Qt.AlignmentFlag.AlignCenter or hiza == Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter:
             yazi_hiza = "center"
-        elif hiza == Qt.AlignRight or hiza == Qt.AlignRight | Qt.AlignVCenter:
+        elif hiza == Qt.AlignmentFlag.AlignRight or hiza == Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter:
             yazi_hiza = "right"
-        elif hiza == Qt.AlignJustify or hiza == Qt.AlignJustify | Qt.AlignVCenter:
+        elif hiza == Qt.AlignmentFlag.AlignJustify or hiza == Qt.AlignmentFlag.AlignJustify | Qt.AlignmentFlag.AlignVCenter:
             yazi_hiza = "justify"
         else:
             yazi_hiza = "left"

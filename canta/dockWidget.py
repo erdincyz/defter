@@ -52,7 +52,7 @@ class DockWidget(QDockWidget):
         #                            "}")
 
         etiket = QLabel(baslik, baslikWidget)
-        etiket.setAlignment(Qt.AlignCenter)
+        etiket.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         lay = QHBoxLayout(baslikWidget)
         lay.setContentsMargins(0, 0, 0, 0)

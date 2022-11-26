@@ -118,7 +118,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.dpi = QApplication.primaryScreen().physicalDotsPerInch()
 
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
 
         self.clipboard = QApplication.clipboard()
         self.clipboard.dataChanged.connect(self.on_clipboard_data_changed)
@@ -158,7 +158,7 @@ class DefterAnaPencere(QMainWindow):
         # TODO: self.fontPointSizeF iptal edilebilir . font uzerinden devam edilebilir.
         self.fontPointSizeF = 10
 
-        self.yazi_hizasi = Qt.AlignLeft
+        self.yazi_hizasi = Qt.AlignmentFlag.AlignLeft
 
         self.printer = None
         self._get_printer()
@@ -205,7 +205,7 @@ class DefterAnaPencere(QMainWindow):
         # eger burdaki self.show() u kaldirisak ilk acilista acilmiyor, dolayisi ile boyle bir workaround
         # aslında ust uste iki tane show olsa da ne olacak bi sorun yok da,
         if self.actionAlwaysOnTopToggle.isChecked():
-            self.setWindowFlags(Qt.WindowStaysOnTopHint)
+            self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
         self.show()
         self.cScene.setSceneRect(self.cView.get_visible_rect())
 
@@ -245,8 +245,8 @@ class DefterAnaPencere(QMainWindow):
 
         self.nesneOzellikleriDW = DockWidget(self.tr("Item & Tool Properties"), self)
         self.nesneOzellikleriDW.setObjectName("nesneOzellikleriDW")
-        # self.nesneOzellikleriDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.nesneOzellikleriDW)
+        # self.nesneOzellikleriDW.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.nesneOzellikleriDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
 
@@ -263,7 +263,7 @@ class DefterAnaPencere(QMainWindow):
         anaLay = QVBoxLayout(self.nesneOzellikleriDWBaseWidget)
         # anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
         # anaLay.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
-        anaLay.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
+        anaLay.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
         # anaLay.setSizeConstraint(QVBoxLayout.SetMaximumSize)
         # anaLay.setContentsMargins(0,0,0,0)
         # self.nesneOzellikleriDW.setContentsMargins(0, 0, 0, 0)
@@ -547,16 +547,16 @@ class DefterAnaPencere(QMainWindow):
         self.cizgiTipiCBox = ComboBox(self.cizgiGrupW)
         self.cizgiTipiCBox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.cizgiTipiCBox.setIconSize(QSize(100, 15))
-        self.cizgiTipiCBox.addItem(self.tr("      No Line"), userData=Qt.NoPen)
-        self.cizgiTipiCBox.addItem(QIcon(':icons/line_solid.png'), "", userData=Qt.SolidLine)
-        self.cizgiTipiCBox.addItem(QIcon(':icons/line_dotted.png'), "", userData=Qt.DotLine)
-        self.cizgiTipiCBox.addItem(QIcon(':icons/line_dashed.png'), "", userData=Qt.DashLine)
-        self.cizgiTipiCBox.addItem(QIcon(':icons/line_dash_dot.png'), "", userData=Qt.DashDotLine)
-        self.cizgiTipiCBox.addItem(QIcon(':icons/line_dash_dot_dot.png'), "", userData=Qt.DashDotDotLine)
+        self.cizgiTipiCBox.addItem(self.tr("      No Line"), userData=Qt.PenStyle.NoPen)
+        self.cizgiTipiCBox.addItem(QIcon(':icons/line_solid.png'), "", userData=Qt.PenStyle.SolidLine)
+        self.cizgiTipiCBox.addItem(QIcon(':icons/line_dotted.png'), "", userData=Qt.PenStyle.DotLine)
+        self.cizgiTipiCBox.addItem(QIcon(':icons/line_dashed.png'), "", userData=Qt.PenStyle.DashLine)
+        self.cizgiTipiCBox.addItem(QIcon(':icons/line_dash_dot.png'), "", userData=Qt.PenStyle.DashDotLine)
+        self.cizgiTipiCBox.addItem(QIcon(':icons/line_dash_dot_dot.png'), "", userData=Qt.PenStyle.DashDotDotLine)
         self.cizgiTipiCBox.setCurrentIndex(1)
         # self.cizgiTipiCBox.activated.connect(self.act_cizgi_tipi_degistir)
         self.cizgiTipiCBox.currentIndexChangedFromComboBoxGuiNotBySetCurrentIndex[int].connect(
-            lambda x: self.act_cizgi_tipi_degistir(self.cizgiTipiCBox.itemData(x, Qt.UserRole)))
+            lambda x: self.act_cizgi_tipi_degistir(self.cizgiTipiCBox.itemData(x, Qt.ItemDataRole.UserRole)))
 
         cizgiTipiLayout = QHBoxLayout()
         cizgiTipiLayout.addWidget(cizgiTipiLabel)
@@ -568,13 +568,13 @@ class DefterAnaPencere(QMainWindow):
         self.cizgiBirlesimTipiCBox = ComboBox(self.cizgiGrupW)
         self.cizgiBirlesimTipiCBox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.cizgiBirlesimTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Round"),
-                                           userData=Qt.RoundJoin)  # Yuvarlak
+                                           userData=Qt.PenJoinStyle.RoundJoin)  # Yuvarlak
         self.cizgiBirlesimTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Miter"),
-                                           userData=Qt.MiterJoin)  # Sivri
+                                           userData=Qt.PenJoinStyle.MiterJoin)  # Sivri
         self.cizgiBirlesimTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Bevel"),
-                                           userData=Qt.BevelJoin)  # Kırpık
+                                           userData=Qt.PenJoinStyle.BevelJoin)  # Kırpık
         self.cizgiBirlesimTipiCBox.currentIndexChangedFromComboBoxGuiNotBySetCurrentIndex[int].connect(
-            lambda x: self.act_cizgi_birlesim_tipi_degistir(self.cizgiBirlesimTipiCBox.itemData(x, Qt.UserRole)))
+            lambda x: self.act_cizgi_birlesim_tipi_degistir(self.cizgiBirlesimTipiCBox.itemData(x, Qt.ItemDataRole.UserRole)))
 
         cizgiBirlesimTipiLayout = QHBoxLayout()
         cizgiBirlesimTipiLayout.addWidget(cizgiBirlesimTipiLabel)
@@ -585,18 +585,18 @@ class DefterAnaPencere(QMainWindow):
         cizgiUcuTipiLabel.setFixedWidth(67)
         self.cizgiUcuTipiCBox = ComboBox(self.cizgiGrupW)
         self.cizgiUcuTipiCBox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.cizgiUcuTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Flat"), userData=Qt.FlatCap)
-        self.cizgiUcuTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Square"), userData=Qt.SquareCap)
-        self.cizgiUcuTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Round"), userData=Qt.RoundCap)
+        self.cizgiUcuTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Flat"), userData=Qt.PenCapStyle.FlatCap)
+        self.cizgiUcuTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Square"), userData=Qt.PenCapStyle.SquareCap)
+        self.cizgiUcuTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Round"), userData=Qt.PenCapStyle.RoundCap)
         self.cizgiUcuTipiCBox.currentIndexChangedFromComboBoxGuiNotBySetCurrentIndex[int].connect(
-            lambda x: self.act_cizgi_ucu_tipi_degistir(self.cizgiUcuTipiCBox.itemData(x, Qt.UserRole)))
+            lambda x: self.act_cizgi_ucu_tipi_degistir(self.cizgiUcuTipiCBox.itemData(x, Qt.ItemDataRole.UserRole)))
 
         cizgiUcuTipiLayout = QHBoxLayout()
         cizgiUcuTipiLayout.addWidget(cizgiUcuTipiLabel)
         cizgiUcuTipiLayout.addWidget(self.cizgiUcuTipiCBox)
 
         # ---- cizgi kalinligi -----------------------------------------------------------------
-        self.cizgiKalinligiDSliderWithDSBox = SliderDoubleWithDoubleSpinBox(yerlesim=Qt.Horizontal,
+        self.cizgiKalinligiDSliderWithDSBox = SliderDoubleWithDoubleSpinBox(yerlesim=Qt.Orientation.Horizontal,
                                                                             parent=self.cizgiGrupW)
         # self.cizgiKalinligiSBox.setSuffix(" h")
         self.cizgiKalinligiDSliderWithDSBox.setMinimum(0)
@@ -763,8 +763,8 @@ class DefterAnaPencere(QMainWindow):
     def olustur_stillerDW(self):
         self.stillerDW = DockWidget(self.tr("Style Presets"), self)
         self.stillerDW.setObjectName("stillerDockWidget")
-        # self.stillerDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.stillerDW)
+        # self.stillerDW.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.stillerDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
 
@@ -781,7 +781,7 @@ class DefterAnaPencere(QMainWindow):
         anaLay = QVBoxLayout(self.stillerDWBaseWidget)
         # anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
         # anaLay.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
-        anaLay.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
+        anaLay.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
         # anaLay.setSizeConstraint(QVBoxLayout.SetMaximumSize)
         # anaLay.setContentsMargins(0,0,0,0)
         # self.stillerDW.setContentsMargins(0, 0, 0, 0)
@@ -862,9 +862,9 @@ class DefterAnaPencere(QMainWindow):
     def olustur_sahneye_baski_siniri_cizim_ayarlari(self):
         self.baskiSiniriCizimAyarlariDW = DockWidget(self.tr("Draw Print Borders"), self)
         self.baskiSiniriCizimAyarlariDW.setObjectName("baskiSiniriCizimAyarlariDockWidget")
-        self.baskiSiniriCizimAyarlariDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.baskiSiniriCizimAyarlariDW.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
         self.baskiSiniriCizimAyarlariDW.setVisible(False)
-        self.addDockWidget(Qt.LeftDockWidgetArea, self.baskiSiniriCizimAyarlariDW)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.baskiSiniriCizimAyarlariDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
 
@@ -881,7 +881,7 @@ class DefterAnaPencere(QMainWindow):
         anaLay = QVBoxLayout(self.baskiSiniriCizimAyarlariDWBW)
         # anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
         # anaLay.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
-        anaLay.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
+        anaLay.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
         # anaLay.setSizeConstraint(QVBoxLayout.SetMaximumSize)
         # anaLay.setContentsMargins(10,15,0,0)
         # self.baskiSiniriCizimAyarlariDW.setContentsMargins(0, 0, 0, 0)
@@ -923,7 +923,7 @@ class DefterAnaPencere(QMainWindow):
         printerInfo = QPrinterInfo(self.printer)
         desteklenenSayfaBoyutlari = printerInfo.supportedPageSizes()
         simdikiId = self.printer.pageLayout().pageSize().id().value
-        for i in range(QPageSize.LastPageSize.value):
+        for i in range(QPageSize.PageSizeId.LastPageSize.value):
             psize = QPageSize((QPageSize.PageSizeId(i)))
             if psize.isValid():
                 desteklenenSayfaBoyutlari.append(psize)
@@ -1076,11 +1076,11 @@ class DefterAnaPencere(QMainWindow):
         # self.printer = QPrinter()
         # self.printer.setPageSize(QPageSize(QPageSize.A4))
         if btn == self.radioBaskiYatay:
-            self.printer.setPageOrientation(QPageLayout.Landscape)
-            # self.printer.pageLayout().setOrientation(QPageLayout.Landscape)
+            self.printer.setPageOrientation(QPageLayout.Orientation.Landscape)
+            # self.printer.pageLayout().setOrientation(QPageLayout.Orientation.Landscape)
         else:
-            self.printer.setPageOrientation(QPageLayout.Portrait)
-            # self.printer.pageLayout().setOrientation(QPageLayout.Portrait)
+            self.printer.setPageOrientation(QPageLayout.Orientation.Portrait)
+            # self.printer.pageLayout().setOrientation(QPageLayout.Orientation.Portrait)
         # printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
         # printer.setOutputFileName("deneme.pdf")
         self.act_yazici_sayfa_kenar_cizdir()
@@ -1090,7 +1090,7 @@ class DefterAnaPencere(QMainWindow):
         self.sayfalarDW = DockWidget(self.tr("Pages"), self)
         self.sayfalarDW.setObjectName("sayfalarDockWidget")
         # self.sayfalarDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.addDockWidget(Qt.LeftDockWidgetArea, self.sayfalarDW)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.sayfalarDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
 
@@ -1170,7 +1170,7 @@ class DefterAnaPencere(QMainWindow):
         self.kutuphaneDW = DockWidget(self.tr("Library"), self)
         self.kutuphaneDW.setObjectName("kutuphaneDockWidget")
         # self.kutuphaneDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea | Qt.BottomDockWidgetArea)
-        self.addDockWidget(Qt.LeftDockWidgetArea, self.kutuphaneDW)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.kutuphaneDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
 
@@ -1620,7 +1620,7 @@ class DefterAnaPencere(QMainWindow):
         pixmap = self.cView.grab(self.cView.viewport().rect())
         # pixmap = pixmap.scaled(128,128,Qt.KeepAspectRatioByExpanding, Qt.FastTransformation)
         # pixmap = pixmap.scaledToWidth(self.sayfalarDWTreeView.width(), Qt.FastTransformation)
-        pixmap = pixmap.scaledToWidth(128, Qt.FastTransformation)
+        pixmap = pixmap.scaledToWidth(128, Qt.TransformationMode.FastTransformation)
         return QIcon(pixmap)
 
     # ---------------------------------------------------------------------
@@ -1728,7 +1728,7 @@ class DefterAnaPencere(QMainWindow):
             # self.actionAlwaysOnTopToggle.setChecked(bool(int(self.settings.value("alwaysOnTop", False))))
             with signals_blocked(self.actionAlwaysOnTopToggle):
                 self.actionAlwaysOnTopToggle.setChecked(int(self.settings.value("alwaysOnTop", False)))
-            self.ekranKutuphane.setBackgroundBrush(self.settings.value("kutuphaneArkaPlanRengi", QColor(Qt.lightGray)))
+            self.ekranKutuphane.setBackgroundBrush(self.settings.value("kutuphaneArkaPlanRengi", QColor(Qt.GlobalColor.lightGray)))
             self.cModel.treeViewIkonBoyutu = self.settings.value("treeViewIkonBoyutu", QSize(48, 48))
             self.sayfalarDWTreeView.setIconSize(self.cModel.treeViewIkonBoyutu)
 
@@ -2565,7 +2565,7 @@ class DefterAnaPencere(QMainWindow):
             lineItem.setRotation(itemDict["rotation"])
             lineItem.setText(itemDict.get("text", ""))
             if itemDict.get("yaziHiza", None):
-                lineItem.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
+                lineItem.painterTextOption.setAlignment(Qt.AlignmentFlag(itemDict.get("yaziHiza")))
             lineItem.setZValue(itemDict["zValue"])
             lineItem.isPinned = itemDict["isPinned"]
             lineItem._command = itemDict["command"]
@@ -2590,7 +2590,7 @@ class DefterAnaPencere(QMainWindow):
             rectItem.setZValue(itemDict["zValue"])
             rectItem.isPinned = itemDict["isPinned"]
             if itemDict.get("yaziHiza", None):
-                rectItem.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
+                rectItem.painterTextOption.setAlignment(Qt.AlignmentFlag(itemDict.get("yaziHiza")))
             rectItem._text = itemDict["text"]
             rectItem._command = itemDict["command"]
 
@@ -2614,7 +2614,7 @@ class DefterAnaPencere(QMainWindow):
             ellipseItem.setZValue(itemDict["zValue"])
             ellipseItem.isPinned = itemDict["isPinned"]
             if itemDict.get("yaziHiza", None):
-                ellipseItem.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
+                ellipseItem.painterTextOption.setAlignment(Qt.AlignmentFlag(itemDict.get("yaziHiza")))
             ellipseItem._text = itemDict["text"]
             ellipseItem._command = itemDict["command"]
 
@@ -2637,7 +2637,7 @@ class DefterAnaPencere(QMainWindow):
             pathItem.setRotation(itemDict["rotation"])
             pathItem.setText(itemDict["text"])
             if itemDict.get("yaziHiza", None):
-                pathItem.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
+                pathItem.painterTextOption.setAlignment(Qt.AlignmentFlag(itemDict.get("yaziHiza")))
             pathItem.setZValue(itemDict["zValue"])
             pathItem.isPinned = itemDict["isPinned"]
             pathItem._command = itemDict["command"]
@@ -2683,7 +2683,7 @@ class DefterAnaPencere(QMainWindow):
             imageItem.isMirrorX = itemDict["isMirrorX"]
             imageItem.isMirrorY = itemDict["isMirrorY"]
             if itemDict.get("yaziHiza", None):
-                imageItem.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
+                imageItem.painterTextOption.setAlignment(Qt.AlignmentFlag(itemDict.get("yaziHiza")))
             imageItem._text = itemDict["text"]
             imageItem._command = itemDict["command"]
             # imageItem.reload_image_after_scale()
@@ -2711,7 +2711,7 @@ class DefterAnaPencere(QMainWindow):
                 textItem.isPlainText = False
             if itemDict.get("yaziHiza", None):
                 option = textItem.doc.defaultTextOption()
-                option.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
+                option.setAlignment(Qt.AlignmentFlag(itemDict.get("yaziHiza")))
                 textItem.doc.setDefaultTextOption(option)
             textItem.textItemFocusedOut.connect(lambda: self.cScene.is_text_item_empty(textItem))
             textItem.setPos(itemDict["pos"])
@@ -2728,7 +2728,7 @@ class DefterAnaPencere(QMainWindow):
                 # self.cScene.addItem(textItem)
                 # undoRedo.undoableAddItem(self.cScene.undoStack, "_dosya_yukleme", self.cScene, textItem)
                 self.cScene.addItem(textItem)
-            textItem.setTextInteractionFlags(Qt.NoTextInteraction)
+            textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
             cursor = textItem.textCursor()
             cursor.clearSelection()
             textItem.setTextCursor(cursor)
@@ -2784,7 +2784,7 @@ class DefterAnaPencere(QMainWindow):
             # videoItem.isMirrorX = itemDict["isMirrorX"]
             # videoItem.isMirrorY = itemDict["isMirrorY"]
             if itemDict.get("yaziHiza", None):
-                videoItem.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
+                videoItem.painterTextOption.setAlignment(Qt.AlignmentFlag.Alignment(itemDict.get("yaziHiza")))
             # videoItem._text = itemDict["text"]
             videoItem.eskiYazi = itemDict["text"]
             videoItem._command = itemDict["command"]
@@ -2829,7 +2829,7 @@ class DefterAnaPencere(QMainWindow):
             # dosyaNesnesi.isMirrorX = itemDict["isMirrorX"]
             # dosyaNesnesi.isMirrorY = itemDict["isMirrorY"]
             if itemDict.get("yaziHiza", None):
-                dosyaNesnesi.painterTextOption.setAlignment(Qt.Alignment(itemDict.get("yaziHiza")))
+                dosyaNesnesi.painterTextOption.setAlignment(Qt.AlignmentFlag.Alignment(itemDict.get("yaziHiza")))
             dosyaNesnesi._text = itemDict["text"]
             dosyaNesnesi._command = itemDict["command"]
             # dosyaNesnesi.reload_image_after_scale()
@@ -3009,7 +3009,7 @@ class DefterAnaPencere(QMainWindow):
         self.sayfalarDWTreeView.setIconSize(self.cModel.treeViewIkonBoyutu)
 
         # self.ekranKutuphane.setBackgroundBrush(dokumanDict["kutuphaneBackgroundBrush"])
-        self.ekranKutuphane.setBackgroundBrush(dokumanDict.get("kutuphaneBackgroundBrush", Qt.lightGray))
+        self.ekranKutuphane.setBackgroundBrush(dokumanDict.get("kutuphaneBackgroundBrush", Qt.GlobalColor.lightGray))
         # self.cDokuman.enSonAktifSayfa = dokumanDict["enSonAktifSayfa"]
 
         # ilk sayfa create_tab ile ekleniyor, o da dokuman olustuurlurken ekleniyor
@@ -3138,7 +3138,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def lutfen_bekleyin_goster(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         self.lutfenBekleyinWidget.show()
         # Ozellikle QThread kullanmiyoruz.
         # Bunlar kullanıcının arayuze bu islemler boyunca etki etmemesinin
@@ -3395,20 +3395,20 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def ekle_hotkeys(self):
 
-        hot_delete_item_with_backspace = QShortcut(QKeySequence(Qt.Key_Backspace),
+        hot_delete_item_with_backspace = QShortcut(QKeySequence(Qt.Key.Key_Backspace),
                                                    self,
                                                    self.act_delete_item)
-        hot_delete_item_with_backspace.setContext(Qt.ApplicationShortcut)
+        hot_delete_item_with_backspace.setContext(Qt.ShortcutContext.ApplicationShortcut)
 
         hot_close_active_tab = QShortcut(QKeySequence("Ctrl+W"),
                                          self,
                                          lambda throw_away=0: self.close_selected_tab(self.tabWidget.currentIndex()))
-        hot_close_active_tab.setContext(Qt.ApplicationShortcut)
+        hot_close_active_tab.setContext(Qt.ShortcutContext.ApplicationShortcut)
 
         hot_stil_uygula_yuzen_listwidget_goster_gizle = QShortcut(QKeySequence("Alt+0"),
                                                                   self,
                                                                   self.stil_uygula_yuzen_listwidget_goster_gizle)
-        hot_stil_uygula_yuzen_listwidget_goster_gizle.setContext(Qt.ApplicationShortcut)
+        hot_stil_uygula_yuzen_listwidget_goster_gizle.setContext(Qt.ShortcutContext.ApplicationShortcut)
 
         # lambda: self.toolsToolBar.setVisible(not self.toolsToolBar.isVisible())
 
@@ -3416,7 +3416,7 @@ class DefterAnaPencere(QMainWindow):
         #                            self,
         #                            # lambda: self.actionCleanMode.setChecked(not self.actionCleanMode.isChecked()))
         #                            self.actionCleanMode.trigger)
-        # hot_clean_mode.setContext(Qt.ApplicationShortcut)
+        # hot_clean_mode.setContext(Qt.ShortcutContext.ApplicationShortcut)
 
     # ---------------------------------------------------------------------
     def olustur_status_bar(self):
@@ -3555,13 +3555,6 @@ class DefterAnaPencere(QMainWindow):
         # self.actionExportDocumentAsHTML.setShortcut(QKeySequence("Ctrl+E"))
         self.actionExportDocumentAsHTML.triggered.connect(self.act_export_document_as_html)
 
-        self.actionExportSelectedTextItemContentAsPdf = QAction(QIcon(':icons/print.png'),
-                                                                self.tr("Export Selected Text Item Content as PDF"),
-                                                                self.mBar)
-        self.actionExportSelectedTextItemContentAsPdf.setShortcut(QKeySequence("Ctrl+Shift+Alt+E"))
-        self.actionExportSelectedTextItemContentAsPdf.triggered.connect(
-            self.act_export_selected_text_item_content_as_pdf)
-
         self.actionPrintOrExportAsPdf = QAction(QIcon(':icons/print.png'),
                                                 self.tr("Print && Export as PDF"), self.mBar)
         self.actionPrintOrExportAsPdf.setShortcut(QKeySequence("Ctrl+P"))
@@ -3573,7 +3566,7 @@ class DefterAnaPencere(QMainWindow):
         self.actionExportPageAsImage.triggered.connect(self.act_export_page_as_image)
 
         self.actionPrintSelectedTextItemContent = QAction(QIcon(':icons/print.png'),
-                                                          self.tr("Print Selected Text Item Content"), self.mBar)
+                                                          self.tr("Print && Export Selected Text Item Content as PDF"), self.mBar)
         self.actionPrintSelectedTextItemContent.setShortcut(QKeySequence("Ctrl+Alt+P"))
         self.actionPrintSelectedTextItemContent.triggered.connect(self.act_print_selected_text_item_content)
 
@@ -3879,29 +3872,29 @@ class DefterAnaPencere(QMainWindow):
         self.actionZoomIn = QAction(QIcon(":/icons/zoom-in.png"), self.tr("Zoom in"), self.zoomMenu)
         # self.actionZoomIn.setShortcut(QKeySequence(Qt.ControlModifier + Qt.Key_Plus))
         self.actionZoomIn.setShortcut(QKeySequence("Ctrl++"))
-        self.actionZoomIn.setShortcutContext(Qt.ApplicationShortcut)
+        self.actionZoomIn.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
         self.actionZoomIn.triggered.connect(lambda: self.cView.zoomIn())
 
         self.actionZoomOut = QAction(QIcon(":/icons/zoom-out.png"), self.tr("Zoom out"), self.zoomMenu)
         # self.actionZoomOut.setShortcut(QKeySequence(Qt.ControlModifier + Qt.Key_Minus))
         self.actionZoomOut.setShortcut(QKeySequence("Ctrl+-"))
-        self.actionZoomOut.setShortcutContext(Qt.ApplicationShortcut)
+        self.actionZoomOut.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
         self.actionZoomOut.triggered.connect(lambda: self.cView.zoomOut())
 
         self.actionZoomToFit = QAction(QIcon(":/icons/zoom-fit.png"), self.tr("Zoom to fit"), self.zoomMenu)
         self.actionZoomToFit.setShortcut(QKeySequence("Ctrl+/"))
-        self.actionZoomToFit.setShortcutContext(Qt.ApplicationShortcut)
+        self.actionZoomToFit.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
         self.actionZoomToFit.triggered.connect(lambda: self.cView.zoomToFit())
 
         self.actionZoomToSelection = QAction(QIcon(":/icons/zoom-select.png"), self.tr("Zoom to selection"),
                                              self.zoomMenu)
         self.actionZoomToSelection.setShortcut(QKeySequence("Ctrl+Shift+/"))
-        self.actionZoomToSelection.setShortcutContext(Qt.ApplicationShortcut)
+        self.actionZoomToSelection.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
         self.actionZoomToSelection.triggered.connect(lambda: self.cView.zoomToSelection())
 
         self.actionResetZoom = QAction(QIcon(":/icons/zoom-reset.png"), self.tr("Reset zoom"), self.zoomMenu)
         self.actionResetZoom.setShortcut(QKeySequence("Ctrl+*"))
-        self.actionResetZoom.setShortcutContext(Qt.ApplicationShortcut)
+        self.actionResetZoom.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
         self.actionResetZoom.triggered.connect(lambda: self.cView.zoomInitial())
 
         self.zoomMenu.addActions((self.actionZoomIn,
@@ -4143,7 +4136,6 @@ class DefterAnaPencere(QMainWindow):
                                          self.actionShowAsWebPage,
                                          self.actionConvertToWebItem,
                                          self.itemContextMenu.addSeparator(),
-                                         self.actionExportSelectedTextItemContentAsPdf,
                                          self.actionPrintSelectedTextItemContent,
                                          self.itemContextMenu.addSeparator(),
                                          self.actionAddSelectedItemStyleAsAPreset,
@@ -4367,7 +4359,6 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionAddSelectedItemStyleAsAPreset,
                                           self.actionSeciliNesneStiliniSeciliAracaUygula,
                                           self.actionSeciliNesneStiliniKendiAracinaUygula,
-                                          self.actionExportSelectedTextItemContentAsPdf,
                                           self.actionPrintSelectedTextItemContent,
                                           # file menu actions
                                           self.actionNewFile,
@@ -4675,7 +4666,7 @@ class DefterAnaPencere(QMainWindow):
         # ---- cizgi kalinligi -----------------------------------------------------------------
 
         # ---- cizgi kalinligi -----------------------------------------------------------------
-        self.cizgiKalinligiDSliderWithDSBox_tbar = SliderDoubleWithDoubleSpinBox(yerlesim=Qt.Horizontal,
+        self.cizgiKalinligiDSliderWithDSBox_tbar = SliderDoubleWithDoubleSpinBox(yerlesim=Qt.Orientation.Horizontal,
                                                                                  parent=self.cizgiOzellikleriToolBar)
         # self.cizgiKalinligiSBox.setSuffix(" h")
         self.cizgiKalinligiDSliderWithDSBox_tbar.setMaximumWidth(150)
@@ -4819,7 +4810,7 @@ class DefterAnaPencere(QMainWindow):
         ))
 
         self.addToolBar(self.fontToolBar)
-        self.addToolBarBreak(Qt.TopToolBarArea)
+        self.addToolBarBreak(Qt.ToolBarArea.TopToolBarArea)
 
     # ---------------------------------------------------------------------
     def olustur_renk_toolbar(self):
@@ -4849,7 +4840,7 @@ class DefterAnaPencere(QMainWindow):
         ))
 
         self.addToolBar(self.renkAracCubugu)
-        self.addToolBarBreak(Qt.TopToolBarArea)
+        self.addToolBarBreak(Qt.ToolBarArea.TopToolBarArea)
 
     # ---------------------------------------------------------------------
     def karakter_bicimi_degisti(self, sozluk=None):
@@ -5083,21 +5074,21 @@ class DefterAnaPencere(QMainWindow):
         if action == self.actionYaziHizalaSola:
             self.btnYaziHizalaSola.setChecked(True)
             aciklama = self.tr("align left")
-            hiza = Qt.AlignLeft
+            hiza = Qt.AlignmentFlag.AlignLeft
         elif action == self.actionYaziHizalaOrtala or action == self.btnYaziHizalaOrtala:
             self.btnYaziHizalaOrtala.setChecked(True)
             aciklama = self.tr("align center")
-            hiza = Qt.AlignCenter
+            hiza = Qt.AlignmentFlag.AlignCenter
         elif action == self.actionYaziHizalaSaga or action == self.btnYaziHizalaSaga:
             self.btnYaziHizalaSaga.setChecked(True)
             aciklama = self.tr("align right")
-            hiza = Qt.AlignRight
+            hiza = Qt.AlignmentFlag.AlignRight
         elif action == self.actionYaziHizalaSigdir or action == self.btnYaziHizalaSigdir:
             self.btnYaziHizalaSigdir.setChecked(True)
             aciklama = self.tr("align justify")
-            hiza = Qt.AlignJustify
+            hiza = Qt.AlignmentFlag.AlignJustify
         else:
-            hiza = Qt.AlignLeft
+            hiza = Qt.AlignmentFlag.AlignLeft
 
         self._yazi_hizala(hiza, aciklama)
 
@@ -5108,21 +5099,21 @@ class DefterAnaPencere(QMainWindow):
         if btn == self.btnYaziHizalaSola:
             self.actionYaziHizalaSola.setChecked(True)
             aciklama = self.tr("align left")
-            hiza = Qt.AlignLeft
+            hiza = Qt.AlignmentFlag.AlignLeft
         elif btn == self.btnYaziHizalaOrtala:
             self.actionYaziHizalaOrtala.setChecked(True)
             aciklama = self.tr("align center")
-            hiza = Qt.AlignCenter
+            hiza = Qt.AlignmentFlag.AlignCenter
         elif btn == self.btnYaziHizalaSaga:
             self.actionYaziHizalaSaga.setChecked(True)
             aciklama = self.tr("align right")
-            hiza = Qt.AlignRight
+            hiza = Qt.AlignmentFlag.AlignRight
         elif btn == self.btnYaziHizalaSigdir:
             self.actionYaziHizalaSigdir.setChecked(True)
             aciklama = self.tr("align justify")
-            hiza = Qt.AlignJustify
+            hiza = Qt.AlignmentFlag.AlignJustify
         else:
-            hiza = Qt.AlignLeft
+            hiza = Qt.AlignmentFlag.AlignLeft
 
         self._yazi_hizala(hiza, aciklama)
 
@@ -5148,16 +5139,16 @@ class DefterAnaPencere(QMainWindow):
         if not hiza:
             hiza = self.cScene.activeItem.ver_yazi_hizasi()
 
-        if hiza == Qt.AlignLeft or hiza == Qt.AlignLeft | Qt.AlignVCenter:
+        if hiza == Qt.AlignmentFlag.AlignLeft or hiza == Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter:
             self.actionYaziHizalaSola.setChecked(True)
             self.btnYaziHizalaSola.setChecked(True)
-        if hiza == Qt.AlignCenter or hiza == Qt.AlignCenter | Qt.AlignVCenter:
+        if hiza == Qt.AlignmentFlag.AlignCenter or hiza == Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter:
             self.actionYaziHizalaOrtala.setChecked(True)
             self.btnYaziHizalaOrtala.setChecked(True)
-        if hiza == Qt.AlignRight or hiza == Qt.AlignRight | Qt.AlignVCenter:
+        if hiza == Qt.AlignmentFlag.AlignRight or hiza == Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter:
             self.actionYaziHizalaSaga.setChecked(True)
             self.btnYaziHizalaSaga.setChecked(True)
-        if hiza == Qt.AlignJustify or hiza == Qt.AlignJustify | Qt.AlignVCenter:
+        if hiza == Qt.AlignmentFlag.AlignJustify or hiza == Qt.AlignmentFlag.AlignJustify | Qt.AlignmentFlag.AlignVCenter:
             self.actionYaziHizalaSigdir.setChecked(True)
             self.btnYaziHizalaSigdir.setChecked(True)
 
@@ -5285,7 +5276,7 @@ class DefterAnaPencere(QMainWindow):
         ekranGoruntusuMenuPB.setMenu(ekranGoruntusuMenu)
 
         self.actionSecimEkranGoruntusuAlCmOn = QAction(self.tr("Selected Area (Comp On)"), self.utilitiesToolBar)
-        self.actionSecimEkranGoruntusuAlCmOn.setShortcut(QKeySequence(Qt.Key_Print))
+        self.actionSecimEkranGoruntusuAlCmOn.setShortcut(QKeySequence(Qt.Key.Key_Print))
         self.actionSecimEkranGoruntusuAlCmOn.triggered.connect(self.act_ekran_goruntusu_secim_cm_on)
 
         self.actionSecimEkranGoruntusuAlCmOff = QAction(self.tr("Selected Area (Comp Off)"), self.utilitiesToolBar)
@@ -5366,7 +5357,6 @@ class DefterAnaPencere(QMainWindow):
         if item.type() == shared.TEXT_ITEM_TYPE:
             self.actionResizeTextItemToFitView.setVisible(True)
             # self.actionShowInFileManager.setVisible(True)
-            self.actionExportSelectedTextItemContentAsPdf.setVisible(True)
             self.actionPrintSelectedTextItemContent.setVisible(True)
 
             if not item.isPlainText:
@@ -5389,7 +5379,6 @@ class DefterAnaPencere(QMainWindow):
             self.actionConvertToPlainText.setVisible(False)
             self.actionShowAsWebPage.setVisible(False)
             self.actionConvertToWebItem.setVisible(False)
-            self.actionExportSelectedTextItemContentAsPdf.setVisible(False)
             self.actionPrintSelectedTextItemContent.setVisible(False)
 
         if item.type() == shared.IMAGE_ITEM_TYPE:
@@ -5602,7 +5591,7 @@ class DefterAnaPencere(QMainWindow):
     def act_draw_line_item(self):
 
         if self.cScene.OkAraci.kalem.style() == Qt.PenStyle.NoPen:
-            self.act_cizgi_tipi_degistir(Qt.SolidLine)
+            self.act_cizgi_tipi_degistir(Qt.PenStyle.SolidLine)
             self.change_line_style_options(self.cScene.OkAraci.kalem)
         self.cScene.aktif_arac_degistir(aktifArac=self.cScene.OkAraci)
         self.actionDrawLineItem.setChecked(True)
@@ -5635,7 +5624,7 @@ class DefterAnaPencere(QMainWindow):
     def act_draw_path_item(self):
 
         if self.cScene.KalemAraci.kalem.style() == Qt.PenStyle.NoPen:
-            self.act_cizgi_tipi_degistir(Qt.SolidLine)
+            self.act_cizgi_tipi_degistir(Qt.PenStyle.SolidLine)
             self.change_line_style_options(self.cScene.KalemAraci.kalem)
         self.cScene.aktif_arac_degistir(aktifArac=self.cScene.KalemAraci)
         self.actionDrawPathItem.setChecked(True)
@@ -5774,7 +5763,7 @@ class DefterAnaPencere(QMainWindow):
         # pixMap = QPixmap(dosyaYolu)
         # pixMap = QPixmap(dosyaYolu).scaled(self.sceneRect().size().toSize() / 1.5, Qt.KeepAspectRatio)
         viewRectSize = self.cScene.views()[0].get_visible_rect().size().toSize()
-        pixMap = QPixmap(dosyaYolu).scaled(viewRectSize / 1.5, Qt.KeepAspectRatio)
+        pixMap = QPixmap(dosyaYolu).scaled(viewRectSize / 1.5, Qt.AspectRatioMode.KeepAspectRatio)
         rectf = QRectF(pixMap.rect())
         # rectf.moveTo(pos)
         item = Image(dosyaYolu, pos, rectf, 
@@ -6174,7 +6163,7 @@ class DefterAnaPencere(QMainWindow):
             textItem.textItemFocusedOut.connect(lambda: self.cScene.is_text_item_empty(textItem))
             self.increase_zvalue(textItem)
             undoRedo.undoableAddItem(self.cScene.undoStack, self.tr("_paste"), self.cScene, textItem)
-            textItem.setTextInteractionFlags(Qt.NoTextInteraction)
+            textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
             cursor = textItem.textCursor()
             cursor.clearSelection()
             textItem.setTextCursor(cursor)
@@ -6188,7 +6177,7 @@ class DefterAnaPencere(QMainWindow):
             textItem.textItemFocusedOut.connect(lambda: self.cScene.is_text_item_empty(textItem))
             self.increase_zvalue(textItem)
             undoRedo.undoableAddItem(self.cScene.undoStack, self.tr("_paste"), self.cScene, textItem)
-            textItem.setTextInteractionFlags(Qt.NoTextInteraction)
+            textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
             cursor = textItem.textCursor()
             cursor.clearSelection()
             textItem.setTextCursor(cursor)
@@ -6275,7 +6264,7 @@ class DefterAnaPencere(QMainWindow):
                 textItem.textItemFocusedOut.connect(lambda: self.cScene.is_text_item_empty(textItem))
                 self.increase_zvalue(textItem)
                 undoRedo.undoableAddItem(self.cScene.undoStack, self.tr("_paste"), self.cScene, textItem)
-                textItem.setTextInteractionFlags(Qt.NoTextInteraction)
+                textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
                 cursor = textItem.textCursor()
                 cursor.clearSelection()
                 textItem.setTextCursor(cursor)
@@ -6294,7 +6283,7 @@ class DefterAnaPencere(QMainWindow):
                 textItem.textItemFocusedOut.connect(lambda: self.cScene.is_text_item_empty(textItem))
                 self.increase_zvalue(textItem)
                 undoRedo.undoableAddItem(self.cScene.undoStack, self.tr("_paste"), self.cScene, textItem)
-                textItem.setTextInteractionFlags(Qt.NoTextInteraction)
+                textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
                 cursor = textItem.textCursor()
                 cursor.clearSelection()
                 textItem.setTextCursor(cursor)
@@ -7112,14 +7101,14 @@ class DefterAnaPencere(QMainWindow):
         renkDialog = QColorDialog(self)
         renkDialog.setWindowTitle(baslik)
         renkDialog.setOptions(
-            QColorDialog.DontUseNativeDialog
-            | QColorDialog.ShowAlphaChannel
+            QColorDialog.ColorDialogOption.DontUseNativeDialog
+            | QColorDialog.ColorDialogOption.ShowAlphaChannel
         )
         if anlikRenkGonderilecekFonksiyon:
             renkDialog.currentColorChanged.connect(anlikRenkGonderilecekFonksiyon)
 
         renkDialog.setCurrentColor(eskiRenk)
-        if renkDialog.exec() == QColorDialog.Accepted:
+        if renkDialog.exec() == QColorDialog.DialogCode.Accepted:
             return renkDialog.currentColor()
         return QColor()
 
@@ -7365,12 +7354,12 @@ class DefterAnaPencere(QMainWindow):
 
         font = QFont("serif", 13, QFont.Bold)
 
-        pix.fill(Qt.transparent)
+        pix.fill(Qt.GlobalColor.transparent)
         # ~ pixFont = QPixmap(16, 16)
         painterTC = QPainter(pix)
         painterTC.setFont(font)
         painterTC.setPen(yaziRengi)
-        painterTC.drawText(pix.rect(), Qt.AlignCenter, "A")
+        painterTC.drawText(pix.rect(), Qt.AlignmentFlag.AlignCenter, "A")
         # painterTC.drawRect(0, 0, 15, 15)
         painterTC.end()
         painterTC = None
@@ -7401,7 +7390,7 @@ class DefterAnaPencere(QMainWindow):
 
         # font = QFont("serif", 13, QFont.Bold)
 
-        pix.fill(Qt.transparent)
+        pix.fill(Qt.GlobalColor.transparent)
         # pixFont = QPixmap(16, 16)
         # pix.fill(Qt.black)
         painterTC = QPainter(pix)
@@ -7586,11 +7575,11 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.undoStack.beginMacro(self.tr("reset items' line properties"))
             for item in self.cScene.selectionQueue:
                 undoRedo.undoableSetLineStyle(self.cScene.undoStack, self.tr("change item's line style"), item,
-                                              Qt.SolidLine)
+                                              Qt.PenStyle.SolidLine)
                 undoRedo.undoableSetLineJoinStyle(self.cScene.undoStack, self.tr("change item's line join style"), item,
-                                                  Qt.RoundJoin)
+                                                  Qt.PenJoinStyle.RoundJoin)
                 undoRedo.undoableSetLineCapStyle(self.cScene.undoStack, self.tr("change item's line cap style"), item,
-                                                 Qt.FlatCap)
+                                                 Qt.PenCapStyle.FlatCap)
                 undoRedo.undoableSetLineWidthF(self.cScene.undoStack, self.tr("change item's line width"), item, 0)
             self.cScene.undoStack.endMacro()
 
@@ -7602,9 +7591,9 @@ class DefterAnaPencere(QMainWindow):
 
             self.cScene.aktifArac.kalem = QPen(self.cScene.aktifArac.cizgiRengi,
                                                0,
-                                               Qt.SolidLine,
-                                               Qt.FlatCap,
-                                               Qt.RoundJoin)
+                                               Qt.PenStyle.SolidLine,
+                                               Qt.PenCapStyle.FlatCap,
+                                               Qt.PenJoinStyle.RoundJoin)
 
     # ---------------------------------------------------------------------
     @Slot(int)
@@ -7768,9 +7757,9 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def change_line_style_options(self, pen):
-        self.cizgiTipiCBox.setCurrentIndex(self.cizgiTipiCBox.findData(pen.style(), Qt.UserRole))
-        self.cizgiBirlesimTipiCBox.setCurrentIndex(self.cizgiBirlesimTipiCBox.findData(pen.joinStyle(), Qt.UserRole))
-        self.cizgiUcuTipiCBox.setCurrentIndex(self.cizgiUcuTipiCBox.findData(pen.capStyle(), Qt.UserRole))
+        self.cizgiTipiCBox.setCurrentIndex(self.cizgiTipiCBox.findData(pen.style(), Qt.ItemDataRole.UserRole))
+        self.cizgiBirlesimTipiCBox.setCurrentIndex(self.cizgiBirlesimTipiCBox.findData(pen.joinStyle(), Qt.ItemDataRole.UserRole))
+        self.cizgiUcuTipiCBox.setCurrentIndex(self.cizgiUcuTipiCBox.findData(pen.capStyle(), Qt.ItemDataRole.UserRole))
         self.change_line_widthF(pen.widthF())
         # self.cizgiKalinligiSlider.setValue(pen.width())
 
@@ -7821,7 +7810,7 @@ class DefterAnaPencere(QMainWindow):
             preset_hotkey = QShortcut(QKeySequence("Alt+{}".format(count)),
                                       self,
                                       lambda throw_away=0: self.act_apply_selected_style(preset))
-            preset_hotkey.setContext(Qt.ApplicationShortcut)
+            preset_hotkey.setContext(Qt.ShortcutContext.ApplicationShortcut)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -8250,7 +8239,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_show_html_source(self):
         widget = QDialog(self)
-        widget.setAttribute(Qt.WA_DeleteOnClose)
+        widget.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         widget.setWindowTitle(self.tr("Defter: HTML source"))
         layout = QVBoxLayout()
         widget.setLayout(layout)
@@ -8504,9 +8493,9 @@ class DefterAnaPencere(QMainWindow):
         """
 
         self.webBrowserDW = DockWidget(self.tr("Web Browser"), self)
-        self.webBrowserDW.setAttribute(Qt.WA_DeleteOnClose)
+        self.webBrowserDW.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.webBrowserDW.setObjectName("webBrowserDockWidget")
-        self.addDockWidget(Qt.RightDockWidgetArea, self.webBrowserDW)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.webBrowserDW)
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
 
@@ -8528,14 +8517,14 @@ class DefterAnaPencere(QMainWindow):
         # widget.setAttribute(Qt.WA_DeleteOnClose)
         # widget.setWindowTitle(self.tr("Defter: Web Browser"))
         layout = QVBoxLayout()
-        layout.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
+        layout.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
         widget.setLayout(layout)
 
         scroll.setWidget(widget)
 
         webView = QWebEngineView(widget)
         webView.setObjectName("webview")
-        webView.settings().setAttribute(QWebEngineSettings.PluginsEnabled, False)
+        webView.settings().setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, False)
 
         if not url_as_string:
             url = QUrl("https://google.com")
@@ -8588,14 +8577,14 @@ class DefterAnaPencere(QMainWindow):
         h1 = self.cScene.activeItem.rect().size().toSize().height()
         h2 = self.cView.size().height()
 
-        widget.setAttribute(Qt.WA_DeleteOnClose)
+        widget.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         widget.setWindowTitle(self.tr("Defter: Show As Web Page"))
         layout = QVBoxLayout()
         widget.setLayout(layout)
 
         webView = QWebEngineView(widget)
         webView.setObjectName("webview")
-        webView.settings().setAttribute(QWebEngineSettings.PluginsEnabled, False)
+        webView.settings().setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, False)
         # if self.cScene.activeItem.type() == shared.DOSYA_ITEM_TYPE:
         #     webView.load(QUrl.fromLocalFile(self.cScene.activeItem.filePathForSave))
         #     widget.resize(self.cView.size())
@@ -8659,7 +8648,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_show_image_info(self):
         widget = QDialog(self)
-        widget.setAttribute(Qt.WA_DeleteOnClose)
+        widget.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         widget.setWindowTitle(self.tr("Defter: Image info"))
         layout = QVBoxLayout()
         widget.setLayout(layout)
@@ -8800,7 +8789,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_show_video_info(self):
         widget = QDialog(self)
-        widget.setAttribute(Qt.WA_DeleteOnClose)
+        widget.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         widget.setWindowTitle(self.tr("Defter: Video info"))
         layout = QVBoxLayout()
         widget.setLayout(layout)
@@ -9068,7 +9057,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_show_dosya_info(self):
         widget = QDialog(self)
-        widget.setAttribute(Qt.WA_DeleteOnClose)
+        widget.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         widget.setWindowTitle(self.tr("Defter: File info"))
         layout = QVBoxLayout()
         widget.setLayout(layout)
@@ -9202,11 +9191,11 @@ class DefterAnaPencere(QMainWindow):
 
         if isChecked:
             # self.windowFlag = self.windowFlags()
-            self.setWindowFlags(Qt.WindowStaysOnTopHint | defaultFlags)
+            self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint | defaultFlags)
             self.setVisible(True)
         else:
             # TODO: ^ bunu bi test et
-            self.setWindowFlags(defaultFlags ^ Qt.WindowStaysOnTopHint)
+            self.setWindowFlags(defaultFlags ^ Qt.WindowType.WindowStaysOnTopHint)
             # self.windowFlag = None
             self.setVisible(True)
 
@@ -9280,14 +9269,14 @@ class DefterAnaPencere(QMainWindow):
 
         fDialog = QFileDialog()
         # fDialog.setFileMode(QFileDialog.Directory)
-        fDialog.setFileMode(QFileDialog.AnyFile)
+        fDialog.setFileMode(QFileDialog.FileMode.AnyFile)
         # fDialog.setOption(QFileDialog.ShowDirsOnly, True)
-        fDialog.setOption(QFileDialog.DontUseNativeDialog, True)
-        fDialog.setOption(QFileDialog.DontUseCustomDirectoryIcons, True)
+        fDialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
+        fDialog.setOption(QFileDialog.Option.DontUseCustomDirectoryIcons, True)
 
         fDialog.setFilter(fDialog.filter() | QDir.Hidden)
         # fDialog.setAcceptMode(QFileDialog.AcceptOpen)
-        fDialog.setAcceptMode(QFileDialog.AcceptSave)
+        fDialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
 
         # uzanti eklendi mi kontrolune ihtiyac kalmiyor
         # fDialog.setDefaultSuffix('html')
@@ -9332,7 +9321,7 @@ class DefterAnaPencere(QMainWindow):
         # if fTreeView:
         #     fTreeView.setSelectionMode(QAbstractItemView.MultiSelection)
 
-        if fDialog.exec() == QDialog.Accepted:
+        if fDialog.exec() == QDialog.DialogCode.Accepted:
             # liste icinde tek adres, files desek de
             paths = fDialog.selectedFiles()
             return paths, dosyalarKopyalansinMiCBox.isChecked()
@@ -9640,13 +9629,15 @@ class DefterAnaPencere(QMainWindow):
             # printer = QPrinter(QPrinter.PrinterResolution)
             # printer = QPrinter(QPrinter.ScreenResolution)
             self.printer = QPrinter()
-            self.printer.setPageSize(QPageSize(QPageSize.A4))
+            # QPageSetupDialog: Cannot be used on non-native printers
+            self.printer.setOutputFormat(QPrinter.OutputFormat.NativeFormat)
+            self.printer.setPageSize(QPageSize(QPageSize.PageSizeId.A4))
             pLayout = self.printer.pageLayout()
-            pLayout.setUnits(QPageLayout.Millimeter)
-            pLayout.setPageSize(QPageSize(QPageSize.A4))
-            # self.printer.setPageLayout(QPageSize(QPageSize.A4))
+            pLayout.setUnits(QPageLayout.Unit.Millimeter)
+            pLayout.setPageSize(QPageSize(QPageSize.PageSizeId.A4))
+            # self.printer.setPageLayout(QPageSize(QPageSize.PageSizeId.A4))
             self.printer.setPageLayout(pLayout)
-            self.printer.setPageOrientation(QPageLayout.Portrait)
+            self.printer.setPageOrientation(QPageLayout.Orientation.Portrait)
             # printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
             # printer.setOutputFileName("deneme.pdf")
             # return printer
@@ -9742,14 +9733,12 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def _paint_document(self, printer):
-        # self.textEdit.print_(printer)
         p = QPainter()
 
         if not p.begin(printer):
             print("hata")
-        p.setRenderHint(QPainter.Antialiasing)
-        # TODO: bu baya yavaş olabiliyor,
-        self.lutfen_bekleyin_goster()
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        # TODO: bu baya yavaş olabiliyor
 
         if self.pDialog.subOptionsRadioBtnGroup.checkedButton() == self.pDialog.radioFitPage:
             for sayfa in self.cModel.sayfalar():
@@ -9762,8 +9751,6 @@ class DefterAnaPencere(QMainWindow):
 
         p.end()
 
-        self.lutfen_bekleyin_gizle()
-
     # ---------------------------------------------------------------------
     def _paint_page(self, printer):
         # self.textEdit.print_(printer)
@@ -9771,7 +9758,7 @@ class DefterAnaPencere(QMainWindow):
 
         if not p.begin(printer):
             print("hata")
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         # itemsBRect = self.cScene.itemsBoundingRect().translated(0,0)
         # itemsBRect = self.cScene.itemsBoundingRect()
         # self.cScene.render(p, itemsBRect)
@@ -9790,7 +9777,7 @@ class DefterAnaPencere(QMainWindow):
 
         if not p.begin(printer):
             print("hata")
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         # p.scale(.3, .3)
 
         """
@@ -9826,7 +9813,7 @@ class DefterAnaPencere(QMainWindow):
                 p = QPainter()
                 if not p.begin(printer):
                     print("hata")
-                p.setRenderHint(QPainter.Antialiasing)
+                p.setRenderHint(QPainter.RenderHint.Antialiasing)
                 # self.cScene.activeItem.doc.print_(printer)
                 # rect = printer.pageRect()
                 # self.cScene.activeItem.doc.setTextWidth(rect.width())
@@ -9843,7 +9830,7 @@ class DefterAnaPencere(QMainWindow):
 
         if not p.begin(printer):
             print("hata")
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
         # itemsBRect = self.cScene.itemsBoundingRect().translated(0,0)
         # itemsBRect = self.cScene.itemsBoundingRect()
         # self.cScene.render(p, itemsBRect)
@@ -10008,7 +9995,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def act_print_document(self):
         # printer = self._get_printer()
-
+        self.lutfen_bekleyin_goster()
         # printer.setResolution(QPrinter.ScreenResolution)
         self.printer.setOutputFormat(QPrinter.OutputFormat.NativeFormat)
         # "document" "page" "view" "selection" "content"
@@ -10021,6 +10008,7 @@ class DefterAnaPencere(QMainWindow):
             self.pDialog.radioFitWidth.setChecked(True)
         # pDialog.exec()
         self.pDialog.show()
+        self.lutfen_bekleyin_gizle()
 
         # TODO bi sekilde self.pDialog none yapmak lazim.. sinyal falan mi gondersek close veya
         # print edince.. sonra da burdan =None desek, bi cesit dialog implementation
@@ -10031,24 +10019,9 @@ class DefterAnaPencere(QMainWindow):
         # preview.exec()
 
     # ---------------------------------------------------------------------
-    def act_export_selected_text_item_content_as_pdf(self):
-
-        # printer = self._get_printer()
-        self.printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
-        self.pDialog = PrintPreviewDialog(self.printer, "content", self)
-        self.pDialog.paintRequested.connect(self._paint_text_item_content)
-        self.pDialog.paintRequestTypeChanged.connect(self._change_preview_mode)
-        if self.radioSayfaSigdir.isChecked():
-            self.pDialog.radioFitPage.setChecked(True)
-        else:
-            self.pDialog.radioFitWidth.setChecked(True)
-        # pDialog.exec()
-        self.pDialog.show()
-
-    # ---------------------------------------------------------------------
     def act_print_selected_text_item_content(self):
         # printer = self._get_printer()
-
+        self.lutfen_bekleyin_goster()
         # printer.setResolution(QPrinter.ScreenResolution)
         self.printer.setOutputFormat(QPrinter.OutputFormat.NativeFormat)
         # "document"  "page" "view" "selection" "content"
@@ -10061,6 +10034,7 @@ class DefterAnaPencere(QMainWindow):
             self.pDialog.radioFitWidth.setChecked(True)
         # pDialog.exec()
         self.pDialog.show()
+        self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     def act_export_page_as_image(self):
@@ -10076,12 +10050,14 @@ class DefterAnaPencere(QMainWindow):
             if not path.endswith(".jpg"):
                 path = '{}.{}'.format(path, "jpg")
 
+            self.lutfen_bekleyin_goster()
+
             # image = QImage(self.cSecne.itemsBoundingRect().toRect(), QImage.Format_ARGB32_Premultiplied)
-            image = QImage(self.cScene.itemsBoundingRect().size().toSize(), QImage.Format_ARGB32)
-            image = QImage(self.cView.viewport().size(), QImage.Format_ARGB32)
-            image.fill(Qt.transparent)
+            image = QImage(self.cScene.itemsBoundingRect().size().toSize(), QImage.Format.Format_ARGB32)
+            image = QImage(self.cView.viewport().size(), QImage.Format.Format_ARGB32)
+            image.fill(Qt.GlobalColor.transparent)
             painter = QPainter(image)
-            painter.setRenderHint(QPainter.Antialiasing)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
             self.cView.render(painter)
             painter.end()
             image.save(path)
@@ -10089,6 +10065,8 @@ class DefterAnaPencere(QMainWindow):
             self.log(self.tr("Page succesfully exported as image. {}".format(path)), 7000)
 
             self.sonKlasorDisaAktar = os.path.dirname(path)
+
+            self.lutfen_bekleyin_gizle()
 
             # if self.printer.outputFileName():
             #     self.preview.print()
@@ -10107,7 +10085,7 @@ class DefterAnaPencere(QMainWindow):
     def act_ekran_goruntusu_secim_cm_on(self):
         self.hide()
         self.shot_selection = TamEkranWidget_CM_On()
-        QApplication.setOverrideCursor(Qt.CrossCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.CrossCursor)
         self.shot_selection.rubberBandReleased.connect(self.bekle_ekran_goruntusu_cek)
         self.shot_selection.esc_key_pressed.connect(self.kapat_ekran_goruntusu)
         # self.shot_selection.activateWindow()
@@ -10119,7 +10097,7 @@ class DefterAnaPencere(QMainWindow):
     def act_ekran_goruntusu_secim_cm_off(self):
         self.hide()
         self.shot_selection = TamEkranWidget_CM_Off()
-        QApplication.setOverrideCursor(Qt.CrossCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.CrossCursor)
         self.shot_selection.rubberBandReleased.connect(self.bekle_ekran_goruntusu_cek)
         self.shot_selection.esc_key_pressed.connect(self.kapat_ekran_goruntusu)
         # self.shot_selection.activateWindow()

@@ -61,7 +61,7 @@ class YuvarlakFircaBoyutu(QGraphicsItem):
     def paint(self, painter, option, widget=None):
 
         if not self._pen.width():
-            painter.setPen(Qt.NoPen)
+            painter.setPen(Qt.PenStyle.NoPen)
         else:
             painter.setPen(self._pen)
         painter.setBrush(self._brush)

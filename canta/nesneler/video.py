@@ -54,7 +54,7 @@ class VideoItem(BaseItem):
         self.videoItem.nativeSizeChanged.connect(self.act_native_size_changed)
         # resolution = media.canonicalResource().resolution()
         # self.videoItem.nativeSizeChanged.connect(self._rect.setSize)
-        self.videoItem.setAspectRatioMode(Qt.KeepAspectRatio)
+        self.videoItem.setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
 
         self.video_hazir_mi = False
 
@@ -158,11 +158,11 @@ class VideoItem(BaseItem):
 
     # ---------------------------------------------------------------------
     def keyPressEvent(self, event) -> None:
-        if event.key() == Qt.Key_Right:
+        if event.key() == Qt.Key.Key_Right:
             self.player.setPosition(self.player.position() + 10000)
-        elif event.key() == Qt.Key_Left:
+        elif event.key() == Qt.Key.Key_Left:
             self.player.setPosition(self.player.position() - 10000)
-        elif event.key() == Qt.Key_Space:
+        elif event.key() == Qt.Key.Key_Space:
             if self.player.playbackState() == QMediaPlayer.PlaybackState.StoppedState \
                     or self.player.playbackState() == QMediaPlayer.PlaybackState.PausedState:
                 self.player.play()
@@ -301,7 +301,7 @@ class VideoItem(BaseItem):
     # ---------------------------------------------------------------------
     def act_native_size_changed(self, nativeSize):
         if not nativeSize.isEmpty():  # videoItem silinice bos QSizeF() gonderiyor.
-            self._rect.setSize(nativeSize.scaled(self.videoItem.size(), Qt.KeepAspectRatio))
+            self._rect.setSize(nativeSize.scaled(self.videoItem.size(), Qt.AspectRatioMode.KeepAspectRatio))
             self.update_elements_after_resize()
 
     # ---------------------------------------------------------------------
@@ -484,7 +484,7 @@ class VideoItem(BaseItem):
             yeniSize = rect.size()
             eskiSize = self.rect().size()
             # eskiSize.scale(yeniSize, Qt.KeepAspectRatio)
-            eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.KeepAspectRatioByExpanding)
+            eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.AspectRatioMode.KeepAspectRatioByExpanding)
             # eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.KeepAspectRatio)
 
             # if not eskiSize.isNull():
@@ -654,7 +654,7 @@ class VideoItem(BaseItem):
 
         if option.state & QStyle.StateFlag.State_MouseOver:
             painter.setOpacity(0.7)
-            painter.setPen(QPen(Qt.red))
+            painter.setPen(QPen(Qt.GlobalColor.red))
             # if self.isSelected():
             # if option.state & QStyle.State_Selected:
             #     painter.setBrush(QBrush(QColor(255, 50, 50)))
@@ -666,8 +666,8 @@ class VideoItem(BaseItem):
             painter.translate(self.videoSliderEllipseRect.topLeft())
             painter.drawPath(self.videoIkonu)
             painter.restore()
-            painter.drawText(self._rect, Qt.AlignLeft, f"{self.video_poziyon_sure_str} - {self.video_toplam_sure_str}")
-            painter.setPen(QPen(Qt.blue))
+            painter.drawText(self._rect, Qt.AlignmentFlag.AlignLeft, f"{self.video_poziyon_sure_str} - {self.video_toplam_sure_str}")
+            painter.setPen(QPen(Qt.GlobalColor.blue))
             painter.setOpacity(0.7)
             if self.isAudioSliderHovered:
                 painter.setOpacity(1)
@@ -751,11 +751,11 @@ class VideoItem(BaseItem):
         hiza = self.ver_yazi_hizasi()
         # if hiza == Qt.AlignLeft or hiza == Qt.AlignLeft | Qt.AlignVCenter:
         #     yazi_hiza = "left"
-        if hiza == Qt.AlignCenter or hiza == Qt.AlignCenter | Qt.AlignVCenter:
+        if hiza == Qt.AlignmentFlag.AlignCenter or hiza == Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter:
             yazi_hiza = "center"
-        elif hiza == Qt.AlignRight or hiza == Qt.AlignRight | Qt.AlignVCenter:
+        elif hiza == Qt.AlignmentFlag.AlignRight or hiza == Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter:
             yazi_hiza = "right"
-        elif hiza == Qt.AlignJustify or hiza == Qt.AlignJustify | Qt.AlignVCenter:
+        elif hiza == Qt.AlignmentFlag.AlignJustify or hiza == Qt.AlignmentFlag.AlignJustify | Qt.AlignmentFlag.AlignVCenter:
             yazi_hiza = "justify"
         else:
             yazi_hiza = "left"

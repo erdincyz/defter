@@ -37,7 +37,7 @@ class Sayfa(object):
         # @adi.setter da temizleniyor, bu ilk olusturma
         self._kayit_adi = "{} - {}".format(slugify(self._adi, False), self._kim)
 
-        self._yaziRengi = QColor(Qt.black)
+        self._yaziRengi = QColor(Qt.GlobalColor.black)
 
         # print(self.adi)
 

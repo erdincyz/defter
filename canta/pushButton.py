@@ -53,7 +53,7 @@ class PushButtonRenk(QPushButton):
             if self.renk:
                 p.fillRect(self.rect(), QBrush(self.renk))
             else:
-                p.fillRect(self.rect(), QBrush(Qt.lightGray))
+                p.fillRect(self.rect(), QBrush(Qt.GlobalColor.lightGray))
             # p.setBrush(self.renk)
             # p.drawRect(self.rect())
             p.end()
@@ -62,7 +62,7 @@ class PushButtonRenk(QPushButton):
 
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.MouseButton.RightButton:
             self.sagTiklandi.emit()
             event.accept()
 

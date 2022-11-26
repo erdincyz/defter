@@ -16,7 +16,7 @@ from PySide6.QtCore import Qt, QRectF, Slot
 class EkranKutuphane(QGraphicsView):
     def __init__(self, scene, parent=None):
         super(EkranKutuphane, self).__init__(scene, parent)
-        self.setDragMode(QGraphicsView.RubberBandDrag)
+        self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
         # self.setRenderHint(QPainter.Antialiasing)
         # self.setRenderHint(QPainter.TextAntialiasing)
         self.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
@@ -27,7 +27,7 @@ class EkranKutuphane(QGraphicsView):
 
         # TODO !!
         # self.setViewportUpdateMode(self.SmartViewportUpdate)
-        self.setViewportUpdateMode(QGraphicsView.MinimalViewportUpdate)  # default
+        self.setViewportUpdateMode(QGraphicsView.ViewportUpdateMode.MinimalViewportUpdate)  # default
         # https: // doc.qt.io / qt - 5 / qgraphicsview.html  # ViewportUpdateMode-enum
         # self.setViewportUpdateMode(self.BoundingRectViewportUpdate)
         # self.setViewportUpdateMode(self.FullViewportUpdate)
@@ -39,12 +39,12 @@ class EkranKutuphane(QGraphicsView):
         # self.background = QPixmap('/pictures/rig.jpg')
         # self.backgroundImage = None
 
-        self.setBackgroundBrush(Qt.lightGray)
+        self.setBackgroundBrush(Qt.GlobalColor.lightGray)
         self.backgroundImagePixmap = None
         self.backgroundImagePath = None
-        self.setCacheMode(QGraphicsView.CacheBackground)
+        self.setCacheMode(QGraphicsView.CacheModeFlag.CacheBackground)
 
-        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+        self.setTransformationAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
         # gercek sahnede "if event.source().objectName() == "kev": " ile
         # kutuphanede drag drop edildi ise nesneyi embeded isaretleyebilmek icin.
         self.viewport().setObjectName("kev")
@@ -127,17 +127,17 @@ class EkranKutuphane(QGraphicsView):
             # view's setSceneRect is not scene's setSceneRect, they are different.
             # self.setSceneRect(QRectF(self.backgroundImagePixmap.rect()))
             self.scene().setSceneRect(QRectF(self.backgroundImagePixmap.rect()))
-            self.fitInView(self.sceneRect(), Qt.KeepAspectRatio)
+            self.fitInView(self.sceneRect(), Qt.AspectRatioMode.KeepAspectRatio)
             self.backgroundImagePath = imagePath
         self.resetCachedContent()
 
     # ---------------------------------------------------------------------
     def keyPressEvent(self, event):
         # self.scene().keyPressEvent(event)  # viewi bypass edip sahneye gonderiyoruz, ok tuslarini yiyor view
-        if event.key() == Qt.Key_Space:
+        if event.key() == Qt.Key.Key_Space:
             if not event.isAutoRepeat():
                 if self.horizontalScrollBar().isVisible() or self.verticalScrollBar().isVisible():
-                    self.setDragMode(QGraphicsView.ScrollHandDrag)
+                    self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
                     # bu interactive olmazsa mouse altında nesne olunca event nesneye geciyor.
                     self.setInteractive(False)
                     # self.bosluk_tusu_basildi_mi = True
@@ -147,10 +147,10 @@ class EkranKutuphane(QGraphicsView):
 
     # ---------------------------------------------------------------------
     def keyReleaseEvent(self, event):
-        if event.key() == Qt.Key_Space:
+        if event.key() == Qt.Key.Key_Space:
             if not event.isAutoRepeat():
                 if self.horizontalScrollBar():
-                    self.setDragMode(QGraphicsView.RubberBandDrag)
+                    self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
                     # bu interactive olmazsa mouse altında nesne olunca event nesneye geciyor.
                     self.setInteractive(True)
                     # self.bosluk_tusu_basildi_mi = False
@@ -161,13 +161,13 @@ class EkranKutuphane(QGraphicsView):
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):
 
-        if event.button() == Qt.MiddleButton:
+        if event.button() == Qt.MouseButton.MiddleButton:
             # if not self.scene().selectedItems():
             # if not self.itemAt(event.pos()):
             self.pan = True
             self.panStartX = event.x()
             self.panStartY = event.y()
-            self.setCursor(Qt.ClosedHandCursor)
+            self.setCursor(Qt.CursorShape.ClosedHandCursor)
             event.accept()
 
         super(EkranKutuphane, self).mousePressEvent(event)
@@ -176,10 +176,10 @@ class EkranKutuphane(QGraphicsView):
     # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
 
-        if event.button() == Qt.MiddleButton:
-            self.setDragMode(QGraphicsView.RubberBandDrag)
+        if event.button() == Qt.MouseButton.MiddleButton:
+            self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
             self.pan = False
-            self.setCursor(Qt.ArrowCursor)
+            self.setCursor(Qt.CursorShape.ArrowCursor)
             event.accept()
 
         super(EkranKutuphane, self).mouseReleaseEvent(event)
@@ -188,7 +188,7 @@ class EkranKutuphane(QGraphicsView):
     def mouseMoveEvent(self, event):
 
         if self.pan:
-            self.setDragMode(QGraphicsView.ScrollHandDrag)
+            self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
             self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - (event.x() - self.panStartX))
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() - (event.y() - self.panStartY))
             self.panStartX = event.x()
@@ -202,9 +202,9 @@ class EkranKutuphane(QGraphicsView):
         # factor = 1.41 ** (event.delta() / 240.0)
         # self.scale(factor, factor)
 
-        if event.modifiers() & Qt.ControlModifier:
+        if event.modifiers() & Qt.KeyboardModifier.ControlModifier:
             # alt 2 satir olmazsa ctrl+shift nesnelere gecmiyor.
-            if event.modifiers() & Qt.ShiftModifier:
+            if event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
                 return QGraphicsView.wheelEvent(self, event)
 
             if event.angleDelta().y() > 0:
@@ -219,7 +219,7 @@ class EkranKutuphane(QGraphicsView):
     @Slot()
     def zoomIn(self):
         if self.scene().parent().zoomSBox.value() < 10000:
-            QApplication.setOverrideCursor(Qt.WaitCursor)
+            QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
             self.scale(1.15, 1.15)
             # ir = self.scene().itemsBoundingRect()
             # vr = self.get_visible_rect()
@@ -238,7 +238,7 @@ class EkranKutuphane(QGraphicsView):
     @Slot()
     def zoomOut(self):
         if self.scene().parent().zoomSBox.value() > 1:
-            QApplication.setOverrideCursor(Qt.WaitCursor)
+            QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
             self.scale(1 / 1.15, 1 / 1.15)
             sr = self.scene().sceneRect()
             vr = self.get_visible_rect()
@@ -254,12 +254,12 @@ class EkranKutuphane(QGraphicsView):
     # ---------------------------------------------------------------------
     @Slot()
     def zoomToFit(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         # make sure the sceneRect is only as large as it needs to be, since
         # it does not automatically shrink
         if self.scene().items():
             self.scene().setSceneRect(self.scene().itemsBoundingRect())
-            self.fitInView(self.scene().sceneRect(), Qt.KeepAspectRatio)
+            self.fitInView(self.scene().sceneRect(), Qt.AspectRatioMode.KeepAspectRatio)
             # self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
         self.scene().setSceneRect(self.get_visible_rect())
 
@@ -268,7 +268,7 @@ class EkranKutuphane(QGraphicsView):
     # ---------------------------------------------------------------------
     @Slot()
     def zoomInitial(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         self.resetTransform()
         # sr = self.scene().sceneRect()
         ir = self.scene().itemsBoundingRect()

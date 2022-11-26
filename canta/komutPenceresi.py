@@ -19,8 +19,8 @@ class CommandDialog(QDialog):
     def __init__(self, item, parent=None):
         super(CommandDialog, self).__init__(parent)
 
-        self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
         layout = QVBoxLayout(self)
         btnLayout = QHBoxLayout()
 

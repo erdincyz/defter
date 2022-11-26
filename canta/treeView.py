@@ -18,7 +18,7 @@ class YeniStil(QProxyStyle):
     def drawPrimitive(self, element, option, painter, widget=None):
         """ """
         if element == QProxyStyle.PrimitiveElement.PE_IndicatorItemViewItemDrop and not option.rect.isNull():
-            painter.setPen(QPen(Qt.blue, 3, Qt.DotLine))
+            painter.setPen(QPen(Qt.GlobalColor.blue, 3, Qt.PenStyle.DotLine))
             # option_new = QStyleOption(option)
             # option_new.rect.setLeft(0)
             # if widget:
@@ -178,7 +178,7 @@ class TreeView(QTreeView):
             # TODO: performans optimize et, direkt inde mi kullanmak ,veya key pressed ile secilince scroll etmeceç
             # bi de gerek ok ztaen
             self.scrollTo(self.model().index_sayfadan(sayfa),
-                          QTreeView.EnsureVisible)  # PositionAtCenter
+                          QTreeView.ScrollHint.EnsureVisible)  # PositionAtCenter
 
     # # ---------------------------------------------------------------------
     # def mouseDoubleClickEvent(self, QMouseEvent):
@@ -217,7 +217,7 @@ class TreeView(QTreeView):
         drag.setMimeData(mime)
 
         # modeldeki supportedDragActions lari parametre olarak kullanir
-        if drag.exec(Qt.MoveAction) == Qt.MoveAction:
+        if drag.exec(Qt.DropAction.MoveAction) == Qt.DropAction.MoveAction:
             print(drag.target(), "asdlşıafslkdfjiklsdjfilkasjdkfjailskdjf")
 
     # def dragMoveEvent(self, event):
@@ -253,7 +253,7 @@ class TreeView(QTreeView):
 
         # print(event.mimeData().data("application/x-qabstractitemmodeldatalist").data())
         if True:
-            event.setDropAction(Qt.MoveAction)
+            event.setDropAction(Qt.DropAction.MoveAction)
             event.accept()
         else:
             event.ignore()
@@ -261,7 +261,7 @@ class TreeView(QTreeView):
     # ---------------------------------------------------------------------
     def dragMooveEvent(self, event):
         # print(event.mimeData().formats())
-        event.setDropAction(Qt.MoveAction)
+        event.setDropAction(Qt.DropAction.MoveAction)
         dropIndicatorPos = self.dropIndicatorPosition()
         # print(dropIndicatorPos)
         event.accept()
@@ -389,7 +389,7 @@ class TreeView(QTreeView):
         # self.setCurrentIndex(idx) # bu ayni isi yapiyor alt iki satirin.
         self.selectionModel().select(idx, QItemSelectionModel.ClearAndSelect)
         self.selectionModel().setCurrentIndex(idx, QItemSelectionModel.ClearAndSelect)
-        self.scrollTo(self.model().index_sayfadan(sayfa), QTreeView.EnsureVisible)  # PositionAtCenter
+        self.scrollTo(self.model().index_sayfadan(sayfa), QTreeView.ScrollHint.EnsureVisible)  # PositionAtCenter
 
         # print(self.model().enSonAktifSayfa.adi)
 
@@ -460,7 +460,7 @@ class TreeView(QTreeView):
 
     # ------------------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MiddleButton:
+        if event.button() == Qt.MouseButton.MiddleButton:
             # mayaTBox.myWindow.createScriptTabs(mayaTBox.myWindow.fsModel.fileInfo(mayaTBox.myWindow.treeViewScripts.selectedIndexes()[0]).filePath())
             self.middleClick.emit()
         return QTreeView.mouseReleaseEvent(self, event)
@@ -468,7 +468,7 @@ class TreeView(QTreeView):
     # ------------------------------------------------------------------------------
     def keyPressEvent(self, event):
 
-        if event.key() == Qt.Key_F2:
+        if event.key() == Qt.Key.Key_F2:
             self.f2Pressed.emit()
             self.edit(self.currentIndex())
         else:
@@ -499,7 +499,7 @@ class TreeView(QTreeView):
 
     # ----------------------------------------------------------------------
     def wheelEvent(self, event):
-        if event.modifiers() & Qt.ControlModifier:
+        if event.modifiers() & Qt.KeyboardModifier.ControlModifier:
             self.zoom(event.angleDelta().y())  # pixelDelta
             # print(event.angleDelta().y())  # dikey delta = y
         else:

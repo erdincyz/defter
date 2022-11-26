@@ -16,19 +16,19 @@ class MyRubberBand(QRubberBand):
     # ---------------------------------------------------------------------
     def __init__(self, shape=QRubberBand.Rectangle, parent=None):
         super(MyRubberBand, self).__init__(shape, parent)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         # defaultFlags = self.windowFlags()
         # self.setWindowFlags(defaultFlags | Qt.ToolTip)
         # self.setWindowFlags(Qt.ToolTip)
         # self.setStyleSheet("selection-background-color: transparent")
-        self._pen = QPen(Qt.blue, 3, Qt.DotLine)
+        self._pen = QPen(Qt.GlobalColor.blue, 3, Qt.PenStyle.DotLine)
 
     # ---------------------------------------------------------------------
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setPen(self._pen)
-        painter.setBrush(Qt.NoBrush)
+        painter.setBrush(Qt.BrushStyle.NoBrush)
         painter.drawRect(event.rect().adjusted(0, 0, -1, -1))
 
 
@@ -42,11 +42,11 @@ class TamEkranWidget_CM_On(QWidget):
     def __init__(self, is_compositing_manager_running=True, parent=None):
 
         super(TamEkranWidget_CM_On, self).__init__(parent)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
 
-        self.setAttribute(Qt.WA_NoSystemBackground)
-        self.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.setAttribute(Qt.WidgetAttribute.WA_NoSystemBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
 
         # self.setPalette(Qt.transparent)
         # self.setAttribute(Qt.WA_TransparentForMouseEvents)
@@ -74,7 +74,7 @@ class TamEkranWidget_CM_On(QWidget):
             # self.rubberBand = QRubberBand(QRubberBand.Rectangle)
             # self.rubberBand = MyRubberBand(QRubberBand.Rectangle)
             # TODO: bunu selfsiz de deneyelim compositor acık iken.
-            self.rubberBand = MyRubberBand(QRubberBand.Rectangle, self)
+            self.rubberBand = MyRubberBand(QRubberBand.Shape.Rectangle, self)
             # self.rubberBand = MyRubberBand(QRubberBand.Rectangle)
         self.rubberBand.setGeometry(QRect(self.origin, QSize()))
         self.rubberBand.show()
@@ -113,7 +113,7 @@ class TamEkranWidget_CM_On(QWidget):
     # ---------------------------------------------------------------------
     def keyPressEvent(self, event):
 
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             self.esc_key_pressed.emit()
         super(TamEkranWidget_CM_On, self).keyPressEvent(event)
         self.close()

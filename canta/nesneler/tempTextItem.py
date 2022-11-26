@@ -29,14 +29,14 @@ class TempTextItem(QGraphicsTextItem):
         self._kim = shared.kim(kac_basamak=16)
         self.setFlags(QGraphicsTextItem.ItemIsFocusable)
 
-        self.setTextInteractionFlags(Qt.TextEditorInteraction)
+        self.setTextInteractionFlags(Qt.TextInteractionFlag.TextEditorInteraction)
 
         self.setTextWidth(width)
         self.setFont(font)
         self.setDefaultTextColor(color)
 
         self.textOption = QTextOption()
-        self.textOption.setAlignment(Qt.AlignCenter)
+        self.textOption.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.textOption.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
         self.document().setDefaultTextOption(self.textOption)
 
@@ -73,7 +73,7 @@ class TempTextItem(QGraphicsTextItem):
     # ---------------------------------------------------------------------
     def focusOutEvent(self, event):
         # self.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        self.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
 
         cursor = self.textCursor()
         cursor.clearSelection()
@@ -85,19 +85,19 @@ class TempTextItem(QGraphicsTextItem):
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
         # if self.textInteractionFlags() == Qt.NoTextInteraction:
-        self.setTextInteractionFlags(Qt.TextEditorInteraction)
+        self.setTextInteractionFlags(Qt.TextInteractionFlag.TextEditorInteraction)
         self.setFocus()
         # self.clearFocus()
         super(TempTextItem, self).mouseDoubleClickEvent(event)
 
     # ---------------------------------------------------------------------
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             self.clearFocus()
             self.setSelected(False)
 
         if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
-            if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
+            if event.key() == Qt.Key.Key_Enter or event.key() == Qt.Key.Key_Return:
                 self.clearFocus()
                 self.setSelected(False)
 

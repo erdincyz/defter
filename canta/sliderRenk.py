@@ -20,7 +20,7 @@ class SliderRenk(Slider):
     def __init__(self, parent=None):
         """ Constructor """
         super(SliderRenk, self).__init__(parent)
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
 
         self.valueChanged.connect(self.degerDegisti.emit)
 
@@ -29,7 +29,7 @@ class SliderRenk(Slider):
         # self.setFocusPolicy(Qt.ClickFocus)
 
         self.setRange(0, 255)
-        self.setOrientation(Qt.Horizontal)
+        self.setOrientation(Qt.Orientation.Horizontal)
 
         self.setGeometry(0, 0, 150, 50)
 
@@ -83,9 +83,9 @@ class SliderRenkYalniz(SliderRenk):
     def __init__(self, parent=None):
         """ Constructor """
         super(SliderRenkYalniz, self).__init__(parent)
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         # self.setFocusPolicy(Qt.NoFocus)
-        self.setFocusPolicy(Qt.WheelFocus)
+        self.setFocusPolicy(Qt.FocusPolicy.WheelFocus)
         # self.setFocusPolicy(Qt.ClickFocus)
 
     # ---------------------------------------------------------------------
@@ -99,7 +99,7 @@ class SliderRenkYalniz(SliderRenk):
 
     # ---------------------------------------------------------------------
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             # self.close()
             self.hide()
         super(SliderRenkYalniz, self).keyPressEvent(event)

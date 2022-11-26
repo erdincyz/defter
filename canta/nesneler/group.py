@@ -15,7 +15,8 @@ from canta import shared
 class Group(QGraphicsItem):
     Type = shared.GROUP_ITEM_TYPE
 
-    def __init__(self, arkaPlanRengi=QColor(Qt.transparent), yaziRengi=QColor(Qt.transparent), pen=QPen(Qt.DotLine),
+    def __init__(self, arkaPlanRengi=QColor(Qt.GlobalColor.transparent),
+                 yaziRengi=QColor(Qt.GlobalColor.transparent), pen=QPen(Qt.PenStyle.DotLine),
                  parent=None):
         super(Group, self).__init__(parent)
 
@@ -25,15 +26,15 @@ class Group(QGraphicsItem):
         self._itemsBoundingRect = QRectF()
 
         self.setHandlesChildEvents(False)
-        self.setFlags(QGraphicsItem.ItemIsSelectable
-                      | QGraphicsItem.ItemIsMovable
-                      # | QGraphicsItem.ItemIsFocusable
+        self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable
+                      | QGraphicsItem.GraphicsItemFlag.ItemIsMovable
+                      # | QGraphicsItem.GraphicsItemFlag.ItemIsFocusable
                       )
 
         self.secili_nesne_kalem_kalinligi = 0
-        self.cizgiTipi = Qt.SolidLine
-        self.cizgiUcuTipi = Qt.RoundCap
-        self.cizgiBirlesimTipi = Qt.RoundJoin
+        self.cizgiTipi = Qt.PenStyle.SolidLine
+        self.cizgiUcuTipi = Qt.PenCapStyle.RoundCap
+        self.cizgiBirlesimTipi = Qt.PenJoinStyle.RoundJoin
 
         self.activeItemLineColor = shared.activeItemLineColor
         self._pen = pen
@@ -65,15 +66,15 @@ class Group(QGraphicsItem):
     @isPinned.setter
     def isPinned(self, value):
         if value:
-            self.setFlags(QGraphicsItem.ItemIsSelectable
+            self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable
                           # | QGraphicsItem.ItemIsMovable
                           #  | QGraphicsItem.ItemIsFocusable
                           )
 
         else:
-            self.setFlags(QGraphicsItem.ItemIsSelectable
-                          | QGraphicsItem.ItemIsMovable
-                          | QGraphicsItem.ItemIsFocusable)
+            self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable
+                          | QGraphicsItem.GraphicsItemFlag.ItemIsMovable
+                          | QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
         self._isPinned = value
 
     # ---------------------------------------------------------------------
@@ -313,9 +314,9 @@ class Group(QGraphicsItem):
         item.isPinned = True  # !! bunun yeri onemli , asagidaki flagleri set edisimizin altında bunu set edersek,
         # isPinned bir property oldugundan, set kisminda her halukarda  "ItemIsSelectable ,True"oldugundan override
         # ediyor ve gruplanmis item secilebilir oluyor.
-        item.setFlag(QGraphicsItem.ItemIsSelectable, False)
-        item.setFlag(QGraphicsItem.ItemIsMovable, False)
-        item.setFlag(QGraphicsItem.ItemIsFocusable, False)
+        item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, False)
+        item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
+        item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsFocusable, False)
         # TODO: ispinned e niye gerek duyduk.. destroy groupta da false ediliyor
 
         if item.type() == self.type():
@@ -380,16 +381,16 @@ class Group(QGraphicsItem):
                 # item._line.setAngle(item._line.angle() - self.rotation())
                 # item.update_arrow()
             item.setPos(pos)
-            item.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsFocusable)
+            item.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable | QGraphicsItem.GraphicsItemFlag.ItemIsMovable | QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
             # TODO: info: gruplanmiş parentlarin childlerini grupta tutmuyoruz. dolayisi ile
             # burda manual ayarliyoruz flaglari. yoksa secilemez oluyrolar. manual false etmistik zaten act_groupta.
             if not item.type() == self.type():  # grubun iceriginin secilemezligi korunsun diye
                 for c in item.childItems():
-                    c.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsFocusable)
+                    c.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable | QGraphicsItem.GraphicsItemFlag.ItemIsMovable | QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
                     c.setSelected(True)
             else:
                 for c in item.parentedWithParentOperation:
-                    c.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsFocusable)
+                    c.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable | QGraphicsItem.GraphicsItemFlag.ItemIsMovable | QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
                     c.setSelected(True)
             item.setSelected(True)
         self.scene().unGroupedRootItems.update(unGroupedRootItems)
@@ -419,7 +420,7 @@ class Group(QGraphicsItem):
         # if change == self.ItemPositionChange:
         # if change == self.ItemSelectedChange:
         # if change == self.ItemSelectedHasChanged:
-        if change == QGraphicsItem.ItemSelectedChange:
+        if change == QGraphicsItem.GraphicsItemChange.ItemSelectedChange:
             if value:
                 self.scene().parent().group_item_selected(self)
                 # self.selectAllChildren()
@@ -427,7 +428,7 @@ class Group(QGraphicsItem):
                 self.scene().parent().group_item_deselected(self)
                 # self.deSelectAllChildren()
 
-        if change == QGraphicsItem.ItemChildRemovedChange:  # sahneden delete ile mesela remove edince, bir de unparent edince
+        if change == QGraphicsItem.GraphicsItemChange.ItemChildRemovedChange:  # sahneden delete ile mesela remove edince, bir de unparent edince
             # TODO: allNonGroupGroupChildren yerine bu changed kullanilabilir mi acaba.
             if value in self.parentedWithParentOperation:
                 self.parentedWithParentOperation.remove(value)
@@ -467,12 +468,12 @@ class Group(QGraphicsItem):
 
         self.selectionPenBottom = QPen(_selectionLineBgColor,
                                        self.secili_nesne_kalem_kalinligi,
-                                       Qt.DashLine,
-                                       Qt.RoundCap, Qt.RoundJoin)
+                                       Qt.PenStyle.DashLine,
+                                       Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
         self.selectionPenBottomIfAlsoActiveItem = QPen(_activeItemLineColor,
                                                        self.secili_nesne_kalem_kalinligi,
-                                                       Qt.DashLine,
-                                                       Qt.RoundCap, Qt.RoundJoin)
+                                                       Qt.PenStyle.DashLine,
+                                                       Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
 
         self.update()
 

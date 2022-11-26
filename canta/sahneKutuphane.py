@@ -43,7 +43,7 @@ class SahneKutuphane(QGraphicsScene):
 
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):
-        mousePos = event.buttonDownScenePos(Qt.LeftButton)
+        mousePos = event.buttonDownScenePos(Qt.MouseButton.LeftButton)
         # self.movingItem = self.itemAt(mousePos)
         self.suruklenmekte_olan_nesne = self.itemAt(mousePos, self.views()[0].transform())
         # if self.suruklenmekte_olan_nesne:  # and event.button() == Qt.LeftButton

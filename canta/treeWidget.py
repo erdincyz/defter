@@ -88,12 +88,12 @@ class TreeWidget(QTreeWidget):
 
         draggedItem = self.selectedItems()[0]
 
-        sayfa = draggedItem.data(1, Qt.UserRole)[0]
+        sayfa = draggedItem.data(1, Qt.ItemDataRole.UserRole)[0]
 
         super(TreeWidget, self).dropEvent(e)
 
         if draggedItem.parent():
-            yeniParent = draggedItem.parent().data(1, Qt.UserRole)[0]
+            yeniParent = draggedItem.parent().data(1, Qt.ItemDataRole.UserRole)[0]
         else:
             yeniParent = None
         # lol :)    [o.showMinimized() for o in QApplication.topLevelWidgets()]
@@ -136,7 +136,7 @@ class TreeWidget(QTreeWidget):
 
         iconSize = self.iconSize()
 
-        if event.modifiers() & Qt.AltModifier:
+        if event.modifiers() & Qt.KeyboardModifier.AltModifier:
             # if event.delta() > 0:
             if event.angleDelta().x() > 0:
 
@@ -161,7 +161,7 @@ class TreeWidget(QTreeWidget):
 
     # ---------------------------------------------------------------------
     def keyPressEvent(self, QKeyEvent):
-        if QKeyEvent.key() == Qt.Key_F2:
+        if QKeyEvent.key() == Qt.Key.Key_F2:
             self.itemIsAboutToEdited.emit(self.currentItem().text(0))
         super(TreeWidget, self).keyPressEvent(QKeyEvent)
 
@@ -180,7 +180,7 @@ class TreeWidget(QTreeWidget):
 
         for i in range(item.childCount()):
             child = item.child(i)
-            if sayfa == child.data(1, Qt.UserRole)[0]:
+            if sayfa == child.data(1, Qt.ItemDataRole.UserRole)[0]:
                 child.setSelected(True)
                 self.setCurrentItem(child)
                 break

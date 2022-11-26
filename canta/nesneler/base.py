@@ -38,9 +38,9 @@ class BaseItem(QGraphicsItem):
         self.resizeHandleSize = QSizeF(self.handleSize, self.handleSize)
         self.create_resize_handles()
 
-        self.setFlags(QGraphicsItem.ItemIsSelectable |
-                      QGraphicsItem.ItemIsMovable |
-                      QGraphicsItem.ItemIsFocusable)
+        self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
+                      QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
+                      QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
 
         # self.setFiltersChildEvents(True)
         # self.setHandlesChildEvents(True)
@@ -52,8 +52,8 @@ class BaseItem(QGraphicsItem):
         self.boundingRectTasmaDegeri = max(self.handleSize, self._pen.widthF() / 2)
 
         self.painterTextOption = QTextOption()
-        self.painterTextOption.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
-        self.painterTextOption.setAlignment(Qt.AlignCenter)
+        self.painterTextOption.setWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere)
+        self.painterTextOption.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.painterTextRect = QRectF(self._rect)
 
@@ -94,15 +94,15 @@ class BaseItem(QGraphicsItem):
     @isPinned.setter
     def isPinned(self, value):
         if value:
-            self.setFlags(QGraphicsItem.ItemIsSelectable
+            self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable
                           # | self.ItemIsMovable
                           #  | item.ItemIsFocusable
                           )
 
         else:
-            self.setFlags(QGraphicsItem.ItemIsSelectable
-                          | QGraphicsItem.ItemIsMovable
-                          | QGraphicsItem.ItemIsFocusable)
+            self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable
+                          | QGraphicsItem.GraphicsItemFlag.ItemIsMovable
+                          | QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
         self._isPinned = value
 
     # ---------------------------------------------------------------------
@@ -393,7 +393,7 @@ class BaseItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def kur_yazi_hizasi(self, hizalama):
-        self.painterTextOption.setAlignment(hizalama | Qt.AlignVCenter)
+        self.painterTextOption.setAlignment(hizalama | Qt.AlignmentFlag.AlignVCenter)
         # self.painterTextOption.setAlignment(hizalama)
         self.update()
 
@@ -491,12 +491,12 @@ class BaseItem(QGraphicsItem):
 
         self.selectionPenBottom = QPen(_selectionLineBgColor,
                                        self.secili_nesne_kalem_kalinligi,
-                                       Qt.DashLine,
-                                       Qt.RoundCap, Qt.RoundJoin)
+                                       Qt.PenStyle.DashLine,
+                                       Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
         self.selectionPenBottomIfAlsoActiveItem = QPen(_activeItemLineColor,
                                                        self.secili_nesne_kalem_kalinligi,
-                                                       Qt.DashLine,
-                                                       Qt.RoundCap, Qt.RoundJoin)
+                                                       Qt.PenStyle.DashLine,
+                                                       Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
         # self.selectionPenTop = QPen(col,
         #                             self.secili_nesne_kalem_kalinligi,
         #                             Qt.DashLine,
@@ -604,7 +604,7 @@ class BaseItem(QGraphicsItem):
         # painter.setClipRegion(QRegion(option.exposedRect.toRect()))
 
         if not self._pen.width():
-            painter.setPen(Qt.NoPen)
+            painter.setPen(Qt.PenStyle.NoPen)
         else:
             painter.setPen(self._pen)
         # painter.setPen(QPen(self.cizgiRengi))
@@ -658,7 +658,7 @@ class BaseItem(QGraphicsItem):
             else:
                 selectionPenBottom = self.selectionPenBottom
 
-            painter.setBrush(Qt.NoBrush)
+            painter.setBrush(Qt.BrushStyle.NoBrush)
 
             painter.setPen(selectionPenBottom)
             painter.drawRect(self.rect())
@@ -736,7 +736,7 @@ class BaseItem(QGraphicsItem):
         # if change == self.ItemPositionChange:
         # if change == self.ItemSelectedChange:
         # if change == self.ItemSelectedHasChanged:
-        if change == QGraphicsItem.ItemSelectedChange:
+        if change == QGraphicsItem.GraphicsItemChange.ItemSelectedChange:
             if value:
                 self.scene().parent().item_selected(self)
             else:
@@ -916,7 +916,7 @@ class BaseItem(QGraphicsItem):
                 yeniSize = rect.size()
                 eskiSize = self.rect().size()
                 # eskiSize.scale(yeniSize, Qt.KeepAspectRatio)
-                eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.KeepAspectRatioByExpanding)
+                eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.AspectRatioMode.KeepAspectRatioByExpanding)
                 # eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.KeepAspectRatio)
 
                 # if not eskiSize.isNull():
@@ -1002,10 +1002,10 @@ class BaseItem(QGraphicsItem):
         if not self.ustGrup:
             if self.scene().aktifArac == self.scene().SecimAraci:
                 if self.topLeftHandle.contains(event.pos()) or self.bottomRightHandle.contains(event.pos()):
-                    self.scene().parent().setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
+                    self.scene().parent().setCursor(Qt.CursorShape.SizeFDiagCursor, gecici_mi=True)
                     # self.setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
                 elif self.topRightHandle.contains(event.pos()) or self.bottomLeftHandle.contains(event.pos()):
-                    self.scene().parent().setCursor(Qt.SizeBDiagCursor, gecici_mi=True)
+                    self.scene().parent().setCursor(Qt.CursorShape.SizeBDiagCursor, gecici_mi=True)
                     # self.setCursor(Qt.SizeBDiagCursor, gecici_mi=True)
                 else:
                     self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)

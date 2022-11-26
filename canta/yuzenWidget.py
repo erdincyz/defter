@@ -20,12 +20,12 @@ class YuzenWidget(QWidget):
         self.setAutoFillBackground(True)
         # self.setStyleSheet("QWidget {background-color: #ccc;}")
         self.setContentsMargins(0, 0, 0, 0)
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         # self.setSizeGripEnabled(True)
         self.setStatusTip(self.tr("Move with left mouse button, resize with right mouse button."))
         # self.setToolTip(self.tr("Move with left mouse button, resize with right mouse button."))
 
-        self.setFocusPolicy(Qt.WheelFocus)
+        self.setFocusPolicy(Qt.FocusPolicy.WheelFocus)
 
         self.mPos = QPoint()
         self.sagClick = False
@@ -103,22 +103,22 @@ class YuzenWidget(QWidget):
 
         super(YuzenWidget, self).mousePressEvent(event)
 
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.mPos = event.pos()
             self.solClick = True
-            self.setCursor(Qt.ClosedHandCursor)
+            self.setCursor(Qt.CursorShape.ClosedHandCursor)
 
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.MouseButton.RightButton:
             self.sagDragx = event.x()
             self.sagDragy = event.y()
             self.enSagX = self.width()
             self.enAltY = self.height()
             self.sagClick = True
-            self.setCursor(Qt.SizeAllCursor)
+            self.setCursor(Qt.CursorShape.SizeAllCursor)
 
     # ---------------------------------------------------------------------
     def mouseMoveEvent(self, event) -> None:
-        if event.buttons() & Qt.LeftButton:
+        if event.buttons() & Qt.MouseButton.LeftButton:
             fark = event.pos() - self.mPos
             yeniPos = self.pos() + fark
             self.move(yeniPos)
@@ -137,4 +137,4 @@ class YuzenWidget(QWidget):
         super(YuzenWidget, self).mouseReleaseEvent(event)
         self.sagClick = False
         self.solClick = False
-        self.setCursor(Qt.ArrowCursor)
+        self.setCursor(Qt.CursorShape.ArrowCursor)

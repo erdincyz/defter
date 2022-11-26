@@ -18,10 +18,10 @@ class SliderDoubleWithDoubleSpinBox(QWidget):
     degerDegisti = Signal(float)
 
     # ---------------------------------------------------------------------
-    def __init__(self, yerlesim=Qt.Horizontal, parent=None):
+    def __init__(self, yerlesim=Qt.Orientation.Horizontal, parent=None):
         super(SliderDoubleWithDoubleSpinBox, self).__init__(parent)
 
-        if yerlesim == Qt.Horizontal:
+        if yerlesim == Qt.Orientation.Horizontal:
             anaLay = QHBoxLayout()
         else:
             anaLay = QVBoxLayout()

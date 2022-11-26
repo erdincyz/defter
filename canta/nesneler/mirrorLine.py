@@ -21,7 +21,7 @@ class MirrorLine(QGraphicsLineItem):
 
         # self.setFlag(QGraphicsLineItem.ItemIgnoresTransformations, True)
         self._kim = shared.kim(kac_basamak=16)
-        pen = QPen(Qt.blue, 1, Qt.DashDotDotLine)
+        pen = QPen(Qt.GlobalColor.blue, 1, Qt.PenStyle.DashDotDotLine)
         self.setPen(pen)
         self.setZValue(10000)
 
@@ -29,7 +29,7 @@ class MirrorLine(QGraphicsLineItem):
         self.textItem = QGraphicsTextItem()
         self.textItem.setParentItem(self)
         self.textItem.setPos(posFeedback)
-        self.textItem.setDefaultTextColor(Qt.blue)
+        self.textItem.setDefaultTextColor(Qt.GlobalColor.blue)
         self.textItem.setPlainText("    {}: {}".format(self.axis, posFeedback.x()))
 
     # def setLine(self):

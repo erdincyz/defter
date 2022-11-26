@@ -19,7 +19,8 @@ from canta.nesneler.tempTextItem import TempTextItem
 class LineItem(QGraphicsItem):
     Type = shared.LINE_ITEM_TYPE
 
-    def __init__(self, pos, pen, yaziRengi=None, arkaPlanRengi=QColor(Qt.transparent), font=None, line=None,
+    def __init__(self, pos, pen, yaziRengi=None, arkaPlanRengi=QColor(Qt.GlobalColor.transparent),
+                 font=None, line=None,
                  parent=None):
         super(LineItem, self).__init__(parent)
 
@@ -50,9 +51,9 @@ class LineItem(QGraphicsItem):
             self.setLine(line)
 
         self.initialFlags = self.flags()
-        self.setFlags(QGraphicsItem.ItemIsSelectable |
-                      QGraphicsItem.ItemIsMovable |
-                      QGraphicsItem.ItemIsFocusable)
+        self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
+                      QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
+                      QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
 
         self._pen = pen
         self._font = font
@@ -69,8 +70,8 @@ class LineItem(QGraphicsItem):
         self.textPadding = 2
 
         self.painterTextOption = QTextOption()
-        self.painterTextOption.setAlignment(Qt.AlignCenter)
-        self.painterTextOption.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
+        self.painterTextOption.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.painterTextOption.setWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere)
 
         self.painterTextRect = QRectF()
 
@@ -423,7 +424,7 @@ class LineItem(QGraphicsItem):
         if not self.ustGrup:
             if self.scene().aktifArac == self.scene().SecimAraci:
                 if self.p1Handle.contains(event.pos()) or self.p2Handle.contains(event.pos()):
-                    self.scene().parent().setCursor(Qt.SizeAllCursor, gecici_mi=True)
+                    self.scene().parent().setCursor(Qt.CursorShape.SizeAllCursor, gecici_mi=True)
                 else:
                     self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
 
@@ -445,15 +446,15 @@ class LineItem(QGraphicsItem):
     @isPinned.setter
     def isPinned(self, value):
         if value:
-            self.setFlags(QGraphicsItem.ItemIsSelectable
-                          # | QGraphicsItem.ItemIsMovable
-                          #  | QGraphicsItem.ItemIsFocusable
+            self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable
+                          # | QGraphicsItem.GraphicsItemFlag.ItemIsMovable
+                          #  | QGraphicsItem.GraphicsItemFlag.ItemIsFocusable
                           )
 
         else:
-            self.setFlags(QGraphicsItem.ItemIsSelectable
-                          | QGraphicsItem.ItemIsMovable
-                          | QGraphicsItem.ItemIsFocusable)
+            self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable
+                          | QGraphicsItem.GraphicsItemFlag.ItemIsMovable
+                          | QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
         self._isPinned = value
 
     # ---------------------------------------------------------------------
@@ -461,7 +462,7 @@ class LineItem(QGraphicsItem):
         # if change == self.ItemPositionChange:
         # if change == self.ItemSelectedChange:
         # if change == self.ItemSelectedHasChanged:
-        if change == QGraphicsItem.ItemSelectedChange:
+        if change == QGraphicsItem.GraphicsItemChange.ItemSelectedChange:
             if value:
                 self.scene().parent().line_item_selected(self)
             else:
@@ -627,12 +628,12 @@ class LineItem(QGraphicsItem):
 
         self.selectionPenBottom = QPen(_selectionLineBgColor,
                                        self.secili_nesne_kalem_kalinligi,
-                                       Qt.DashLine,
-                                       Qt.RoundCap, Qt.RoundJoin)
+                                       Qt.PenStyle.DashLine,
+                                       Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
         self.selectionPenBottomIfAlsoActiveItem = QPen(_activeItemLineColor,
                                                        self.secili_nesne_kalem_kalinligi,
-                                                       Qt.DashLine,
-                                                       Qt.RoundCap, Qt.RoundJoin)
+                                                       Qt.PenStyle.DashLine,
+                                                       Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
 
         self.update()
 
@@ -694,7 +695,7 @@ class LineItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def kur_yazi_hizasi(self, hizalama):
-        self.painterTextOption.setAlignment(hizalama | Qt.AlignVCenter)
+        self.painterTextOption.setAlignment(hizalama | Qt.AlignmentFlag.AlignVCenter)
         # self.painterTextOption.setAlignment(hizalama)
         self.update()
 
@@ -1119,7 +1120,7 @@ class LineItem(QGraphicsItem):
         painter.setBrush(self._pen.color())
         # painter.drawEllipse(self._line.p1(), 5,5)
 
-        painter.setPen(Qt.NoPen)
+        painter.setPen(Qt.PenStyle.NoPen)
         painter.drawConvexPolygon(self.ok_polygon)
         # painter.drawPolygon(self.ok_polygon)
         # painter.drawText(20,20,str(self._line.angle()))
@@ -1160,7 +1161,7 @@ class LineItem(QGraphicsItem):
             else:
                 selectionPenBottom = self.selectionPenBottom
 
-            painter.setBrush(Qt.NoBrush)
+            painter.setBrush(Qt.BrushStyle.NoBrush)
 
             painter.setPen(selectionPenBottom)
             painter.drawLine(self._line)
@@ -1251,7 +1252,7 @@ class LineItem(QGraphicsItem):
         painter.translate(-diff)
         painter.drawLine(cizilecekLine)
         painter.setBrush(self._pen.color())
-        painter.setPen(Qt.NoPen)
+        painter.setPen(Qt.PenStyle.NoPen)
         painter.drawConvexPolygon(cizilecekOkPolygon)
         # painter.drawRect(cizilecekTextRect)
         # painter.drawText(cizilecekTextRect, self._text, self.painterTextOption)

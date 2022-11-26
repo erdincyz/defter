@@ -17,10 +17,10 @@ class RenkCubuguVeSayiKutusu(QWidget):
     degerDegisti = Signal(int)
 
     # ---------------------------------------------------------------------
-    def __init__(self, baslik, yerlesim=Qt.Horizontal, parent=None):
+    def __init__(self, baslik, yerlesim=Qt.Orientation.Horizontal, parent=None):
         super(RenkCubuguVeSayiKutusu, self).__init__(parent)
 
-        if yerlesim == Qt.Horizontal:
+        if yerlesim == Qt.Orientation.Horizontal:
             anaLay = QHBoxLayout()
         else:
             anaLay = QVBoxLayout()
@@ -30,7 +30,7 @@ class RenkCubuguVeSayiKutusu(QWidget):
 
         self.slider = SliderRenk(self)
         self.slider.setOrientation(yerlesim)
-        if yerlesim == Qt.Horizontal:
+        if yerlesim == Qt.Orientation.Horizontal:
             self.slider.setMinimumWidth(100)
         else:
             self.slider.setMinimumHeight(100)

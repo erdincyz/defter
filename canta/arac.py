@@ -8,6 +8,7 @@ __author__ = 'E. Y.'
 from PySide6.QtGui import QPen, QFont, QColor, Qt, QPixmap, QCursor
 
 
+# ---------------------------------------------------------------------
 def ver_arac_ikon_tipi(tip):
     tipIkonAdresSozluk = {'secimAraci': Qt.CursorShape.ArrowCursor,
                           'okAraci': ':icons/cursor-line.png',

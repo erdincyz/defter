@@ -15,11 +15,11 @@ class OzelliklerAcilirMenu(QWidget):
     def __init__(self, baslik, parent=None):
         super(OzelliklerAcilirMenu, self).__init__(parent)
 
-        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        self.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)
         # self.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
 
         anaLayout = QVBoxLayout()
-        anaLayout.setSizeConstraint(QVBoxLayout.SetMinAndMaxSize)
+        anaLayout.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
         self.setLayout(anaLayout)
 
         # self.dugme = QPushButton("V     {}".format(baslik), self)

@@ -21,9 +21,9 @@ class TabBar(QTabBar):
 
         self.setMovable(True)
         self.setTabsClosable(True)
-        self.setSelectionBehaviorOnRemove(QTabBar.SelectPreviousTab)
+        self.setSelectionBehaviorOnRemove(QTabBar.SelectionBehavior.SelectPreviousTab)
         self.setUsesScrollButtons(True)
-        self.setElideMode(Qt.ElideRight)
+        self.setElideMode(Qt.TextElideMode.ElideRight)
         # self.setElideMode(Qt.ElideNone)
 
         # self.setSizePolicy(QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Fixed)
@@ -139,7 +139,7 @@ class TabBar(QTabBar):
 
     # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MiddleButton:
+        if event.button() == Qt.MouseButton.MiddleButton:
             index = self.tabAt(event.pos())
             if not index == -1:
                 self.tabCloseRequested.emit(index)

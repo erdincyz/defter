@@ -485,7 +485,7 @@ class Scene(QGraphicsScene):
         # Alt satir simdilik iptal
         # self.views()[0].setMouseTracking(False)
         self.aktifArac = self.SecimAraci
-        self.parent().setCursor(Qt.ArrowCursor)
+        self.parent().setCursor(Qt.CursorShape.ArrowCursor)
         # self.deleteLater()
         self.parent().actionSwitchToSelectionTool.setChecked(True)
 
@@ -495,7 +495,8 @@ class Scene(QGraphicsScene):
                       -self.KalemAraci.kalem.widthF() / 2,
                       self.KalemAraci.kalem.widthF(),
                       self.KalemAraci.kalem.widthF())
-        pen = QPen(self.KalemAraci.kalem.color(), 1, Qt.DashLine, Qt.RoundCap, Qt.RoundJoin)
+        pen = QPen(self.KalemAraci.kalem.color(), 1,
+                   Qt.PenStyle.DashLine, Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
         self.fircaBoyutuItem = YuvarlakFircaBoyutu(self.fircaSonPos, rect, QColor.fromRgbF(0, 0, 0, 0),
                                                    # self.KalemAraci.kalem,
                                                    pen)
@@ -654,7 +655,7 @@ class Scene(QGraphicsScene):
                 #     self.parent().act_paste()
                 #     self.set_modified(True)
 
-                mousePos = event.buttonDownScenePos(Qt.LeftButton)
+                mousePos = event.buttonDownScenePos(Qt.MouseButton.LeftButton)
                 self.tasinanNesne = self.itemAt(mousePos, self.views()[0].transform())
                 if self.tasinanNesne:  # and event.button() == Qt.LeftButton
 
@@ -1047,10 +1048,10 @@ class Scene(QGraphicsScene):
     # ---------------------------------------------------------------------
     def keyPressEvent(self, event):
 
-        if event.key() == Qt.Key_Space:
+        if event.key() == Qt.Key.Key_Space:
             self.space_tusu_su_an_basili = True
 
-        if event.key() == Qt.Key_Delete \
+        if event.key() == Qt.Key.Key_Delete \
                 or event.key() == Qt.Key_Backspace:
             if self.aktifArac == self.KalemAraci:
                 if self.pathItem:
@@ -1059,11 +1060,11 @@ class Scene(QGraphicsScene):
                     # else:
                     #     self.finish_interactive_tools()
 
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             self.finish_interactive_tools(kapat=False)
 
-        if event.key() == Qt.Key_Enter \
-                or event.key() == Qt.Key_Return:
+        if event.key() == Qt.Key.Key_Enter \
+                or event.key() == Qt.Key.Key_Return:
 
             if self.aktifArac == self.AynalaXAraci:
                 self.parent().act_mirror_x(
@@ -1073,20 +1074,20 @@ class Scene(QGraphicsScene):
                 self.parent().act_mirror_y(
                     self.parent().get_mouse_scene_pos())  # bu finish_interactive_toolsu da cagiriyor.
 
-        if event.key() == Qt.Key_Enter \
-                or event.key() == Qt.Key_Return:
+        if event.key() == Qt.Key.Key_Enter \
+                or event.key() == Qt.Key.Key_Return:
             self.finish_interactive_tools(kapat=True)
 
-        # if event.key() == Qt.Key_Up:
+        # if event.key() == Qt.Key.Key_Up:
         #     pass
-        # if event.key() == Qt.Key_Down:
+        # if event.key() == Qt.Key.Key_Down:
         #     pass
-        # if event.key() == Qt.Key_Right:
+        # if event.key() == Qt.Key.Key_Right:
         #     self.focusNextPrevChild(True)
-        # if event.key() == Qt.Key_Left:
+        # if event.key() == Qt.Key.Key_Left:
         #     self.focusNextPrevChild(False)
 
-        # if event.key() == Qt.Key_Space:
+        # if event.key() == Qt.Key.Key_Space:
         #     print(self.selectionQueue)
 
         ########################################################################
@@ -1095,16 +1096,16 @@ class Scene(QGraphicsScene):
         # # dolayisiyla tek birim hareket de alt tusuna falan mi atasak.
 
         if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
-            if event.key() == Qt.Key_Up:
+            if event.key() == Qt.Key.Key_Up:
                 self.yazi_yazilmiyorsa_nesneyi_kaydir(0, -10)
-            if event.key() == Qt.Key_Down:
+            if event.key() == Qt.Key.Key_Down:
                 self.yazi_yazilmiyorsa_nesneyi_kaydir(0, 10)
-            if event.key() == Qt.Key_Right:
+            if event.key() == Qt.Key.Key_Right:
                 self.yazi_yazilmiyorsa_nesneyi_kaydir(10, 0)
-            if event.key() == Qt.Key_Left:
+            if event.key() == Qt.Key.Key_Left:
                 self.yazi_yazilmiyorsa_nesneyi_kaydir(-10, 0)
 
-            if event.key() == Qt.Key_Shift:
+            if event.key() == Qt.Key.Key_Shift:
 
                 if self.aktifArac == self.KalemAraci:
                     if not self.fircaBoyutuItem:
@@ -1117,13 +1118,13 @@ class Scene(QGraphicsScene):
             return QGraphicsScene.keyPressEvent(self, event)
 
         else:
-            if event.key() == Qt.Key_Up:
+            if event.key() == Qt.Key.Key_Up:
                 self.yazi_yazilmiyorsa_nesneyi_kaydir(0, -1)
-            if event.key() == Qt.Key_Down:
+            if event.key() == Qt.Key.Key_Down:
                 self.yazi_yazilmiyorsa_nesneyi_kaydir(0, 1)
-            if event.key() == Qt.Key_Right:
+            if event.key() == Qt.Key.Key_Right:
                 self.yazi_yazilmiyorsa_nesneyi_kaydir(1, 0)
-            if event.key() == Qt.Key_Left:
+            if event.key() == Qt.Key.Key_Left:
                 self.yazi_yazilmiyorsa_nesneyi_kaydir(-1, 0)
 
             # event.accept()
@@ -1133,7 +1134,7 @@ class Scene(QGraphicsScene):
     # ---------------------------------------------------------------------
     def keyReleaseEvent(self, event):
 
-        if event.key() == Qt.Key_Space:
+        if event.key() == Qt.Key.Key_Space:
             self.space_tusu_su_an_basili = False
 
         # if event.key() == Qt.Key_Alt:
@@ -1142,7 +1143,7 @@ class Scene(QGraphicsScene):
         #         self.parent().setCursor(Qt.ArrowCursor)
 
         if self.aktifArac == self.KalemAraci:
-            if event.key() == Qt.Key_Shift:
+            if event.key() == Qt.Key.Key_Shift:
                 if self.fircaBoyutuItem:
                     self.removeItem(self.fircaBoyutuItem)
                     self.fircaBoyutuItem = None
@@ -1322,7 +1323,7 @@ class Scene(QGraphicsScene):
                 textItem.textItemFocusedOut.connect(lambda: self.is_text_item_empty(textItem))
                 self.parent().increase_zvalue(textItem)
                 undoRedo.undoableAddItem(self.undoStack, self.tr("drag && drop url as text"), self, textItem)
-                textItem.setTextInteractionFlags(Qt.NoTextInteraction)
+                textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
                 cursor = textItem.textCursor()
                 cursor.clearSelection()
                 textItem.setTextCursor(cursor)
@@ -1342,7 +1343,7 @@ class Scene(QGraphicsScene):
                 textItem.textItemFocusedOut.connect(lambda: self.is_text_item_empty(textItem))
                 self.parent().increase_zvalue(textItem)
                 undoRedo.undoableAddItem(self.undoStack, self.tr("drag && drop text"), self, textItem)
-                textItem.setTextInteractionFlags(Qt.NoTextInteraction)
+                textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
                 cursor = textItem.textCursor()
                 cursor.clearSelection()
                 textItem.setTextCursor(cursor)
@@ -1354,7 +1355,7 @@ class Scene(QGraphicsScene):
                 textItem.textItemFocusedOut.connect(lambda: self.is_text_item_empty(textItem))
                 self.parent().increase_zvalue(textItem)
                 undoRedo.undoableAddItem(self.undoStack, self.tr("drag && drop text"), self, textItem)
-                textItem.setTextInteractionFlags(Qt.NoTextInteraction)
+                textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
                 cursor = textItem.textCursor()
                 cursor.clearSelection()
                 textItem.setTextCursor(cursor)
@@ -1372,7 +1373,7 @@ class Scene(QGraphicsScene):
             textItem.textItemFocusedOut.connect(lambda: self.is_text_item_empty(textItem))
             self.parent().increase_zvalue(textItem)
             undoRedo.undoableAddItem(self.undoStack, self.tr("drag && drop text"), self, textItem)
-            textItem.setTextInteractionFlags(Qt.NoTextInteraction)
+            textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
             cursor = textItem.textCursor()
             cursor.clearSelection()
             textItem.setTextCursor(cursor)

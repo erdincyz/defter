@@ -71,16 +71,16 @@ class Text(QGraphicsTextItem):
         # self.setCacheMode(Text.DeviceCoordinateCache)
         # self.setCacheMode(Text.ItemCoordinateCache)
         self.setCacheMode(Text.NoCache)
-        self.setFlags(QGraphicsTextItem.ItemIsSelectable |
-                      QGraphicsTextItem.ItemIsMovable |
-                      QGraphicsTextItem.ItemIsFocusable)
+        self.setFlags(QGraphicsTextItem.GraphicsItemFlag.ItemIsSelectable |
+                      QGraphicsTextItem.GraphicsItemFlag.ItemIsMovable |
+                      QGraphicsTextItem.GraphicsItemFlag.ItemIsFocusable)
 
         # self.setTextInteractionFlags(Qt.TextEditable)
-        self.setTextInteractionFlags(Qt.TextEditorInteraction)
+        self.setTextInteractionFlags(Qt.TextInteractionFlag.TextEditorInteraction)
 
         self.cursorPos = cursorPos
 
-        self.hiza = Qt.AlignLeft
+        self.hiza = Qt.AlignmentFlag.AlignLeft
 
         # fmt = QTextBlockFormat()
         # fmt.setAlignment(Qt.AlignCenter)
@@ -130,15 +130,15 @@ class Text(QGraphicsTextItem):
     @isPinned.setter
     def isPinned(self, value):
         if value:
-            self.setFlags(QGraphicsTextItem.ItemIsSelectable
-                          # | QGraphicsTextItem.ItemIsMovable
-                          #  | QGraphicsTextItem.ItemIsFocusable
+            self.setFlags(QGraphicsTextItem.GraphicsItemFlag.ItemIsSelectable
+                          # | QGraphicsTextItem.GraphicsItemFlag.ItemIsMovable
+                          #  | QGraphicsTextItem.GraphicsItemFlag.ItemIsFocusable
                           )
 
         else:
-            self.setFlags(QGraphicsTextItem.ItemIsSelectable
-                          | QGraphicsTextItem.ItemIsMovable
-                          | QGraphicsTextItem.ItemIsFocusable)
+            self.setFlags(QGraphicsTextItem.GraphicsItemFlag.ItemIsSelectable
+                          | QGraphicsTextItem.GraphicsItemFlag.ItemIsMovable
+                          | QGraphicsTextItem.GraphicsItemFlag.ItemIsFocusable)
         self._isPinned = value
 
     # ---------------------------------------------------------------------
@@ -493,12 +493,12 @@ class Text(QGraphicsTextItem):
 
         self.selectionPenBottom = QPen(_selectionLineBgColor,
                                        self.secili_nesne_kalem_kalinligi,
-                                       Qt.DashLine,
-                                       Qt.RoundCap, Qt.RoundJoin)
+                                       Qt.PenStyle.DashLine,
+                                       Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
         self.selectionPenBottomIfAlsoActiveItem = QPen(_activeItemLineColor,
                                                        self.secili_nesne_kalem_kalinligi,
-                                                       Qt.DashLine,
-                                                       Qt.RoundCap, Qt.RoundJoin)
+                                                       Qt.PenStyle.DashLine,
+                                                       Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
 
         self.update()
 
@@ -523,7 +523,7 @@ class Text(QGraphicsTextItem):
     # ---------------------------------------------------------------------
     def itemChange(self, change, value):
 
-        if change == QGraphicsTextItem.ItemSelectedChange:
+        if change == QGraphicsTextItem.GraphicsItemChange.ItemSelectedChange:
             if value:
                 self.scene().parent().text_item_selected(self)
             else:
@@ -550,7 +550,7 @@ class Text(QGraphicsTextItem):
     def focusOutEvent(self, event):
 
         # self.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        self.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
 
         cursor = self.textCursor()
         cursor.clearSelection()
@@ -572,7 +572,7 @@ class Text(QGraphicsTextItem):
 
         else:
             # if self.textInteractionFlags() == Qt.NoTextInteraction:
-            self.setTextInteractionFlags(Qt.TextEditorInteraction)
+            self.setTextInteractionFlags(Qt.TextInteractionFlag.TextEditorInteraction)
             self.setFocus()
             # self.clearFocus()
         super(Text, self).mouseDoubleClickEvent(event)
@@ -595,10 +595,10 @@ class Text(QGraphicsTextItem):
         if not self.ustGrup:
             if self.scene().aktifArac == self.scene().SecimAraci:
                 if self.topLeftHandle.contains(event.pos()) or self.bottomRightHandle.contains(event.pos()):
-                    self.scene().parent().setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
+                    self.scene().parent().setCursor(Qt.CursorShape.SizeFDiagCursor, gecici_mi=True)
                     # self.setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
                 elif self.topRightHandle.contains(event.pos()) or self.bottomLeftHandle.contains(event.pos()):
-                    self.scene().parent().setCursor(Qt.SizeBDiagCursor, gecici_mi=True)
+                    self.scene().parent().setCursor(Qt.CursorShape.SizeBDiagCursor, gecici_mi=True)
                     # self.setCursor(Qt.SizeBDiagCursor, gecici_mi=True)
                 else:
                     self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
@@ -1085,7 +1085,7 @@ class Text(QGraphicsTextItem):
     # ---------------------------------------------------------------------
     def keyPressEvent(self, event):
 
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             self.clearFocus()
             # bu asagidaki if var cunku text item bos ise
             # birden fazla defa selectionqueue da remove etmeye calisabiliyor
@@ -1095,13 +1095,13 @@ class Text(QGraphicsTextItem):
                 self.setSelected(False)
 
         if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
-            if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
+            if event.key() == Qt.Key.Key_Enter or event.key() == Qt.Key.Key_Return:
                 self.clearFocus()
                 if self.toPlainText() or self.childItems():
                     self.setSelected(False)
 
         if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
-            if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
+            if event.key() == Qt.Key.Key_Enter or event.key() == Qt.Key.Key_Return:
                 self.clearFocus()
                 if self.toPlainText() or self.childItems():
                     self.setSelected(False)
@@ -1152,11 +1152,11 @@ class Text(QGraphicsTextItem):
         hiza = self.ver_yazi_hizasi()
         # if hiza == Qt.AlignLeft or hiza == Qt.AlignLeft | Qt.AlignVCenter:
         #     yazi_hiza = "left"
-        if hiza == Qt.AlignCenter or hiza == Qt.AlignCenter | Qt.AlignVCenter:
+        if hiza == Qt.AlignmentFlag.AlignCenter or hiza == Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter:
             yazi_hiza = "center"
-        elif hiza == Qt.AlignRight or hiza == Qt.AlignRight | Qt.AlignVCenter:
+        elif hiza == Qt.AlignmentFlag.AlignRight or hiza == Qt.AlignmentFlag.AlignRight | Qt.AAlignmentFlag.lignVCenter:
             yazi_hiza = "right"
-        elif hiza == Qt.AlignJustify or hiza == Qt.AlignJustify | Qt.AlignVCenter:
+        elif hiza == Qt.AlignmentFlag.AlignJustify or hiza == Qt.AlignmentFlag.AlignJustify | Qt.AlignmentFlag.AlignVCenter:
             yazi_hiza = "justify"
         else:
             yazi_hiza = "left"
@@ -1211,7 +1211,7 @@ class Text(QGraphicsTextItem):
             ########################################################################
 
         if self.isTextOverflowed:
-            painter.setPen(QPen(Qt.red, 2, Qt.DashLine))
+            painter.setPen(QPen(Qt.GlobalColor.red, 2, Qt.PenStyle.DashLine))
             painter.drawLine(self._rect.bottomLeft(), self._rect.bottomRight())
 
         # painter.setPen(Qt.blue)

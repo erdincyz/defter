@@ -19,7 +19,7 @@ class ListWidgetItem(QListWidgetItem):
         self._pen = QPen()
         # self._fontPointSize = 10
         self._presetFont = self.font()
-        self._cizgiRengi = QColor(Qt.transparent)
+        self._cizgiRengi = QColor(Qt.GlobalColor.transparent)
 
     # ---------------------------------------------------------------------
     def setCizgiRengi(self, col):

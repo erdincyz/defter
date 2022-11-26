@@ -89,7 +89,7 @@ class PrintPreviewDialog(QMainWindow):
     def __init__(self, printer, yazdirmaAlaniTipi, parent=None):
         super(PrintPreviewDialog, self).__init__(parent)
 
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         # self.setWindowModality(Qt.WindowModal)
         # self.setWindowModality(Qt.ApplicationModal)
 
@@ -155,7 +155,7 @@ class PrintPreviewDialog(QMainWindow):
 
         self.optionsDW.setWindowTitle(self.tr("Print Options"))
         self.optionsDW.setObjectName("printOptionsDockWidget")
-        self.optionsDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.optionsDW.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
         self.optionsDW.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetMovable |
                                    QDockWidget.DockWidgetFeature.DockWidgetClosable |
                                    # QDockWidget.DockWidgetFeature.DockWidgetVerticalTitleBar|
@@ -269,7 +269,7 @@ class PrintPreviewDialog(QMainWindow):
 
         self.optionsDW.setWidget(baseWidget)
 
-        self.addDockWidget(Qt.LeftDockWidgetArea, self.optionsDW)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.optionsDW)
 
     # ---------------------------------------------------------------------
     def act_as_viewed_cbox_toggled(self, secili_mi):
@@ -342,7 +342,7 @@ class PrintPreviewDialog(QMainWindow):
         self.toolBar.setIconSize(QSize(16, 16))
 
         self.pageNumberLineEdit = QLineEdit(self.toolBar)
-        self.pageNumberLineEdit.setAlignment(Qt.AlignRight)
+        self.pageNumberLineEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pageNumberLineEdit.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.pageNumberLineEdit.editingFinished.connect(self.act_page_num_edited)
 
@@ -451,12 +451,12 @@ class PrintPreviewDialog(QMainWindow):
 
         formLayout = QFormLayout()
         # if mac
-        formLayout.setFieldGrowthPolicy(QFormLayout.AllNonFixedFieldsGrow)
+        formLayout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
         # end if
-        formLayout.setWidget(0, QFormLayout.LabelRole, self.pageNumberLineEdit)
-        formLayout.setWidget(0, QFormLayout.FieldRole, self.pageNumberLabel)
+        formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.pageNumberLineEdit)
+        formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.pageNumberLabel)
         vBoxLayout.addLayout(formLayout)
-        vBoxLayout.setAlignment(Qt.AlignCenter)
+        vBoxLayout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pageEdit.setLayout(vBoxLayout)
 
         # ---------------------------------------------------------------------
@@ -499,7 +499,7 @@ class PrintPreviewDialog(QMainWindow):
         self.addToolBar(self.toolBar)
         self.actionFitPage.setChecked(True)
         self.actionSingleMode.setChecked(True)
-        if self.preview.orientation() == QPageLayout.Portrait:
+        if self.preview.orientation() == QPageLayout.Orientation.Portrait:
             self.actionPortrait.setChecked(True)
         else:
             self.actionLandscape.setChecked(True)
@@ -533,7 +533,7 @@ class PrintPreviewDialog(QMainWindow):
         QCoreApplication.setOrganizationName(shared.DEFTER_ORG_NAME)
         QCoreApplication.setOrganizationDomain(shared.DEFTER_ORG_DOMAIN)
         QCoreApplication.setApplicationName(shared.DEFTER_APP_NAME)
-        self.settings = QSettings(shared.DEFTER_AYARLAR_DOSYA_ADRES, QSettings.IniFormat)
+        self.settings = QSettings(shared.DEFTER_AYARLAR_DOSYA_ADRES, QSettings.Format.IniFormat)
         # self.settings.clear()
 
     # ---------------------------------------------------------------------
@@ -728,16 +728,14 @@ class PrintPreviewDialog(QMainWindow):
     def act_page_setup(self):
         pageSetupDialog = QPageSetupDialog(self.printer, self)
         if pageSetupDialog.exec() == QPageSetupDialog.DialogCode.Accepted:
-            if self.preview.orientation() == QPageLayout.Portrait:
+            if self.preview.orientation() == QPageLayout.Orientation.Portrait:
                 self.actionPortrait.setChecked(True)
                 self.preview.setPortraitOrientation()
             else:
                 self.actionLandscape.setChecked(True)
                 self.preview.setLandscapeOrientation()
 
-
     # ---------------------------------------------------------------------
     def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             self.close()

@@ -140,7 +140,8 @@ class DosyaNesnesi(BaseItem):
         pixmap = QPixmap('/path/to/image.png')
 
         # resize pixmap
-        pixmap = pixmap.scaled(hedefBoyut, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+        pixmap = pixmap.scaled(hedefBoyut, Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                               Qt.TransformationMode.SmoothTransformation)
 
         # crop pixmap - the following assumes the image aspect is always wider than the button.  if that's not the case
         # you'll need to compare your image/button aspects and crop vertically/horizontally as necessary
@@ -157,7 +158,7 @@ class DosyaNesnesi(BaseItem):
 
         painter.setFont(self._font)
         if not self._pen.width():
-            painter.setPen(Qt.NoPen)
+            painter.setPen(Qt.PenStyle.NoPen)
         else:
             painter.setPen(self._pen)
         # painter.setPen(QPen(self.cizgiRengi))
@@ -175,7 +176,7 @@ class DosyaNesnesi(BaseItem):
         # painter.setWorldMatrixEnabled(False)
 
         painter.setBrush(self.renk_yazi_alti_kutusu)
-        painter.setPen(Qt.NoPen)
+        painter.setPen(Qt.PenStyle.NoPen)
         painter.drawRect(self._rect.toRect())
 
         painter.save()
@@ -198,7 +199,7 @@ class DosyaNesnesi(BaseItem):
             else:
                 selectionPenBottom = self.selectionPenBottom
 
-            painter.setBrush(Qt.NoBrush)
+            painter.setBrush(Qt.BrushStyle.NoBrush)
 
             painter.setPen(selectionPenBottom)
             painter.drawRect(self.rect())

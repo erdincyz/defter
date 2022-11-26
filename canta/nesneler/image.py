@@ -23,7 +23,7 @@ class Image(BaseItem):
     def __init__(self, filePath, pos, rect, yaziRengi, arkaPlanRengi, pen, font, isEmbeded=False, parent=None):
         super(Image, self).__init__(pos, rect, yaziRengi, arkaPlanRengi, pen, font, parent)
 
-        self.setCacheMode(Image.DeviceCoordinateCache)
+        self.setCacheMode(Image.CacheMode.DeviceCoordinateCache)
         self.isEmbeded = isEmbeded
         self.filePathForSave = filePath
         if not isEmbeded:
@@ -60,7 +60,7 @@ class Image(BaseItem):
 
         # self.pixmap = QPixmap(self.filePathForDraw)
 
-        self.setFlags(BaseItem.ItemIsMovable | BaseItem.ItemIsSelectable)
+        self.setFlags(BaseItem.GraphicsItemFlag.ItemIsMovable | BaseItem.GraphicsItemFlag.ItemIsSelectable)
 
         self.imageOpacity = 1.0
         self.isMirrorX = False
@@ -123,7 +123,7 @@ class Image(BaseItem):
 
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             textItem = Text(event.scenePos(), self.yaziRengi, self.arkaPlanRengi, self.pen(), self.font())
             textItem.set_document_url(self.scene().tempDirPath)
             textItem.textItemFocusedOut.connect(self.scene().is_text_item_empty)
@@ -199,7 +199,7 @@ class Image(BaseItem):
                 # eskiSize = self.rect().size()
                 pixMapOriginalSize = self.pixmap.rect().size()
                 # eskiSize.scale(yeniSize, Qt.KeepAspectRatio)
-                pixMapOriginalSize.scale(yeniSize.height(), yeniSize.height(), Qt.KeepAspectRatioByExpanding)
+                pixMapOriginalSize.scale(yeniSize.height(), yeniSize.height(), Qt.AspectRatioMode.KeepAspectRatioByExpanding)
                 # eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.KeepAspectRatio)
 
                 # if not eskiSize.isNull():
@@ -276,7 +276,7 @@ class Image(BaseItem):
             pixmap = QPixmap(self.filePathForDraw)
             QPixmapCache.insert(self.filePathForDraw, pixmap)
 
-        self.pixmap = pixmap.scaled(self.rect().size().toSize(), Qt.KeepAspectRatio)
+        self.pixmap = pixmap.scaled(self.rect().size().toSize(), Qt.AspectRatioMode.KeepAspectRatio)
 
         if self.isMirrorX:
             self.pixmap = self.pixmap.transformed(QTransform().scale(-1, 1))
@@ -325,11 +325,11 @@ class Image(BaseItem):
                                                   imageItem)
             imageItem.reload_image_after_scale()
             self.scene().unite_with_scene_rect(imageItem.sceneBoundingRect())
-            self.scene().parent().setCursor(Qt.ArrowCursor)
+            self.scene().parent().setCursor(Qt.CursorShape.ArrowCursor)
 
         self._isCropping = False
         self.cropRectF = QRectF()
-        self.scene().parent().setCursor(Qt.ArrowCursor)
+        self.scene().parent().setCursor(Qt.CursorShape.ArrowCursor)
 
     # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
@@ -355,7 +355,7 @@ class Image(BaseItem):
 
         # cursor = self.scene().parent().cursor()
         if self._isCropping:
-            self.scene().parent().setCursor(Qt.CrossCursor, gecici_mi=True)
+            self.scene().parent().setCursor(Qt.CursorShape.CrossCursor, gecici_mi=True)
         else:
             super(Image, self).hoverMoveEvent(event)
 
@@ -370,7 +370,7 @@ class Image(BaseItem):
         # if change == self.ItemPositionChange:
         # if change == self.ItemSelectedChange:
         # if change == self.ItemSelectedHasChanged:
-        if change == BaseItem.ItemSelectedChange:
+        if change == BaseItem.GraphicsItemChange.ItemSelectedChange:
             if value:
                 self.scene().parent().item_selected(self)
             else:  # yani deselected
@@ -521,7 +521,7 @@ class Image(BaseItem):
 
         painter.setClipRect(option.exposedRect)
 
-        painter.setBrush(Qt.NoBrush)
+        painter.setBrush(Qt.BrushStyle.NoBrush)
         # rect = self.boundingRect().toRect()
         rect = self._rect.toRect()
         painter.setOpacity(self.imageOpacity)
@@ -535,7 +535,7 @@ class Image(BaseItem):
             else:
                 selectionPenBottom = self.selectionPenBottom
 
-            painter.setBrush(Qt.NoBrush)
+            painter.setBrush(Qt.BrushStyle.NoBrush)
 
             painter.setPen(selectionPenBottom)
             painter.drawRect(self.rect())

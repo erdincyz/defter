@@ -38,14 +38,14 @@ class View(QGraphicsView):
         # self.background = QPixmap('/pictures/rig.jpg')
         # self.backgroundImage = None
 
-        self.setBackgroundBrush(Qt.lightGray)
+        self.setBackgroundBrush(Qt.GlobalColor.lightGray)
         self.backgroundImagePixmap = None
         self.backgroundImagePath = None
         self.backgroundImagePathIsEmbeded = False
         self.setCacheMode(QGraphicsView.CacheModeFlag.CacheBackground)
 
         self.setTransformationAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
-        self.baski_cerceve_kalemi = QPen(Qt.black)
+        self.baski_cerceve_kalemi = QPen(Qt.GlobalColor.black)
         self.baskiRectler = []
 
         # self.debug_rect=QRectF()
@@ -63,8 +63,8 @@ class View(QGraphicsView):
     def baski_cerceve_rengi_kur(self, renk):
         self.baski_cerceve_kalemi = QPen(renk,
                                          0,
-                                         Qt.DashLine,
-                                         Qt.RoundCap, Qt.RoundJoin)
+                                         Qt.PenStyle.DashLine,
+                                         Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
 
     # ---------------------------------------------------------------------
     def setDragModeRubberBandDrag(self):
@@ -161,7 +161,7 @@ class View(QGraphicsView):
             # view's setSceneRect is not scene's setSceneRect, they are different.
             # self.setSceneRect(QRectF(self.backgroundImagePixmap.rect()))
             self.setSceneRect(QRectF(self.backgroundImagePixmap.rect()))
-            self.fitInView(self.sceneRect(), Qt.KeepAspectRatio)
+            self.fitInView(self.sceneRect(), Qt.AspectRatioMode.KeepAspectRatio)
             self.backgroundImagePath = imagePath
         self.resetCachedContent()
 
@@ -202,7 +202,7 @@ class View(QGraphicsView):
         # sahneye gitmeden once view' in abstractScrollAreasindaki
         # scrollbarlarin sliderSingleStepAdd aksiyonuna gidiyor. bu da nesne secili iken,
         #  ekranın scroll etmesine sebep oluyor
-        if key in (Qt.Key_Up, Qt.Key_Down, Qt.Key_Right, Qt.Key_Left):
+        if key in (Qt.Key.Key_Up, Qt.Key.Key_Down, Qt.Key.Key_Right, Qt.Key.Key_Left):
             if self.scene().activeItem:
                 self.horizontalScrollBar().setSingleStep(0)
                 self.verticalScrollBar().setSingleStep(0)
@@ -215,16 +215,16 @@ class View(QGraphicsView):
 
         # print(self.viewportEvent())/
 
-        if key == Qt.Key_Home:
+        if key == Qt.Key.Key_Home:
             self.verticalScrollBar().setValue(self.verticalScrollBar().minimum())
 
-        if key == Qt.Key_End:
+        if key == Qt.Key.Key_End:
             self.verticalScrollBar().setValue(self.verticalScrollBar().maximum())
 
-        if key == Qt.Key_PageUp:
+        if key == Qt.Key.Key_PageUp:
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() - self.viewport().rect().height() + 10)
 
-        if key == Qt.Key_PageDown:
+        if key == Qt.Key.Key_PageDown:
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() + self.viewport().rect().height() - 10)
 
         super(View, self).keyPressEvent(event)
@@ -235,7 +235,7 @@ class View(QGraphicsView):
         # ---------------------------------------------------------------------
         # Bunu iptal ettik space basinca sahne hareket ettirmek icindi, keypressde de var oncesi
         # ---------------------------------------------------------------------
-        # if key == Qt.Key_Space:
+        # if key == Qt.Key.Key_Space:
         #     if self.dragMode() == QGraphicsView.ScrollHandDrag:
         #         if not event.isAutoRepeat():
         #             self.setDragMode(QGraphicsView.RubberBandDrag)
@@ -249,7 +249,7 @@ class View(QGraphicsView):
         super(View, self).keyPressEvent(event)
 
         # bunların superden sonra gelmesi lazim.
-        if key in (Qt.Key_Up, Qt.Key_Down, Qt.Key_Right, Qt.Key_Left):
+        if key in (Qt.Key.Key_Up, Qt.Key.Key_Down, Qt.Key.Key_Right, Qt.Key.Key_Left):
             # bir tusu birakmadan diger tusa basinca ve digerini birtakinca kaymalar oluyor o yuzden
             # secili nesne kontrolu
             if not self.scene().activeItem:
@@ -262,11 +262,11 @@ class View(QGraphicsView):
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):
 
-        if event.button() == Qt.MiddleButton:
+        if event.button() == Qt.MouseButton.MiddleButton:
             # if not self.scene().selectedItems():
             # if not self.itemAt(event.pos()):
             self.panStartPos = event.pos()
-            self.setCursor(Qt.ClosedHandCursor)
+            self.setCursor(Qt.CursorShape.ClosedHandCursor)
             event.accept()
             # nesne uzerine orta tıklayıp sahne hareket ettirisek,
             # orta tusu birakinca ic nesneleri seciyor ve secili birakiyor, o yuzden burda return kullandik
@@ -279,10 +279,10 @@ class View(QGraphicsView):
     # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
 
-        if event.button() == Qt.MiddleButton:
+        if event.button() == Qt.MouseButton.MiddleButton:
             self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
             self.panStartPos = None
-            self.setCursor(Qt.ArrowCursor)
+            self.setCursor(Qt.CursorShape.ArrowCursor)
             self.setSceneRect(self.sceneRect().united(self.scene().itemsBoundingRect()))
 
             event.accept()
@@ -381,7 +381,7 @@ class View(QGraphicsView):
         """
             we set this from status bar spinbox
         """
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         scale = scale / 100 * (1 / self.transform().m11())
         # self.scene().parent().zoomSBox.setValue(scale*100)
         self.scale(scale, scale)
@@ -394,7 +394,7 @@ class View(QGraphicsView):
     @Slot()
     def zoomIn(self):
         if self.scene().parent().zoomSBox.value() < 10000:
-            QApplication.setOverrideCursor(Qt.WaitCursor)
+            QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
             self.scale(1.15, 1.15)
             # ir = self.scene().itemsBoundingRect()
             # vr = self.get_visible_rect()
@@ -413,7 +413,7 @@ class View(QGraphicsView):
     @Slot()
     def zoomOut(self):
         if self.scene().parent().zoomSBox.value() > 1:
-            QApplication.setOverrideCursor(Qt.WaitCursor)
+            QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
             self.scale(1 / 1.15, 1 / 1.15)
             sr = self.scene().sceneRect()
             vr = self.get_visible_rect()
@@ -429,12 +429,12 @@ class View(QGraphicsView):
     # ---------------------------------------------------------------------
     @Slot()
     def zoomToFit(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         # make sure the sceneRect is only as large as it needs to be, since
         # it does not automatically shrink
         if self.scene().items():
             self.setSceneRect(self.scene().itemsBoundingRect())
-            self.fitInView(self.scene().sceneRect(), Qt.KeepAspectRatio)
+            self.fitInView(self.scene().sceneRect(), Qt.AspectRatioMode.KeepAspectRatio)
             # self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
         # self.setSceneRect(self.get_visible_rect())
 
@@ -447,7 +447,7 @@ class View(QGraphicsView):
     # ---------------------------------------------------------------------
     @Slot()
     def zoomToSelection(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         if self.scene().selectionQueue:
             yeniRect = QRectF()
             for item in self.scene().selectionQueue:
@@ -464,7 +464,7 @@ class View(QGraphicsView):
             self.setSceneRect(yeniRect)
             self.debug_rect = yeniRect
             # self.fitInView(self.scene().sceneRect(), Qt.KeepAspectRatio)
-            self.fitInView(yeniRect, Qt.KeepAspectRatio)
+            self.fitInView(yeniRect, Qt.AspectRatioMode.KeepAspectRatio)
             # self.setSceneRect(self.get_visible_rect())
             # self.centerOn(0, 0)
 
@@ -477,7 +477,7 @@ class View(QGraphicsView):
     # ---------------------------------------------------------------------
     @Slot()
     def zoomInitial(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         self.resetTransform()
         # sr = self.scene().sceneRect()
         ir = self.scene().itemsBoundingRect()

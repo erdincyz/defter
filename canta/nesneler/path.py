@@ -49,9 +49,9 @@ class PathItem(QGraphicsItem):
         self.cizgi_basitlestirme_miktari = 10  # moveCenterda kullanildigi icin yarisi aslinda
 
         self.initialFlags = self.flags()
-        self.setFlags(QGraphicsItem.ItemIsSelectable |
-                      QGraphicsItem.ItemIsMovable |
-                      QGraphicsItem.ItemIsFocusable)
+        self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
+                      QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
+                      QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
 
         self.secili_nesne_kalem_kalinligi = 0
 
@@ -67,7 +67,7 @@ class PathItem(QGraphicsItem):
         self.setArkaPlanRengi(arkaPlanRengi)  # also sets self._brush
 
         # we override bg brush for drawing.
-        self.setBrush(Qt.NoBrush)
+        self.setBrush(Qt.BrushStyle.NoBrush)
         # self.setBrush(arkaPlanRengi)
 
         self.cosmeticSelect = False
@@ -87,7 +87,7 @@ class PathItem(QGraphicsItem):
 
         self.painterTextOption = QTextOption()
         self.painterTextOption.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
-        self.painterTextOption.setAlignment(Qt.AlignCenter)
+        self.painterTextOption.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.painterTextRect = QRectF(self.boundingRect())
 
@@ -127,15 +127,15 @@ class PathItem(QGraphicsItem):
     @isPinned.setter
     def isPinned(self, value):
         if value:
-            self.setFlags(QGraphicsItem.ItemIsSelectable
-                          # | QGraphicsItem.ItemIsMovable
-                          #  | QGraphicsItem.ItemIsFocusable
+            self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable
+                          # | QGraphicsItem.GraphicsItemFlag.ItemIsMovable
+                          #  | QGraphicsItem.GraphicsItemFlag.ItemIsFocusable
                           )
 
         else:
-            self.setFlags(QGraphicsItem.ItemIsSelectable
-                          | QGraphicsItem.ItemIsMovable
-                          | QGraphicsItem.ItemIsFocusable)
+            self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable
+                          | QGraphicsItem.GraphicsItemFlag.ItemIsMovable
+                          | QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
         self._isPinned = value
 
     # ---------------------------------------------------------------------
@@ -196,7 +196,7 @@ class PathItem(QGraphicsItem):
         # if change == self.ItemPositionChange:
         # if change == self.ItemSelectedChange:
         # if change == self.ItemSelectedHasChanged:
-        if change == QGraphicsItem.ItemSelectedChange:
+        if change == QGraphicsItem.GraphicsItemChange.ItemSelectedChange:
             if value:
                 self.scene().parent().path_item_selected(self)
             else:
@@ -353,12 +353,12 @@ class PathItem(QGraphicsItem):
 
         self.selectionPenBottom = QPen(_selectionLineBgColor,
                                        self.secili_nesne_kalem_kalinligi,
-                                       Qt.DashLine,
-                                       Qt.RoundCap, Qt.RoundJoin)
+                                       Qt.PenStyle.DashLine,
+                                       Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
         self.selectionPenBottomIfAlsoActiveItem = QPen(_activeItemLineColor,
                                                        self.secili_nesne_kalem_kalinligi,
-                                                       Qt.DashLine,
-                                                       Qt.RoundCap, Qt.RoundJoin)
+                                                       Qt.PenStyle.DashLine,
+                                                       Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
 
         self.update()
 
@@ -383,7 +383,7 @@ class PathItem(QGraphicsItem):
         self.arkaPlanRengi = col
         # burda nesne kapali mi degil mi kontrolu yapiyoruz
         # daha iyi olabilir bu kontrol
-        if not self._brush == Qt.NoBrush:
+        if not self._brush == Qt.BrushStyle.NoBrush:
             self.setBrush(QBrush(col))
 
     # ---------------------------------------------------------------------
@@ -429,7 +429,7 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def kur_yazi_hizasi(self, hizalama):
-        self.painterTextOption.setAlignment(hizalama | Qt.AlignVCenter)
+        self.painterTextOption.setAlignment(hizalama | Qt.AlignmentFlag.AlignVCenter)
         # self.painterTextOption.setAlignment(hizalama)
         self.update()
 
@@ -619,9 +619,9 @@ class PathItem(QGraphicsItem):
         self.basitlestir()
         # basitlestir() -> self.setPath yapiyor
         # self.setPath(self.lastPath)
-        self.setFlags(QGraphicsItem.ItemIsSelectable |
-                      QGraphicsItem.ItemIsMovable |
-                      QGraphicsItem.ItemIsFocusable)
+        self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
+                      QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
+                      QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
         self.intersects = False
         # self.setSelected(True)
 
@@ -1124,7 +1124,7 @@ class PathItem(QGraphicsItem):
             else:
                 selectionPenBottom = self.selectionPenBottom
 
-            painter.setBrush(Qt.NoBrush)
+            painter.setBrush(Qt.BrushStyle.NoBrush)
 
             # if self.pixmap.isNull():
             if self.editMode:
@@ -1139,7 +1139,7 @@ class PathItem(QGraphicsItem):
                 for i in range(path.elementCount()):
                     painter.drawPoint(QPointF(path.elementAt(i).x, path.elementAt(i).y))
                 if self.secilen_nokta:
-                    painter.setPen(QPen(Qt.red, 10))
+                    painter.setPen(QPen(Qt.GlobalColor.red, 10))
                     painter.drawPoint(
                         QPointF(path.elementAt(self.secilen_nokta_idx).x, path.elementAt(self.secilen_nokta_idx).y))
 

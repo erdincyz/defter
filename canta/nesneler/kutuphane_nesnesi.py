@@ -55,10 +55,10 @@ class KutuphaneNesnesi(QGraphicsItem):
             # print("asdasd")
             # viewRectSize = self.scene().views()[0].get_visible_rect().size().toSize()
             # self.pixMap = QPixmap(self.filePathForDraw).scaled(viewRectSize / 1.5, Qt.KeepAspectRatio)
-            self.pixmap = QPixmap(self.filePathForDraw).scaledToWidth(45, Qt.FastTransformation)
+            self.pixmap = QPixmap(self.filePathForDraw).scaledToWidth(45, Qt.TransformationMode.FastTransformation)
             QPixmapCache.insert(self.filePathForDraw, self.pixmap)
         else:
-            self.pixmap = self.pixmap.scaledToWidth(45, Qt.FastTransformation)
+            self.pixmap = self.pixmap.scaledToWidth(45, Qt.TransformationMode.FastTransformation)
 
         rectf = QRectF(self.pixmap.rect())
 
@@ -70,7 +70,7 @@ class KutuphaneNesnesi(QGraphicsItem):
 
         self.setAcceptHoverEvents(True)
 
-        self.setFlags(QGraphicsItem.ItemIsSelectable)
+        self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
 
         # self.setFlags(QGraphicsItem.ItemIsSelectable |
         #               # QGraphicsItem.ItemIsMovable |
@@ -88,17 +88,17 @@ class KutuphaneNesnesi(QGraphicsItem):
         # self._text = dosya_adresi
 
         self.painterTextOption = QTextOption()
-        self.painterTextOption.setAlignment(Qt.AlignCenter)
+        self.painterTextOption.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.painterTextOption.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
 
         self.activeItemLineColor = shared.activeItemLineColor
         # self.cizgiRengi = pen.color()
         # self.setCizgiRengi(self.cizgiRengi)  # also sets self._pen
-        self.setCizgiRengi(QColor(Qt.red))
+        self.setCizgiRengi(QColor(Qt.GlobalColor.red))
         # self.yaziRengi = yaziRengi
         # self.setYaziRengi(yaziRengi)
-        self.setYaziRengi(QColor(Qt.black))
-        self.setArkaPlanRengi(QColor(Qt.transparent))  # also sets self._brush # veya nobrush
+        self.setYaziRengi(QColor(Qt.GlobalColor.black))
+        self.setArkaPlanRengi(QColor(Qt.GlobalColor.transparent))  # also sets self._brush # veya nobrush
 
         self.setToolTip(dosya_adresi)
 
@@ -339,8 +339,8 @@ class KutuphaneNesnesi(QGraphicsItem):
 
         self.selectionPenBottom = QPen(_activeItemLineColor,
                                        self._pen.width(),
-                                       Qt.DashLine,
-                                       Qt.FlatCap, Qt.RoundJoin)
+                                       Qt.PenStyle.DashLine,
+                                       Qt.PenCapStyle.FlatCap, Qt.PenJoinStyle.RoundJoin)
 
         self.update()
 
@@ -386,10 +386,10 @@ class KutuphaneNesnesi(QGraphicsItem):
                     # print("asdasd")
                     # viewRectSize = self.scene().views()[0].get_visible_rect().size().toSize()
                     # self.pixMap = QPixmap(self.filePathForDraw).scaled(viewRectSize / 1.5, Qt.KeepAspectRatio)
-                    self.onizlemePixmap = QPixmap(self.filePathForDraw).scaledToWidth(300, Qt.FastTransformation)
+                    self.onizlemePixmap = QPixmap(self.filePathForDraw).scaledToWidth(300, Qt.TransformationMode.FastTransformation)
                     QPixmapCache.insert(self.dosya_adresi, self.onizlemePixmap)
                 else:
-                    self.onizlemePixmap = self.onizlemePixmap.scaledToWidth(300, Qt.FastTransformation)
+                    self.onizlemePixmap = self.onizlemePixmap.scaledToWidth(300, Qt.TransformationMode.FastTransformation)
 
                 self.onizlemePixmapItem = QGraphicsPixmapItem(self.onizlemePixmap, self)
             else:
@@ -430,7 +430,7 @@ class KutuphaneNesnesi(QGraphicsItem):
 
         # start the drag operation
         # exec_ will return the accepted action from dropEvent
-        if drag.exec_(Qt.CopyAction | Qt.MoveAction) == Qt.MoveAction:
+        if drag.exec_(Qt.DropAction.CopyAction | Qt.DropAction.MoveAction) == Qt.DropAction.MoveAction:
             print('moved')
             self.sahnede_kullaniliyor_mu = True
             self.belgede_kullaniliyor_mu = True
@@ -438,15 +438,15 @@ class KutuphaneNesnesi(QGraphicsItem):
         else:
             print('copied')
 
-        self.setCursor(Qt.OpenHandCursor)
+        self.setCursor(Qt.CursorShape.OpenHandCursor)
 
     # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
-        self.setCursor(Qt.OpenHandCursor)
+        self.setCursor(Qt.CursorShape.OpenHandCursor)
 
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):
-        self.setCursor(Qt.ClosedHandCursor)
+        self.setCursor(Qt.CursorShape.ClosedHandCursor)
         # QGraphicsItem.mousePressEvent(self, e)
         # if e.button() == Qt.LeftButton:
         #     print('press')
@@ -457,7 +457,7 @@ class KutuphaneNesnesi(QGraphicsItem):
         painter.setClipRect(option.exposedRect)
 
         painter.setFont(self._font)
-        painter.setBrush(Qt.NoBrush)
+        painter.setBrush(Qt.BrushStyle.NoBrush)
         # rect = self.boundingRect().toRect()
         rect = self._rect.toRect()
         painter.drawPixmap(rect, self.pixmap)
@@ -490,7 +490,7 @@ class KutuphaneNesnesi(QGraphicsItem):
         if option.state & QStyle.StateFlag.State_Selected:
             selectionPenBottom = self.selectionPenBottom
 
-            painter.setBrush(Qt.NoBrush)
+            painter.setBrush(Qt.BrushStyle.NoBrush)
 
             painter.setPen(selectionPenBottom)
             painter.drawRect(self.rect())
@@ -499,30 +499,30 @@ class KutuphaneNesnesi(QGraphicsItem):
             # painter.drawRect(self.rect())
 
         if self.isHtmlImage:
-            painter.setBrush(Qt.cyan)
-            painter.setPen(Qt.black)
+            painter.setBrush(Qt.GlobalColor.cyan)
+            painter.setPen(Qt.GlobalColor.black)
             painter.drawEllipse(QRectF(0, 0, 16, 15))
             painter.drawText(QRectF(3, 0, 16, 15), "w")
             return
 
         if not self.isEmbeded:
-            painter.setBrush(Qt.yellow)
-            painter.setPen(Qt.black)
+            painter.setBrush(Qt.GlobalColor.yellow)
+            painter.setPen(Qt.GlobalColor.black)
             painter.drawEllipse(QRectF(0, 0, 15, 15))
             painter.drawText(QRectF(3, 0, 15, 15), "~")
             return
 
         if not self.belgede_kullaniliyor_mu:
-            painter.setBrush(Qt.red)
-            painter.setPen(Qt.white)
+            painter.setBrush(Qt.GlobalColor.red)
+            painter.setPen(Qt.GlobalColor.white)
             painter.drawEllipse(QRectF(0, 0, 15, 15))
             painter.drawText(QRectF(3, 0, 15, 15), "X")
             # painter.drawEllipse(QRectF(0,0,10,10))
             return
 
         if not self.sahnede_kullaniliyor_mu:
-            painter.setBrush(Qt.darkYellow)
-            painter.setPen(Qt.white)
+            painter.setBrush(Qt.GlobalColor.darkYellow)
+            painter.setPen(Qt.GlobalColor.white)
             painter.drawEllipse(QRectF(0, 0, 15, 15))
             painter.drawText(QRectF(3, 0, 15, 15), "X")
             # painter.drawEllipse(QRectF(0,0,10,10))
