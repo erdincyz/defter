@@ -7,13 +7,13 @@ __author__ = 'Erdinç Yılmaz'
 
 import os
 
-from PySide6.QtCore import Qt, Slot, Signal, QCoreApplication, QSettings, QSize, QLocale
+from PySide6.QtCore import Qt, Slot, Signal, QSettings, QSize, QLocale
 from PySide6.QtGui import QIcon, QKeySequence, QDoubleValidator, QIntValidator, QActionGroup, QAction, \
     QPageLayout
 from PySide6.QtPrintSupport import QPrintPreviewWidget, QPrinter, QPrintDialog, QPageSetupDialog
 from PySide6.QtWidgets import QVBoxLayout, QToolBar, QMainWindow, QLineEdit, QLabel, \
     QSizePolicy, QComboBox, QWidget, QFormLayout, QDockWidget, QPushButton, QHBoxLayout, QButtonGroup, \
-    QRadioButton, QGroupBox, QCheckBox, QFileDialog
+    QRadioButton, QGroupBox, QCheckBox, QFileDialog, QApplication
 
 from canta import shared
 
@@ -530,9 +530,9 @@ class PrintPreviewDialog(QMainWindow):
 
     # ---------------------------------------------------------------------
     def olustur_ayarlar(self):
-        QCoreApplication.setOrganizationName(shared.DEFTER_ORG_NAME)
-        QCoreApplication.setOrganizationDomain(shared.DEFTER_ORG_DOMAIN)
-        QCoreApplication.setApplicationName(shared.DEFTER_APP_NAME)
+        QApplication.setOrganizationName(shared.DEFTER_ORG_NAME)
+        QApplication.setOrganizationDomain(shared.DEFTER_ORG_DOMAIN)
+        QApplication.setApplicationName(shared.DEFTER_APP_NAME)
         self.settings = QSettings(shared.DEFTER_AYARLAR_DOSYA_ADRES, QSettings.Format.IniFormat)
         # self.settings.clear()
 

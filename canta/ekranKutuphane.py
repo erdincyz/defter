@@ -19,8 +19,8 @@ class EkranKutuphane(QGraphicsView):
         self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
         # self.setRenderHint(QPainter.Antialiasing)
         # self.setRenderHint(QPainter.TextAntialiasing)
-        self.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
-        self.setRenderHint(QPainter.TextAntialiasing)
+        self.setRenderHints(QPainter.RenderHint.Antialiasing | QPainter.RenderHint.SmoothPixmapTransform)
+        self.setRenderHint(QPainter.RenderHint.TextAntialiasing)
         # self.setDragMode(QGraphicsView.ScrollHandDrag)
         # self.setDragMode(QGraphicsView.RubberBandDrag)  # secmek icin meseala box selection
         # self.setRubberBandSelectionMode(Qt.ItemSelectionModelaraBak)

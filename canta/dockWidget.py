@@ -20,10 +20,10 @@ class DockWidget(QDockWidget):
         self.renkYazi = QColor(255, 255, 255)
         self.renkArkaplan = QColor(153, 170, 187)
 
-        self.setFeatures(QDockWidget.DockWidgetMovable |
-                         QDockWidget.DockWidgetClosable |
+        self.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetMovable |
+                         QDockWidget.DockWidgetFeature.DockWidgetClosable |
                          # QDockWidget.DockWidgetVerticalTitleBar|
-                         QDockWidget.DockWidgetFloatable
+                         QDockWidget.DockWidgetFeature.DockWidgetFloatable
                          )
 
         self.setWindowTitle(baslik)

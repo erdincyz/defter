@@ -5,8 +5,8 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QTextEdit, QPushButton, QLineEdit
-from PySide6.QtCore import Qt, Slot, QCoreApplication, QSettings
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QTextEdit, QPushButton, QLineEdit, QApplication
+from PySide6.QtCore import Qt, Slot, QSettings
 from canta import shared
 
 
@@ -57,10 +57,10 @@ class CommandDialog(QDialog):
 
     # ---------------------------------------------------------------------
     def olustur_ayarlar(self):
-        QCoreApplication.setOrganizationName(shared.DEFTER_ORG_NAME)
-        QCoreApplication.setOrganizationDomain(shared.DEFTER_ORG_DOMAIN)
-        QCoreApplication.setApplicationName(shared.DEFTER_APP_NAME)
-        self.settings = QSettings(shared.DEFTER_AYARLAR_DOSYA_ADRES, QSettings.IniFormat)
+        QApplication.setOrganizationName(shared.DEFTER_ORG_NAME)
+        QApplication.setOrganizationDomain(shared.DEFTER_ORG_DOMAIN)
+        QApplication.setApplicationName(shared.DEFTER_APP_NAME)
+        self.settings = QSettings(shared.DEFTER_AYARLAR_DOSYA_ADRES, QSettings.Format.IniFormat)
         # self.settings.clear()
 
     # ---------------------------------------------------------------------

@@ -35,7 +35,7 @@ from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, Q
                                QLineEdit, QToolButton, QComboBox, QButtonGroup, QGroupBox, QRadioButton, QProgressBar,
                                QCheckBox, QGraphicsItem)
 
-from PySide6.QtCore import (Qt, QRectF, QCoreApplication, QSettings, QPoint, Slot, QSizeF, QSize, QFile, QSaveFile,
+from PySide6.QtCore import (Qt, QRectF, QSettings, QPoint, Slot, QSizeF, QSize, QFile, QSaveFile,
                             QIODevice, QDataStream, QMimeData, QByteArray, QPointF, qCompress, qUncompress, QLocale,
                             QThread, QUrl, QLineF, QObject, QRect, QTimer, QDir)
 
@@ -1650,11 +1650,11 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def olustur_ayarlar(self):
-        QCoreApplication.setOrganizationName(shared.DEFTER_ORG_NAME)
-        QCoreApplication.setOrganizationDomain(shared.DEFTER_ORG_DOMAIN)
-        QCoreApplication.setApplicationName(shared.DEFTER_APP_NAME)
+        QApplication.setOrganizationName(shared.DEFTER_ORG_NAME)
+        QApplication.setOrganizationDomain(shared.DEFTER_ORG_DOMAIN)
+        QApplication.setApplicationName(shared.DEFTER_APP_NAME)
         self.settings = QSettings(shared.DEFTER_AYARLAR_DOSYA_ADRES, QSettings.IniFormat)
-        self.settingsAraclar = QSettings(shared.DEFTER_AYARLAR_ARACLAR_DOSYA_ADRES, QSettings.IniFormat)
+        self.settingsAraclar = QSettings(shared.DEFTER_AYARLAR_ARACLAR_DOSYA_ADRES, QSettings.Format.IniFormat)
         # self.settings.clear()
 
     # ---------------------------------------------------------------------
