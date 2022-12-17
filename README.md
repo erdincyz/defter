@@ -49,7 +49,7 @@ It can bu used for;
 * To draw shapes, diagrams
 * To collect data by dragging and dropping from the Internet
 * To curate some data you collected about something.
-* It is visual. It supports adding-emebedding images, videos, (any) files to the document, and copy-paste, drag-and-drop text (supports HTML) from the browser (or from other software).
+* It is visual. It supports adding-embedding images, videos, (any) files to the document, and copy-paste, drag-and-drop text (supports HTML) from the browser (or from other software).
 * You can make HTML-containing text objects clickable again by using the "Show as Web Page" feature in the menu that opens when you right-click on the object.
 * If you double-click on an image that you have added to the scene, a text box will appear at the point you clicked on the image. You can take as many notes as you want on the image.
 
