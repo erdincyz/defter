@@ -671,7 +671,9 @@ class DefterAnaPencere(QMainWindow):
         self.nesneGrupW.show()
         self.yaziGrupW.hide()
         self.cizgiGrupW.hide()
+        self.aracIkonuEtiketi = QLabel(self.nesneOzellikleriDWBaseWidget)
         radioLay = QHBoxLayout()
+        radioLay.addWidget(self.aracIkonuEtiketi)
         radioLay.addWidget(self.radioArkaplan)
         radioLay.addWidget(self.radioYazi)
         radioLay.addWidget(self.radioCizgi)
@@ -4547,31 +4549,37 @@ class DefterAnaPencere(QMainWindow):
         self.actionSwitchToSelectionTool.setShortcut(QKeySequence("Q"))
         self.actionSwitchToSelectionTool.triggered.connect(self.act_switch_to_selection_tool)
         self.actionSwitchToSelectionTool.setCheckable(True)
+        self.ikonSecimAraci = self.actionSwitchToSelectionTool.icon().pixmap(16, 16)
 
         self.actionAddTextItem = QAction(QIcon(':icons/t.png'), self.tr("Add Text"), actionGroup)
         self.actionAddTextItem.setShortcut(QKeySequence("T"))
         self.actionAddTextItem.triggered.connect(self.act_add_text_item)
         self.actionAddTextItem.setCheckable(True)
+        self.ikonYaziAraci = self.actionAddTextItem.icon().pixmap(16, 16)
 
         self.actionAddRectItem = QAction(QIcon(':icons/rectangle.png'), self.tr("Add Rectangle"), actionGroup)
         self.actionAddRectItem.setShortcut(QKeySequence("R"))
         self.actionAddRectItem.triggered.connect(self.act_add_rect_item)
         self.actionAddRectItem.setCheckable(True)
+        self.ikonKutuAraci = self.actionAddRectItem.icon().pixmap(16, 16)
 
         self.actionAddEllipseItem = QAction(QIcon(':icons/circle.png'), self.tr("Add Ellipse"), actionGroup)
         self.actionAddEllipseItem.setShortcut(QKeySequence("E"))
         self.actionAddEllipseItem.triggered.connect(self.act_add_ellipse_item)
         self.actionAddEllipseItem.setCheckable(True)
+        self.ikonYuvarlakAraci = self.actionAddEllipseItem.icon().pixmap(16, 16)
 
         self.actionDrawLineItem = QAction(QIcon(':icons/line.png'), self.tr("Draw Line"), actionGroup)
         self.actionDrawLineItem.setShortcut(QKeySequence("L"))
         self.actionDrawLineItem.triggered.connect(self.act_draw_line_item)
         self.actionDrawLineItem.setCheckable(True)
+        self.ikonOkAraci = self.actionDrawLineItem.icon().pixmap(16, 16)
 
         self.actionDrawPathItem = QAction(QIcon(':icons/pen.png'), self.tr("Draw Path"), actionGroup)
         self.actionDrawPathItem.setShortcut(QKeySequence("D"))
         self.actionDrawPathItem.triggered.connect(self.act_draw_path_item)
         self.actionDrawPathItem.setCheckable(True)
+        self.ikonKalemAraci = self.actionDrawLineItem.icon().pixmap(16, 16)
 
         # self.actionAddImageItem = QAction(QIcon(':icons/file-image.png'), self.tr("Add Image"), actionGroup)
         # self.actionAddImageItem.setShortcut(QKeySequence("I"))
@@ -4586,16 +4594,19 @@ class DefterAnaPencere(QMainWindow):
         self.actionAddImageItem.setShortcut(QKeySequence("I"))
         self.actionAddImageItem.triggered.connect(self.act_add_image_item)
         self.recentImagesMenu.aboutToShow.connect(self.on_recent_images_menu_about_to_show)
+        self.ikonResimAraci = self.actionAddImageItem.icon().pixmap(16, 16)
 
         self.actionAddVideoItem = QAction(QIcon(':icons/file-video.png'), self.tr("Add Video"), actionGroup)
         self.actionAddVideoItem.setShortcut(QKeySequence("V"))
         self.actionAddVideoItem.triggered.connect(self.act_add_video_item)
         self.actionAddVideoItem.setCheckable(True)
+        self.ikonVideoAraci = self.actionAddVideoItem.icon().pixmap(16, 16)
 
         self.actionEkleDosyaNesnesi = QAction(QIcon(':icons/import-file.png'), self.tr("Add File"), actionGroup)
         self.actionEkleDosyaNesnesi.setShortcut(QKeySequence("O"))
         self.actionEkleDosyaNesnesi.triggered.connect(self.act_ekle_dosya_nesnesi)
         self.actionEkleDosyaNesnesi.setCheckable(True)
+        self.ikonDosyaAraci = self.actionEkleDosyaNesnesi.icon().pixmap(16, 16)
 
         self.actionWebBrowserAc = QAction(QIcon(':icons/web-browser.png'), self.tr("Web Browser"), actionGroup)
         self.actionWebBrowserAc.setShortcut(QKeySequence("W"))
@@ -5585,6 +5596,8 @@ class DefterAnaPencere(QMainWindow):
         self.cScene.clearSelection()
         self.radioArkaplan.setChecked(True)
         self.act_radio_secim_degisti(self.radioArkaplan)
+        self.aracIkonuEtiketi.setPixmap(self.ikonSecimAraci)
+        self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonSecimAraci)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5598,16 +5611,20 @@ class DefterAnaPencere(QMainWindow):
         self.cScene.clearSelection()
         self.radioCizgi.setChecked(True)
         self.act_radio_secim_degisti(self.radioCizgi)
+        self.aracIkonuEtiketi.setPixmap(self.ikonOkAraci)
+        self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonOkAraci)
 
     # ---------------------------------------------------------------------
     @Slot()
     def act_add_rect_item(self):
 
-        self.cScene.aktif_arac_degistir(aktifArac=self.cScene.DortgenAraci)
+        self.cScene.aktif_arac_degistir(aktifArac=self.cScene.KutuAraci)
         self.actionAddRectItem.setChecked(True)
         self.cScene.clearSelection()
         self.radioArkaplan.setChecked(True)
         self.act_radio_secim_degisti(self.radioArkaplan)
+        self.aracIkonuEtiketi.setPixmap(self.ikonKutuAraci)
+        self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonKutuAraci)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5618,6 +5635,8 @@ class DefterAnaPencere(QMainWindow):
         self.cScene.clearSelection()
         self.radioArkaplan.setChecked(True)
         self.act_radio_secim_degisti(self.radioArkaplan)
+        self.aracIkonuEtiketi.setPixmap(self.ikonYuvarlakAraci)
+        self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonYuvarlakAraci)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5631,6 +5650,8 @@ class DefterAnaPencere(QMainWindow):
         self.cScene.clearSelection()
         self.radioCizgi.setChecked(True)
         self.act_radio_secim_degisti(self.radioCizgi)
+        self.aracIkonuEtiketi.setPixmap(self.ikonKalemAraci)
+        self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonKalemAraci)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5641,6 +5662,8 @@ class DefterAnaPencere(QMainWindow):
         self.cScene.clearSelection()
         self.radioYazi.setChecked(True)
         self.act_radio_secim_degisti(self.radioYazi)
+        self.aracIkonuEtiketi.setPixmap(self.ikonYaziAraci)
+        self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonYaziAraci)
 
     # # ---------------------------------------------------------------------
     # def toggle_transforms_for_base(self):
@@ -5675,6 +5698,8 @@ class DefterAnaPencere(QMainWindow):
             filePath = fn[0]
             self.cScene.aktif_arac_degistir(aktifArac=self.cScene.ResimAraci, dosyaYolu=filePath)
             self.actionAddImageItem.setChecked(True)
+            self.aracIkonuEtiketi.setPixmap(self.ikonResimAraci)
+            self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonResimAraci)
 
             add = True
 
@@ -5794,6 +5819,8 @@ class DefterAnaPencere(QMainWindow):
             filePath = fn[0]
             self.cScene.aktif_arac_degistir(aktifArac=self.cScene.VideoAraci, dosyaYolu=filePath)
             self.actionAddVideoItem.setChecked(True)
+            self.aracIkonuEtiketi.setPixmap(self.ikonVideoAraci)
+            self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonVideoAraci)
 
             self.sonKlasorVideolar = os.path.dirname(filePath)
 
@@ -5867,6 +5894,8 @@ class DefterAnaPencere(QMainWindow):
             filePath = fn[0]
             self.cScene.aktif_arac_degistir(aktifArac=self.cScene.DosyaAraci, dosyaYolu=filePath)
             self.actionEkleDosyaNesnesi.setChecked(True)
+            self.aracIkonuEtiketi.setPixmap(self.ikonDosyaAraci)
+            self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonDosyaAraci)
 
             self.sonKlasorDosyalar = os.path.dirname(filePath)
 
@@ -7369,8 +7398,11 @@ class DefterAnaPencere(QMainWindow):
         self.actionItemTextColor.setIcon(QIcon(pix))
         try:
             self.yaziRengiBtn.renkGuncelle(yaziRengi)
-            if self.renk_tipi == "y" and not renkSecicidenMi:
-                self.renkSecici.disardan_renk_gir(yaziRengi)
+            if not renkSecicidenMi:
+                if self.renk_tipi == "y":
+                    self.renkSecici.disardan_renk_gir(yaziRengi)
+                if self.nesneOzellikleriYW.renk_tipi == "y":
+                    self.nesneOzellikleriYW.renkSecici.disardan_renk_gir(yaziRengi)
 
         except Exception as e:
             pass
@@ -7408,8 +7440,11 @@ class DefterAnaPencere(QMainWindow):
         self.actionItemLineColor.setIcon(QIcon(pix))
         try:
             self.cizgiRengiBtn.renkGuncelle(cizgiRengi)
-            if self.renk_tipi == "c" and not renkSecicidenMi:
-                self.renkSecici.disardan_renk_gir(cizgiRengi)
+            if not renkSecicidenMi:
+                if self.renk_tipi == "c":
+                    self.renkSecici.disardan_renk_gir(cizgiRengi)
+                if self.nesneOzellikleriYW.renk_tipi == "c":
+                    self.nesneOzellikleriYW.renkSecici.disardan_renk_gir(cizgiRengi)
         except Exception as e:
             pass
 
@@ -7461,8 +7496,11 @@ class DefterAnaPencere(QMainWindow):
 
         try:
             self.nesneArkaplanRengiBtn.renkGuncelle(arkaplanRengi)
-            if self.renk_tipi == "a" and not renkSecicidenMi:
-                self.renkSecici.disardan_renk_gir(arkaplanRengi)
+            if not renkSecicidenMi:
+                if self.renk_tipi == "a":
+                    self.renkSecici.disardan_renk_gir(arkaplanRengi)
+                if self.nesneOzellikleriYW.renk_tipi == "a":
+                    self.nesneOzellikleriYW.renkSecici.disardan_renk_gir(arkaplanRengi)
 
         except Exception as e:
             pass
@@ -8100,7 +8138,7 @@ class DefterAnaPencere(QMainWindow):
         if tip == shared.TEXT_ITEM_TYPE:
             arac = self.cScene.YaziAraci
         elif tip == shared.RECT_ITEM_TYPE:
-            arac = self.cScene.DortgenAraci
+            arac = self.cScene.KutuAraci
         elif tip == shared.PATH_ITEM_TYPE:
             arac = self.cScene.KalemAraci
         elif tip == shared.ELLIPSE_ITEM_TYPE:

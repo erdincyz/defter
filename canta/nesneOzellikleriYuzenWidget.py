@@ -7,7 +7,7 @@ __author__ = 'Erdinç Yılmaz'
 
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QHBoxLayout, QButtonGroup, QRadioButton
+from PySide6.QtWidgets import QHBoxLayout, QButtonGroup, QRadioButton, QLabel
 from canta.renkSecici import RenkSeciciWidget
 from canta.sliderDoubleWithDoubleSpinBox import SliderDoubleWithDoubleSpinBox
 from canta.yuzenWidget import YuzenWidget
@@ -50,6 +50,9 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
 
     # ---------------------------------------------------------------------
     def olustur_radio(self):
+
+        self.aracIkonuEtiketi = QLabel(self)
+
         self.radioBtnGroup = QButtonGroup(self)
 
         self.radioArkaplan = QRadioButton(self.tr("Background"), self)
@@ -62,6 +65,7 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
 
         radioLay = QHBoxLayout()
 
+        radioLay.addWidget(self.aracIkonuEtiketi)
         radioLay.addWidget(self.radioArkaplan)
         radioLay.addWidget(self.radioYazi)
         radioLay.addWidget(self.radioCizgi)
@@ -91,16 +95,28 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
     # ---------------------------------------------------------------------
     def act_radio_secim_degisti(self, btn):
         if btn == self.radioArkaplan:
-            renk = self.arkaPlanRengi
+            # renk = self.arkaPlanRengi
+            if self.parent().cScene.activeItem:
+                renk = self.parent().cScene.activeItem.arkaPlanRengi
+            else:
+                renk = self.parent().cScene.aktifArac.arkaPlanRengi
             self.renk_tipi = "a"
             self.cizgiKalinligiDSlider.hide()
         elif btn == self.radioYazi:
-            renk = self.yaziRengi
+            # renk = self.yaziRengi
+            if self.parent().cScene.activeItem:
+                renk = self.parent().cScene.activeItem.yaziRengi
+            else:
+                renk = self.parent().cScene.aktifArac.yaziRengi
             self.renk_tipi = "y"
             self.cizgiKalinligiDSlider.hide()
 
         elif btn == self.radioCizgi:
-            renk = self.cizgiRengi
+            # renk = self.cizgiRengi
+            if self.parent().cScene.activeItem:
+                renk = self.parent().cScene.activeItem.cizgiRengi
+            else:
+                renk = self.parent().cScene.aktifArac.cizgiRengi
             self.renk_tipi = "c"
             self.cizgiKalinligiDSlider.show()
 

@@ -50,7 +50,7 @@ class Scene(QGraphicsScene):
         # her belgede arac ozellikleri farkli olsun diye classta degil de burda tanimladik
         self.SecimAraci = Arac('secimAraci')
         self.OkAraci = Arac('okAraci')
-        self.DortgenAraci = Arac('dortgenAraci')
+        self.KutuAraci = Arac('kutuAraci')
         self.YuvarlakAraci = Arac('yuvarlakAraci')
         self.KalemAraci = Arac('kalemAraci')
         self.YaziAraci = Arac('yaziAraci')
@@ -61,7 +61,7 @@ class Scene(QGraphicsScene):
         self.AynalaYAraci = Arac('aynalaYAraci')
         self.ResimKirpAraci = Arac('resimKirpAraci')
 
-        self.araclar = (self.SecimAraci, self.OkAraci, self.DortgenAraci, self.YuvarlakAraci, self.KalemAraci,
+        self.araclar = (self.SecimAraci, self.OkAraci, self.KutuAraci, self.YuvarlakAraci, self.KalemAraci,
                         self.YaziAraci, self.ResimAraci, self.VideoAraci, self.DosyaAraci, self.AynalaXAraci,
                         self.AynalaYAraci, self.ResimKirpAraci)
 
@@ -488,6 +488,8 @@ class Scene(QGraphicsScene):
         self.parent().setCursor(Qt.CursorShape.ArrowCursor)
         # self.deleteLater()
         self.parent().actionSwitchToSelectionTool.setChecked(True)
+        self.parent().aracIkonuEtiketi.setPixmap(self.parent().ikonSecimAraci)
+        self.parent().nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.parent().ikonSecimAraci)
 
     # ---------------------------------------------------------------------
     def _fircaBoyutuItem_olustur(self):
@@ -692,15 +694,15 @@ class Scene(QGraphicsScene):
 
                 return QGraphicsScene.mousePressEvent(self, event)
 
-            elif self.aktifArac == self.DortgenAraci:
+            elif self.aktifArac == self.KutuAraci:
 
                 # rect = QRectF(event.scenePos(), self.itemSize).translated(-self.itemSize.width() / 2,
                 #                                                           -self.itemSize.height() / 2)
 
                 # rect = QRectF(event.scenePos(), QSizeF(1, 1))
                 rect = QRectF(0, 0, 1, 1)
-                item = Rect(event.scenePos(), rect, self.DortgenAraci.yaziRengi, self.DortgenAraci.arkaPlanRengi,
-                            QPen(self.DortgenAraci.kalem),
+                item = Rect(event.scenePos(), rect, self.KutuAraci.yaziRengi, self.KutuAraci.arkaPlanRengi,
+                            QPen(self.KutuAraci.kalem),
                             self.font())
                 self.parent().increase_zvalue(item)
 
@@ -991,7 +993,7 @@ class Scene(QGraphicsScene):
         if event.button() == Qt.MouseButton.LeftButton:
             self.views()[0].setDragModeRubberBandDrag()
             # if event.modifiers() == Qt.KeyboardModifier.AltModifier:
-            #     if self.aktifArac == self.DortgenAraci or self.aktifArac == self.YuvarlakAraci:
+            #     if self.aktifArac == self.KutuAraci or self.aktifArac == self.YuvarlakAraci:
             #         self.aktifArac = self.SecimAraci
             #         self.parent().setCursor(Qt.ArrowCursor)
             if self.aktifArac == self.KalemAraci:
@@ -1011,7 +1013,7 @@ class Scene(QGraphicsScene):
             if self.aktifArac == self.OkAraci:
                 return QGraphicsScene.mouseReleaseEvent(self, event)
 
-            elif self.aktifArac == self.DortgenAraci or self.aktifArac == self.YuvarlakAraci:
+            elif self.aktifArac == self.KutuAraci or self.aktifArac == self.YuvarlakAraci:
                 self.lastItem.show_resize_handles()
                 # if not event.modifiers() == Qt.KeyboardModifier.AltModifier:
                 if not self.space_tusu_su_an_basili:
@@ -1138,7 +1140,7 @@ class Scene(QGraphicsScene):
             self.space_tusu_su_an_basili = False
 
         # if event.key() == Qt.Key_Alt:
-        #     if self.aktifArac == self.DortgenAraci or self.aktifArac == self.YuvarlakAraci:
+        #     if self.aktifArac == self.KutuAraci or self.aktifArac == self.YuvarlakAraci:
         #         self.aktifArac = self.SecimAraci
         #         self.parent().setCursor(Qt.ArrowCursor)
 

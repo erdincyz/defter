@@ -12,7 +12,7 @@ from PySide6.QtGui import QPen, QFont, QColor, Qt, QPixmap, QCursor
 def ver_arac_ikon_tipi(tip):
     tipIkonAdresSozluk = {'secimAraci': Qt.CursorShape.ArrowCursor,
                           'okAraci': ':icons/cursor-line.png',
-                          'dortgenAraci': ':icons/cursor-rectangle.png',
+                          'kutuAraci': ':icons/cursor-rectangle.png',
                           'yuvarlakAraci': ':icons/cursor-circle.png',
                           'kalemAraci': ':icons/cursor-pen.png',
                           'yaziAraci': ':icons/cursor-text.png',
