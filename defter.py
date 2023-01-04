@@ -2786,7 +2786,7 @@ class DefterAnaPencere(QMainWindow):
             # videoItem.isMirrorX = itemDict["isMirrorX"]
             # videoItem.isMirrorY = itemDict["isMirrorY"]
             if itemDict.get("yaziHiza", None):
-                videoItem.painterTextOption.setAlignment(Qt.AlignmentFlag.Alignment(itemDict.get("yaziHiza")))
+                videoItem.painterTextOption.setAlignment(Qt.AlignmentFlag(itemDict.get("yaziHiza")))
             # videoItem._text = itemDict["text"]
             videoItem.eskiYazi = itemDict["text"]
             videoItem._command = itemDict["command"]
@@ -2831,7 +2831,7 @@ class DefterAnaPencere(QMainWindow):
             # dosyaNesnesi.isMirrorX = itemDict["isMirrorX"]
             # dosyaNesnesi.isMirrorY = itemDict["isMirrorY"]
             if itemDict.get("yaziHiza", None):
-                dosyaNesnesi.painterTextOption.setAlignment(Qt.AlignmentFlag.Alignment(itemDict.get("yaziHiza")))
+                dosyaNesnesi.painterTextOption.setAlignment(Qt.AlignmentFlag(itemDict.get("yaziHiza")))
             dosyaNesnesi._text = itemDict["text"]
             dosyaNesnesi._command = itemDict["command"]
             # dosyaNesnesi.reload_image_after_scale()
