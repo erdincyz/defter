@@ -259,6 +259,7 @@ class Scene(QGraphicsScene):
             self.setSceneRect(unitedRect)
         # else:
         #     self.setSceneRect(visRect)
+        self.parent().act_yazici_sayfa_kenar_cizdir()
 
         # mouseRelease a koydugumuz icin iptal bu.
         # self.parent().tw_sayfa_guncelle()

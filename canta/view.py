@@ -25,9 +25,9 @@ class View(QGraphicsView):
         # self.setRubberBandSelectionMode(Qt.ItemSelectionModelaraBak)
 
         # TODO !!
-        self.setViewportUpdateMode(QGraphicsView.ViewportUpdateMode.SmartViewportUpdate)
+        self.setViewportUpdateMode(QGraphicsView.ViewportUpdateMode.FullViewportUpdate)
+        # self.setViewportUpdateMode(QGraphicsView.ViewportUpdateMode.SmartViewportUpdate)
         # self.setViewportUpdateMode(self.MinimalViewportUpdate)  # default
-        # https: // doc.qt.io / qt - 5 / qgraphicsview.html  # ViewportUpdateMode-enum
         # self.setViewportUpdateMode(self.BoundingRectViewportUpdate)
         # self.setViewportUpdateMode(self.FullViewportUpdate)
 

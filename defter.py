@@ -9682,9 +9682,11 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def act_yazici_sayfa_kenar_cizdir(self):
+        # kapatinca da sinirlari sildigi icin if icinde degil.
         self.cView.baskiRectler = []
 
         if self.baskiSinirGBox.isChecked():
+
             if self.radioSayfaSigdir.isChecked():
 
                 basilacakRect = self.cScene.itemsBoundingRect()
@@ -9700,13 +9702,17 @@ class DefterAnaPencere(QMainWindow):
                 # print(kagitPozisyonBoyutRect)
 
                 self.cView.baskiRectler.append(basilacakRect)
+                i = 1
                 while toplamBaskiYuksekligi > 0:
                     toplamBaskiYuksekligi -= oranlanmis_basilacakRect_yukseklik
                     if toplamBaskiYuksekligi > 0:
                         sonrakiRect = QRectF(basilacakRect)
-                        sonrakiRect.moveTop(basilacakRect.top() + oranlanmis_basilacakRect_yukseklik)
+                        sonrakiRect.moveTop(basilacakRect.top() + (i * oranlanmis_basilacakRect_yukseklik))
                         self.cView.baskiRectler.append(sonrakiRect)
-        self.cView.update()
+                        i += 1
+            # self.cView.viewport().repaint()
+            # self.cView.update()
+            self.cView.setSceneRect(self.cView.sceneRect())
 
     # ---------------------------------------------------------------------
     def _paint_fit_page(self, painter, printer, sahne, basilacakRect):
@@ -9745,7 +9751,7 @@ class DefterAnaPencere(QMainWindow):
         # pageRect.moveTopLeft(basilacakRect.topLeft().toPoint())
         # basilacakRect.moveTopLeft(pageRect.topLeft())
         toplamBaskiYuksekligi = basilacakRect.height()
-        # sigdirma algoritmasi 
+        # sigdirma algoritmasi
         # basilacak karenin genisliginin kagit genisligine oranina gore
         # basilacak karenin yuksekligi tekrar ayarlaniyor
         baski_kagit_genislik_orani = basilacakRect.width() / kagitPozisyonBoyutRect.width()
