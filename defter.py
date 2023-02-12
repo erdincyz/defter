@@ -912,6 +912,8 @@ class DefterAnaPencere(QMainWindow):
 
         self.baskiBirimCBox = QComboBox(self.baskiSiniriCizimAyarlariDWBW)
 
+        self.baskiBirimCBox.setFixedWidth(135)
+
         self.baskiBirimCBox.addItem(self.tr("Millimeter"))
         self.baskiBirimCBox.addItem(self.tr("Point"))
         self.baskiBirimCBox.addItem(self.tr("Inch"))
@@ -919,8 +921,8 @@ class DefterAnaPencere(QMainWindow):
                                       "Didot",
                                       "Cicero"])
 
-        kagitLay = QHBoxLayout()
         self.baskiKagitBoyutuCBox = QComboBox(self.baskiSiniriCizimAyarlariDWBW)
+        # self.baskiKagitBoyutuCBox.setFixedWidth(135)
         self.baskiKagitBoyutuCBox.setMaximumWidth(135)
         printerInfo = QPrinterInfo(self.printer)
         desteklenenSayfaBoyutlari = printerInfo.supportedPageSizes()
@@ -932,7 +934,9 @@ class DefterAnaPencere(QMainWindow):
                 self.baskiKagitBoyutuCBox.addItem(psize.name())
 
         widthLbl = QLabel(self.tr("Width"), self.baskiSiniriCizimAyarlariDWBW)
+        widthLbl.setFixedWidth(50)
         heightLbl = QLabel(self.tr("Height"), self.baskiSiniriCizimAyarlariDWBW)
+        heightLbl.setFixedWidth(50)
         self.kagitGenislikLE = QLineEdit(self.baskiSiniriCizimAyarlariDWBW)
         self.kagitGenislikLE.setMaximumWidth(75)
         self.kagitGenislikLE.setEnabled(False)
@@ -944,15 +948,14 @@ class DefterAnaPencere(QMainWindow):
         self.baskiKagitBoyutuCBox.currentIndexChanged.connect(self.act_baski_kagit_boyutu_degisti)
         self.baskiKagitBoyutuCBox.setCurrentIndex(simdikiId)
 
-        kagitLay.addWidget(self.baskiBirimCBox)
-        kagitLay.addWidget(self.baskiKagitBoyutuCBox)
-        kagitLay.addStretch(1)
-        boyutLay = QHBoxLayout()
-        boyutLay.addWidget(widthLbl)
-        boyutLay.addWidget(self.kagitGenislikLE)
-        boyutLay.addWidget(heightLbl)
-        boyutLay.addWidget(self.kagitYukseklikLE)
-        boyutLay.addStretch(1)
+        boyutGenLay = QHBoxLayout()
+        boyutGenLay.addWidget(widthLbl)
+        boyutGenLay.addWidget(self.kagitGenislikLE)
+        boyutGenLay.addStretch(1)
+        boyutYukLay = QHBoxLayout()
+        boyutYukLay.addWidget(heightLbl)
+        boyutYukLay.addWidget(self.kagitYukseklikLE)
+        boyutYukLay.addStretch(1)
 
         fitRadioBtnGrp = QButtonGroup(self.baskiSinirGBox)
 
@@ -966,14 +969,6 @@ class DefterAnaPencere(QMainWindow):
         fitRadioBtnGrp.addButton(self.radioGenislikSigdir)
 
         fitRadioBtnGrp.buttonClicked.connect(self.act_yazici_sayfa_kenar_cizdir)
-
-        sigdirUstLay = QHBoxLayout()
-        sigdirLay = QVBoxLayout()
-        sigdirLay.addWidget(self.radioSayfaSigdir)
-        sigdirLay.addWidget(self.radioGenislikSigdir)
-        sigdirLay.addStretch(1)
-
-        kagitYonLay = QVBoxLayout()
 
         kagitYonBtnGrp = QButtonGroup(self.baskiSiniriCizimAyarlariDWBW)
 
@@ -989,17 +984,17 @@ class DefterAnaPencere(QMainWindow):
         kagitYonBtnGrp.addButton(self.radioBaskiDikey)
         kagitYonBtnGrp.addButton(self.radioBaskiYatay)
 
-        kagitYonLay.addWidget(self.radioBaskiDikey)
-        kagitYonLay.addWidget(self.radioBaskiYatay)
-        kagitYonLay.addStretch(1)
-
-        sigdirUstLay.addLayout(kagitYonLay)
-        sigdirUstLay.addLayout(sigdirLay)
-
         self.baskiSinirGBoxLay.addLayout(renkLay)
-        self.baskiSinirGBoxLay.addLayout(kagitLay)
-        self.baskiSinirGBoxLay.addLayout(boyutLay)
-        self.baskiSinirGBoxLay.addLayout(sigdirUstLay)
+        self.baskiSinirGBoxLay.addWidget(self.baskiBirimCBox)
+        self.baskiSinirGBoxLay.addWidget(self.baskiKagitBoyutuCBox)
+        self.baskiSinirGBoxLay.addLayout(boyutGenLay)
+        self.baskiSinirGBoxLay.addLayout(boyutYukLay)
+        self.baskiSinirGBoxLay.addSpacing(10)
+        self.baskiSinirGBoxLay.addWidget(self.radioBaskiDikey)
+        self.baskiSinirGBoxLay.addWidget(self.radioBaskiYatay)
+        self.baskiSinirGBoxLay.addSpacing(10)
+        self.baskiSinirGBoxLay.addWidget(self.radioSayfaSigdir)
+        self.baskiSinirGBoxLay.addWidget(self.radioGenislikSigdir)
 
         anaLay.addWidget(self.baskiSinirGBox)
 
@@ -1036,6 +1031,13 @@ class DefterAnaPencere(QMainWindow):
             birim_yazi = "DD"
         elif birim == psize.Unit.Cicero:
             birim_yazi = "CC"
+
+        w = psize.size(birim).width()
+        h = psize.size(birim).height()
+
+        if self.printer.pageLayout().orientation() == QPageLayout.Orientation.Landscape:
+            h, w = w, h
+
         self.kagitGenislikLE.setText("{}{}".format(psize.size(birim).width(), birim_yazi))
         self.kagitYukseklikLE.setText("{}{}".format(psize.size(birim).height(), birim_yazi))
 
@@ -1062,8 +1064,14 @@ class DefterAnaPencere(QMainWindow):
         elif birim == psize.Unit.Cicero:
             birim_yazi = "CC"
 
-        self.kagitGenislikLE.setText("{}{}".format(psize.size(birim).width(), birim_yazi))
-        self.kagitYukseklikLE.setText("{}{}".format(psize.size(birim).height(), birim_yazi))
+        w = psize.size(birim).width()
+        h = psize.size(birim).height()
+
+        if self.printer.pageLayout().orientation() == QPageLayout.Orientation.Landscape:
+            h, w = w, h
+
+        self.kagitGenislikLE.setText("{}{}".format(w, birim_yazi))
+        self.kagitYukseklikLE.setText("{}{}".format(h, birim_yazi))
         # self.printer.pageLayout().setPageSize(psize)
 
         pLayout = self.printer.pageLayout()
@@ -1085,6 +1093,7 @@ class DefterAnaPencere(QMainWindow):
             # self.printer.pageLayout().setOrientation(QPageLayout.Orientation.Portrait)
         # printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
         # printer.setOutputFileName("deneme.pdf")
+        self.act_baski_kagit_boyutu_degisti(self.baskiKagitBoyutuCBox.currentIndex())
         self.act_yazici_sayfa_kenar_cizdir()
 
     # ---------------------------------------------------------------------
