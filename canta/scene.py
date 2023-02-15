@@ -1229,6 +1229,12 @@ class Scene(QGraphicsScene):
                 if url.isLocalFile():
                     filePath = url.toLocalFile()
                     extension = os.path.splitext(filePath)[1][1:].lower()
+                    # surukle birakla pdf doya olarak eklensin, resim olarak degil.
+                    # pdf ayni zamanda supportedImageFormatList icinde de var,
+                    # o listeden pdf silmiyoruz cunku resim ekle menusunden pdfi resim olarak secebilsin.
+                    if extension == "pdf":
+                        otherFilePaths.append(filePath)
+                        continue
                     if extension in self.parent().supportedImageFormatList:
                         imgPaths.append(filePath)
                     elif extension == "def":

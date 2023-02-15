@@ -41,10 +41,14 @@ from PySide6.QtCore import (Qt, QRectF, QSettings, QPoint, Slot, QSizeF, QSize, 
 
 from PySide6.QtWebEngineWidgets import QWebEngineView
 
+from PySide6.QtPdf import QPdfDocument, QPdfPageRenderer
+
 from PySide6.QtPrintSupport import QPrinter, QPrinterInfo
 from canta import shared
 from canta.dockWidget import DockWidget
+from canta.lutfenBekleyin import LutfenBekleyin
 from canta.nesneOzellikleriYuzenWidget import NesneOzellikleriYuzenWidget
+from canta.pdfyiResmeCevirPenceresi import PdfyiResmeCevirPenceresi
 from canta.printPreviewDialog import PrintPreviewDialog
 from canta.renkSecici import RenkSeciciWidget
 from canta.scene import Scene
@@ -126,6 +130,9 @@ class DefterAnaPencere(QMainWindow):
         self.supportedImageFormatList = []
         for formatAsQByte in QImageReader.supportedImageFormats():
             self.supportedImageFormatList.append(str(formatAsQByte, 'ascii'))
+
+        # print(QImageReader.allocationLimit())
+        QImageReader.setAllocationLimit(1024)
 
         # TODO: options=QFileDialog.DontUseNativeDialog
         # TODO: su anda JPEG, PNG gibi buyuk harfli dosyalari bir gtk bugindan dolayi gormuyor,
@@ -243,7 +250,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def olustur_nesne_ozellikleriDW(self):
 
-        self.nesneOzellikleriDW = DockWidget(self.tr("Item & Tool Properties"), self)
+        self.nesneOzellikleriDW = DockWidget(self.tr("Item && Tool Properties"), self)
         self.nesneOzellikleriDW.setObjectName("nesneOzellikleriDW")
         # self.nesneOzellikleriDW.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.nesneOzellikleriDW)
@@ -3148,9 +3155,14 @@ class DefterAnaPencere(QMainWindow):
         return sceneDict
 
     # ---------------------------------------------------------------------
-    def lutfen_bekleyin_goster(self):
+    def lutfen_bekleyin_goster(self, encok_deger: int = 0):
         QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+        if encok_deger:
+            self.lutfenBekleyinWidget.belirli_yuzde_moduna_al(encok_deger)
+        else:
+            self.lutfenBekleyinWidget.belirsiz_yuzde_moduna_al()
         self.lutfenBekleyinWidget.show()
+
         # Ozellikle QThread kullanmiyoruz.
         # Bunlar kullanıcının arayuze bu islemler boyunca etki etmemesinin
         # daha iyi olacagi durumlarda cagriliyor. 
@@ -3436,25 +3448,7 @@ class DefterAnaPencere(QMainWindow):
         self.setStatusBar(self._statusBar)
         # self._statusBar.mouseDoubleClickEvent()
 
-        self.lutfenBekleyinWidget = QWidget(self._statusBar)
-        lay = QHBoxLayout()
-        lay.setContentsMargins(0, 0, 0, 0)
-        layCubuk = QVBoxLayout()
-        layCubuk.setContentsMargins(0, 4, 0, 0)
-        self.lutfenBekleyinWidget.setLayout(lay)
-        cubuk = QProgressBar(self._statusBar)
-        cubuk.setMaximumWidth(200)
-        cubuk.setMaximumHeight(7)
-        cubuk.setMinimum(0)
-        cubuk.setMaximum(0)
-
-        etiket = QLabel(self.tr("Please wait"), self.lutfenBekleyinWidget)
-        # etiket.move(30, 0)
-        lay.addStretch()
-        lay.addWidget(etiket)
-        layCubuk.addWidget(cubuk)
-        lay.addLayout(layCubuk)
-
+        self.lutfenBekleyinWidget = LutfenBekleyin(self._statusBar)
         self.lutfenBekleyinWidget.hide()
         self._statusBar.addPermanentWidget(self.lutfenBekleyinWidget)
 
@@ -4110,7 +4104,10 @@ class DefterAnaPencere(QMainWindow):
         self.actionExportDosya.triggered.connect(self.act_export_dosya)
 
         self.actionShowDosyaInfo = QAction(QIcon(':icons/info.png'), self.tr("Show file info"), self.itemContextMenu)
-        self.actionShowDosyaInfo.triggered.connect(self.act_show_dosya_info)
+        self.actionShowDosyaInfo.triggered.connect(self.act_dosya_bilgisi_goster)
+
+        self.actionPdfResmeCevir = QAction(QIcon(':icons/file-image.png'), self.tr("PDF to image(s)"), self.itemContextMenu)
+        self.actionPdfResmeCevir.triggered.connect(self.act_pdf_resme_cevir)
 
         self.itemContextMenu.addActions((self.actionPinItem,
                                          self.actionUnPinItem,
@@ -4139,14 +4136,17 @@ class DefterAnaPencere(QMainWindow):
                                          self.actionShowVideoInfo,
                                          self.actionEmbedDosya,
                                          self.actionExportDosya,
+                                         self.itemContextMenu.addSeparator(),
                                          self.actionShowDosyaInfo,
                                          self.actionShowHTMLSource,
                                          self.actionLocalizeHtml,
+                                         self.itemContextMenu.addSeparator(),
                                          self.actionShowInFileManager,
                                          self.actionResizeTextItemToFitView,
                                          self.actionShowAsWebPage,
                                          self.actionConvertToWebItem,
                                          self.itemContextMenu.addSeparator(),
+                                         self.actionPdfResmeCevir,
                                          self.actionPrintSelectedTextItemContent,
                                          self.itemContextMenu.addSeparator(),
                                          self.actionAddSelectedItemStyleAsAPreset,
@@ -4361,6 +4361,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionShowVideoInfo,
                                           self.actionEmbedDosya,
                                           self.actionExportDosya,
+                                          self.actionPdfResmeCevir,
                                           self.actionShowDosyaInfo,
                                           self.actionShowHTMLSource,
                                           self.actionLocalizeHtml,
@@ -4716,7 +4717,6 @@ class DefterAnaPencere(QMainWindow):
         self.fontCBox_tbar.setCurrentFont(self.currentFont)
         self.fontCBox_tbar.valueChangedFromFontComboBoxGuiNotByCode.connect(self.act_set_current_font)
 
-        # self.fontPointSizeFDSBox_tbar = QSpinBox(self.fontToolBar)
         self.fontPointSizeFDSBox_tbar = DoubleSpinBox(self.fontToolBar)
         self.fontPointSizeFDSBox_tbar.setSuffix(" pt")
         self.fontPointSizeFDSBox_tbar.setValue(self.fontPointSizeF)
@@ -5454,12 +5454,17 @@ class DefterAnaPencere(QMainWindow):
                 self.actionEmbedDosya.setVisible(False)
             else:
                 self.actionEmbedDosya.setVisible(True)
+            if os.path.splitext(item.filePathForSave)[1][1:].lower() == "pdf":
+                self.actionPdfResmeCevir.setVisible(True)
+            else:
+                self.actionPdfResmeCevir.setVisible(False)
         else:
             # self.actionConvertToWebItem.setVisible(True)
             # self.actionShowAsWebPage.setVisible(False)
             self.actionExportDosya.setVisible(False)
             self.actionShowDosyaInfo.setVisible(False)
             self.actionEmbedDosya.setVisible(False)
+            self.actionPdfResmeCevir.setVisible(False)
 
     # ---------------------------------------------------------------------
     # @Slot() # this is called directly from groups's overriden contextMenuEvent
@@ -9102,23 +9107,105 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_show_dosya_info(self):
+    def act_dosya_bilgisi_goster(self):
         widget = QDialog(self)
         widget.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         widget.setWindowTitle(self.tr("Defter: File info"))
         layout = QVBoxLayout()
         widget.setLayout(layout)
 
+        dosya_adres = self.cScene.activeItem.filePathForSave
+        uzanti = os.path.splitext(dosya_adres)[1][1:].lower()
+
         textEdit = QTextEdit(widget)
         textEdit.setReadOnly(True)
         layout.addWidget(textEdit)
         textEdit.append(self.tr(" Original Source Path: {}").format(self.cScene.activeItem.originalSourceFilePath))
-        textEdit.append(self.tr("\n Current Path: {}").format(self.cScene.activeItem.filePathForSave))
+        textEdit.append(self.tr("\n Current Path: {}").format(dosya_adres))
         textEdit.append(self.tr("\n isEmbeded: {}").format(self.cScene.activeItem.isEmbeded))
 
         st = os.stat(self.cScene.activeItem.filePathForSave)
         textEdit.append(self.tr("\n Size: {} Mb").format(st.st_size / 1024 / 1024))
+
+        if uzanti == "pdf":
+            pdf = QPdfDocument(self)
+            pdf.load(self.cScene.activeItem.filePathForSave)
+            boyut_point = pdf.pagePointSize(1).toSize()
+            textEdit.append(self.tr(f"\n Pages: {pdf.pageCount()}"))
+            textEdit.append(self.tr(f"\n Width: {boyut_point.width()}"))
+            textEdit.append(self.tr(f"\n Height: {boyut_point.height()}"))
+            # pdf.deleteLater()
+
         widget.show()
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def act_pdf_resme_cevir(self):
+
+        # self.dpi = QApplication.primaryScreen().physicalDotsPerInch()
+        # print(self.dpi)
+        # self.dpr = QApplication.primaryScreen().devicePixelRatio()
+        # print(self.dpr)
+        # self.ldpr = QApplication.primaryScreen().logicalDotsPerInch()
+        # print(self.ldpr)
+
+        self.pdfPos = self.cScene.activeItem.scenePos() + QPoint(0, self.cScene.activeItem.rect().height())
+        self.pdf = QPdfDocument(self)
+        self.pdf.load(self.cScene.activeItem.filePathForSave)
+
+        boyut_point = self.pdf.pagePointSize(1).toSize()
+
+        pdfyiResmeCevir = PdfyiResmeCevirPenceresi(boyut_point, self.pdf.pageCount())
+        pdfyiResmeCevir.donusturTiklandi.connect(self._pdf_resme_cevir_sayfalari_iste)
+        pdfyiResmeCevir.exec()
+
+    # ---------------------------------------------------------------------
+    @Slot(int, int, int, int, int)
+    def _pdf_resme_cevir_sayfalari_iste(self, gen, yuk, ilk, son, sayfa_arasi_bosluk):
+        self.lutfen_bekleyin_goster(encok_deger=son)
+        self.sayfa_arasi_bosluk = sayfa_arasi_bosluk
+
+        rend = QPdfPageRenderer(self)
+        rend.setDocument(self.pdf)
+        rend.setRenderMode(QPdfPageRenderer.RenderMode.MultiThreaded)
+        rend.pageRendered.connect(self._pdf_resme_cevir_sayfa_hazir)
+
+        for sayfa_no in range(ilk, 1 + son):
+            rend.requestPage(sayfa_no, QSize(gen, yuk))
+        self.pdf = None
+
+    # ---------------------------------------------------------------------
+    def _pdf_resme_cevir_sayfa_hazir(self, sayfa_no, boyut, sayfa_img, options, reqId):
+
+        sablon_dosya_adi = "image-from-pdf.png"
+        imageSavePath = self.cScene.get_unique_path_for_embeded_image(sablon_dosya_adi)
+
+        sayfa_img.save(imageSavePath)
+        # print(image.byteCount())
+
+        # pixMap = QPixmap(imageSavePath)
+        # pixMap = QPixmap(sayfa_img)
+        pixMap = QPixmap.fromImage(sayfa_img)
+
+        rect = QRectF(pixMap.rect())
+        imageItem = Image(imageSavePath, self.pdfPos, rect, self.cScene.ResimAraci.yaziRengi,
+                          self.cScene.ResimAraci.arkaPlanRengi,
+                          QPen(self.cScene.ResimAraci.kalem), self.cScene.ResimAraci.yaziTipi)
+
+        imageItem.isEmbeded = True
+
+        self.increase_zvalue(imageItem)
+        self.cScene.undoRedo.undoableAddItem(self.cScene.undoStack, description=self.tr("PDF to image"),
+                                             scene=self.cScene,
+                                             item=imageItem)
+        imageItem.reload_image_after_scale()
+        self.cScene.unite_with_scene_rect(imageItem.sceneBoundingRect())
+
+        self.pdfPos += QPoint(0, boyut.height() + self.sayfa_arasi_bosluk)
+
+        self.lutfenBekleyinWidget.simdiki_deger_gir(sayfa_no)
+        if sayfa_no == self.lutfenBekleyinWidget.yuzdeCubukEnCokDeger():
+            self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     def item_selected(self, item):

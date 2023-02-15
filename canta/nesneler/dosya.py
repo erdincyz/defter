@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # .
 
-
 __project_name__ = 'Defter'
 __date__ = '06/Nov/2018'
 __author__ = 'Erdinç Yılmaz'
@@ -131,24 +130,6 @@ class DosyaNesnesi(BaseItem):
         self.scene().parent().itemContextMenu.popup(event.screenPos())
 
         event.accept()
-
-    # ---------------------------------------------------------------------
-    def onizle(self):
-
-        hedefBoyut = QSize(30, 40)
-
-        pixmap = QPixmap('/path/to/image.png')
-
-        # resize pixmap
-        pixmap = pixmap.scaled(hedefBoyut, Qt.AspectRatioMode.KeepAspectRatioByExpanding,
-                               Qt.TransformationMode.SmoothTransformation)
-
-        # crop pixmap - the following assumes the image aspect is always wider than the button.  if that's not the case
-        # you'll need to compare your image/button aspects and crop vertically/horizontally as necessary
-        cropOffsetX = (pixmap.width() - hedefBoyut.width()) / 2
-        pixmap = pixmap.copy(cropOffsetX, 0, QSize(30, 40).width(), QSize(30, 40).height())
-
-        # icon = QIcon(pixmap)
 
     # ---------------------------------------------------------------------
     def paint(self, painter, option, widget=None):
