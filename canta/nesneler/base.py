@@ -34,9 +34,12 @@ class BaseItem(QGraphicsItem):
 
         self.secili_nesne_kalem_kalinligi = 0
 
+        # resim nesnesinde paint icinde kullaniyoruz,
+        # o yuzden nesneye tiklanmamisken de lazim oluyor.
+        self._resizing = False
         self.handleSize = 10
         self.resizeHandleSize = QSizeF(self.handleSize, self.handleSize)
-        self.create_resize_handles()
+        self.update_resize_handles()
 
         self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
                       QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
@@ -310,22 +313,20 @@ class BaseItem(QGraphicsItem):
             self.rotateWithOffset(eskiRot)
 
     # ---------------------------------------------------------------------
-    def create_resize_handles(self):
-        self.topLeftHandle = QRectF(self.rect().topLeft(), self.resizeHandleSize)
-        self.topRightHandle = QRectF(self.rect().topRight(), self.resizeHandleSize)
-        self.bottomRightHandle = QRectF(self.rect().bottomRight(), self.resizeHandleSize)
-        self.bottomLeftHandle = QRectF(self.rect().bottomLeft(), self.resizeHandleSize)
-
-        # initial move
-        self.topRightHandle.moveTopRight(self.rect().topRight())
-        self.bottomRightHandle.moveBottomRight(self.rect().bottomRight())
-        self.bottomLeftHandle.moveBottomLeft(self.rect().bottomLeft())
-
-    # ---------------------------------------------------------------------
     def update_resize_handles(self):
         self.prepareGeometryChange()
 
-        self.topLeftHandle.moveTopLeft(self.rect().topLeft())
+        if self.scene():
+            resizeHandleSize = self.resizeHandleSize / self.scene().views()[0].transform().m11()
+        else:
+            resizeHandleSize = self.resizeHandleSize
+
+        self.topLeftHandle = QRectF(self.rect().topLeft(), resizeHandleSize)
+        self.topRightHandle = QRectF(self.rect().topRight(), resizeHandleSize)
+        self.bottomRightHandle = QRectF(self.rect().bottomRight(), resizeHandleSize)
+        self.bottomLeftHandle = QRectF(self.rect().bottomLeft(), resizeHandleSize)
+
+        # self.topLeftHandle.moveTopLeft(self.rect().topLeft())
         self.topRightHandle.moveTopRight(self.rect().topRight())
         self.bottomRightHandle.moveBottomRight(self.rect().bottomRight())
         self.bottomLeftHandle.moveBottomLeft(self.rect().bottomLeft())
@@ -508,7 +509,8 @@ class BaseItem(QGraphicsItem):
         # self.selectionPenBottomIfAlsoActiveItem.setCosmetic(True)
         # self.selectionPenTop.setCosmetic(True)
 
-        # self.handlePen = QPen(self.cizgiRengi, self.cizgiKalinligi, Qt.DashLine)
+        # self.handlePen = QPen(_selectionLineBgColor, self.secili_nesne_kalem_kalinligi, Qt.PenStyle.SolidLine)
+        self.handlePen = QPen(_activeItemLineColor, self.secili_nesne_kalem_kalinligi, Qt.PenStyle.SolidLine)
 
         self.update()
 
@@ -670,17 +672,17 @@ class BaseItem(QGraphicsItem):
             # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
             #######################################################################
             # if not self.isPinned and self.isActiveItem:
-            #     # painter.setPen(self.handlePen)
-            #     # painter.drawRect(self.topLeftHandle)
-            #     # painter.drawRect(self.topRightHandle)
-            #     # painter.drawRect(self.bottomRightHandle)
-            #     # painter.drawRect(self.bottomLeftHandle)
+            #     painter.setPen(self.handlePen)
+            #     painter.drawRect(self.topLeftHandle)
+            #     painter.drawRect(self.topRightHandle)
+            #     painter.drawRect(self.bottomRightHandle)
+            #     painter.drawRect(self.bottomLeftHandle)
             #
-            #     # painter.setPen(QPen(Qt.red, 3))
-            #     # painter.drawPoint(self.topLeftHandle.center())
-            #     # painter.drawPoint(self.topRightHandle.center())
-            #     # painter.drawPoint(self.bottomRightHandle.center())
-            #     # painter.drawPoint(self.bottomLeftHandle.center())
+            #     painter.setPen(QPen(Qt.red, 3))
+            #     painter.drawPoint(self.topLeftHandle.center())
+            #     painter.drawPoint(self.topRightHandle.center())
+            #     painter.drawPoint(self.bottomRightHandle.center())
+            #     painter.drawPoint(self.bottomLeftHandle.center())
 
             #######################################################################
 

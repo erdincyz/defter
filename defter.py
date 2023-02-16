@@ -4080,6 +4080,12 @@ class DefterAnaPencere(QMainWindow):
         self.actionCrop.setShortcut(QKeySequence("Alt+C"))
         self.actionCrop.triggered.connect(lambda: self.act_crop(self.cScene.activeItem))
 
+        self.actionResmiOrjinalBoyutunaDondur = QAction(QIcon(':icons/zoom-reset.png'),
+                                                        self.tr("Image to original size"),
+                                                        self.itemContextMenu)
+        # self.actionResmiOrjinalBoyutunaDondur.setShortcut(QKeySequence("Alt+C"))
+        self.actionResmiOrjinalBoyutunaDondur.triggered.connect(self.act_resmi_orjinal_boyutuna_dondur)
+
         # ---------------------------------------------------------------------
         self.actionEmbedVideo = QAction(QIcon(":icons/command.png"), self.tr("Embed video(s) to document"),
                                         self.itemContextMenu)
@@ -4131,6 +4137,7 @@ class DefterAnaPencere(QMainWindow):
                                          self.actionExportImage,
                                          self.actionShowImageInfo,
                                          self.actionCrop,
+                                         self.actionResmiOrjinalBoyutunaDondur,
                                          self.actionEmbedVideo,
                                          self.actionExportVideo,
                                          self.actionShowVideoInfo,
@@ -4356,6 +4363,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionExportImage,
                                           self.actionShowImageInfo,
                                           self.actionCrop,
+                                          self.actionResmiOrjinalBoyutunaDondur,
                                           self.actionEmbedVideo,
                                           self.actionExportVideo,
                                           self.actionShowVideoInfo,
@@ -5407,6 +5415,7 @@ class DefterAnaPencere(QMainWindow):
             self.actionExportImage.setVisible(True)
             self.actionShowImageInfo.setVisible(True)
             self.actionCrop.setVisible(True)
+            self.actionResmiOrjinalBoyutunaDondur.setVisible(True)
             if item.isEmbeded:
                 # self.actionEmbedImage.setEnabled(False)
                 self.actionEmbedImage.setVisible(False)
@@ -5418,6 +5427,7 @@ class DefterAnaPencere(QMainWindow):
             self.actionEmbedImage.setVisible(False)
             self.actionShowImageInfo.setVisible(False)
             self.actionCrop.setVisible(False)
+            self.actionResmiOrjinalBoyutunaDondur.setVisible(False)
 
         if item.type() == shared.VIDEO_ITEM_TYPE:
             self.actionShowInFileManager.setVisible(True)
@@ -5694,6 +5704,15 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.aktif_arac_degistir(aktifArac=self.cScene.ResimKirpAraci)
         else:
             self.log(self.tr("No active image item!"), 5000, toStatusBarOnly=True)
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def act_resmi_orjinal_boyutuna_dondur(self):
+        if self.cScene.activeItem.type() == shared.IMAGE_ITEM_TYPE:  # hotkeyden item none gelirse diye
+            self.cScene.activeItem.orjinal_boyuta_dondur()
+        else:
+            self.log(self.tr("No active image item!"), 5000, toStatusBarOnly=True)
+
 
     # ---------------------------------------------------------------------
     @Slot()

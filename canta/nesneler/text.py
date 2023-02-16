@@ -66,7 +66,7 @@ class Text(QGraphicsTextItem):
         self.secili_nesne_kalem_kalinligi = 0
         self.handleSize = 10
         self.resizeHandleSize = QSizeF(self.handleSize, self.handleSize)
-        self.create_resize_handles()
+        self.update_resize_handles()
 
         # self.setCacheMode(Text.DeviceCoordinateCache)
         # self.setCacheMode(Text.ItemCoordinateCache)
@@ -244,22 +244,20 @@ class Text(QGraphicsTextItem):
         self.update_resize_handles()
 
     # ---------------------------------------------------------------------
-    def create_resize_handles(self):
-        self.topLeftHandle = QRectF(self._rect.topLeft(), self.resizeHandleSize)
-        self.topRightHandle = QRectF(self._rect.topRight(), self.resizeHandleSize)
-        self.bottomRightHandle = QRectF(self._rect.bottomRight(), self.resizeHandleSize)
-        self.bottomLeftHandle = QRectF(self._rect.bottomLeft(), self.resizeHandleSize)
-
-        # initial move
-        self.topRightHandle.moveTopRight(self._rect.topRight())
-        self.bottomRightHandle.moveBottomRight(self._rect.bottomRight())
-        self.bottomLeftHandle.moveBottomLeft(self._rect.bottomLeft())
-
-    # ---------------------------------------------------------------------
     def update_resize_handles(self):
         self.prepareGeometryChange()
 
-        self.topLeftHandle.moveTopLeft(self.boundingRect().topLeft())
+        if self.scene():
+            resizeHandleSize = self.resizeHandleSize / self.scene().views()[0].transform().m11()
+        else:
+            resizeHandleSize = self.resizeHandleSize
+
+        self.topLeftHandle = QRectF(self.rect().topLeft(), resizeHandleSize)
+        self.topRightHandle = QRectF(self.rect().topRight(), resizeHandleSize)
+        self.bottomRightHandle = QRectF(self.rect().bottomRight(), resizeHandleSize)
+        self.bottomLeftHandle = QRectF(self.rect().bottomLeft(), resizeHandleSize)
+
+        # self.topLeftHandle.moveTopLeft(self.boundingRect().topLeft())
         self.topRightHandle.moveTopRight(self.boundingRect().topRight())
         self.bottomRightHandle.moveBottomRight(self.boundingRect().bottomRight())
         self.bottomLeftHandle.moveBottomLeft(self.boundingRect().bottomLeft())

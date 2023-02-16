@@ -45,7 +45,7 @@ class LineItem(QGraphicsItem):
 
         self.handleSize = 25
         self.resizeHandleSize = QSizeF(self.handleSize, self.handleSize)
-        self.create_resize_handles()
+        self.update_resize_handles()
 
         if line:
             self.setLine(line)
@@ -178,18 +178,16 @@ class LineItem(QGraphicsItem):
         self.scene().parent().log(txt=sahne_acisi, toStatusBarOnly=True)
 
     # ---------------------------------------------------------------------
-    def create_resize_handles(self):
-        self.p1Handle = QRectF(self._line.p1(), self.resizeHandleSize)
-        self.p2Handle = QRectF(self._line.p2(), self.resizeHandleSize)
-
-        # initial move
-        self.p2Handle.moveCenter(self._line.p2())
-        # self.bottomRightHandle.moveBottomRight(self.rect().bottomRight())
-        # self.bottomLeftHandle.moveBottomLeft(self.rect().bottomLeft())
-
-    # ---------------------------------------------------------------------
     def update_resize_handles(self):
         self.prepareGeometryChange()
+
+        if self.scene():
+            resizeHandleSize = self.resizeHandleSize / self.scene().views()[0].transform().m11()
+        else:
+            resizeHandleSize = self.resizeHandleSize
+
+        self.p1Handle = QRectF(self._line.p1(), resizeHandleSize)
+        self.p2Handle = QRectF(self._line.p2(), resizeHandleSize)
 
         self.p1Handle.moveCenter(self._line.p1())
         self.p2Handle.moveCenter(self._line.p2())

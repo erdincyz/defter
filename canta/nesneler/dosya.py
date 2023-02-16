@@ -192,7 +192,7 @@ class DosyaNesnesi(BaseItem):
             # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
             ########################################################################
             # if not self.isPinned and self.isActiveItem:
-            #     # painter.setPen(self.handlePen)
+            #     painter.setPen(self.handlePen)
             #     painter.drawRect(self.topLeftHandle)
             #     painter.drawRect(self.topRightHandle)
             #     painter.drawRect(self.bottomRightHandle)

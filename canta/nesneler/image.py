@@ -60,6 +60,9 @@ class Image(BaseItem):
 
         # self.pixmap = QPixmap(self.filePathForDraw)
 
+        self.orjinal_boyut = self.pixmap.size()
+        self.bilgi_olcek = "1 - 1"
+
         self.setFlags(BaseItem.GraphicsItemFlag.ItemIsMovable | BaseItem.GraphicsItemFlag.ItemIsSelectable)
 
         self.imageOpacity = 1.0
@@ -123,6 +126,11 @@ class Image(BaseItem):
 
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
+
+        if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
+            self.orjinal_boyuta_dondur()
+            return  # QGraphicsItem.mouseDoubleClickEvent(self, event)
+
         if event.button() == Qt.MouseButton.LeftButton:
             textItem = Text(event.scenePos(), self.yaziRengi, self.arkaPlanRengi, self.pen(), self.font())
             textItem.set_document_url(self.scene().tempDirPath)
@@ -199,7 +207,8 @@ class Image(BaseItem):
                 # eskiSize = self.rect().size()
                 pixMapOriginalSize = self.pixmap.rect().size()
                 # eskiSize.scale(yeniSize, Qt.KeepAspectRatio)
-                pixMapOriginalSize.scale(yeniSize.height(), yeniSize.height(), Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+                pixMapOriginalSize.scale(yeniSize.height(), yeniSize.height(),
+                                         Qt.AspectRatioMode.KeepAspectRatioByExpanding)
                 # eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.KeepAspectRatio)
 
                 # if not eskiSize.isNull():
@@ -256,12 +265,34 @@ class Image(BaseItem):
             self.setRect(self.mapRectFromItem(self, rect))  # mouse release eventten gonderiyoruz undoya
             self.update_resize_handles()
             self.scene().parent().change_transform_box_values(self)
+
+            self.bilgi_olcek = f"{rect.width() / self.orjinal_boyut.width():.2f} " \
+                               f"- {rect.height() / self.orjinal_boyut.height():.2f}"
             # self.setPos(x, y)
             # self.update_painter_text_rect()
 
         # event.accept()
         else:
             super(Image, self).mouseMoveEvent(event)
+
+    # ---------------------------------------------------------------------
+    def orjinal_boyuta_dondur(self):
+
+        yeniRect = QRectF(self._rect)
+        yeniRect.setSize(self.orjinal_boyut)
+
+        self.scene().undoRedo.undoableResizeBaseItem(self.scene().undoStack,
+                                                     "resize to original",
+                                                     self,
+                                                     # yeniRect=self.rect(),
+                                                     yeniRect=yeniRect,
+                                                     eskiRect=QRectF(self._rect),
+                                                     eskiPos=self.pos())
+
+        self.update_resize_handles()
+        self.scene().parent().change_transform_box_values(self)
+        self.update_painter_text_rect()
+        self.scene().unite_with_scene_rect(self.sceneBoundingRect())
 
     # ---------------------------------------------------------------------
     def reload_image_after_scale(self):
@@ -276,12 +307,16 @@ class Image(BaseItem):
             pixmap = QPixmap(self.filePathForDraw)
             QPixmapCache.insert(self.filePathForDraw, pixmap)
 
-        self.pixmap = pixmap.scaled(self.rect().size().toSize(), Qt.AspectRatioMode.KeepAspectRatio)
+        size = self.rect().size().toSize()
+        self.pixmap = pixmap.scaled(size, Qt.AspectRatioMode.KeepAspectRatio)
 
         if self.isMirrorX:
             self.pixmap = self.pixmap.transformed(QTransform().scale(-1, 1))
         if self.isMirrorY:
             self.pixmap = self.pixmap.transformed(QTransform().scale(1, -1))
+
+        self.bilgi_olcek = f"{size.width() / self.orjinal_boyut.width():.2f} " \
+                           f"- {size.height() / self.orjinal_boyut.height():.2f}"
 
     # ---------------------------------------------------------------------
     def finish_crop(self):
@@ -540,6 +575,13 @@ class Image(BaseItem):
             painter.setPen(selectionPenBottom)
             painter.drawRect(self.rect())
 
+            if self._resizing:
+                oran = 1 / self.scene().views()[0].transform().m11()
+                font = painter.font()
+                font.setPointSizeF(font.pointSizeF() * oran)
+                painter.setFont(font)
+                painter.drawText(rect.topLeft().x(), rect.topLeft().y() + 10, self.bilgi_olcek)
+
             # painter.setPen(self.selectionPenTop)
             # painter.drawRect(self.rect())
 
@@ -547,7 +589,7 @@ class Image(BaseItem):
             # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
             ########################################################################
             # if not self.isPinned and self.isActiveItem:
-            #     # painter.setPen(self.handlePen)
+            #     painter.setPen(self.handlePen)
             #     painter.drawRect(self.topLeftHandle)
             #     painter.drawRect(self.topRightHandle)
             #     painter.drawRect(self.bottomRightHandle)
