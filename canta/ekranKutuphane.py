@@ -69,7 +69,7 @@ class EkranKutuphane(QGraphicsView):
         # if some item was under the mouse and showed its context menu, the event will
         # have been accepted
         if not event.isAccepted():
-            self.scene().parent().ekran_kutuphane_context_menu_goster(event.globalPos())
+            self.scene().parent().ekran_kutuphane_sag_menu_goster(event.globalPos())
             # TODO: gerek var mi?
             # event.accept()
 

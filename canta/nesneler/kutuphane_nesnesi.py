@@ -307,7 +307,7 @@ class KutuphaneNesnesi(QGraphicsItem):
         # self.scene().parent().item_context_menu(self, event.screenPos())
         # self.scene().parent().on_item_context_menu_about_to_show(self)
         # self.scene().parent().itemContextMenu.popup(event.screenPos())
-        self.scene().parent().kutuphaneNesneContextMenu.popup(event.screenPos())
+        self.scene().parent().kutuphaneNesneSagMenu.popup(event.screenPos())
         event.accept()
 
     # ---------------------------------------------------------------------

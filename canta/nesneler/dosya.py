@@ -126,8 +126,8 @@ class DosyaNesnesi(BaseItem):
         self.setSelected(True)
 
         # self.scene().parent().item_context_menu(self, event.screenPos())
-        self.scene().parent().on_item_context_menu_about_to_show(self)
-        self.scene().parent().itemContextMenu.popup(event.screenPos())
+        self.scene().parent().on_dosya_sag_menu_about_to_show(self)
+        self.scene().parent().dosyaSagMenu.popup(event.screenPos())
 
         event.accept()
 

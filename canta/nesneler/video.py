@@ -7,7 +7,7 @@ __date__ = '04/Sep/2016'
 
 import os
 
-from PySide6.QtCore import Qt, QUrl, QSizeF, QRectF, QPointF, QPoint, QLine, QTimer
+from PySide6.QtCore import Qt, QUrl, QSizeF, QRectF, QPointF, QPoint, QLine
 from PySide6.QtGui import QPen, QPixmap, QPixmapCache, QPainterPath
 from PySide6.QtWidgets import QStyle
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
@@ -40,7 +40,7 @@ class VideoItem(BaseItem):
         # if rect.size() == QSizeF(1, 1):
         #     rect
         self.videoItem = GraphicsVideoItem()
-        self.videoItem.setFlag(QGraphicsVideoItem.ItemStacksBehindParent)
+        self.videoItem.setFlag(QGraphicsVideoItem.GraphicsItemFlag.ItemStacksBehindParent)
         rect.setSize(self.videoItem.size())
         super(VideoItem, self).__init__(pos, rect, yaziRengi, arkaPlanRengi, pen, font, parent)
         # QGraphicsVideoItem.__init__(parent)
@@ -173,6 +173,23 @@ class VideoItem(BaseItem):
         event.accept()
 
     # super(VideoItem, self).keyPressEvent(event)
+
+    # ---------------------------------------------------------------------
+    def contextMenuEvent(self, event):
+        # TODO: bu alttaki iki satir aktif idi, ve de ctrl harici sag tiklayinca
+        # (base- text -path -group nesnelerinin contextMenuEventinde var)
+        # mesela birden fazla nesne secili ve de gruplayacagız diyelim sag menu ile
+        # ctrl basılı degil ise tikladigimiz secili kaliyor digerleri siliniyordu
+        # uygunsuz bir kullanıcı deneyimi, niye yaptık acaba boyleyi hatırlayana kadar kalsın burda :)
+        # if not event.modifiers() == Qt.KeyboardModifier.ControlModifier:
+        #     self.scene().clearSelection()
+        self.setSelected(True)
+
+        # self.scene().parent().item_context_menu(self, event.screenPos())
+        self.scene().parent().on_video_sag_menu_about_to_show(self)
+        self.scene().parent().videoSagMenu.popup(event.screenPos())
+
+        event.accept()
 
     # ---------------------------------------------------------------------
     def act_player_media_status_changed(self, status):

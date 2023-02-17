@@ -151,8 +151,8 @@ class Group(QGraphicsItem):
         self.setSelected(True)
 
         # self.scene().parent().group_item_context_menu(self, event.screenPos())
-        self.scene().parent().on_group_item_context_menu_about_to_show(self)
-        self.scene().parent().groupContextMenu.popup(event.screenPos())
+        self.scene().parent().on_grup_sag_menu_about_to_show(self)
+        self.scene().parent().grupSagMenu.popup(event.screenPos())
         event.accept()
 
     # ---------------------------------------------------------------------
@@ -381,16 +381,22 @@ class Group(QGraphicsItem):
                 # item._line.setAngle(item._line.angle() - self.rotation())
                 # item.update_arrow()
             item.setPos(pos)
-            item.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable | QGraphicsItem.GraphicsItemFlag.ItemIsMovable | QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
+            item.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
+                          QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
+                          QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
             # TODO: info: gruplanmiş parentlarin childlerini grupta tutmuyoruz. dolayisi ile
             # burda manual ayarliyoruz flaglari. yoksa secilemez oluyrolar. manual false etmistik zaten act_groupta.
             if not item.type() == self.type():  # grubun iceriginin secilemezligi korunsun diye
                 for c in item.childItems():
-                    c.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable | QGraphicsItem.GraphicsItemFlag.ItemIsMovable | QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
+                    c.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
+                               QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
+                               QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
                     c.setSelected(True)
             else:
                 for c in item.parentedWithParentOperation:
-                    c.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable | QGraphicsItem.GraphicsItemFlag.ItemIsMovable | QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
+                    c.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
+                               QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
+                               QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
                     c.setSelected(True)
             item.setSelected(True)
         self.scene().unGroupedRootItems.update(unGroupedRootItems)

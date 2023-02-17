@@ -6,7 +6,6 @@ __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
 # from math import fabs
-from math import ceil
 
 from PySide6.QtCore import Qt, Signal, QSizeF, QRectF, QPointF, Slot, QUrl
 from PySide6.QtGui import QBrush, QPen, QColor, QPainterPath, QFontMetricsF, QTextCursor
@@ -70,7 +69,7 @@ class Text(QGraphicsTextItem):
 
         # self.setCacheMode(Text.DeviceCoordinateCache)
         # self.setCacheMode(Text.ItemCoordinateCache)
-        self.setCacheMode(Text.NoCache)
+        self.setCacheMode(Text.CacheMode.NoCache)
         self.setFlags(QGraphicsTextItem.GraphicsItemFlag.ItemIsSelectable |
                       QGraphicsTextItem.GraphicsItemFlag.ItemIsMovable |
                       QGraphicsTextItem.GraphicsItemFlag.ItemIsFocusable)
@@ -376,8 +375,8 @@ class Text(QGraphicsTextItem):
         self.setSelected(True)
 
         # self.scene().parent().item_context_menu(self, event.screenPos())
-        self.scene().parent().on_item_context_menu_about_to_show(self)
-        self.scene().parent().itemContextMenu.popup(event.screenPos())
+        self.scene().parent().on_yazi_sag_menu_about_to_show(self)
+        self.scene().parent().yaziSagMenu.popup(event.screenPos())
 
         event.accept()
 

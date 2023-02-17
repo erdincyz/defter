@@ -482,8 +482,8 @@ class LineItem(QGraphicsItem):
         self.setSelected(True)
 
         # self.scene().parent().item_context_menu(self, event.screenPos())
-        self.scene().parent().on_item_context_menu_about_to_show(self)
-        self.scene().parent().itemContextMenu.popup(event.screenPos())
+        self.scene().parent().on_nesne_sag_menu_about_to_show(self)
+        self.scene().parent().nesneSagMenu.popup(event.screenPos())
 
         event.accept()
 

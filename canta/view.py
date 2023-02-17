@@ -84,7 +84,7 @@ class View(QGraphicsView):
         QGraphicsView.contextMenuEvent(self, event)
         # mouse altinda bir nesne varsa ve sag click menusunu gosterdiyse event.accepted() doner.
         if not event.isAccepted():
-            self.scene().parent().view_context_menu_goster(event.globalPos())
+            self.scene().parent().view_sag_menu_goster(event.globalPos())
             # TODO: gerek var mi?
             # event.accept()
 

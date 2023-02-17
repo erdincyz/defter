@@ -82,8 +82,8 @@ from canta.treeView import TreeView
 from canta.treeSayfa import Sayfa
 from canta.pushButton import PushButton, PushButtonRenk
 from canta.yuzenWidget import YuzenWidget
-from canta.with_signals_updates_blocked import signals_blocked_and_updates_disabled as signals_updates_blocked, \
-    signals_blocked
+from canta.with_signals_updates_blocked import (signals_blocked_and_updates_disabled as signals_updates_blocked,
+                                                signals_blocked)
 import canta.icons_rc
 
 from canta import undoRedoFonksiyolar as undoRedo
@@ -192,7 +192,7 @@ class DefterAnaPencere(QMainWindow):
         self.olustur_menu_bar()
         self.olustur_utilities_toolbar()
         self.olustur_status_bar()
-        self.olustur_item_context_menus_and_actions()
+        self.olustur_nesne_sag_menuler()
         self.olustur_dummy_widget_for_actions()
 
         self.ekle_hotkeys()
@@ -1446,7 +1446,7 @@ class DefterAnaPencere(QMainWindow):
                 #     self.log(self.tr("Please select a page."))
                 #     return
             # satir = self.sayfalarDWTreeView.get_selected_sayfa().satir()
-            satir = parentItem.satirSayisi()-1
+            satir = parentItem.satirSayisi() - 1
             sayfa = self.cModel.sayfa_ekle(satir=satir,
                                            scene=scene,
                                            view=view,
@@ -3992,19 +3992,19 @@ class DefterAnaPencere(QMainWindow):
         self.undoGroup.cleanChanged.connect(self.clean_changed)
 
     # ---------------------------------------------------------------------
-    def olustur_item_context_menus_and_actions(self):
-        self.itemContextMenu = QMenu(self.tr("Item Menu"), self)
+    def olustur_nesne_sag_menuler(self):
+        self.nesneSagMenu = QMenu(self.tr("Item Menu"), self)
 
-        self.actionPinItem = QAction(QIcon(":icons/pin.png"), self.tr("Pin"), self.itemContextMenu)
+        self.actionPinItem = QAction(QIcon(":icons/pin.png"), self.tr("Pin"), self.nesneSagMenu)
         self.actionPinItem.setShortcut(QKeySequence("k"))
         # self.actionPinItem.setShortcutContext(Qt.ApplicationShortcut)
         self.actionPinItem.triggered.connect(self.act_pin_item)
 
-        self.actionUnPinItem = QAction(QIcon(":icons/unpin.png"), self.tr("Unpin"), self.itemContextMenu)
+        self.actionUnPinItem = QAction(QIcon(":icons/unpin.png"), self.tr("Unpin"), self.nesneSagMenu)
         self.actionUnPinItem.setShortcut(QKeySequence("Shift+k"))
         self.actionUnPinItem.triggered.connect(self.act_unpin_item)
 
-        self.actionEditCommand = QAction(QIcon(":icons/command.png"), self.tr("~Edit Command"), self.itemContextMenu)
+        self.actionEditCommand = QAction(QIcon(":icons/command.png"), self.tr("~Edit Command"), self.nesneSagMenu)
         self.actionEditCommand.setShortcut(QKeySequence("Shift+C"))
         self.actionEditCommand.triggered.connect(lambda: self.act_edit_command(self.cScene.activeItem))
         # self.actionEditCommand.setShortcutContext(Qt.WindowShortcut)
@@ -4012,182 +4012,285 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionAddSelectedItemStyleAsAPreset = QAction(QIcon(':icons/icons/text-html.png'),
                                                            self.tr("Add selected item's style as a preset"),
-                                                           self.itemContextMenu)
+                                                           self.nesneSagMenu)
         self.actionAddSelectedItemStyleAsAPreset.triggered.connect(self.act_add_style_preset)
 
         self.actionSeciliNesneStiliniSeciliAracaUygula = QAction(QIcon(':icons/icons/text-html.png'),
                                                                  self.tr(
                                                                      "Apply selected item's style to the active tool"),
-                                                                 self.itemContextMenu)
+                                                                 self.nesneSagMenu)
         self.actionSeciliNesneStiliniSeciliAracaUygula.triggered.connect(
             self.act_secili_nesne_stilini_secili_araca_uygula)
 
         self.actionSeciliNesneStiliniKendiAracinaUygula = QAction(QIcon(':icons/icons/text-html.png'),
                                                                   self.tr(
                                                                       "Set selected item's style as tool default"),
-                                                                  self.itemContextMenu)
+                                                                  self.nesneSagMenu)
         self.actionSeciliNesneStiliniKendiAracinaUygula.triggered.connect(
             self.act_secili_nesne_stilini_kendi_aracina_uygula)
 
         self.actionShowInFileManager = QAction(QIcon(':icons/icons/text-html.png'), self.tr("Show in file manager"),
-                                               self.itemContextMenu)
+                                               self.nesneSagMenu)
         self.actionShowInFileManager.triggered.connect(self.act_show_in_file_manager)
 
         # ---------------------------------------------------------------------
 
         self.actionConvertToPlainText = QAction(QIcon(":icons/command.png"),
                                                 self.tr("Convert selected item(s) to plain text"),
-                                                self.itemContextMenu)
+                                                self.nesneSagMenu)
         self.actionConvertToPlainText.setShortcut(QKeySequence("Ctrl+Alt+P"))
         self.actionConvertToPlainText.triggered.connect(self.act_convert_to_plain_text)
 
         self.actionShowHTMLSource = QAction(QIcon(':icons/icons/text-html.png'), self.tr("Show HTML source"),
-                                            self.itemContextMenu)
+                                            self.nesneSagMenu)
         self.actionShowHTMLSource.triggered.connect(self.act_show_html_source)
 
         self.actionLocalizeHtml = QAction(QIcon(':icons/icons/text-html.png'), self.tr("Localize HTML"),
-                                          self.itemContextMenu)
+                                          self.nesneSagMenu)
         self.actionLocalizeHtml.triggered.connect(self.act_localize_html)
 
         self.actionResizeTextItemToFitView = QAction(QIcon(':icons/icons/text-html.png'),
-                                                     self.tr("Resize to fit in view"), self.itemContextMenu)
+                                                     self.tr("Resize to fit in view"), self.nesneSagMenu)
         self.actionResizeTextItemToFitView.triggered.connect(self.act_resize_text_item_to_fit_view)
 
         self.actionShowAsWebPage = QAction(QIcon(':icons/icons/text-html.png'), self.tr("Show as web page"),
-                                           self.itemContextMenu)
+                                           self.nesneSagMenu)
         self.actionShowAsWebPage.triggered.connect(self.act_show_as_web_page)
 
         self.actionConvertToWebItem = QAction(QIcon(':icons/icons/text-html.png'),
                                               self.tr("~Convert to web item (Experimental && Slow)"),
-                                              self.itemContextMenu)
+                                              self.nesneSagMenu)
         self.actionConvertToWebItem.triggered.connect(self.act_convert_to_web_item)
         self.actionConvertToWebItem.setDisabled(True)
 
         # ---------------------------------------------------------------------
         self.actionEmbedImage = QAction(QIcon(":icons/command.png"), self.tr("Embed image(s) to document"),
-                                        self.itemContextMenu)
+                                        self.nesneSagMenu)
         # self.actionEmbedImage.setShortcut(QKeySequence("Ctrl+Shift+E"))
         self.actionEmbedImage.triggered.connect(self.act_embed_images)
 
-        self.actionExportImage = QAction(QIcon(":icons/command.png"), self.tr("Export image(s)"), self.itemContextMenu)
+        self.actionExportImage = QAction(QIcon(":icons/command.png"), self.tr("Export image(s)"), self.nesneSagMenu)
         # self.actionExportImage.setShortcut(QKeySequence("Ctrl+Shift+I"))
         self.actionExportImage.triggered.connect(self.act_export_image)
 
-        self.actionShowImageInfo = QAction(QIcon(':icons/info.png'), self.tr("Show image info"), self.itemContextMenu)
+        self.actionShowImageInfo = QAction(QIcon(':icons/info.png'), self.tr("Show image info"), self.nesneSagMenu)
         self.actionShowImageInfo.triggered.connect(self.act_show_image_info)
 
-        self.actionCrop = QAction(QIcon(':icons/info.png'), self.tr("Crop Image"), self.itemContextMenu)
+        self.actionCrop = QAction(QIcon(':icons/info.png'), self.tr("Crop Image"), self.nesneSagMenu)
         self.actionCrop.setShortcut(QKeySequence("Alt+C"))
         self.actionCrop.triggered.connect(lambda: self.act_crop(self.cScene.activeItem))
 
         self.actionResmiOrjinalBoyutunaDondur = QAction(QIcon(':icons/zoom-reset.png'),
                                                         self.tr("Image to original size"),
-                                                        self.itemContextMenu)
+                                                        self.nesneSagMenu)
         # self.actionResmiOrjinalBoyutunaDondur.setShortcut(QKeySequence("Alt+C"))
         self.actionResmiOrjinalBoyutunaDondur.triggered.connect(self.act_resmi_orjinal_boyutuna_dondur)
 
         # ---------------------------------------------------------------------
         self.actionEmbedVideo = QAction(QIcon(":icons/command.png"), self.tr("Embed video(s) to document"),
-                                        self.itemContextMenu)
+                                        self.nesneSagMenu)
         # self.actionEmbedVideo.setShortcut(QKeySequence("Ctrl+Shift+E"))
         self.actionEmbedVideo.triggered.connect(self.act_embed_video)
 
-        self.actionExportVideo = QAction(QIcon(":icons/command.png"), self.tr("Export video(s)"), self.itemContextMenu)
+        self.actionExportVideo = QAction(QIcon(":icons/command.png"), self.tr("Export video(s)"), self.nesneSagMenu)
         # self.actionExportVideo.setShortcut(QKeySequence("Ctrl+Shift+I"))
         self.actionExportVideo.triggered.connect(self.act_export_video)
 
-        self.actionShowVideoInfo = QAction(QIcon(':icons/info.png'), self.tr("Show video info"), self.itemContextMenu)
+        self.actionShowVideoInfo = QAction(QIcon(':icons/info.png'), self.tr("Show video info"), self.nesneSagMenu)
         self.actionShowVideoInfo.triggered.connect(self.act_show_video_info)
 
         # ---------------------------------------------------------------------
         self.actionEmbedDosya = QAction(QIcon(":icons/command.png"), self.tr("Embed file(s) to document"),
-                                        self.itemContextMenu)
+                                        self.nesneSagMenu)
         # self.actionEmbedDosya.setShortcut(QKeySequence("Ctrl+Shift+E"))
         self.actionEmbedDosya.triggered.connect(self.act_embed_dosya)
 
-        self.actionExportDosya = QAction(QIcon(":icons/command.png"), self.tr("Export file(s)"), self.itemContextMenu)
+        self.actionExportDosya = QAction(QIcon(":icons/command.png"), self.tr("Export file(s)"), self.nesneSagMenu)
         # self.actionExportDosya.setShortcut(QKeySequence("Ctrl+Shift+I"))
         self.actionExportDosya.triggered.connect(self.act_export_dosya)
 
-        self.actionShowDosyaInfo = QAction(QIcon(':icons/info.png'), self.tr("Show file info"), self.itemContextMenu)
+        self.actionShowDosyaInfo = QAction(QIcon(':icons/info.png'), self.tr("Show file info"), self.nesneSagMenu)
         self.actionShowDosyaInfo.triggered.connect(self.act_dosya_bilgisi_goster)
 
-        self.actionPdfResmeCevir = QAction(QIcon(':icons/file-image.png'), self.tr("PDF to image(s)"), self.itemContextMenu)
-        self.actionPdfResmeCevir.triggered.connect(self.act_pdf_resme_cevir)
+        self.actionPdfyiResmeCevir = QAction(QIcon(':icons/file-image.png'), self.tr("PDF to image(s)"), self.nesneSagMenu)
+        self.actionPdfyiResmeCevir.triggered.connect(self.act_pdfyi_resme_cevir)
 
-        self.itemContextMenu.addActions((self.actionPinItem,
-                                         self.actionUnPinItem,
-                                         self.itemContextMenu.addSeparator(),
-                                         self.actionCut,
-                                         self.actionCopy,
-                                         self.itemContextMenu.addSeparator(),
-                                         self.actionBringToFront,
-                                         self.actionSendToBack,
-                                         self.itemContextMenu.addSeparator(),
-                                         self.actionGroupItems,
-                                         self.actionUnGroupItems,
-                                         self.itemContextMenu.addSeparator(),
-                                         self.actionParent,
-                                         self.actionUnParent,
-                                         self.itemContextMenu.addSeparator(),
-                                         self.actionEditCommand,
-                                         self.itemContextMenu.addSeparator(),
-                                         self.actionConvertToPlainText,
-                                         self.actionEmbedImage,
-                                         self.actionExportImage,
-                                         self.actionShowImageInfo,
-                                         self.actionCrop,
-                                         self.actionResmiOrjinalBoyutunaDondur,
-                                         self.actionEmbedVideo,
-                                         self.actionExportVideo,
-                                         self.actionShowVideoInfo,
-                                         self.actionEmbedDosya,
-                                         self.actionExportDosya,
-                                         self.itemContextMenu.addSeparator(),
-                                         self.actionShowDosyaInfo,
-                                         self.actionShowHTMLSource,
-                                         self.actionLocalizeHtml,
-                                         self.itemContextMenu.addSeparator(),
-                                         self.actionShowInFileManager,
-                                         self.actionResizeTextItemToFitView,
-                                         self.actionShowAsWebPage,
-                                         self.actionConvertToWebItem,
-                                         self.itemContextMenu.addSeparator(),
-                                         self.actionPdfResmeCevir,
-                                         self.actionPrintSelectedTextItemContent,
-                                         self.itemContextMenu.addSeparator(),
-                                         self.actionAddSelectedItemStyleAsAPreset,
-                                         self.actionSeciliNesneStiliniSeciliAracaUygula,
-                                         self.actionSeciliNesneStiliniKendiAracinaUygula
-                                         ))
+        self.nesneSagMenu.addActions((self.actionPinItem,
+                                      self.actionUnPinItem,
+                                      self.nesneSagMenu.addSeparator(),
+                                      self.actionCut,
+                                      self.actionCopy,
+                                      self.nesneSagMenu.addSeparator(),
+                                      self.actionBringToFront,
+                                      self.actionSendToBack,
+                                      self.nesneSagMenu.addSeparator(),
+                                      self.actionGroupItems,
+                                      self.actionUnGroupItems,
+                                      self.nesneSagMenu.addSeparator(),
+                                      self.actionParent,
+                                      self.actionUnParent,
+                                      self.nesneSagMenu.addSeparator(),
+                                      self.actionEditCommand,
+                                      self.nesneSagMenu.addSeparator(),
+                                      self.actionAddSelectedItemStyleAsAPreset,
+                                      self.actionSeciliNesneStiliniSeciliAracaUygula,
+                                      self.actionSeciliNesneStiliniKendiAracinaUygula
+                                      ))
 
-        self.groupContextMenu = QMenu(self.tr("Group Menu"), self)
-        # self.groupContextMenu.aboutToShow.connect(lambda: self.on_group_item_context_menu_about_to_show(group))
+        self.yaziSagMenu = QMenu(self.tr("Text Item Menu"), self)
+        self.yaziSagMenu.addActions((self.actionPinItem,
+                                     self.actionUnPinItem,
+                                     self.yaziSagMenu.addSeparator(),
+                                     self.actionCut,
+                                     self.actionCopy,
+                                     self.yaziSagMenu.addSeparator(),
+                                     self.actionBringToFront,
+                                     self.actionSendToBack,
+                                     self.yaziSagMenu.addSeparator(),
+                                     self.actionGroupItems,
+                                     self.actionUnGroupItems,
+                                     self.yaziSagMenu.addSeparator(),
+                                     self.actionParent,
+                                     self.actionUnParent,
+                                     self.yaziSagMenu.addSeparator(),
+                                     self.actionEditCommand,
+                                     self.yaziSagMenu.addSeparator(),
+                                     self.actionConvertToPlainText,
+                                     self.yaziSagMenu.addSeparator(),
+                                     self.actionResizeTextItemToFitView,
+                                     self.actionLocalizeHtml,
+                                     self.yaziSagMenu.addSeparator(),
+                                     self.actionShowAsWebPage,
+                                     self.actionConvertToWebItem,
+                                     self.yaziSagMenu.addSeparator(),
+                                     self.actionShowHTMLSource,
+                                     self.yaziSagMenu.addSeparator(),
+                                     self.actionPrintSelectedTextItemContent,
+                                     self.yaziSagMenu.addSeparator(),
+                                     self.actionAddSelectedItemStyleAsAPreset,
+                                     self.actionSeciliNesneStiliniSeciliAracaUygula,
+                                     self.actionSeciliNesneStiliniKendiAracinaUygula
+                                     ))
 
-        self.groupContextMenu.addActions((self.actionPinItem,
-                                          self.actionUnPinItem,
-                                          self.groupContextMenu.addSeparator(),
-                                          self.actionCut,
-                                          self.actionCopy,
-                                          self.groupContextMenu.addSeparator(),
-                                          self.actionBringToFront,
-                                          self.actionSendToBack,
-                                          self.groupContextMenu.addSeparator(),
-                                          self.actionGroupItems,
-                                          self.actionUnGroupItems,
-                                          self.groupContextMenu.addSeparator(),
-                                          self.actionParent,
-                                          self.actionUnParent))
+        self.resimSagMenu = QMenu(self.tr("Image Item Menu"), self)
+        self.resimSagMenu.addActions((self.actionPinItem,
+                                      self.actionUnPinItem,
+                                      self.resimSagMenu.addSeparator(),
+                                      self.actionCut,
+                                      self.actionCopy,
+                                      self.resimSagMenu.addSeparator(),
+                                      self.actionBringToFront,
+                                      self.actionSendToBack,
+                                      self.resimSagMenu.addSeparator(),
+                                      self.actionGroupItems,
+                                      self.actionUnGroupItems,
+                                      self.resimSagMenu.addSeparator(),
+                                      self.actionParent,
+                                      self.actionUnParent,
+                                      self.resimSagMenu.addSeparator(),
+                                      self.actionEditCommand,
+                                      self.resimSagMenu.addSeparator(),
+                                      self.actionEmbedImage,
+                                      self.actionExportImage,
+                                      self.actionShowInFileManager,
+                                      self.resimSagMenu.addSeparator(),
+                                      self.actionResmiOrjinalBoyutunaDondur,
+                                      self.actionCrop,
+                                      self.resimSagMenu.addSeparator(),
+                                      self.actionShowImageInfo,
+                                      self.resimSagMenu.addSeparator(),
+                                      self.actionAddSelectedItemStyleAsAPreset,
+                                      self.actionSeciliNesneStiliniSeciliAracaUygula,
+                                      self.actionSeciliNesneStiliniKendiAracinaUygula
+                                      ))
+
+        self.videoSagMenu = QMenu(self.tr("Video Item Menu"), self)
+        self.videoSagMenu.addActions((self.actionPinItem,
+                                      self.actionUnPinItem,
+                                      self.videoSagMenu.addSeparator(),
+                                      self.actionCut,
+                                      self.actionCopy,
+                                      self.videoSagMenu.addSeparator(),
+                                      self.actionBringToFront,
+                                      self.actionSendToBack,
+                                      self.videoSagMenu.addSeparator(),
+                                      self.actionGroupItems,
+                                      self.actionUnGroupItems,
+                                      self.videoSagMenu.addSeparator(),
+                                      self.actionParent,
+                                      self.actionUnParent,
+                                      self.videoSagMenu.addSeparator(),
+                                      self.actionEditCommand,
+                                      self.videoSagMenu.addSeparator(),
+                                      self.actionEmbedVideo,
+                                      self.actionExportVideo,
+                                      self.actionShowInFileManager,
+                                      self.videoSagMenu.addSeparator(),
+                                      self.actionShowVideoInfo,
+                                      self.videoSagMenu.addSeparator(),
+                                      self.actionAddSelectedItemStyleAsAPreset,
+                                      self.actionSeciliNesneStiliniSeciliAracaUygula,
+                                      self.actionSeciliNesneStiliniKendiAracinaUygula
+                                      ))
+
+        self.dosyaSagMenu = QMenu(self.tr("File Item Menu"), self)
+        self.dosyaSagMenu.addActions((self.actionPinItem,
+                                      self.actionUnPinItem,
+                                      self.dosyaSagMenu.addSeparator(),
+                                      self.actionCut,
+                                      self.actionCopy,
+                                      self.dosyaSagMenu.addSeparator(),
+                                      self.actionBringToFront,
+                                      self.actionSendToBack,
+                                      self.dosyaSagMenu.addSeparator(),
+                                      self.actionGroupItems,
+                                      self.actionUnGroupItems,
+                                      self.dosyaSagMenu.addSeparator(),
+                                      self.actionParent,
+                                      self.actionUnParent,
+                                      self.dosyaSagMenu.addSeparator(),
+                                      self.actionEditCommand,
+                                      self.dosyaSagMenu.addSeparator(),
+                                      self.actionEmbedDosya,
+                                      self.actionExportDosya,
+                                      self.actionShowInFileManager,
+                                      self.dosyaSagMenu.addSeparator(),
+                                      self.actionPdfyiResmeCevir,
+                                      self.dosyaSagMenu.addSeparator(),
+                                      self.actionShowDosyaInfo,
+                                      self.dosyaSagMenu.addSeparator(),
+                                      self.actionAddSelectedItemStyleAsAPreset,
+                                      self.actionSeciliNesneStiliniSeciliAracaUygula,
+                                      self.actionSeciliNesneStiliniKendiAracinaUygula
+                                      ))
+
+        self.grupSagMenu = QMenu(self.tr("Group Menu"), self)
+        # self.grupSagMenu.aboutToShow.connect(lambda: self.on_group_sag_menu_about_to_show(group))
+
+        self.grupSagMenu.addActions((self.actionPinItem,
+                                     self.actionUnPinItem,
+                                     self.grupSagMenu.addSeparator(),
+                                     self.actionCut,
+                                     self.actionCopy,
+                                     self.grupSagMenu.addSeparator(),
+                                     self.actionBringToFront,
+                                     self.actionSendToBack,
+                                     self.grupSagMenu.addSeparator(),
+                                     self.actionGroupItems,
+                                     self.actionUnGroupItems,
+                                     self.grupSagMenu.addSeparator(),
+                                     self.actionParent,
+                                     self.actionUnParent))
 
         # ---------------------------------------------------------------------
-        self.kutuphaneEkranContextMenu = QMenu(self.tr("Library Item Menu"), self)
+        self.kutuphaneEkranSagMenu = QMenu(self.tr("Library Item Menu"), self)
 
         self.kutuphaneZoomMenu = QMenu(self.tr("Zoom"), self.viewMenu)
         self.kutuphaneZoomMenu.setIcon(QIcon(":/icons/zoom.png"))
 
         self.actionKutEkrYenileBelgeGomuluVeLinkli = QAction(QIcon(':icons/refresh.png'),
                                                              self.tr("Both linked and embeded - document"),
-                                                             self.kutuphaneEkranContextMenu)
+                                                             self.kutuphaneEkranSagMenu)
         self.actionKutEkrYenileBelgeGomuluVeLinkli.setToolTip(
             self.tr("List both linked and embeded images in the document"))
         self.actionKutEkrYenileBelgeGomuluVeLinkli.setShortcut(QKeySequence("Ctrl+F1"))
@@ -4196,7 +4299,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionKutEkrYenileSahneGomuluVeLinkli = QAction(QIcon(':icons/refresh.png'),
                                                              self.tr("Both linked and embeded - page"),
-                                                             self.kutuphaneEkranContextMenu)
+                                                             self.kutuphaneEkranSagMenu)
         self.actionKutEkrYenileSahneGomuluVeLinkli.setToolTip(
             self.tr("List both linked and embeded images in the page"))
         self.actionKutEkrYenileSahneGomuluVeLinkli.setShortcut(QKeySequence("Ctrl+F2"))
@@ -4205,7 +4308,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionKutEkrYenileBelgeLinkli = QAction(QIcon(':icons/refresh.png'),
                                                      self.tr("Linked - document"),
-                                                     self.kutuphaneEkranContextMenu)
+                                                     self.kutuphaneEkranSagMenu)
         self.actionKutEkrYenileBelgeLinkli.setToolTip(self.tr("List linked images in the document"))
         self.actionKutEkrYenileBelgeLinkli.setShortcut(QKeySequence("Ctrl+F3"))
         self.actionKutEkrYenileBelgeLinkli.triggered.connect(
@@ -4213,7 +4316,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionKutEkrYenileSahneLinkli = QAction(QIcon(':icons/refresh.png'),
                                                      self.tr("Linked - page"),
-                                                     self.kutuphaneEkranContextMenu)
+                                                     self.kutuphaneEkranSagMenu)
         self.actionKutEkrYenileSahneLinkli.setToolTip(self.tr("List linked images in the page"))
         self.actionKutEkrYenileSahneLinkli.setShortcut(QKeySequence("Ctrl+F4"))
         self.actionKutEkrYenileSahneLinkli.triggered.connect(
@@ -4221,21 +4324,21 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionKutEkrYenileBelgeGomulu = QAction(QIcon(':icons/refresh.png'),
                                                      self.tr("Embeded - document"),
-                                                     self.kutuphaneEkranContextMenu)
+                                                     self.kutuphaneEkranSagMenu)
         self.actionKutEkrYenileBelgeGomulu.setToolTip(self.tr("List embeded images in the document"))
         self.actionKutEkrYenileBelgeGomulu.setShortcut(QKeySequence("Ctrl+F5"))
         self.actionKutEkrYenileBelgeGomulu.triggered.connect(self.act_kut_belgedeki_gomulu_dosyalari_goster)
 
         self.actionKutEkrYenileSahneGomulu = QAction(QIcon(':icons/refresh.png'),
                                                      self.tr("Embeded - page"),
-                                                     self.kutuphaneEkranContextMenu)
+                                                     self.kutuphaneEkranSagMenu)
         self.actionKutEkrYenileSahneGomulu.setToolTip(self.tr("List embeded images in the page"))
         self.actionKutEkrYenileSahneGomulu.setShortcut(QKeySequence("Ctrl+F6"))
         self.actionKutEkrYenileSahneGomulu.triggered.connect(self.act_kut_sahnedeki_gomulu_dosyalari_goster)
 
         self.actionKutEkrYenileBelgedeOlmayanGomulu = QAction(QIcon(':icons/refresh.png'),
                                                               self.tr("Unused embeded - document"),
-                                                              self.kutuphaneEkranContextMenu)
+                                                              self.kutuphaneEkranSagMenu)
         self.actionKutEkrYenileBelgedeOlmayanGomulu.setToolTip(self.tr("List unused embeded images in the document"))
         self.actionKutEkrYenileBelgedeOlmayanGomulu.setShortcut(QKeySequence("Ctrl+F7"))
         self.actionKutEkrYenileBelgedeOlmayanGomulu.triggered.connect(
@@ -4243,7 +4346,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionKutEkrYenileSahnedeOlmayanGomulu = QAction(QIcon(':icons/refresh.png'),
                                                               self.tr("Unused embeded - page"),
-                                                              self.kutuphaneEkranContextMenu)
+                                                              self.kutuphaneEkranSagMenu)
         self.actionKutEkrYenileSahnedeOlmayanGomulu.setToolTip(self.tr("List unused embeded images in the page"))
         self.actionKutEkrYenileSahnedeOlmayanGomulu.setShortcut(QKeySequence("Ctrl+F8"))
         self.actionKutEkrYenileSahnedeOlmayanGomulu.triggered.connect(
@@ -4251,7 +4354,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionKutEkrYenileBelgeHtmlImajTumu = QAction(QIcon(':icons/refresh.png'),
                                                            self.tr("All Html images"),
-                                                           self.kutuphaneEkranContextMenu)
+                                                           self.kutuphaneEkranSagMenu)
         self.actionKutEkrYenileBelgeHtmlImajTumu.setToolTip(
             self.tr("List all images downloaded with HTML localization"), )
         self.actionKutEkrYenileBelgeHtmlImajTumu.setShortcut(QKeySequence("Ctrl+F9"))
@@ -4259,7 +4362,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionKutEkrSilBelgedeOlmayanlar = QAction(QIcon(':icons/delete.png'),
                                                         self.tr("Delete unused embeded - document"),
-                                                        self.kutuphaneEkranContextMenu)
+                                                        self.kutuphaneEkranSagMenu)
         self.actionKutEkrSilBelgedeOlmayanlar.setToolTip(self.tr("Delete unused embeded images in the document"))
         self.actionKutEkrSilBelgedeOlmayanlar.setShortcut(QKeySequence("Ctrl+F10"))
         self.actionKutEkrSilBelgedeOlmayanlar.triggered.connect(
@@ -4272,25 +4375,25 @@ class DefterAnaPencere(QMainWindow):
         self.actionKutEkrChangeBackgroundColor.setShortcut(QKeySequence("Shift+Alt+C"))
         self.actionKutEkrChangeBackgroundColor.triggered.connect(self.act_kut_change_background_color)
 
-        self.kutuphaneEkranContextMenu.addActions((self.actionKutEkrYenileBelgeGomuluVeLinkli,
+        self.kutuphaneEkranSagMenu.addActions((self.actionKutEkrYenileBelgeGomuluVeLinkli,
                                                    self.actionKutEkrYenileSahneGomuluVeLinkli,
-                                                   self.kutuphaneEkranContextMenu.addSeparator(),
+                                                   self.kutuphaneEkranSagMenu.addSeparator(),
                                                    self.actionKutEkrYenileBelgeLinkli,
                                                    self.actionKutEkrYenileSahneLinkli,
-                                                   self.kutuphaneEkranContextMenu.addSeparator(),
+                                                   self.kutuphaneEkranSagMenu.addSeparator(),
                                                    self.actionKutEkrYenileBelgeGomulu,
                                                    self.actionKutEkrYenileSahneGomulu,
-                                                   self.kutuphaneEkranContextMenu.addSeparator(),
+                                                   self.kutuphaneEkranSagMenu.addSeparator(),
                                                    self.actionKutEkrYenileBelgedeOlmayanGomulu,
                                                    self.actionKutEkrYenileSahnedeOlmayanGomulu,
-                                                   self.kutuphaneEkranContextMenu.addSeparator(),
+                                                   self.kutuphaneEkranSagMenu.addSeparator(),
                                                    self.actionKutEkrYenileBelgeHtmlImajTumu,
-                                                   self.kutuphaneEkranContextMenu.addSeparator(),
+                                                   self.kutuphaneEkranSagMenu.addSeparator(),
                                                    self.actionKutEkrSilBelgedeOlmayanlar,
-                                                   self.kutuphaneEkranContextMenu.addSeparator(),
+                                                   self.kutuphaneEkranSagMenu.addSeparator(),
                                                    self.actionKutEkrChangeBackgroundColor,
-                                                   self.kutuphaneEkranContextMenu.addSeparator(),
-                                                   self.kutuphaneEkranContextMenu.addMenu(self.kutuphaneZoomMenu),
+                                                   self.kutuphaneEkranSagMenu.addSeparator(),
+                                                   self.kutuphaneEkranSagMenu.addMenu(self.kutuphaneZoomMenu),
                                                    ))
 
         # ---------------------------------------------------------------------
@@ -4324,31 +4427,31 @@ class DefterAnaPencere(QMainWindow):
                                            self.actionKutuphaneResetZoom))
 
         # ---------------------------------------------------------------------
-        self.kutuphaneNesneContextMenu = QMenu(self.tr("Library Item Menu"), self)
+        self.kutuphaneNesneSagMenu = QMenu(self.tr("Library Item Menu"), self)
 
         self.actionKutuphaneNesneSil = QAction(QIcon(":icons/remove.png"), self.tr("Delete"),
-                                               self.kutuphaneNesneContextMenu)
+                                               self.kutuphaneNesneSagMenu)
         # self.actionKutuphaneNesneSil.setShortcut(QKeySequence("P"))
         # self.actionPinItem.setShortcutContext(Qt.ApplicationShortcut)
         self.actionKutuphaneNesneSil.triggered.connect(self.act_kutuphaneden_nesne_sil)
 
         self.actionKutuphaneDosyaYonetcisindeGoster = QAction(QIcon(":icons/icons/text-html.png"),
                                                               self.tr("Show in file manager"),
-                                                              self.kutuphaneNesneContextMenu)
+                                                              self.kutuphaneNesneSagMenu)
         # self.actionKutuphaneDosyaYonetcisindeGoster.setShortcut(QKeySequence("P"))
         # self.actionKutuphaneDosyaYonetcisindeGoster.setShortcutContext(Qt.ApplicationShortcut)
         self.actionKutuphaneDosyaYonetcisindeGoster.triggered.connect(self.act_kut_dosya_yoneticisinde_goster)
 
         self.actionKutuphaneSahnedeGoster = QAction(QIcon(":icons/icons/text-html.png"), self.tr("~Show in scene"),
-                                                    self.kutuphaneNesneContextMenu)
+                                                    self.kutuphaneNesneSagMenu)
         # self.actionKutuphaneDosyaYonetcisindeGoster.setShortcut(QKeySequence("P"))
         # self.actionKutuphaneDosyaYonetcisindeGoster.setShortcutContext(Qt.ApplicationShortcut)
         self.actionKutuphaneSahnedeGoster.triggered.connect(self.act_kut_dosya_yoneticisinde_goster)
         self.actionKutuphaneSahnedeGoster.setDisabled(True)
 
-        self.kutuphaneNesneContextMenu.addActions((self.actionKutuphaneNesneSil,
-                                                   self.actionKutuphaneDosyaYonetcisindeGoster,
-                                                   self.actionKutuphaneSahnedeGoster))
+        self.kutuphaneNesneSagMenu.addActions((self.actionKutuphaneNesneSil,
+                                               self.actionKutuphaneDosyaYonetcisindeGoster,
+                                               self.actionKutuphaneSahnedeGoster))
 
     # ---------------------------------------------------------------------
     def olustur_dummy_widget_for_actions(self):
@@ -4369,7 +4472,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionShowVideoInfo,
                                           self.actionEmbedDosya,
                                           self.actionExportDosya,
-                                          self.actionPdfResmeCevir,
+                                          self.actionPdfyiResmeCevir,
                                           self.actionShowDosyaInfo,
                                           self.actionShowHTMLSource,
                                           self.actionLocalizeHtml,
@@ -4467,7 +4570,7 @@ class DefterAnaPencere(QMainWindow):
                                           ))
 
     # ---------------------------------------------------------------------
-    def view_context_menu_goster(self, pos):
+    def view_sag_menu_goster(self, pos):
         menu = QMenu()
 
         if self.cView.backgroundImagePath and not self.cView.backgroundImagePathIsEmbeded:
@@ -4494,9 +4597,9 @@ class DefterAnaPencere(QMainWindow):
         # menu.popup(pos)  # async , does not block main lopp, non modal
 
     # ---------------------------------------------------------------------
-    def ekran_kutuphane_context_menu_goster(self, pos):
+    def ekran_kutuphane_sag_menu_goster(self, pos):
 
-        self.kutuphaneEkranContextMenu.exec(pos)  # sync, blocks main loop, modal
+        self.kutuphaneEkranSagMenu.exec(pos)  # sync, blocks main loop, modal
         # baska yerlerde popup kullaniyoruz, viewda olmuyor, menu acilip hemen kapaniyor.
         # menu.popup(pos)  # async , does not block main lopp, non modal
 
@@ -4543,7 +4646,7 @@ class DefterAnaPencere(QMainWindow):
         # self.arkaPlanRengi vs iptal edilince, nesneye bile tiklasak, secim aracina geciyor, sahneye tiklasa yine ayni
         # kalemde iken de kalem secili zaten
         self.nesneOzellikleriYW = NesneOzellikleriYuzenWidget(self.cScene.aktifArac.arkaPlanRengi,  # secim toolu
-                                                              self.cScene.aktifArac.yaziRengi, 
+                                                              self.cScene.aktifArac.yaziRengi,
                                                               self.cScene.aktifArac.cizgiRengi,
                                                               self.cScene.aktifArac.cizgiKalinligi, self)
         self.nesneOzellikleriYW.hide()
@@ -5378,74 +5481,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     # @Slot() # this is called directly from base's overriden contextMenuEvent
-    def on_item_context_menu_about_to_show(self, item):
-
-        self.actionShowInFileManager.setVisible(False)
-
-        if item.type() == shared.TEXT_ITEM_TYPE:
-            self.actionResizeTextItemToFitView.setVisible(True)
-            # self.actionShowInFileManager.setVisible(True)
-            self.actionPrintSelectedTextItemContent.setVisible(True)
-
-            if not item.isPlainText:
-                self.actionConvertToPlainText.setVisible(True)
-                self.actionShowHTMLSource.setVisible(True)
-                self.actionLocalizeHtml.setVisible(True)
-                self.actionShowAsWebPage.setVisible(True)
-                self.actionConvertToWebItem.setVisible(True)
-            else:
-                self.actionShowHTMLSource.setVisible(False)
-                self.actionLocalizeHtml.setVisible(False)
-                self.actionConvertToPlainText.setVisible(False)
-                self.actionShowAsWebPage.setVisible(False)
-                self.actionConvertToWebItem.setVisible(False)
-
-        else:
-            self.actionResizeTextItemToFitView.setVisible(False)
-            self.actionShowHTMLSource.setVisible(False)
-            self.actionLocalizeHtml.setVisible(False)
-            self.actionConvertToPlainText.setVisible(False)
-            self.actionShowAsWebPage.setVisible(False)
-            self.actionConvertToWebItem.setVisible(False)
-            self.actionPrintSelectedTextItemContent.setVisible(False)
-
-        if item.type() == shared.IMAGE_ITEM_TYPE:
-            self.actionShowInFileManager.setVisible(True)
-            # self.actionEmbedImage.setVisible(True)
-            self.actionExportImage.setVisible(True)
-            self.actionShowImageInfo.setVisible(True)
-            self.actionCrop.setVisible(True)
-            self.actionResmiOrjinalBoyutunaDondur.setVisible(True)
-            if item.isEmbeded:
-                # self.actionEmbedImage.setEnabled(False)
-                self.actionEmbedImage.setVisible(False)
-            else:
-                # self.actionEmbedImage.setEnabled(True)
-                self.actionEmbedImage.setVisible(True)
-        else:
-            self.actionExportImage.setVisible(False)
-            self.actionEmbedImage.setVisible(False)
-            self.actionShowImageInfo.setVisible(False)
-            self.actionCrop.setVisible(False)
-            self.actionResmiOrjinalBoyutunaDondur.setVisible(False)
-
-        if item.type() == shared.VIDEO_ITEM_TYPE:
-            self.actionShowInFileManager.setVisible(True)
-            # self.actionEmbedVideo,
-            # self.actionExportVideo,
-            # self.actionShowVideoInfo,
-            self.actionExportVideo.setVisible(True)
-            self.actionShowVideoInfo.setVisible(True)
-            if item.isEmbeded:
-                # self.actionEmbedImage.setEnabled(False)
-                self.actionEmbedVideo.setVisible(False)
-            else:
-                # self.actionEmbedImage.setEnabled(True)
-                self.actionEmbedVideo.setVisible(True)
-        else:
-            self.actionExportVideo.setVisible(False)
-            self.actionEmbedVideo.setVisible(False)
-            self.actionShowVideoInfo.setVisible(False)
+    def on_nesne_sag_menu_about_to_show(self, item):
 
         if item.isPinned:
             self.actionPinItem.setEnabled(False)
@@ -5454,38 +5490,75 @@ class DefterAnaPencere(QMainWindow):
             self.actionPinItem.setEnabled(True)
             self.actionUnPinItem.setEnabled(False)
 
-        if item.type() == shared.DOSYA_ITEM_TYPE:
-            # self.actionConvertToWebItem.setVisible(True)
-            # self.actionShowAsWebPage.setVisible(True)
-            self.actionShowInFileManager.setVisible(True)
-            self.actionExportDosya.setVisible(True)
-            self.actionShowDosyaInfo.setVisible(True)
-            if item.isEmbeded:
-                self.actionEmbedDosya.setVisible(False)
-            else:
-                self.actionEmbedDosya.setVisible(True)
-            if os.path.splitext(item.filePathForSave)[1][1:].lower() == "pdf":
-                self.actionPdfResmeCevir.setVisible(True)
-            else:
-                self.actionPdfResmeCevir.setVisible(False)
+    # ---------------------------------------------------------------------
+    # @Slot() # this is called directly from item's overriden contextMenuEvent
+    def on_yazi_sag_menu_about_to_show(self, item):
+
+        if not item.isPlainText:
+            self.actionConvertToPlainText.setVisible(True)
+            self.actionShowHTMLSource.setVisible(True)
+            self.actionLocalizeHtml.setVisible(True)
+            self.actionShowAsWebPage.setVisible(True)
+            self.actionConvertToWebItem.setVisible(True)
         else:
-            # self.actionConvertToWebItem.setVisible(True)
-            # self.actionShowAsWebPage.setVisible(False)
-            self.actionExportDosya.setVisible(False)
-            self.actionShowDosyaInfo.setVisible(False)
+            self.actionShowHTMLSource.setVisible(False)
+            self.actionLocalizeHtml.setVisible(False)
+            self.actionConvertToPlainText.setVisible(False)
+            self.actionShowAsWebPage.setVisible(False)
+            self.actionConvertToWebItem.setVisible(False)
+
+        self.on_nesne_sag_menu_about_to_show(item)
+
+    # ---------------------------------------------------------------------
+    # @Slot() # this is called directly from item's overriden contextMenuEvent
+    def on_resim_sag_menu_about_to_show(self, item):
+        if item.isEmbeded:
+            # self.actionEmbedImage.setEnabled(False)
+            self.actionEmbedImage.setVisible(False)
+        else:
+            # self.actionEmbedImage.setEnabled(True)
+            self.actionEmbedImage.setVisible(True)
+
+        self.on_nesne_sag_menu_about_to_show(item)
+
+    # ---------------------------------------------------------------------
+    # @Slot() # this is called directly from item's overriden contextMenuEvent
+    def on_video_sag_menu_about_to_show(self, item):
+
+        if item.isEmbeded:
+            # self.actionEmbedImage.setEnabled(False)
+            self.actionEmbedVideo.setVisible(False)
+        else:
+            # self.actionEmbedImage.setEnabled(True)
+            self.actionEmbedVideo.setVisible(True)
+
+        if os.path.splitext(item.filePathForSave)[1][1:].lower() == "pdf":
+            self.actionPdfyiResmeCevir.setVisible(True)
+        else:
+            self.actionPdfyiResmeCevir.setVisible(False)
+
+        self.on_nesne_sag_menu_about_to_show(item)
+
+    # ---------------------------------------------------------------------
+    # @Slot() # this is called directly from item's overriden contextMenuEvent
+    def on_dosya_sag_menu_about_to_show(self, item):
+
+        if item.isEmbeded:
             self.actionEmbedDosya.setVisible(False)
-            self.actionPdfResmeCevir.setVisible(False)
+        else:
+            self.actionEmbedDosya.setVisible(True)
+        if os.path.splitext(item.filePathForSave)[1][1:].lower() == "pdf":
+            self.actionPdfyiResmeCevir.setVisible(True)
+        else:
+            self.actionPdfyiResmeCevir.setVisible(False)
+
+        self.on_nesne_sag_menu_about_to_show(item)
 
     # ---------------------------------------------------------------------
     # @Slot() # this is called directly from groups's overriden contextMenuEvent
-    def on_group_item_context_menu_about_to_show(self, group):
+    def on_grup_sag_menu_about_to_show(self, group):
 
-        if group.isPinned:
-            self.actionPinItem.setEnabled(False)
-            self.actionUnPinItem.setEnabled(True)
-        else:
-            self.actionPinItem.setEnabled(True)
-            self.actionUnPinItem.setEnabled(False)
+        self.on_nesne_sag_menu_about_to_show(group)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5713,7 +5786,6 @@ class DefterAnaPencere(QMainWindow):
         else:
             self.log(self.tr("No active image item!"), 5000, toStatusBarOnly=True)
 
-
     # ---------------------------------------------------------------------
     @Slot()
     def act_add_image_item(self):
@@ -5824,10 +5896,10 @@ class DefterAnaPencere(QMainWindow):
         pixMap = QPixmap(dosyaYolu).scaled(viewRectSize / 1.5, Qt.AspectRatioMode.KeepAspectRatio)
         rectf = QRectF(pixMap.rect())
         # rectf.moveTo(pos)
-        item = Image(dosyaYolu, pos, rectf, 
-                     self.cScene.aktifArac.yaziRengi, 
+        item = Image(dosyaYolu, pos, rectf,
+                     self.cScene.aktifArac.yaziRengi,
                      self.cScene.aktifArac.arkaPlanRengi,
-                     self.cScene.aktifArac.kalem, 
+                     self.cScene.aktifArac.kalem,
                      self.font(),
                      isEmbeded=isEmbeded)
         self.increase_zvalue(item)
@@ -6010,8 +6082,8 @@ class DefterAnaPencere(QMainWindow):
         # QString imgBase64 = ba.toBase64();
         # bu.close();
         # """
-        nesne = DosyaNesnesi(dosyaAdresi, pos, QRectF(0, 0, 125, 160), 
-                             self.cScene.aktifArac.yaziRengi, 
+        nesne = DosyaNesnesi(dosyaAdresi, pos, QRectF(0, 0, 125, 160),
+                             self.cScene.aktifArac.yaziRengi,
                              self.cScene.aktifArac.arkaPlanRengi,
                              self.cScene.aktifArac.kalem,
                              self.font(),
@@ -6213,10 +6285,10 @@ class DefterAnaPencere(QMainWindow):
         if not mimeData.hasText() or not mimeData.hasHtml():
             return
         self.lutfen_bekleyin_goster()
-        textItem = Text(self.get_mouse_scene_pos(), 
-                        self.cScene.YaziAraci.yaziRengi, 
-                        self.cScene.YaziAraci.arkaPlanRengi, 
-                        self.cScene.YaziAraci.kalem, 
+        textItem = Text(self.get_mouse_scene_pos(),
+                        self.cScene.YaziAraci.yaziRengi,
+                        self.cScene.YaziAraci.arkaPlanRengi,
+                        self.cScene.YaziAraci.kalem,
                         self.cScene.YaziAraci.yaziTipi)
         textItem.set_document_url(self.cScene.tempDirPath)
 
@@ -6298,8 +6370,8 @@ class DefterAnaPencere(QMainWindow):
                 pixMap = QPixmap(imageSavePath)
                 # pixMap = QPixmap(image)
                 rect = QRectF(pixMap.rect())
-                imageItem = Image(imageSavePath, self.get_mouse_scene_pos(), rect, 
-                                  self.cScene.ResimAraci.yaziRengi, 
+                imageItem = Image(imageSavePath, self.get_mouse_scene_pos(), rect,
+                                  self.cScene.ResimAraci.yaziRengi,
                                   self.cScene.ResimAraci.arkaPlanRengi,
                                   self.cScene.ResimAraci.kalem,
                                   self.cScene.ResimAraci.yaziTipi)
@@ -6315,9 +6387,9 @@ class DefterAnaPencere(QMainWindow):
                 # return imageItem
 
             elif mimeData.hasHtml():
-                textItem = Text(self.get_mouse_scene_pos(), 
-                                self.cScene.YaziAraci.yaziRengi, 
-                                self.cScene.YaziAraci.arkaPlanRengi, 
+                textItem = Text(self.get_mouse_scene_pos(),
+                                self.cScene.YaziAraci.yaziRengi,
+                                self.cScene.YaziAraci.arkaPlanRengi,
                                 self.cScene.YaziAraci.kalem,
                                 self.cScene.YaziAraci.yaziTipi)
                 textItem.set_document_url(self.cScene.tempDirPath)
@@ -6335,9 +6407,9 @@ class DefterAnaPencere(QMainWindow):
                 # return
             elif mimeData.hasText():
 
-                textItem = Text(self.get_mouse_scene_pos(), 
-                                self.cScene.YaziAraci.yaziRengi, 
-                                self.cScene.YaziAraci.arkaPlanRengi, 
+                textItem = Text(self.get_mouse_scene_pos(),
+                                self.cScene.YaziAraci.yaziRengi,
+                                self.cScene.YaziAraci.arkaPlanRengi,
                                 self.cScene.YaziAraci.kalem,
                                 self.cScene.YaziAraci.yaziTipi,
                                 text=mimeData.text())
@@ -8690,7 +8762,7 @@ class DefterAnaPencere(QMainWindow):
         #                   self._pen,
         #                   self.currentFont)
 
-        webItem = Web(item.toHtml(), None, item.scenePos(), item.rect(), 
+        webItem = Web(item.toHtml(), None, item.scenePos(), item.rect(),
                       self.cScene.aktifArac.yaziRengi,
                       self.cScene.aktifArac.arkaPlanRengi,
                       self.cScene.aktifArac.kalem,
@@ -9159,7 +9231,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_pdf_resme_cevir(self):
+    def act_pdfyi_resme_cevir(self):
 
         # self.dpi = QApplication.primaryScreen().physicalDotsPerInch()
         # print(self.dpi)

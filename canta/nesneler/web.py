@@ -6,7 +6,7 @@ __author__ = 'Erdinç Yılmaz'
 __date__ = '21/Aug/2016'
 
 from PySide6.QtCore import QUrl
-from PySide6.QtWebEngineCore import QWebEngineSettings, QWebEngineProfile, QWebEnginePage
+from PySide6.QtWebEngineCore import QWebEngineSettings  # , QWebEngineProfile, QWebEnginePage
 from PySide6.QtWidgets import QGraphicsProxyWidget
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from canta.nesneler.base import BaseItem
@@ -34,7 +34,7 @@ class Web(BaseItem):
 
         self.wView = QWebEngineView()
         # self.wView.setAttribute(Qt.WA_DontShowOnScreen)
-        self.wView.settings().setAttribute(QWebEngineSettings.PluginsEnabled, False)
+        self.wView.settings().setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, False)
         if html:
             self.wView.setHtml(html)
         else:

@@ -7,7 +7,7 @@ __date__ = '3/28/16'
 
 import os
 from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF
-from PySide6.QtGui import QColor, QPixmap, QTransform, QPixmapCache, QPainter, QPen
+from PySide6.QtGui import QColor, QPixmap, QTransform, QPixmapCache, QPainter
 from PySide6.QtWidgets import QStyle
 from canta.nesneler.base import BaseItem
 from canta import shared
@@ -123,6 +123,23 @@ class Image(BaseItem):
     def flipVertical(self, mposy):
         self.mirror(x=False, y=True)
         super(Image, self).flipVertical(mposy)
+
+    # ---------------------------------------------------------------------
+    def contextMenuEvent(self, event):
+        # TODO: bu alttaki iki satir aktif idi, ve de ctrl harici sag tiklayinca
+        # (base- text -path -group nesnelerinin contextMenuEventinde var)
+        # mesela birden fazla nesne secili ve de gruplayacagız diyelim sag menu ile
+        # ctrl basılı degil ise tikladigimiz secili kaliyor digerleri siliniyordu
+        # uygunsuz bir kullanıcı deneyimi, niye yaptık acaba boyleyi hatırlayana kadar kalsın burda :)
+        # if not event.modifiers() == Qt.KeyboardModifier.ControlModifier:
+        #     self.scene().clearSelection()
+        self.setSelected(True)
+
+        # self.scene().parent().item_context_menu(self, event.screenPos())
+        self.scene().parent().on_resim_sag_menu_about_to_show(self)
+        self.scene().parent().resimSagMenu.popup(event.screenPos())
+
+        event.accept()
 
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
