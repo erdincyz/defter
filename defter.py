@@ -24,7 +24,7 @@ from collections import deque
 
 from PySide6.QtGui import (QCursor, QKeySequence, QIcon, QPixmap, QColor, QPen, QFont, QPainter, QPainterPath,
                            QImageReader, QImage, QPixmapCache, QTextCharFormat, QTextCursor, QPalette, QTextListFormat,
-                           QTextBlockFormat, QPageSize, QPageLayout, QAction, QActionGroup, QUndoGroup, QUndoStack,
+                           QTextBlockFormat, QPageSize, QPageLayout, QAction, QActionGroup, QUndoGroup,
                            QShortcut)
 from PySide6.QtWebEngineCore import QWebEngineSettings  # , QWebEngineProfile, QWebEnginePage
 
@@ -32,7 +32,7 @@ from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, Q
                                QFileDialog, QToolBar, QMenuBar, QMenu, QColorDialog, QMessageBox,
                                QStatusBar, QSizePolicy, QLabel, QPushButton, QScrollArea,
                                QDialog, QTextEdit, QInputDialog, QListWidget, QListWidgetItem,
-                               QLineEdit, QToolButton, QComboBox, QButtonGroup, QGroupBox, QRadioButton, QProgressBar,
+                               QLineEdit, QToolButton, QComboBox, QButtonGroup, QGroupBox, QRadioButton,
                                QCheckBox, QGraphicsItem)
 
 from PySide6.QtCore import (Qt, QRectF, QSettings, QPoint, Slot, QSizeF, QSize, QFile, QSaveFile,
@@ -4049,7 +4049,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.nesneSagMenu)
         self.actionLocalizeHtml.triggered.connect(self.act_localize_html)
 
-        self.actionResizeTextItemToFitView = QAction(QIcon(':icons/icons/text-html.png'),
+        self.actionResizeTextItemToFitView = QAction(QIcon(':icons/genislik-sigdir.png'),
                                                      self.tr("Resize to fit in view"), self.nesneSagMenu)
         self.actionResizeTextItemToFitView.triggered.connect(self.act_resize_text_item_to_fit_view)
 
@@ -4190,14 +4190,14 @@ class DefterAnaPencere(QMainWindow):
                                       self.resimSagMenu.addSeparator(),
                                       self.actionEditCommand,
                                       self.resimSagMenu.addSeparator(),
-                                      self.actionEmbedImage,
-                                      self.actionExportImage,
-                                      self.actionShowInFileManager,
+                                      self.actionShowImageInfo,
                                       self.resimSagMenu.addSeparator(),
                                       self.actionResmiOrjinalBoyutunaDondur,
                                       self.actionCrop,
                                       self.resimSagMenu.addSeparator(),
-                                      self.actionShowImageInfo,
+                                      self.actionEmbedImage,
+                                      self.actionExportImage,
+                                      self.actionShowInFileManager,
                                       self.resimSagMenu.addSeparator(),
                                       self.actionAddSelectedItemStyleAsAPreset,
                                       self.actionSeciliNesneStiliniSeciliAracaUygula,
@@ -4222,11 +4222,11 @@ class DefterAnaPencere(QMainWindow):
                                       self.videoSagMenu.addSeparator(),
                                       self.actionEditCommand,
                                       self.videoSagMenu.addSeparator(),
+                                      self.actionShowVideoInfo,
+                                      self.videoSagMenu.addSeparator(),
                                       self.actionEmbedVideo,
                                       self.actionExportVideo,
                                       self.actionShowInFileManager,
-                                      self.videoSagMenu.addSeparator(),
-                                      self.actionShowVideoInfo,
                                       self.videoSagMenu.addSeparator(),
                                       self.actionAddSelectedItemStyleAsAPreset,
                                       self.actionSeciliNesneStiliniSeciliAracaUygula,
@@ -4251,13 +4251,13 @@ class DefterAnaPencere(QMainWindow):
                                       self.dosyaSagMenu.addSeparator(),
                                       self.actionEditCommand,
                                       self.dosyaSagMenu.addSeparator(),
-                                      self.actionEmbedDosya,
-                                      self.actionExportDosya,
-                                      self.actionShowInFileManager,
+                                      self.actionShowDosyaInfo,
                                       self.dosyaSagMenu.addSeparator(),
                                       self.actionPdfyiResmeCevir,
                                       self.dosyaSagMenu.addSeparator(),
-                                      self.actionShowDosyaInfo,
+                                      self.actionEmbedDosya,
+                                      self.actionExportDosya,
+                                      self.actionShowInFileManager,
                                       self.dosyaSagMenu.addSeparator(),
                                       self.actionAddSelectedItemStyleAsAPreset,
                                       self.actionSeciliNesneStiliniSeciliAracaUygula,
@@ -8645,7 +8645,7 @@ class DefterAnaPencere(QMainWindow):
         base = QWidget(self.webBrowserDW)
         base.setContentsMargins(0, 0, 0, 0)
         self.webBrowserDW.setWidget(base)
-        layBase = QVBoxLayout(base)
+        # layBase = QVBoxLayout(base)
 
         scroll = QScrollArea()
         # scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)

@@ -250,13 +250,13 @@ class KutuphaneNesnesi(QGraphicsItem):
         return self._font
 
     # ---------------------------------------------------------------------
-    def setFontPointSize(self, fontPointSize):
-        self._font.setPointSize(fontPointSize)
+    def setFontPointSizeF(self, fontPointSizeF):
+        self._font.setPointSizeF(fontPointSizeF)
         self.update()
 
     # ---------------------------------------------------------------------
-    def fontPointSize(self):
-        return self._font.pointSize()
+    def fontPointSizeF(self):
+        return self._font.pointSizeF()
 
     # ---------------------------------------------------------------------
     def setPen(self, pen):

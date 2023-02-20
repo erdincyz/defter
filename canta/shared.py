@@ -143,16 +143,25 @@ def _scaleChildItemsByResizing(nesne, scaleFactor):
             scaledPath = c.path() * scaleMatrix
             c.setPath(scaledPath)
 
+            c.update_resize_handles()
+            c.update_painter_text_rect()
+
         elif c.type() == LINE_ITEM_TYPE:
             scaleMatrix = QTransform()
             scaleMatrix.scale(scaleFactor, scaleFactor)
             scaledLine = c.line() * scaleMatrix
             c.setLine(scaledLine)
+            
+            c.update_resize_handles()
+            c.update_painter_text_rect()
 
         else:
             rect = QRectF(c.rect().topLeft(), c.rect().size() * scaleFactor)
             rect.moveTo(0, 0)
             c.setRect(rect)
+
+            c.update_resize_handles()
+            c.update_painter_text_rect()
 
         c.setX(c.x() * scaleFactor)
         c.setY(c.y() * scaleFactor)

@@ -22,6 +22,7 @@ class GraphicsVideoItem(QGraphicsVideoItem):
     # ---------------------------------------------------------------------
     def __init__(self, parent=None):
         super(GraphicsVideoItem, self).__init__(parent)
+        self.ustGrup = None
 
     # ---------------------------------------------------------------------
     def html_dive_cevir(self, html_klasor_kayit_adres, video_kopyalaniyor_mu):
@@ -356,12 +357,12 @@ class VideoItem(BaseItem):
 
     # ---------------------------------------------------------------------
     def itemChange(self, change, value):
-        if change == BaseItem.ItemSelectedChange:
+        if change == BaseItem.GraphicsItemChange.ItemSelectedChange:
             if value:
                 self.scene().parent().item_selected(self)
             else:
                 self.scene().parent().item_deselected(self)
-        elif change == BaseItem.ItemSceneChange:
+        elif change == BaseItem.GraphicsItemChange.ItemSceneChange:
             # The value argument is the new scene or a null pointer if the item is removed from a scene.
             # When item removed from the scene, we stop the player, to prevent stream errors.
             if not value:
@@ -641,7 +642,7 @@ class VideoItem(BaseItem):
             self.changeTextColorAlpha(event.delta())
 
         elif toplam == ctrlAltShift:
-            self.changeFontSize(event.delta())
+            self.changeFontSizeF(event.delta())
         #
         elif toplam == altShift:
             # self.changeImageItemTextBackgroundColorAlpha(event.delta())

@@ -221,7 +221,7 @@ class Ellipse(BaseItem):
             x="{w / 2}"
             y="{h / 2}"
             font-family={self.font().family()}
-            font-size="{self.fontPointSize()}pt"
+            font-size="{self.fontPointSizeF()}pt"
             {bicimler1}
             {bicimler2}
             text-align="{yazi_hiza}"

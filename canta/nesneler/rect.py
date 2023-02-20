@@ -85,7 +85,7 @@ class Rect(BaseItem):
             fill="rgba{self.yaziRengi.toTuple()}" fill-opacity="{self.yaziRengi.alpha() / 255}" 
             stroke="none" xml:space="preserve" 
             x="{w / 2}" y="{h / 2}" text-anchor="middle" alignment-baseline="middle"
-            font-family={self.font().family()} font-size="{self.fontPointSize()}pt"
+            font-family={self.font().family()} font-size="{self.fontPointSizeF()}pt"
             {bicimler1} {bicimler2} text-align="{yazi_hiza}">{self.text()}</text>
             """
         else:

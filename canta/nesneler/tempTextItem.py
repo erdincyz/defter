@@ -67,8 +67,8 @@ class TempTextItem(QGraphicsTextItem):
         self.clearFocus()
 
     # ---------------------------------------------------------------------
-    def fontPointSize(self):
-        return self.font().pointSize()
+    def fontPointSizeF(self):
+        return self.font().pointSizeF()
 
     # ---------------------------------------------------------------------
     def focusOutEvent(self, event):
