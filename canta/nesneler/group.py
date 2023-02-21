@@ -317,6 +317,7 @@ class Group(QGraphicsItem):
         item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, False)
         item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
         item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsFocusable, False)
+        item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemStacksBehindParent, True)
         # TODO: ispinned e niye gerek duyduk.. destroy groupta da false ediliyor
 
         if item.type() == self.type():
@@ -384,6 +385,7 @@ class Group(QGraphicsItem):
             item.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
                           QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                           QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
+            item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemStacksBehindParent, False)
             # TODO: info: gruplanmiş parentlarin childlerini grupta tutmuyoruz. dolayisi ile
             # burda manual ayarliyoruz flaglari. yoksa secilemez oluyrolar. manual false etmistik zaten act_groupta.
             if not item.type() == self.type():  # grubun iceriginin secilemezligi korunsun diye
@@ -391,12 +393,14 @@ class Group(QGraphicsItem):
                     c.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
                                QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                                QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
+                    c.setFlag(QGraphicsItem.GraphicsItemFlag.ItemStacksBehindParent, False)
                     c.setSelected(True)
             else:
                 for c in item.parentedWithParentOperation:
                     c.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
                                QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                                QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
+                    c.setFlag(QGraphicsItem.GraphicsItemFlag.ItemStacksBehindParent, False)
                     c.setSelected(True)
             item.setSelected(True)
         self.scene().unGroupedRootItems.update(unGroupedRootItems)

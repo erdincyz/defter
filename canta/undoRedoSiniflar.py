@@ -302,12 +302,6 @@ class UndoableGroup(QUndoCommand):
         super(UndoableGroup, self).__init__(description, parent)
 
         self.group = Group()
-        # group = QGraphicsItemGroup(None)
-        self.group.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable
-                            | QGraphicsItem.GraphicsItemFlag.ItemIsMovable
-                            # | QGraphicsItem.GraphicsItemFlag.ItemIsFocusable
-                            )
-
         self.items = items
         self.scene = scene
 
@@ -321,6 +315,7 @@ class UndoableGroup(QUndoCommand):
                     item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, False)
                     item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
                     item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsFocusable, False)
+                    item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemStacksBehindParent, True)
                     # muhtemelen parentta da sorun var
                     # continue
                 else:
@@ -336,6 +331,7 @@ class UndoableGroup(QUndoCommand):
                         c.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, False)
                         c.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
                         c.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsFocusable, False)
+                        c.setFlag(QGraphicsItem.GraphicsItemFlag.ItemStacksBehindParent, True)
                 self.group.addSingleItemToGroup(item)
                 # TODO: if ile kontrol etsek once daha mi hizli olur, time complexity ye bakmak lazim.
                 # gruplandigi icin referansi parentta olacak ayrica tutmaya gerek yok
@@ -388,6 +384,7 @@ class UndoableUnGroup(QUndoCommand):
                     item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, False)
                     item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
                     item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsFocusable, False)
+                    item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemStacksBehindParent, True)
                     # muhtemelen parentta da sorun var
                     # continue
                 else:
@@ -403,6 +400,7 @@ class UndoableUnGroup(QUndoCommand):
                         c.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, False)
                         c.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
                         c.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsFocusable, False)
+                        c.setFlag(QGraphicsItem.GraphicsItemFlag.ItemStacksBehindParent, True)
                 self.group.addSingleItemToGroup(item)
                 # TODO: if ile kontrol etsek once daha mi hizli olur, time complexity ye bakmak lazim.
                 # gruplandigi icin referansi parentta olacak ayrica tutmaya gerek yok

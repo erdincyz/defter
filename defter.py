@@ -14,7 +14,6 @@ import operator
 import time
 import filecmp
 import zipfile
-# import time
 import shutil
 import tempfile
 import platform
@@ -2756,8 +2755,8 @@ class DefterAnaPencere(QMainWindow):
         elif itemType == shared.GROUP_ITEM_TYPE:
             groupItem = Group(itemDict["arkaPlanRengi"], itemDict.get("yaziRengi", QColor(0, 0, 0)), itemDict["pen"])
             # group = QGraphicsItemGroup(None)
-            groupItem.setFlags(Group.ItemIsSelectable
-                               | Group.ItemIsMovable
+            groupItem.setFlags(Group.GraphicsItemFlag.ItemIsSelectable
+                               | Group.GraphicsItemFlag.ItemIsMovable
                                # | Group.ItemIsFocusable
                                )
 
@@ -6318,6 +6317,135 @@ class DefterAnaPencere(QMainWindow):
         self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
+    def act_baska_dokumana_kopyala_yapistir_oncesi_gomulu_dosyalari_kopyala(self, itemDict, eskiTempDir):
+        # itemdictler 2 defa donguden gecmis oluyor, ama bu sekilde islem daha acik
+        # hepsini tek yerde toplamak iyice karmasiklastiracak isleri
+
+        self._act_gomulu_dosyalari_yeni_tmp_klasore_kopyala(itemDict, eskiTempDir)
+        if "group_children" in itemDict:
+            for cItemDict in itemDict["group_children"]:
+                self.act_baska_dokumana_kopyala_yapistir_oncesi_gomulu_dosyalari_kopyala(cItemDict, eskiTempDir)
+        if "children" in itemDict:
+            for cItemDict in itemDict["children"]:
+                self.act_baska_dokumana_kopyala_yapistir_oncesi_gomulu_dosyalari_kopyala(cItemDict, eskiTempDir)
+
+    # ---------------------------------------------------------------------
+    def _act_gomulu_dosyalari_yeni_tmp_klasore_kopyala(self, itemDict, eskiTempDir):
+        # ------------------------------------------------------------------------------------
+        # ## START ##  Copying related textItem's html images                      ## START ##
+        # ## START ##  from one doc's temp folder to newly pasted's temp folder    ## START ##
+        # ## START ##   before object creation                                     ## START ##
+        # ------------------------------------------------------------------------------------
+        # for ex, if you paste from one document to another, images don't show if we dont update this.
+
+        if itemDict["type"] == Text.Type and not itemDict["isPlainText"] and eskiTempDir:
+            imgSrcParser = ImgSrcParser()
+            imgSrcParser.feed(itemDict["html"])
+            for srcURL in imgSrcParser.urls:
+                if srcURL.startswith("defter"):
+
+                    yeniImgFolderPath = os.path.join(self.cScene.tempDirPath, "images")
+
+                    # try:
+                    if not os.path.exists(yeniImgFolderPath):
+                        os.makedirs(yeniImgFolderPath)
+
+                    imgPath = os.path.join(eskiTempDir, "images", srcURL)
+                    yeniImgPath = os.path.join(yeniImgFolderPath, srcURL)
+
+                    # print(imgPath)
+                    # print(yeniImgPath)
+                    # If shallow is true, files with identical os.stat() signatures are taken to be equal.
+                    # Otherwise, the contents of the files are compared.
+                    if os.path.exists(yeniImgPath):
+                        if not filecmp.cmp(imgPath, yeniImgPath, shallow=True):
+                            # print("ayni isimde dosya var, icerik farkli")
+                            try:
+                                shutil.copy2(imgPath, yeniImgPath)
+                                # print(imgPath)
+                                # print(yeniImgPath)
+                            except Exception as e:
+                                self.log(str(e), level=3)
+                        # else:
+                        #     print("ayni isimde ve ayni icerikte dosya var")
+                    else:
+                        # print("ayni isimde dosya yok")
+                        # farkli isimdeki halizirdaki diger dosyalar ile bu kopyalanan
+                        # yeni dosya ayni icerige sahip mi diye kontrol etmek de
+                        # false pozitif bir optimizasyon olur, anlamsiz yuk bindirir
+                        try:
+                            shutil.copy2(imgPath, yeniImgPath)
+                        except Exception as e:
+                            self.log(str(e), level=3)
+        # ------------------------------------------------------------------------------------
+        # ##  END  ##  Copying related textItem's html images                      ##  END  ##
+        # ##  END  ##  from one doc's temp folder to newly pasted's temp folder    ##  END  ##
+        # ##  END  ##   before object creation                                     ##  END  ##
+        # ------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------------
+        # ##  BASLA  ## gomulu resim ,video,dosya nesnlerini bir belgeden digerine ##  BASLA  ##
+        # ##  BASLA  ## kopyalamadan once ilgili dosyalari kopyaliyoruz            ##  BASLA  ##
+        # --------------------------------------------------------------------------------------
+
+        kopyalamak_lazim_mi = False
+        if itemDict["type"] == Image.Type and itemDict["isEmbeded"] and eskiTempDir:
+            cesit_klasor_adi = "images"
+            cakismayan_isim_al_fonksiyonu = self.cScene.get_unique_path_for_embeded_image
+            kopyalamak_lazim_mi = True
+
+        if itemDict["type"] == VideoItem.Type and itemDict["isEmbeded"] and eskiTempDir:
+            cesit_klasor_adi = "videos"
+            cakismayan_isim_al_fonksiyonu = self.cScene.get_unique_path_for_embeded_video
+            kopyalamak_lazim_mi = True
+
+        if itemDict["type"] == DosyaNesnesi.Type and itemDict["isEmbeded"] and eskiTempDir:
+            cesit_klasor_adi = "files"
+            cakismayan_isim_al_fonksiyonu = self.cScene.get_unique_path_for_embeded_file
+            kopyalamak_lazim_mi = True
+
+        if kopyalamak_lazim_mi:
+            yeniKlasorAdresi = os.path.join(self.cScene.tempDirPath, cesit_klasor_adi)
+            # try:
+            if not os.path.exists(yeniKlasorAdresi):
+                os.makedirs(yeniKlasorAdresi)
+
+            dosya_adi = os.path.basename(itemDict["filePath"])
+
+            eskiDosyaAdresi = os.path.join(eskiTempDir, cesit_klasor_adi, dosya_adi)
+            yeniDosyaAdresi = os.path.join(yeniKlasorAdresi, dosya_adi)
+
+            # If shallow is true, files with identical os.stat() signatures are taken to be equal.
+            # Otherwise, the contents of the files are compared.
+            if os.path.exists(yeniDosyaAdresi):
+                if not filecmp.cmp(eskiDosyaAdresi, yeniDosyaAdresi, shallow=True):
+                    # print("ayni isimde dosya var, ama icerik farkli")
+                    try:
+                        yeniDosyaAdresi = cakismayan_isim_al_fonksiyonu(dosya_adi)
+                        shutil.copy2(eskiDosyaAdresi, yeniDosyaAdresi)
+                        # nesnenin resim dosya adresi degisti
+                        itemDict["filePath"] = yeniDosyaAdresi
+                        # print(eskiDosyaAdresi)
+                        # print(yeniDosyaAdresi)
+                    except Exception as e:
+                        self.log(str(e), level=3)
+                # else:
+                #     # dolayisi ile bir sey yapmaya gerek yok, o dosya kullanilacak
+                #     print("ayni isimde ve ayni icerikte dosya var")
+            else:
+                # print("ayni isimde dosya yok")
+                # farkli isimdeki halizirdaki diger dosyalar ile bu kopyalanan
+                # yeni dosya ayni icerige sahip mi diye kontrol etmemek tercih edildi.
+                try:
+                    shutil.copy2(eskiDosyaAdresi, yeniDosyaAdresi)
+                except Exception as e:
+                    self.log(str(e), level=3)
+
+        # --------------------------------------------------------------------------------------
+        # ##  SON  ##  gomlu resim ,video,dosya nesnlerini bir belgeden digerine ##  SON  ##
+        # ##  SON  ## kopyalamadan once ilgili dosyalari kopyaliyoruz            ##  SON  ##
+        # --------------------------------------------------------------------------------------
+
+    # ---------------------------------------------------------------------
     @Slot()
     def act_paste(self):
         self.lutfen_bekleyin_goster()
@@ -6433,9 +6561,9 @@ class DefterAnaPencere(QMainWindow):
         self.cScene.clearSelection()
 
         paste_group = Group()
-        paste_group.setFlags(Group.ItemIsSelectable
-                             | Group.ItemIsMovable
-                             # | group.ItemIsFocusable
+        paste_group.setFlags(Group.GraphicsItemFlag.ItemIsSelectable
+                             | Group.GraphicsItemFlag.ItemIsMovable
+                             # | Group.GraphicsItemFlag.ItemIsFocusable
                              )
         self.cScene.addItem(paste_group)
         # TODO: try icine mi alsak, cursor olurda bir hata olursa WaitCursor halde kalmasin.
@@ -6444,6 +6572,8 @@ class DefterAnaPencere(QMainWindow):
             itemDict = stream.readQVariant()
             # item = stream.readQVariant()
             # print(item)
+
+            self.act_baska_dokumana_kopyala_yapistir_oncesi_gomulu_dosyalari_kopyala(itemDict, eskiTempDir)
 
             if itemDict["type"] == shared.GROUP_ITEM_TYPE:
                 group = self.add_item_to_scene_from_dict(itemDict, isPaste=True)
@@ -6458,120 +6588,6 @@ class DefterAnaPencere(QMainWindow):
                 paste_group.allFirstLevelGroupChildren.append(group)
 
             else:
-                # ------------------------------------------------------------------------------------
-                # ## START ##  Copying related textItem's html images                      ## START ##
-                # ## START ##  from one doc's temp folder to newly pasted's temp folder    ## START ##
-                # ## START ##   before object creation                                     ## START ##
-                # ------------------------------------------------------------------------------------
-                # for ex, if you paste from one document to another, images don't show if we dont update this.
-
-                if itemDict["type"] == Text.Type and not itemDict["isPlainText"] and eskiTempDir:
-                    imgSrcParser = ImgSrcParser()
-                    imgSrcParser.feed(itemDict["html"])
-                    for srcURL in imgSrcParser.urls:
-                        if srcURL.startswith("defter"):
-
-                            yeniImgFolderPath = os.path.join(self.cScene.tempDirPath, "images")
-
-                            # try:
-                            if not os.path.exists(yeniImgFolderPath):
-                                os.makedirs(yeniImgFolderPath)
-
-                            imgPath = os.path.join(eskiTempDir, "images", srcURL)
-                            yeniImgPath = os.path.join(yeniImgFolderPath, srcURL)
-
-                            # print(imgPath)
-                            # print(yeniImgPath)
-                            # If shallow is true, files with identical os.stat() signatures are taken to be equal.
-                            # Otherwise, the contents of the files are compared.
-                            if os.path.exists(yeniImgPath):
-                                if not filecmp.cmp(imgPath, yeniImgPath, shallow=True):
-                                    # print("ayni isimde dosya var, icerik farkli")
-                                    try:
-                                        shutil.copy2(imgPath, yeniImgPath)
-                                        # print(imgPath)
-                                        # print(yeniImgPath)
-                                    except Exception as e:
-                                        self.log(str(e), level=3)
-                                # else:
-                                #     print("ayni isimde ve ayni icerikte dosya var")
-                            else:
-                                # print("ayni isimde dosya yok")
-                                # farkli isimdeki halizirdaki diger dosyalar ile bu kopyalanan
-                                # yeni dosya ayni icerige sahip mi diye kontrol etmek de
-                                # false pozitif bir optimizasyon olur, anlamsiz yuk bindirir
-                                try:
-                                    shutil.copy2(imgPath, yeniImgPath)
-                                except Exception as e:
-                                    self.log(str(e), level=3)
-                # ------------------------------------------------------------------------------------
-                # ##  END  ##  Copying related textItem's html images                      ##  END  ##
-                # ##  END  ##  from one doc's temp folder to newly pasted's temp folder    ##  END  ##
-                # ##  END  ##   before object creation                                     ##  END  ##
-                # ------------------------------------------------------------------------------------
-                # --------------------------------------------------------------------------------------
-                # ##  BASLA  ##  gomlu resim ,video,dosya nesnlerini bir belgeden digerine ##  BASLA  ##
-                # ##  BASLA  ## kopyalamadan once ilgili dosyalari kopyaliyoruz            ##  BASLA  ##
-                # --------------------------------------------------------------------------------------
-
-                kopyalamak_lazim_mi = False
-                if itemDict["type"] == Image.Type and itemDict["isEmbeded"] and eskiTempDir:
-                    cesit_klasor_adi = "images"
-                    cakismayan_isim_al_fonksiyonu = self.cScene.get_unique_path_for_embeded_image
-                    kopyalamak_lazim_mi = True
-
-                if itemDict["type"] == VideoItem.Type and itemDict["isEmbeded"] and eskiTempDir:
-                    cesit_klasor_adi = "videos"
-                    cakismayan_isim_al_fonksiyonu = self.cScene.get_unique_path_for_embeded_video
-                    kopyalamak_lazim_mi = True
-
-                if itemDict["type"] == DosyaNesnesi.Type and itemDict["isEmbeded"] and eskiTempDir:
-                    cesit_klasor_adi = "files"
-                    cakismayan_isim_al_fonksiyonu = self.cScene.get_unique_path_for_embeded_file
-                    kopyalamak_lazim_mi = True
-
-                if kopyalamak_lazim_mi:
-                    yeniKlasorAdresi = os.path.join(self.cScene.tempDirPath, cesit_klasor_adi)
-                    # try:
-                    if not os.path.exists(yeniKlasorAdresi):
-                        os.makedirs(yeniKlasorAdresi)
-
-                    dosya_adi = os.path.basename(itemDict["filePath"])
-
-                    eskiDosyaAdresi = os.path.join(eskiTempDir, cesit_klasor_adi, dosya_adi)
-                    yeniDosyaAdresi = os.path.join(yeniKlasorAdresi, dosya_adi)
-
-                    # If shallow is true, files with identical os.stat() signatures are taken to be equal.
-                    # Otherwise, the contents of the files are compared.
-                    if os.path.exists(yeniDosyaAdresi):
-                        if not filecmp.cmp(eskiDosyaAdresi, yeniDosyaAdresi, shallow=True):
-                            # print("ayni isimde dosya var, ama icerik farkli")
-                            try:
-                                yeniDosyaAdresi = cakismayan_isim_al_fonksiyonu(dosya_adi)
-                                shutil.copy2(eskiDosyaAdresi, yeniDosyaAdresi)
-                                # nesnenin resim dosya adresi degisti
-                                itemDict["filePath"] = yeniDosyaAdresi
-                                # print(eskiDosyaAdresi)
-                                # print(yeniDosyaAdresi)
-                            except Exception as e:
-                                self.log(str(e), level=3)
-                        # else:
-                        #     # dolayisi ile bir sey yapmaya gerek yok, o dosya kullanilacak
-                        #     print("ayni isimde ve ayni icerikte dosya var")
-                    else:
-                        # print("ayni isimde dosya yok")
-                        # farkli isimdeki halizirdaki diger dosyalar ile bu kopyalanan
-                        # yeni dosya ayni icerige sahip mi diye kontrol etmemek tercih edildi.
-                        try:
-                            shutil.copy2(eskiDosyaAdresi, yeniDosyaAdresi)
-                        except Exception as e:
-                            self.log(str(e), level=3)
-
-                # --------------------------------------------------------------------------------------
-                # ##  SON  ##  gomlu resim ,video,dosya nesnlerini bir belgeden digerine ##  SON  ##
-                # ##  SON  ## kopyalamadan once ilgili dosyalari kopyaliyoruz            ##  SON  ##
-                # --------------------------------------------------------------------------------------
-
                 item = self.add_item_to_scene_from_dict(itemDict, isPaste=True)
                 # parentItem() == None her zaman.
                 # self.increase_zvalue(item)
@@ -6592,19 +6608,6 @@ class DefterAnaPencere(QMainWindow):
         self.cScene.removeItem(paste_group)
         del paste_group
         self.lutfen_bekleyin_gizle()
-
-        # if mimeData.hasImage():
-        #     setPixmap(mimeData.imageData())
-        # elif mimeData.hasHtml():
-        #     setText(mimeData.html())
-        #     setTextFormat(Qt.RichText)
-        # elif (mimeData.hasText():
-        #     setText(mimeData.text())
-        #     setTextFormat(Qt.PlainText)
-        # else:
-        #     setText(tr("Cannot display data"))
-
-        # print(self.cScene.items())
 
     # ---------------------------------------------------------------------
     @Slot()
