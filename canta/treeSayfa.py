@@ -37,8 +37,6 @@ class Sayfa(object):
         # @adi.setter da temizleniyor, bu ilk olusturma
         self._kayit_adi = "{} - {}".format(slugify(self._adi, False), self._kim)
 
-        self._yaziRengi = QColor(Qt.GlobalColor.black)
-
         # print(self.adi)
 
         Sayfa.sayfa_no += 1
@@ -66,15 +64,6 @@ class Sayfa(object):
     @ikon.setter
     def ikon(self, ikon):
         self._ikon = ikon
-
-    # @pyqtProperty(str)
-    @property
-    def yaziRengi(self):
-        return self._yaziRengi
-
-    @yaziRengi.setter
-    def yaziRengi(self, renk):
-        self._yaziRengi = renk
 
     # @pyqtProperty(Scene)
     @property

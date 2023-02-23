@@ -41,6 +41,7 @@ class DokumanAgacModel(QAbstractItemModel):
         self.embededFileCounter = 0
 
         self.treeViewIkonBoyutu = QSize(48, 48)
+        self.yaziRengi = parent.palette().windowText().color()
 
         # self.sayfalar = []
         Sayfa.sayfa_no = 0  # her dokuman icin sayfa sayisini sifirliyoruz
@@ -117,7 +118,6 @@ class DokumanAgacModel(QAbstractItemModel):
             itemText = sayfa.adi
             if itemText[0] == "★":
                 sayfa.adi = itemText[2:]
-                sayfa.yaziRengi = QColor(Qt.GlobalColor.black)
 
             idx = self.index_sayfadan(sayfa)
             self.dataChanged.emit(idx, idx)
@@ -553,9 +553,9 @@ class DokumanAgacModel(QAbstractItemModel):
 
         elif role == Qt.ItemDataRole.ForegroundRole:
             if sayfa.scene.isModified():
-                sayfa.yaziRengi = renk_degismis_nesne_yazi_rengi
+                return renk_degismis_nesne_yazi_rengi
             else:
-                return sayfa.yaziRengi
+                return self.yaziRengi
         elif role == Qt.ItemDataRole.SizeHintRole:
             return self.treeViewIkonBoyutu
 
