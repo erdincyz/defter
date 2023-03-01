@@ -51,6 +51,8 @@ class SahneKutuphane(QGraphicsScene):
 
         self.suruklenmekte_olan_nesne = None
 
+        self.desteklenen_tipler = [shared.IMAGE_ITEM_TYPE, shared.VIDEO_ITEM_TYPE, shared.DOSYA_ITEM_TYPE]
+
     # ---------------------------------------------------------------------
     def dragEnterEvent(self, e):
         # print(e)
@@ -74,8 +76,9 @@ class SahneKutuphane(QGraphicsScene):
         kume = set()
 
         for item in self.aktif_sahne.items():
-            if not item.isEmbeded:
-                kume.add(Eleman(tip=item.type(), adres=item.filePathForSave))
+            if item.type() in self.desteklenen_tipler:
+                if not item.isEmbeded:
+                    kume.add(Eleman(tip=item.type(), adres=item.filePathForSave))
         return kume
 
     # ---------------------------------------------------------------------
@@ -84,8 +87,9 @@ class SahneKutuphane(QGraphicsScene):
 
         for sayfa in self.sayfalar:
             for item in sayfa.scene.items():
-                if not item.isEmbeded:
-                    kume.add(Eleman(tip=item.type(), adres=item.filePathForSave))
+                if item.type() in self.desteklenen_tipler:
+                    if not item.isEmbeded:
+                        kume.add(Eleman(tip=item.type(), adres=item.filePathForSave))
         return kume
 
     # ---------------------------------------------------------------------
@@ -93,8 +97,9 @@ class SahneKutuphane(QGraphicsScene):
         kume = set()
 
         for item in self.aktif_sahne.items():
-            if item.isEmbeded:
-                kume.add(Eleman(tip=item.type(), adres=item.filePathForSave))
+            if item.type() in self.desteklenen_tipler:
+                if item.isEmbeded:
+                    kume.add(Eleman(tip=item.type(), adres=item.filePathForSave))
         return kume
 
     # ---------------------------------------------------------------------
@@ -106,8 +111,9 @@ class SahneKutuphane(QGraphicsScene):
 
         for sayfa in self.sayfalar:
             for item in sayfa.scene.items():
-                if item.isEmbeded:
-                    kume.add(Eleman(tip=item.type(), adres=item.filePathForSave))
+                if item.type() in self.desteklenen_tipler:
+                    if item.isEmbeded:
+                        kume.add(Eleman(tip=item.type(), adres=item.filePathForSave))
             if sayfa.view.backgroundImagePathIsEmbeded:
                 kume.add(Eleman(tip=shared.IMAGE_ITEM_TYPE, adres=sayfa.view.backgroundImagePath))
         return kume
