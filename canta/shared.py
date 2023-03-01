@@ -151,7 +151,7 @@ def _scaleChildItemsByResizing(nesne, scaleFactor):
             scaleMatrix.scale(scaleFactor, scaleFactor)
             scaledLine = c.line() * scaleMatrix
             c.setLine(scaledLine)
-            
+
             c.update_resize_handles()
             c.update_painter_text_rect()
 

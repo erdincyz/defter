@@ -9,8 +9,8 @@ __license__ = 'GPLv3'
 import os
 from PySide6.QtGui import (QPen, QBrush, QPainterPath, QPainterPathStroker, QColor, QTextOption, QPixmap, QFont,
                            QPixmapCache, QDrag)
-from PySide6.QtWidgets import (QGraphicsItem, QStyle, QGraphicsPixmapItem)
-from PySide6.QtCore import (QRectF, Qt, QMimeData, QUrl)
+from PySide6.QtWidgets import (QGraphicsItem, QStyle, QGraphicsPixmapItem, QFileIconProvider)
+from PySide6.QtCore import (QRectF, Qt, QMimeData, QUrl, QFileInfo, QSize)
 from canta import shared
 
 
@@ -18,7 +18,7 @@ from canta import shared
 class KutuphaneNesnesi(QGraphicsItem):
     Type = shared.KUTUPHANE_NESNESI
 
-    def __init__(self, pos, dosya_adresi, sahnede_kullaniliyor_mu=True,
+    def __init__(self, pos, tip, dosya_adresi, sahnede_kullaniliyor_mu=True,
                  belgede_kullaniliyor_mu=True,
                  isEmbeded=True,
                  isHtmlImage=False,
@@ -30,6 +30,8 @@ class KutuphaneNesnesi(QGraphicsItem):
         self.belgede_kullaniliyor_mu = belgede_kullaniliyor_mu
         self.isEmbeded = isEmbeded
         self.isHtmlImage = isHtmlImage
+
+        self.tip = tip
 
         self.dosya_adresi = dosya_adresi
 
@@ -55,7 +57,13 @@ class KutuphaneNesnesi(QGraphicsItem):
             # print("asdasd")
             # viewRectSize = self.scene().views()[0].get_visible_rect().size().toSize()
             # self.pixMap = QPixmap(self.filePathForDraw).scaled(viewRectSize / 1.5, Qt.KeepAspectRatio)
-            self.pixmap = QPixmap(self.filePathForDraw).scaledToWidth(45, Qt.TransformationMode.FastTransformation)
+            if self.tip == shared.VIDEO_ITEM_TYPE or self.tip == shared.DOSYA_ITEM_TYPE:
+                iconProvider = QFileIconProvider()
+                self.ikon = iconProvider.icon(QFileInfo(dosya_adresi))
+                # self.pixmap = self.ikon.pixmap(self._rect.toRect().size())
+                self.pixmap = self.ikon.pixmap(QSize(45, 45))
+            else:
+                self.pixmap = QPixmap(self.filePathForDraw).scaledToWidth(45, Qt.TransformationMode.FastTransformation)
             QPixmapCache.insert(self.filePathForDraw, self.pixmap)
         else:
             self.pixmap = self.pixmap.scaledToWidth(45, Qt.TransformationMode.FastTransformation)

@@ -1271,32 +1271,47 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def act_kut_belgede_kullanilmayan_gomulu_dosyalari_sil(self):
 
+        fark_liste_eleman = self.sahneKutuphane.belgede_kullanilmayan_gomulu_dosyalari_listele()
+
         msgBox = QMessageBox(self)
         msgBox.setWindowTitle(self.tr("Defter: Delete unused embeded files?"))
-        msgBox.setIcon(QMessageBox.Warning)
-        msgBox.setText(self.tr("Do you want to delete unused embeded files in the document?"))
-        msgBox.setInformativeText(self.tr("This is undoable!"))
+        msgBox.setIcon(QMessageBox.Icon.Warning)
 
-        deleteButton = msgBox.addButton(self.tr("&Delete"), QMessageBox.AcceptRole)
-        cancelButton = msgBox.addButton(self.tr("&Cancel"), QMessageBox.RejectRole)
-        # msgBox.addButton(QMessageBox.Cancel)
-        msgBox.setDefaultButton(deleteButton)
-        msgBox.setEscapeButton(cancelButton)
+        if fark_liste_eleman:
+            fark_liste_adres = [eleman.adres for eleman in fark_liste_eleman]
+            fark_liste_str = "\n".join(fark_liste_adres)
 
-        msgBox.exec()
-        if msgBox.clickedButton() == deleteButton:
-            self.sahneKutuphane.belgede_kullanilmayan_gomulu_dosyalari_sil()
+
+            msgBox.setText(self.tr(f"Do you want to delete {len(fark_liste_eleman)} unused embeded file(s) in the document?"))
+            msgBox.setInformativeText(self.tr("This is undoable!"))
+            msgBox.setDetailedText(fark_liste_str)
+
+            deleteButton = msgBox.addButton(self.tr("&Delete"), QMessageBox.ButtonRole.AcceptRole)
+            cancelButton = msgBox.addButton(self.tr("&Cancel"), QMessageBox.ButtonRole.RejectRole)
+            # msgBox.addButton(QMessageBox.Cancel)
+            msgBox.setDefaultButton(deleteButton)
+            msgBox.setEscapeButton(cancelButton)
+
+            msgBox.exec()
+            if msgBox.clickedButton() == deleteButton:
+                self.sahneKutuphane.belgede_kullanilmayan_gomulu_dosyalari_sil(fark_liste_eleman)
+        else:
+            msgBox.setText(self.tr(f"There is 0 unused embeded file in the document!"))
+            tamamButton = msgBox.addButton(self.tr("&Ok"), QMessageBox.ButtonRole.AcceptRole)
+            msgBox.setDefaultButton(tamamButton)
+            msgBox.setEscapeButton(tamamButton)
+            msgBox.exec()
 
     # ---------------------------------------------------------------------
     def act_kutuphaneden_nesne_sil(self):
         msgBox = QMessageBox(self)
         msgBox.setWindowTitle(self.tr("Defter: Delete selected embeded files?"))
-        msgBox.setIcon(QMessageBox.Warning)
+        msgBox.setIcon(QMessageBox.Icon.Warning)
         msgBox.setText(self.tr("Do you want to delete selected embeded files in the document?"))
         msgBox.setInformativeText(self.tr("This is undoable! Used files will not be deleted!"))
 
-        deleteButton = msgBox.addButton(self.tr("&Delete"), QMessageBox.AcceptRole)
-        cancelButton = msgBox.addButton(self.tr("&Cancel"), QMessageBox.RejectRole)
+        deleteButton = msgBox.addButton(self.tr("&Delete"), QMessageBox.ButtonRole.AcceptRole)
+        cancelButton = msgBox.addButton(self.tr("&Cancel"), QMessageBox.ButtonRole.RejectRole)
         # msgBox.addButton(QMessageBox.Cancel)
         msgBox.setDefaultButton(deleteButton)
         msgBox.setEscapeButton(cancelButton)
@@ -1380,7 +1395,6 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot(Sayfa)
     def tv_sayfa_degistir(self, sayfa):
-        # print(item)
 
         """
             # sayfa ekleyip cikarinca cagiriyoruz,
@@ -1399,6 +1413,7 @@ class DefterAnaPencere(QMainWindow):
         self.cView = sayfa.view
         self.cScene = sayfa.scene
         # self.cScene = self.cView.scene()
+        self.sahneKutuphane.aktif_sahne = sayfa.scene
 
         self.undoGroup.setActiveStack(self.cScene.undoStack)
 
@@ -2226,7 +2241,7 @@ class DefterAnaPencere(QMainWindow):
         idx = self.tabWidget.currentIndex()
         yazi = "{} - {}".format(self.cModel.fileName, self.sayfalarDWTreeView.get_current_sayfa().adi.replace("★ ", ""))
 
-        self.setWindowTitle("%s %s  -  %s" % ("Defter", VERSION, yazi))
+        self.setWindowTitle(f"Defter {VERSION}  -  {yazi}")
 
         self.tabBar.setTabText(idx, yazi)  #
         # ---------------------------------------------------------------------
@@ -3369,13 +3384,13 @@ class DefterAnaPencere(QMainWindow):
     def do_you_want_to_save(self):
         msgBox = QMessageBox(self)
         msgBox.setWindowTitle(self.tr("Defter: Save file?"))
-        msgBox.setIcon(QMessageBox.Warning)
+        msgBox.setIcon(QMessageBox.Icon.Warning)
         msgBox.setText(self.tr("The file has been modified!"))
         msgBox.setInformativeText(self.tr("Do you want to save your changes?"))
 
-        saveButton = msgBox.addButton(self.tr("&Save"), QMessageBox.AcceptRole)
-        discardButton = msgBox.addButton(self.tr("&Discard"), QMessageBox.DestructiveRole)
-        cancelButton = msgBox.addButton(self.tr("&Cancel"), QMessageBox.RejectRole)
+        saveButton = msgBox.addButton(self.tr("&Save"), QMessageBox.ButtonRole.AcceptRole)
+        discardButton = msgBox.addButton(self.tr("&Discard"), QMessageBox.ButtonRole.DestructiveRole)
+        cancelButton = msgBox.addButton(self.tr("&Cancel"), QMessageBox.ButtonRole.RejectRole)
         # msgBox.addButton(QMessageBox.Cancel)
         msgBox.setDefaultButton(saveButton)
         msgBox.setEscapeButton(cancelButton)
@@ -3396,13 +3411,13 @@ class DefterAnaPencere(QMainWindow):
         # self.fileChangeReport=""
         msgBox = QMessageBox(self)
         msgBox.setWindowTitle("Defter")
-        msgBox.setIcon(QMessageBox.Warning)
+        msgBox.setIcon(QMessageBox.Icon.Warning)
         # msgBox.setDetailedText(self.fileChangeReport)
         msgBox.setText(self.tr("There are unsaved files!"))
         msgBox.setInformativeText(self.tr("Your changes will be lost if you don't save them."))
 
-        discardButton = msgBox.addButton(self.tr("Close &without saving"), QMessageBox.DestructiveRole)
-        cancelButton = msgBox.addButton(self.tr("&Cancel"), QMessageBox.RejectRole)
+        discardButton = msgBox.addButton(self.tr("Close &without saving"), QMessageBox.ButtonRole.DestructiveRole)
+        cancelButton = msgBox.addButton(self.tr("&Cancel"), QMessageBox.ButtonRole.RejectRole)
         msgBox.setDefaultButton(cancelButton)
         msgBox.setEscapeButton(cancelButton)
 
@@ -8004,12 +8019,12 @@ class DefterAnaPencere(QMainWindow):
 
         msgBox = QMessageBox(self)
         msgBox.setWindowTitle(self.tr("Defter: Delete style preset?"))
-        msgBox.setIcon(QMessageBox.Warning)
+        msgBox.setIcon(QMessageBox.Icon.Warning)
         msgBox.setText(self.tr("Do you want to delete selected file preset(s)?"))
         msgBox.setInformativeText(self.tr("This is undoable!"))
 
-        deleteButton = msgBox.addButton(self.tr("&Delete"), QMessageBox.AcceptRole)
-        cancelButton = msgBox.addButton(self.tr("&Cancel"), QMessageBox.RejectRole)
+        deleteButton = msgBox.addButton(self.tr("&Delete"), QMessageBox.ButtonRole.AcceptRole)
+        cancelButton = msgBox.addButton(self.tr("&Cancel"), QMessageBox.ButtonRole.RejectRole)
         # msgBox.addButton(QMessageBox.Cancel)
         msgBox.setDefaultButton(deleteButton)
         msgBox.setEscapeButton(cancelButton)
