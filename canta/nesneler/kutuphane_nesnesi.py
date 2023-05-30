@@ -108,7 +108,7 @@ class KutuphaneNesnesi(QGraphicsItem):
         self.setYaziRengi(QColor(Qt.GlobalColor.black))
         self.setArkaPlanRengi(QColor(Qt.GlobalColor.transparent))  # also sets self._brush # veya nobrush
 
-        self.setToolTip(dosya_adresi)
+        self.setToolTip(f'{dosya_adresi}\n\n -- Press "Alt" to preview"')
 
     # ---------------------------------------------------------------------
     def type(self):

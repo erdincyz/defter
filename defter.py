@@ -1534,30 +1534,44 @@ class DefterAnaPencere(QMainWindow):
             self.log(self.tr("Please select a page."))
             return
 
-        # klavye ile secilip aktif edilmeden silinebilir sayfa, o yuzden selectedItems[0]
-        # idx = self.sayfalarDWTreeView.selectedIndexes()[0]
-        # with signals_updates_blocked(self.tabWidget):
-        scene = sayfa.scene
-        view = sayfa.view
+        msgBox = QMessageBox(self)
+        msgBox.setWindowTitle(self.tr("Defter: Delete page?"))
+        msgBox.setIcon(QMessageBox.Icon.Warning)
+        msgBox.setText(self.tr("Do you want to delete selected page?"))
+        msgBox.setInformativeText(self.tr("This is undoable!"))
 
-        self.cModel.satir_sil(sayfa)
-        self.cModel.enSonAktifSayfa = None
+        deleteButton = msgBox.addButton(self.tr("&Delete"), QMessageBox.ButtonRole.AcceptRole)
+        cancelButton = msgBox.addButton(self.tr("&Cancel"), QMessageBox.ButtonRole.RejectRole)
+        # msgBox.addButton(QMessageBox.Cancel)
+        msgBox.setDefaultButton(cancelButton)
+        msgBox.setEscapeButton(cancelButton)
 
-        # self.tv_sayfa_degistir(self.sayfalarDWTreeView.currentItem())
-        # self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(parentSayfa)
-        self.tv_sayfa_degistir(self.sayfalarDWTreeView.get_current_sayfa())
+        msgBox.exec()
+        if msgBox.clickedButton() == deleteButton:
+            # klavye ile secilip aktif edilmeden silinebilir sayfa, o yuzden selectedItems[0]
+            # idx = self.sayfalarDWTreeView.selectedIndexes()[0]
+            # with signals_updates_blocked(self.tabWidget):
+            scene = sayfa.scene
+            view = sayfa.view
 
-        # silinen satirin(sayfanin scene ve viewi temizleniyor)
-        scene.undoStack.clear()
-        self.undoGroup.removeStack(scene.undoStack)
-        scene.undoStack.setParent(None)
-        scene.undoStack.deleteLater()
-        # self.undoGroup.blockSignals(False)
+            self.cModel.satir_sil(sayfa)
+            self.cModel.enSonAktifSayfa = None
 
-        view.setParent(None)
-        scene.setParent(None)
-        view.deleteLater()
-        scene.deleteLater()
+            # self.tv_sayfa_degistir(self.sayfalarDWTreeView.currentItem())
+            # self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(parentSayfa)
+            self.tv_sayfa_degistir(self.sayfalarDWTreeView.get_current_sayfa())
+
+            # silinen satirin(sayfanin scene ve viewi temizleniyor)
+            scene.undoStack.clear()
+            self.undoGroup.removeStack(scene.undoStack)
+            scene.undoStack.setParent(None)
+            scene.undoStack.deleteLater()
+            # self.undoGroup.blockSignals(False)
+
+            view.setParent(None)
+            scene.setParent(None)
+            view.deleteLater()
+            scene.deleteLater()
 
     # ---------------------------------------------------------------------
     def tw_modeli_ve_sayfalari_sil(self, model):
