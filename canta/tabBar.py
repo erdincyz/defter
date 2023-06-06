@@ -42,7 +42,7 @@ class TabBar(QTabBar):
     # ---------------------------------------------------------------------
     def createMiniButton(self):
         self.addTabButton = QToolButton(self)
-        self.addTabButton.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.addTabButton.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         self.addTabButton.setGeometry(0, 0, 15, 15)
         # self.addTabButton.setGeometry(0, 0, 20, 33)
         # self.addTabButton.setMinimumSize(20, 33)
@@ -51,7 +51,7 @@ class TabBar(QTabBar):
         self.addTabButton.setText("+")
 
         # addTabButton.clicked.connect(self.miniButtonClicked)
-        self.addTabButton.clicked.connect(self.tabLeftMiniButtonClicked.emit)
+        self.addTabButton.clicked.connect(lambda: self.tabLeftMiniButtonClicked.emit())
 
         # self.parent().setCornerWidget(self.addTabButton, Qt.TopLeftCorner)
         # self.parent().setCornerWidget(addTabButton)

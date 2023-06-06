@@ -43,8 +43,8 @@ class RenkCubuguVeSayiKutusu(QWidget):
         anaLay.addWidget(self.dSpinBox)
         # anaLay.addStretch()
 
-        self.slider.valueChangedFromSliderGuiNotBySetValue.connect(self.degerDegisti.emit)
-        self.dSpinBox.valueChangedFromSpinBoxGuiNotBySetValue.connect(self.degerDegisti.emit)
+        self.slider.valueChangedFromSliderGuiNotBySetValue.connect(lambda x: self.degerDegisti.emit(x))
+        self.dSpinBox.valueChangedFromSpinBoxGuiNotBySetValue.connect(lambda x: self.degerDegisti.emit(x))
 
         self.slider.valueChanged.connect(self.dSpinBox.setValue)
         self.dSpinBox.valueChanged.connect(self.slider.setValue)

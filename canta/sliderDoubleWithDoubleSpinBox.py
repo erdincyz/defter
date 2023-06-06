@@ -38,7 +38,7 @@ class SliderDoubleWithDoubleSpinBox(QWidget):
         # anaLay.addStretch()
 
         self.slider.valueChangedFromSliderGuiNotBySetValue.connect(lambda x: self.degerDegisti.emit(x / 10))
-        self.dSpinBox.valueChangedFromDoubleSpinBoxGuiNotBySetValue.connect(self.degerDegisti.emit)
+        self.dSpinBox.valueChangedFromDoubleSpinBoxGuiNotBySetValue.connect(lambda x: self.degerDegisti.emit(x))
 
         self.slider.valueChanged.connect(lambda x: self.dSpinBox.setValue(x / 10))
         self.dSpinBox.valueChanged.connect(lambda x: self.slider.setValue(x * 10))

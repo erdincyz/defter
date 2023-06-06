@@ -82,7 +82,7 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
         self.cizgiKalinligiDSlider.setMaximum(100)
         self.cizgiKalinligiDSlider.setSingleStep(0.1)
         self.cizgiKalinligiDSlider.setValue(self.cizgiKalinligi * 10)
-        self.cizgiKalinligiDSlider.degerDegisti.connect(self.cizgiKalinligiDegisti.emit)
+        self.cizgiKalinligiDSlider.degerDegisti.connect(lambda x: self.cizgiKalinligiDegisti.emit(x))
 
         # etiket = QLabel(self.tr("Line&&Pen"), self)
         # layH = QHBoxLayout()

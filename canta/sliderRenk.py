@@ -22,7 +22,7 @@ class SliderRenk(Slider):
         super(SliderRenk, self).__init__(parent)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
 
-        self.valueChanged.connect(self.degerDegisti.emit)
+        self.valueChanged.connect(lambda x: self.degerDegisti.emit(x))
 
         # self.setFocusPolicy(Qt.NoFocus)
         # self.setFocusPolicy(Qt.WheelFocus)

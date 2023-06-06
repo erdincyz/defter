@@ -143,7 +143,7 @@ class PrintPreviewDialog(QMainWindow):
         # self.preview.setViewMode(QPrintPreviewWidget.SinglePageView)
 
         # self.preview.paintRequested.connect(lambda: self.paint_requested(printer))
-        self.preview.paintRequested.connect(self.paintRequested.emit)
+        self.preview.paintRequested.connect(lambda prntr: self.paintRequested.emit(prntr))
         self.preview.previewChanged.connect(self.act_preview_changed)
 
         self.setCentralWidget(centralWidget)
