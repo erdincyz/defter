@@ -3086,6 +3086,7 @@ class DefterAnaPencere(QMainWindow):
         sayfa = self.cModel.kimlikten_sayfa(sayfa_kim)
         if sayfa:
             self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(sayfa)
+            self.pencere_ve_tab_yazilarini_guncelle()
 
         tempWidgetViewYerine.deleteLater()
         del tempWidgetViewYerine
