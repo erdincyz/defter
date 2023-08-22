@@ -1,4 +1,4 @@
-![ScreenShot](https://raw.githubusercontent.com/erdincyz/gorseller/master/_defter/defter_ekran_goruntusu.jpg)
+![GIF](https://raw.githubusercontent.com/erdincyz/gorseller/master/_defter/defter.gif)
 
 
 ### Hoşgeldiniz
