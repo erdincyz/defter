@@ -4679,9 +4679,9 @@ class DefterAnaPencere(QMainWindow):
                                                               self.cScene.aktifArac.cizgiRengi,
                                                               self.cScene.aktifArac.cizgiKalinligi, self)
         self.nesneOzellikleriYW.hide()
-        self.nesneOzellikleriYW.arkaPlanRengiDegisti.connect(self.act_set_item_background_color)
-        self.nesneOzellikleriYW.yaziRengiDegisti.connect(self.act_set_item_text_color)
-        self.nesneOzellikleriYW.cizgiRengiDegisti.connect(self.act_set_item_line_color)
+        self.nesneOzellikleriYW.arkaPlanRengiDegisti.connect(lambda color: self.act_set_item_background_color(color,renkSecicidenMi=True))
+        self.nesneOzellikleriYW.yaziRengiDegisti.connect(lambda color: self.act_set_item_text_color(color,renkSecicidenMi=True))
+        self.nesneOzellikleriYW.cizgiRengiDegisti.connect(lambda color: self.act_set_item_line_color(color,renkSecicidenMi=True))
         self.nesneOzellikleriYW.cizgiKalinligiDegisti.connect(self.act_cizgi_kalinligi_degistir)
         self.nesneOzellikleriYW.cizgiKalinligiDegisti.connect(
             lambda x: self.cizgiKalinligiDSliderWithDSBox_tbar.setValue(x * 10))
