@@ -1296,7 +1296,7 @@ class DefterAnaPencere(QMainWindow):
             if msgBox.clickedButton() == deleteButton:
                 self.sahneKutuphane.belgede_kullanilmayan_gomulu_dosyalari_sil(fark_liste_eleman)
         else:
-            msgBox.setText(self.tr(f"There is 0 unused embeded file in the document!"))
+            msgBox.setText(self.tr("There is 0 unused embeded file in the document!"))
             tamamButton = msgBox.addButton(self.tr("&Ok"), QMessageBox.ButtonRole.AcceptRole)
             msgBox.setDefaultButton(tamamButton)
             msgBox.setEscapeButton(tamamButton)
@@ -1439,8 +1439,9 @@ class DefterAnaPencere(QMainWindow):
         self.ekle_sil_butonlari_guncelle()
 
         try:
+            self.sahneKutuphane.clear()
             self.sahneKutuphane.tempDirPath = self.cModel.tempDirPath
-            self.sahneKutuphane.asil_sahne = self.cScene
+            self.sahneKutuphane.aktif_sahne = self.cScene
             # list(self.cModel.sayfalar()) cunku generator, ilk islemde tuketiyoruz, sonra problem
             self.sahneKutuphane.sayfalar = list(self.cModel.sayfalar())
         except AttributeError:
@@ -2302,8 +2303,9 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.secim_aracina_gec()
 
             try:
+                self.sahneKutuphane.clear()
                 self.sahneKutuphane.tempDirPath = self.cModel.tempDirPath
-                self.sahneKutuphane.asil_sahne = self.cScene
+                self.sahneKutuphane.aktif_sahne = self.cScene
                 # list(self.cModel.sayfalar()) cunku generator, ilk islemde tuketiyoruz, sonra problem
                 self.sahneKutuphane.sayfalar = list(self.cModel.sayfalar())
             except AttributeError:
@@ -2321,7 +2323,7 @@ class DefterAnaPencere(QMainWindow):
         """ modifies sceneDict in act_import_def_files_into_current_def_file"""
 
         for itemDict in itemDictList:
-            if itemDict["type"] == Image.Type and itemDict["isEmbeded"]:
+            if itemDict["type"] == shared.IMAGE_ITEM_TYPE and itemDict["isEmbeded"]:
                 yeniBaseName = "{}_{}".format(prefix, os.path.basename(itemDict["filePath"]))
                 itemDict["filePath"] = os.path.join(os.path.dirname(itemDict["filePath"]), yeniBaseName)
             elif itemDict["type"] == shared.GROUP_ITEM_TYPE:
@@ -2711,12 +2713,12 @@ class DefterAnaPencere(QMainWindow):
                 filePath = os.path.join(self.cScene.tempDirPath, "images",
                                         os.path.basename(itemDict["filePath"].replace("\\", os.sep)))
 
-                imageItem = Image(filePath, itemDict["pos"], itemDict["rect"], itemDict["yaziRengi"],
+                imageItem = Image(filePath, itemDict["pos"], itemDict["rect"], None, itemDict["yaziRengi"],
                                   itemDict["arkaPlanRengi"],
                                   itemDict["pen"], itemDict["font"], True)
                 imageItem.originalSourceFilePath = itemDict["originalSourceFilePath"]
             else:
-                imageItem = Image(itemDict["filePath"], itemDict["pos"], itemDict["rect"], itemDict["yaziRengi"],
+                imageItem = Image(itemDict["filePath"], itemDict["pos"], itemDict["rect"], None, itemDict["yaziRengi"],
                                   itemDict["arkaPlanRengi"],
                                   itemDict["pen"], itemDict["font"])
 
@@ -3016,7 +3018,6 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def oklari_bagla(self):
         for nesne in self.cScene.items():
-            # if nesne.type() == LineItem.Type:
             if nesne.type() == shared.LINE_ITEM_TYPE and nesne.baglanmis_nesneler:
                 for baglanan_nesne_kimligi, nokta in nesne.baglanmis_nesneler.items():
                     baglanan_nesne = self.cScene._kimlik_nesne_sozluk[baglanan_nesne_kimligi]
@@ -5919,13 +5920,12 @@ class DefterAnaPencere(QMainWindow):
     def ekle_resim_direkt(self, dosyaYolu, pos, isEmbeded=False):
 
         # yeni TODO: simdi bi de pixmap dosya boyutu icin lazim .. alternatif bi şeyler dusunelim.
+        #viewRectSize = self.cScene.views()[0].get_visible_rect().size().toSize()
+        #pixMap = QPixmap(dosyaYolu).scaled(viewRectSize / 1.5, Qt.AspectRatioMode.KeepAspectRatio)
         # pixMap = QPixmap(dosyaYolu)
-        # pixMap = QPixmap(dosyaYolu).scaled(self.sceneRect().size().toSize() / 1.5, Qt.KeepAspectRatio)
-        viewRectSize = self.cScene.views()[0].get_visible_rect().size().toSize()
-        pixMap = QPixmap(dosyaYolu).scaled(viewRectSize / 1.5, Qt.AspectRatioMode.KeepAspectRatio)
-        rectf = QRectF(pixMap.rect())
+        # rectf = QRectF(pixMap.rect())
         # rectf.moveTo(pos)
-        item = Image(dosyaYolu, pos, rectf,
+        item = Image(dosyaYolu, pos, None, None,
                      self.cScene.aktifArac.yaziRengi,
                      self.cScene.aktifArac.arkaPlanRengi,
                      self.cScene.aktifArac.kalem,
@@ -6368,7 +6368,7 @@ class DefterAnaPencere(QMainWindow):
         # ------------------------------------------------------------------------------------
         # for ex, if you paste from one document to another, images don't show if we dont update this.
 
-        if itemDict["type"] == Text.Type and not itemDict["isPlainText"] and eskiTempDir:
+        if itemDict["type"] == shared.TEXT_ITEM_TYPE and not itemDict["isPlainText"] and eskiTempDir:
             imgSrcParser = ImgSrcParser()
             imgSrcParser.feed(itemDict["html"])
             for srcURL in imgSrcParser.urls:
@@ -6418,17 +6418,17 @@ class DefterAnaPencere(QMainWindow):
         # --------------------------------------------------------------------------------------
 
         kopyalamak_lazim_mi = False
-        if itemDict["type"] == Image.Type and itemDict["isEmbeded"] and eskiTempDir:
+        if itemDict["type"] == shared.IMAGE_ITEM_TYPE and itemDict["isEmbeded"] and eskiTempDir:
             cesit_klasor_adi = "images"
             cakismayan_isim_al_fonksiyonu = self.cScene.get_unique_path_for_embeded_image
             kopyalamak_lazim_mi = True
 
-        if itemDict["type"] == VideoItem.Type and itemDict["isEmbeded"] and eskiTempDir:
+        if itemDict["type"] == shared.VIDEO_ITEM_TYPE and itemDict["isEmbeded"] and eskiTempDir:
             cesit_klasor_adi = "videos"
             cakismayan_isim_al_fonksiyonu = self.cScene.get_unique_path_for_embeded_video
             kopyalamak_lazim_mi = True
 
-        if itemDict["type"] == DosyaNesnesi.Type and itemDict["isEmbeded"] and eskiTempDir:
+        if itemDict["type"] == shared.DOSYA_ITEM_TYPE and itemDict["isEmbeded"] and eskiTempDir:
             cesit_klasor_adi = "files"
             cakismayan_isim_al_fonksiyonu = self.cScene.get_unique_path_for_embeded_file
             kopyalamak_lazim_mi = True
@@ -6525,10 +6525,10 @@ class DefterAnaPencere(QMainWindow):
                 # print(image.byteCount())
                 imageSavePath = self.cScene.get_unique_path_for_embeded_image("pasted_image.jpg")
                 image.save(imageSavePath)
-                pixMap = QPixmap(imageSavePath)
-                # pixMap = QPixmap(image)
-                rect = QRectF(pixMap.rect())
-                imageItem = Image(imageSavePath, self.get_mouse_scene_pos(), rect,
+                # pixMap = QPixmap(imageSavePath)
+                pixMap = QPixmap(image)
+                rectf = QRectF(pixMap.rect())
+                imageItem = Image(imageSavePath, self.get_mouse_scene_pos(), rectf, pixMap,
                                   self.cScene.ResimAraci.yaziRengi,
                                   self.cScene.ResimAraci.arkaPlanRengi,
                                   self.cScene.ResimAraci.kalem,
@@ -7213,7 +7213,7 @@ class DefterAnaPencere(QMainWindow):
             #     for item in self.cScene.selectionQueue:
             #         if item.parentItem() in self.cScene.selectionQueue:
             #             continue
-            #         if item.type() == PathItem.Type:
+            #         if item.type() == shared.PATH_ITEM_TYPE:
             #             undoRedo.undoableRotate(self.cScene.undoStack, "rotate", item, gRot)
             #         else:
             #             undoRedo.undoableRotateWithOffset(self.cScene.undoStack, "rotate", item, gRot)
@@ -8453,17 +8453,17 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_kut_dosya_yoneticisinde_goster(self):
 
-        # if self.cScene.activeItem.type() == Text.Type:
+        # if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
         #     url = self.cScene.activeItem.get_document_url()
         #     url = url.toLocalFile()
-        # elif self.cScene.activeItem.type() == Image.Type or self.cScene.activeItem.type() == VideoItem.Type:
+        # elif self.cScene.activeItem.type() == shared.IMAGE_ITEM_TYPE or self.cScene.activeItem.type() == shared.VIDEO_ITEM_TYPE:
         #     url = self.cScene.activeItem.filePathForSave
         # else:
         #     return
 
         url = self.sahneKutuphane.selectedItems()[0].dosya_adresi
         norm = os.path.normpath(url)
-
+        
         sistem = platform.system()
         if sistem == "Darwin":
 
@@ -8776,7 +8776,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_convert_to_web_item(self):
         # for item in self.cScene.selectionQueue:
-        #     if item.type() == Text.Type:
+        #     if item.type() == shared.TEXT_ITEM_TYPE:
         #         if not item.isPlainText:
         #             html = item.toHtml()
         #             # pos, rect, arkaPlanRengi, pen, font
@@ -8784,8 +8784,8 @@ class DefterAnaPencere(QMainWindow):
         #             undoRedo.undoableAddItem(self.cScene.undoStack, "convert to web item", self.cScene, webItem)
 
         item = self.cScene.activeItem
-
-        # if item.type() == DosyaNesnesi.Type:
+        
+        # if item.type() == shared.DOSYA_ITEM_TYPE:
         #     webItem = Web(None, item.filePathForSave, item.scenePos(), 
         #                   item.rect(), self.yaziRengi, self.arkaPlanRengi,
         #                   self._pen,
@@ -8951,7 +8951,7 @@ class DefterAnaPencere(QMainWindow):
                 self.lutfen_bekleyin_goster()
                 if not userPath.endswith(ext):
                     userPath = '{}{}'.format(userPath, ext)
-                # if self.cScene.activeItem.type() == Image.Type:
+                # if self.cScene.activeItem.type() == shared.IMAGE_ITEM_TYPE:
                 shutil.copy2(self.cScene.activeItem.filePathForSave, userPath)
                 succesfulExportCount += 1
                 # path = userPath
@@ -9098,7 +9098,7 @@ class DefterAnaPencere(QMainWindow):
                 self.lutfen_bekleyin_goster()
                 if not userPath.endswith(ext):
                     userPath = '{}{}'.format(userPath, ext)
-                # if self.cScene.activeItem.type() == VideoItem.Type:
+                # if self.cScene.activeItem.type() == shared.VIDEO_ITEM_TYPE:
                 shutil.copy2(self.cScene.activeItem.filePathForSave, userPath)
                 succesfulExportCount += 1
                 # path = userPath
@@ -9218,7 +9218,7 @@ class DefterAnaPencere(QMainWindow):
                 self.lutfen_bekleyin_goster()
                 if not userPath.endswith(ext):
                     userPath = '{}{}'.format(userPath, ext)
-                # if self.cScene.activeItem.type() == VideoItem.Type:
+                # if self.cScene.activeItem.type() == shared.VIDEO_ITEM_TYPE:
                 shutil.copy2(self.cScene.activeItem.filePathForSave, userPath)
                 succesfulExportCount += 1
                 # path = userPath
@@ -9310,9 +9310,8 @@ class DefterAnaPencere(QMainWindow):
         # pixMap = QPixmap(imageSavePath)
         # pixMap = QPixmap(sayfa_img)
         pixMap = QPixmap.fromImage(sayfa_img)
-
-        rect = QRectF(pixMap.rect())
-        imageItem = Image(imageSavePath, self.pdfPos, rect, self.cScene.ResimAraci.yaziRengi,
+        rectf = QRectF(pixMap.rect())
+        imageItem = Image(imageSavePath, self.pdfPos, rectf, pixMap, self.cScene.ResimAraci.yaziRengi,
                           self.cScene.ResimAraci.arkaPlanRengi,
                           QPen(self.cScene.ResimAraci.kalem), self.cScene.ResimAraci.yaziTipi)
 

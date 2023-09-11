@@ -12,8 +12,6 @@ import shutil
 from PySide6.QtCore import Qt, QRectF, QPointF, Slot, Signal, QThread, QLineF, QObject
 from PySide6.QtGui import QPixmap, QPen, QImage, QUndoStack, QColor
 from PySide6.QtWidgets import QApplication, QGraphicsScene
-# from sub.items.base import BaseItem
-# TODO: bunu sadece dragEnterEvent kaynagi belirlemek icin kullaniyoruz, bi inceleyelim
 from canta.arac import Arac
 from canta.nesneler.yuvarlakFircaBoyutu import YuvarlakFircaBoyutu
 from canta.shared import kim
@@ -25,8 +23,6 @@ from canta.nesneler.text import Text
 from canta.nesneler.rect import Rect
 from canta.nesneler.ellipse import Ellipse
 from canta.nesneler.path import PathItem
-# from canta.nesneler.video import VideoItem
-# from canta.nesneler.dosya import DosyaNesnesi
 from canta.nesneler.mirrorLine import MirrorLine
 from canta.threadWorkers import DownloadWorker
 from canta import undoRedoFonksiyolar as undoRedo, shared
@@ -1279,11 +1275,11 @@ class Scene(QGraphicsScene):
                             self.parent().log(self.tr("Could not embeded! --> {}").format(e), level=3, toLogOnly=False)
                             return
 
-                        pixMap = QPixmap(imageSavePath)
+                        # pixMap = QPixmap(imageSavePath)
                         # print(imageSavePath)
                         # pixMap = QPixmap(image)
-                        rect = QRectF(pixMap.rect())
-                        imageItem = Image(imageSavePath, event.scenePos(), rect, self.ResimAraci.yaziRengi,
+                        # rectf = QRectF(pixMap.rect())
+                        imageItem = Image(imageSavePath, event.scenePos(), None, None, self.ResimAraci.yaziRengi,
                                           self.ResimAraci.arkaPlanRengi,
                                           QPen(self.ResimAraci.kalem), self.font())
 
@@ -1422,11 +1418,11 @@ class Scene(QGraphicsScene):
             image.save(imageSavePath)
             # print(image.byteCount())
 
-            pixMap = QPixmap(imageSavePath)
+            # pixMap = QPixmap(imageSavePath)
             # print(imageSavePath)
-            # pixMap = QPixmap(image)
-            rect = QRectF(pixMap.rect())
-            imageItem = Image(imageSavePath, event.scenePos(), rect, self.ResimAraci.yaziRengi,
+            pixMap = QPixmap(image)
+            rectf = QRectF(pixMap.rect())
+            imageItem = Image(imageSavePath, event.scenePos(), rectf, pixMap, self.ResimAraci.yaziRengi,
                               self.ResimAraci.arkaPlanRengi,
                               QPen(self.ResimAraci.kalem), self.font())
 
@@ -1529,10 +1525,10 @@ class Scene(QGraphicsScene):
             # imagePath = self.get_unique_path_for_embeded_image()
             imagePath = self.get_unique_path_for_embeded_image("image.jpg")
             image.save(imagePath)
-            pixMap = QPixmap(imagePath)
-            # pixMap = QPixmap(image)
-            rect = QRectF(pixMap.rect())
-            imageItem = Image(imagePath, event.scenePos(), rect, self.ResimAraci.yaziRengi,
+            # pixMap = QPixmap(imagePath)
+            pixMap = QPixmap(image)
+            rectf = QRectF(pixMap.rect())
+            imageItem = Image(imagePath, event.scenePos(), rectf, pixMap, self.ResimAraci.yaziRengi,
                               self.ResimAraci.arkaPlanRengi,
                               QPen(self.ResimAraci.kalem), self.font())
 
@@ -1552,11 +1548,11 @@ class Scene(QGraphicsScene):
     @Slot(str, str, QPointF, QObject)
     def dThread_finished(self, url, imagePath, scenePos, worker):
 
-        pixMap = QPixmap(imagePath)
+        # pixMap = QPixmap(imagePath)
         # pixMap = QPixmap(image)
-        rect = QRectF(pixMap.rect())
+        # rectf = QRectF(pixMap.rect())
 
-        imageItem = Image(imagePath, scenePos, rect, self.ResimAraci.yaziRengi, self.ResimAraci.arkaPlanRengi,
+        imageItem = Image(imagePath, scenePos, None, None, self.ResimAraci.yaziRengi, self.ResimAraci.arkaPlanRengi,
                           QPen(self.ResimAraci.kalem), self.font())
         imageItem.originalSourceFilePath = url
         imageItem.isEmbeded = True

@@ -20,50 +20,47 @@ class Image(BaseItem):
 
     # ---------------------------------------------------------------------
     # def __init__(self, filePath, pixmap, rect, arkaPlanRengi, cizgiRengi, parent=None, scene=None):
-    def __init__(self, filePath, pos, rect, yaziRengi, arkaPlanRengi, pen, font, isEmbeded=False, parent=None):
-        super(Image, self).__init__(pos, rect, yaziRengi, arkaPlanRengi, pen, font, parent)
+    def __init__(self, filePath, pos, rectf, pixmap, yaziRengi, arkaPlanRengi, pen, font, isEmbeded=False, parent=None):
 
-        self.setCacheMode(Image.CacheMode.DeviceCoordinateCache)
         self.isEmbeded = isEmbeded
         self.filePathForSave = filePath
         if not isEmbeded:
             self.originalSourceFilePath = filePath
         else:
             self.originalSourceFilePath = None
-        #     #bu zaten embeded ise, file open veya importtan cagriliyor demek, dolayisi ile, ordan direkt set edilsin.
-
-        # isembededi init paramtresine none diye tasınabilir
-        # ve eger embeded degilse sourceFilePath de set edilir.
+            # bu zaten embeded ise, file open veya importtan cagriliyor demek,
+            # dolayisi ile, ordan direkt set edilsin.
 
         if os.path.isfile(filePath):
             self.filePathForDraw = filePath
         else:
             self.filePathForDraw = ':icons/warning.png'
 
-        # # self.pixmap = pixmap
-        # self.pixmap = QPixmap()
-        # if not QPixmapCache.find(self.filePathForDraw, self.pixmap):
-        #     self.pixmap = QPixmap(self.filePathForDraw)
-        #     QPixmapCache.insert(self.filePathForDraw, self.pixmap)
-        #
-        # # self.pixmap = QPixmap(self.filePathForDraw)
-
-        # self.pixmap = pixmap
-        # self.pixmap = QPixmap()
-        # print(QPixmapCache.cacheLimit())
         # self.pixmap = QPixmapCache.find(self.filePathForDraw, self.pixmap)
-        self.pixmap = QPixmapCache.find(self.filePathForDraw)
-        if not self.pixmap:
-            # print("asdasd")
+        # self.pixmap = QPixmapCache.find(self.filePathForDraw)
+
+        if pixmap:
+            self.pixmap = pixmap
+        else:
             self.pixmap = QPixmap(self.filePathForDraw)
-            QPixmapCache.insert(self.filePathForDraw, self.pixmap)
+        # else:
+        #     self.pixmap = QPixmap()
+        #     if not QPixmapCache.find(self.filePathForDraw, self.pixmap):
+        #         self.pixmap = QPixmap(self.filePathForDraw)
+        #         QPixmapCache.insert(self.filePathForDraw, self.pixmap)
+        # print(QPixmapCache.cacheLimit())
 
-        # self.pixmap = QPixmap(self.filePathForDraw)
+        if not rectf:
+            rectf = QRectF(self.pixmap.rect())
 
+        super(Image, self).__init__(pos, rectf, yaziRengi, arkaPlanRengi, pen, font, parent)
+        # self.setCacheMode(Image.CacheMode.DeviceCoordinateCache)
+        # self.setCacheMode(Image.CacheMode.ItemCoordinateCache)
         self.orjinal_boyut = self.pixmap.size()
         self.bilgi_olcek = "1 - 1"
 
-        self.setFlags(BaseItem.GraphicsItemFlag.ItemIsMovable | BaseItem.GraphicsItemFlag.ItemIsSelectable)
+        self.setFlags(BaseItem.GraphicsItemFlag.ItemIsMovable |
+                      BaseItem.GraphicsItemFlag.ItemIsSelectable)
 
         self.imageOpacity = 1.0
         self.isMirrorX = False
@@ -285,6 +282,7 @@ class Image(BaseItem):
 
             self.bilgi_olcek = f"{rect.width() / self.orjinal_boyut.width():.2f} " \
                                f"- {rect.height() / self.orjinal_boyut.height():.2f}"
+            self.scene().parent().log(txt=self.bilgi_olcek, msecs=500)
             # self.setPos(x, y)
             # self.update_painter_text_rect()
 
@@ -319,10 +317,16 @@ class Image(BaseItem):
         else:
             self.filePathForDraw = self.filePathForSave
 
-        pixmap = QPixmapCache.find(self.filePathForDraw)
-        if not pixmap:
-            pixmap = QPixmap(self.filePathForDraw)
-            QPixmapCache.insert(self.filePathForDraw, pixmap)
+        # pixmap = QPixmapCache.find(self.filePathForDraw)
+        # if not pixmap:
+        #     pixmap = QPixmap(self.filePathForDraw)
+        #     QPixmapCache.insert(self.filePathForDraw, pixmap)
+
+        # pixmap = QPixmap()
+        # if not QPixmapCache.find(self.filePathForDraw, pixmap):
+        #     QPixmapCache.insert(self.filePathForDraw, pixmap)
+
+        pixmap = QPixmap(self.filePathForDraw)
 
         size = self.rect().size().toSize()
         self.pixmap = pixmap.scaled(size, Qt.AspectRatioMode.KeepAspectRatio)
@@ -343,12 +347,12 @@ class Image(BaseItem):
         rectf = rectf.intersected(self._rect)
         if not rectf.isEmpty():
             srectf = self.mapRectToScene(rectf)
-            pixmap = QPixmap(srectf.size().toSize())
+            pixMap = QPixmap(srectf.size().toSize())
             # son bir update, yoksa bazen crop rect cizgisi kaliyor render icinde
             self.update(rectf)
             painter = QPainter()
 
-            if not painter.begin(pixmap):
+            if not painter.begin(pixMap):
                 # print("hata")
                 self._isCropping = False
                 self.cropRectF = QRectF()
@@ -359,17 +363,17 @@ class Image(BaseItem):
 
             painter.end()
 
-            # image = QImage(self.pixmap.copy(rect))
+            # image = QImage(self.pixMap.copy(rect))
             fileName = os.path.splitext(os.path.basename(self.filePathForSave))[0]
             imageSavePath = self.scene().get_unique_path_for_embeded_image("cropped_{}.jpg".format(fileName))
-            pixmap.save(imageSavePath)
+            pixMap.save(imageSavePath)
 
             pos = self.scenePos()
 
             pos.setX(pos.x() + 5)
             pos.setY(pos.y() + 5)
 
-            imageItem = Image(imageSavePath, pos, rectf, self.yaziRengi, self.arkaPlanRengi,
+            imageItem = Image(imageSavePath, pos, rectf, pixMap, self.yaziRengi, self.arkaPlanRengi,
                               self._pen, self.font(), isEmbeded=True)
 
             self.scene().parent().increase_zvalue(imageItem)
@@ -590,7 +594,7 @@ class Image(BaseItem):
             painter.setBrush(Qt.BrushStyle.NoBrush)
 
             painter.setPen(selectionPenBottom)
-            painter.drawRect(self.rect())
+            painter.drawRect(rect)
 
             if self._resizing:
                 oran = 1 / self.scene().views()[0].transform().m11()
