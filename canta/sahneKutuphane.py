@@ -255,7 +255,7 @@ class SahneKutuphane(QGraphicsScene):
         self.clear()
 
         self._dosyalari_goster(self.tum_sahnelerdeki_linkli_dosya_adresleri(),
-                               isEmbeded=True, pozisyonSifirla=True)
+                               isEmbeded=False, pozisyonSifirla=True)
 
         self._dosyalari_goster(self.tum_sahnelerdeki_gomulu_dosya_adresleri(),
                                isEmbeded=True, pozisyonSifirla=False)

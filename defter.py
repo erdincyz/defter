@@ -5936,7 +5936,6 @@ class DefterAnaPencere(QMainWindow):
         # TODO: macro undo redo
         undoRedo.undoableAddItem(self.cScene.undoStack, description=self.tr("add image"), scene=self.cScene, item=item)
         self.cScene.unite_with_scene_rect(item.sceneBoundingRect())
-        pixMap = None
 
     # ---------------------------------------------------------------------
     @Slot()
