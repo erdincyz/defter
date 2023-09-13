@@ -86,7 +86,7 @@ class PathItem(QGraphicsItem):
         self.textPadding = 20
 
         self.painterTextOption = QTextOption()
-        self.painterTextOption.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
+        self.painterTextOption.setWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere)
         self.painterTextOption.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.painterTextRect = QRectF(self.boundingRect())
@@ -777,13 +777,13 @@ class PathItem(QGraphicsItem):
         toplam = event.modifiers().value
 
         # ctrl = int(Qt.ControlModifier)
-        shift = Qt.ShiftModifier.value
-        alt = Qt.AltModifier.value
+        shift = Qt.KeyboardModifier.ShiftModifier.value
+        alt = Qt.KeyboardModifier.AltModifier.value
 
-        ctrlAlt = Qt.ControlModifier.value + Qt.AltModifier.value
-        ctrlShift = Qt.ControlModifier.value + Qt.ShiftModifier.value
-        altShift = Qt.AltModifier.value + Qt.ShiftModifier.value
-        ctrlAltShift = Qt.ControlModifier.value + Qt.AltModifier.value + Qt.ShiftModifier.value
+        ctrlAlt = Qt.KeyboardModifier.ControlModifier.value + Qt.KeyboardModifier.AltModifier.value
+        ctrlShift = Qt.KeyboardModifier.ControlModifier.value + Qt.KeyboardModifier.ShiftModifier.value
+        altShift = Qt.KeyboardModifier.AltModifier.value + Qt.KeyboardModifier.ShiftModifier.value
+        ctrlAltShift = Qt.KeyboardModifier.ControlModifier.value + Qt.KeyboardModifier.AltModifier.value + Qt.KeyboardModifier.ShiftModifier.value
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:
@@ -1187,7 +1187,7 @@ class PathItem(QGraphicsItem):
         y = y - ys
 
         buffer = QBuffer()
-        buffer.open(QIODevice.WriteOnly)
+        buffer.open(QIODevice.OpenModeFlag.WriteOnly)
 
         generator = QSvgGenerator()
         # generator.setFileName("dosya.svg")

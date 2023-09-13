@@ -343,7 +343,7 @@ class PrintPreviewDialog(QMainWindow):
 
         self.pageNumberLineEdit = QLineEdit(self.toolBar)
         self.pageNumberLineEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.pageNumberLineEdit.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.pageNumberLineEdit.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.pageNumberLineEdit.editingFinished.connect(self.act_page_num_edited)
 
         self.pageNumberLabel = QLabel(self.toolBar)

@@ -62,7 +62,7 @@ class YuzenWidget(QWidget):
 
         self.anaLay.addLayout(baslikLay)
 
-        self.baslikEtiket.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.baslikEtiket.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         self.icerikToplamMinWidth = 0
         self.icerikToplamMinHeight = 0
 

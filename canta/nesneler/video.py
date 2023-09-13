@@ -618,13 +618,13 @@ class VideoItem(BaseItem):
         toplam = event.modifiers().value
 
         # ctrl = int(Qt.ControlModifier)
-        shift = Qt.ShiftModifier.value
-        alt = Qt.AltModifier.value
+        shift = Qt.KeyboardModifier.ShiftModifier.value
+        alt = Qt.KeyboardModifier.AltModifier.value
 
-        ctrlAlt = Qt.ControlModifier.value + Qt.AltModifier.value
-        ctrlShift = Qt.ControlModifier.value + Qt.ShiftModifier.value
-        altShift = Qt.AltModifier.value + Qt.ShiftModifier.value
-        ctrlAltShift = Qt.ControlModifier.value + Qt.AltModifier.value + Qt.ShiftModifier.value
+        ctrlAlt = Qt.KeyboardModifier.ControlModifier.value + Qt.KeyboardModifier.AltModifier.value
+        ctrlShift = Qt.KeyboardModifier.ControlModifier.value + Qt.KeyboardModifier.ShiftModifier.value
+        altShift = Qt.KeyboardModifier.AltModifier.value + Qt.KeyboardModifier.ShiftModifier.value
+        ctrlAltShift = Qt.KeyboardModifier.ControlModifier.value + Qt.KeyboardModifier.AltModifier.value + Qt.KeyboardModifier.ShiftModifier.value
 
         # if event.modifiers() & Qt.ControlModifier:
         if toplam == ctrlShift:

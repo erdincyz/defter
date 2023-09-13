@@ -58,7 +58,7 @@ class SliderRenk(Slider):
         # " Expand outside the groove */ "
         # " border-radius: 0px; }")
         self.bgGradient = QLinearGradient(0, 0, 1, 0)
-        self.bgGradient.setCoordinateMode(QLinearGradient.ObjectMode)
+        self.bgGradient.setCoordinateMode(QLinearGradient.CoordinateMode.ObjectMode)
 
     # ---------------------------------------------------------------------
     def setBgGradient(self, bgGradient):

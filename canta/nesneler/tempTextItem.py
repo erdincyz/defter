@@ -27,7 +27,7 @@ class TempTextItem(QGraphicsTextItem):
         super(TempTextItem, self).__init__(text, parent)
 
         self._kim = shared.kim(kac_basamak=16)
-        self.setFlags(QGraphicsTextItem.ItemIsFocusable)
+        self.setFlags(QGraphicsTextItem.GraphicsItemFlag.ItemIsFocusable)
 
         self.setTextInteractionFlags(Qt.TextInteractionFlag.TextEditorInteraction)
 
@@ -37,7 +37,7 @@ class TempTextItem(QGraphicsTextItem):
 
         self.textOption = QTextOption()
         self.textOption.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.textOption.setWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
+        self.textOption.setWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere)
         self.document().setDefaultTextOption(self.textOption)
 
         self.setTransformOriginPoint(self.boundingRect().center())

@@ -228,7 +228,7 @@ class DosyaNesnesi(BaseItem):
     def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
 
         buffer = QBuffer()
-        buffer.open(QIODevice.WriteOnly)
+        buffer.open(QIODevice.OpenModeFlag.WriteOnly)
         self.ikonPixmap.save(buffer, "PNG")
 
         ikon_base64_buffer = buffer.data().toBase64()

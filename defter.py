@@ -449,31 +449,31 @@ class DefterAnaPencere(QMainWindow):
         self.btnBold.setIcon(QIcon(':icons/bold.png'))
         self.btnBold.setFlat(True)
         self.btnBold.setCheckable(True)
-        self.btnBold.clicked.connect(lambda: self.act_bold(from_button=True))
+        self.btnBold.clicked.connect(lambda durum: self.act_bold(durum=durum, from_button=True))
 
         self.btnItalic = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnItalic.setIcon(QIcon(':icons/italic.png'))
         self.btnItalic.setFlat(True)
         self.btnItalic.setCheckable(True)
-        self.btnItalic.clicked.connect(lambda: self.act_italic(from_button=True))
+        self.btnItalic.clicked.connect(lambda durum: self.act_italic(durum=durum, from_button=True))
 
         self.btnUnderline = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnUnderline.setIcon(QIcon(':icons/underline.png'))
         self.btnUnderline.setFlat(True)
         self.btnUnderline.setCheckable(True)
-        self.btnUnderline.clicked.connect(lambda: self.act_underline(from_button=True))
+        self.btnUnderline.clicked.connect(lambda durum: self.act_underline(durum=durum, from_button=True))
 
         self.btnStrikeOut = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnStrikeOut.setIcon(QIcon(':icons/strikeout.png'))
         self.btnStrikeOut.setFlat(True)
         self.btnStrikeOut.setCheckable(True)
-        self.btnStrikeOut.clicked.connect(lambda: self.act_strikeout(from_button=True))
+        self.btnStrikeOut.clicked.connect(lambda durum: self.act_strikeout(durum=durum, from_button=True))
 
         self.btnOverline = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnOverline.setIcon(QIcon(':icons/overline.png'))
         self.btnOverline.setFlat(True)
         self.btnOverline.setCheckable(True)
-        self.btnOverline.clicked.connect(lambda: self.act_overline(from_button=True))
+        self.btnOverline.clicked.connect(lambda durum: self.act_overline(durum=durum, from_button=True))
 
         btnKaratkerBicimleriLay = QHBoxLayout()
         btnKaratkerBicimleriLay.addWidget(self.btnBold)
@@ -551,7 +551,7 @@ class DefterAnaPencere(QMainWindow):
         cizgiTipiLabel = QLabel(self.tr("Line Type"), self.cizgiGrupW)
         cizgiTipiLabel.setFixedWidth(67)
         self.cizgiTipiCBox = ComboBox(self.cizgiGrupW)
-        self.cizgiTipiCBox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.cizgiTipiCBox.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.cizgiTipiCBox.setIconSize(QSize(100, 15))
         self.cizgiTipiCBox.addItem(self.tr("      No Line"), userData=Qt.PenStyle.NoPen)
         self.cizgiTipiCBox.addItem(QIcon(':icons/line_solid.png'), "", userData=Qt.PenStyle.SolidLine)
@@ -572,7 +572,7 @@ class DefterAnaPencere(QMainWindow):
         cizgiBirlesimTipiLabel = QLabel(self.tr("Join Style"), self.cizgiGrupW)
         cizgiBirlesimTipiLabel.setFixedWidth(67)
         self.cizgiBirlesimTipiCBox = ComboBox(self.cizgiGrupW)
-        self.cizgiBirlesimTipiCBox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.cizgiBirlesimTipiCBox.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.cizgiBirlesimTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Round"),
                                            userData=Qt.PenJoinStyle.RoundJoin)  # Yuvarlak
         self.cizgiBirlesimTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Miter"),
@@ -590,7 +590,7 @@ class DefterAnaPencere(QMainWindow):
         cizgiUcuTipiLabel = QLabel(self.tr("Cap Style"), self.cizgiGrupW)
         cizgiUcuTipiLabel.setFixedWidth(67)
         self.cizgiUcuTipiCBox = ComboBox(self.cizgiGrupW)
-        self.cizgiUcuTipiCBox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.cizgiUcuTipiCBox.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.cizgiUcuTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Flat"), userData=Qt.PenCapStyle.FlatCap)
         self.cizgiUcuTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Square"), userData=Qt.PenCapStyle.SquareCap)
         self.cizgiUcuTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Round"), userData=Qt.PenCapStyle.RoundCap)
@@ -1700,7 +1700,7 @@ class DefterAnaPencere(QMainWindow):
         QApplication.setOrganizationName(shared.DEFTER_ORG_NAME)
         QApplication.setOrganizationDomain(shared.DEFTER_ORG_DOMAIN)
         QApplication.setApplicationName(shared.DEFTER_APP_NAME)
-        self.settings = QSettings(shared.DEFTER_AYARLAR_DOSYA_ADRES, QSettings.IniFormat)
+        self.settings = QSettings(shared.DEFTER_AYARLAR_DOSYA_ADRES, QSettings.Format.IniFormat)
         self.settingsAraclar = QSettings(shared.DEFTER_AYARLAR_ARACLAR_DOSYA_ADRES, QSettings.Format.IniFormat)
         # self.settings.clear()
 
@@ -2193,7 +2193,7 @@ class DefterAnaPencere(QMainWindow):
                 self.actionSaveAsFile.setEnabled(True)
 
         else:
-            self.tabBar.setTabTextColor(idx, self.tabBar.palette().color(QPalette.Text))
+            self.tabBar.setTabTextColor(idx, self.tabBar.palette().color(QPalette.ColorRole.Text))
 
             self.actionSaveFile.setEnabled(False)
             if self.cModel.saveFilePath:
@@ -2263,7 +2263,7 @@ class DefterAnaPencere(QMainWindow):
         if self.tabWidget.cModel.degismis_sayfa_var_mi():
             self.tabBar.setTabTextColor(idx, shared.renk_degismis_nesne_yazi_rengi)
         else:
-            self.tabBar.setTabTextColor(idx, self.tabBar.palette().color(QPalette.Text))
+            self.tabBar.setTabTextColor(idx, self.tabBar.palette().color(QPalette.ColorRole.Text))
         # ---------------------------------------------------------------------
 
     # ---------------------------------------------------------------------
@@ -2374,14 +2374,14 @@ class DefterAnaPencere(QMainWindow):
             filePath = os.path.join(tempDirPath, fileName)
             _file = QFile(filePath)
             # if not _file.open(QIODevice.ReadOnly | QIODevice.Text): # QIODevice.Text - eger json load edersek diye.
-            if not _file.open(QIODevice.ReadOnly):
+            if not _file.open(QIODevice.OpenModeFlag.ReadOnly):
                 hata = self.tr('Could not open file  --   "{0:s}"\n{1:s}').format(filePath, _file.errorString())
                 self.log(hata, 5000, 3, dialog=True)
                 continue
 
             # read the serialized data from the file
             fromFileStream = QDataStream(_file)
-            fromFileStream.setVersion(QDataStream.Qt_5_7)
+            fromFileStream.setVersion(QDataStream.Version.Qt_5_7)
             magic = fromFileStream.readInt32()
             if magic != DEF_MAGIC_NUMBER:
                 # raise IOError("unrecognized file type")
@@ -2408,8 +2408,8 @@ class DefterAnaPencere(QMainWindow):
             fromFileStream >> compressedBArray
             unCompressedBArray = qUncompress(compressedBArray)
 
-            tempStream = QDataStream(unCompressedBArray, QIODevice.ReadWrite)
-            tempStream.setVersion(QDataStream.Qt_5_7)
+            tempStream = QDataStream(unCompressedBArray, QIODevice.OpenModeFlag.ReadWrite)
+            tempStream.setVersion(QDataStream.Version.Qt_5_7)
             dokumanDict = tempStream.readQVariant()
 
             # _file.flush()
@@ -2527,7 +2527,7 @@ class DefterAnaPencere(QMainWindow):
             filePath = os.path.join(tempDirPath, fileName)
             _file = QFile(filePath)
             # if not _file.open(QIODevice.ReadOnly | QIODevice.Text): # QIODevice.Text - eger json load edersek diye.
-            if not _file.open(QIODevice.ReadOnly):
+            if not _file.open(QIODevice.OpenModeFlag.ReadOnly):
                 self.lutfen_bekleyin_gizle()
                 hata = self.tr('Could not open file  --   "{0:s}"\n{1:s}').format(filePath, _file.errorString())
                 self.log(hata, 5000, 3, dialog=True)
@@ -2535,7 +2535,7 @@ class DefterAnaPencere(QMainWindow):
 
             # read the serialized data from the file
             fromFileStream = QDataStream(_file)
-            fromFileStream.setVersion(QDataStream.Qt_5_7)
+            fromFileStream.setVersion(QDataStream.Version.Qt_5_7)
             magic = fromFileStream.readInt32()
             if magic != DEF_MAGIC_NUMBER:
                 # raise IOError("unrecognized file type")
@@ -2563,8 +2563,8 @@ class DefterAnaPencere(QMainWindow):
             fromFileStream >> compressedBArray
             unCompressedBArray = qUncompress(compressedBArray)
 
-            tempStream = QDataStream(unCompressedBArray, QIODevice.ReadWrite)
-            tempStream.setVersion(QDataStream.Qt_5_7)
+            tempStream = QDataStream(unCompressedBArray, QIODevice.OpenModeFlag.ReadWrite)
+            tempStream.setVersion(QDataStream.Version.Qt_5_7)
             dokumanDict = tempStream.readQVariant()
 
             # _file.flush()
@@ -2909,9 +2909,9 @@ class DefterAnaPencere(QMainWindow):
                 if parentItem.type() == shared.GROUP_ITEM_TYPE:
                     parentItem.parentedWithParentOperation.append(group)
                 if isInGroup:
-                    group.setFlag(QGraphicsItem.ItemIsSelectable, False)
-                    group.setFlag(QGraphicsItem.ItemIsMovable, False)
-                    group.setFlag(QGraphicsItem.ItemIsFocusable, False)
+                    group.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, False)
+                    group.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
+                    group.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsFocusable, False)
 
                 if "children" in childDict:
                     self.dict_to_scene_recursive_parent(childDict["children"], group)
@@ -2922,9 +2922,9 @@ class DefterAnaPencere(QMainWindow):
                 if parentItem.type() == shared.GROUP_ITEM_TYPE:
                     parentItem.parentedWithParentOperation.append(c)
                 if isInGroup:
-                    c.setFlag(QGraphicsItem.ItemIsSelectable, False)
-                    c.setFlag(QGraphicsItem.ItemIsMovable, False)
-                    c.setFlag(QGraphicsItem.ItemIsFocusable, False)
+                    c.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, False)
+                    c.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
+                    c.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsFocusable, False)
 
                 if "children" in childDict:
                     self.dict_to_scene_recursive_parent(childDict["children"], c)
@@ -3259,7 +3259,7 @@ class DefterAnaPencere(QMainWindow):
         _file = QSaveFile(filePathInTempDir)
         # if not _file.open( QFile.WriteOnly):
         # if not _file.open(QIODevice.WriteOnly | QIODevice.Text): # QIODevice.Text - eger json save edersek diye.
-        if not _file.open(QIODevice.WriteOnly):
+        if not _file.open(QIODevice.OpenModeFlag.WriteOnly):
             self.lutfen_bekleyin_gizle()
             QMessageBox.warning(self,
                                 'Defter',
@@ -3271,8 +3271,8 @@ class DefterAnaPencere(QMainWindow):
         # yukariyi try icine alirsak hata algilanmiyor ve hata mesaji vermiyor. o yuzden bu sekilde ayirdik.
         try:
             tempBArray = QByteArray()
-            tempStream = QDataStream(tempBArray, QIODevice.WriteOnly)
-            tempStream.setVersion(QDataStream.Qt_5_7)
+            tempStream = QDataStream(tempBArray, QIODevice.OpenModeFlag.WriteOnly)
+            tempStream.setVersion(QDataStream.Version.Qt_5_7)
 
             # self.cModel kullanmiyoruz. aktif olmayan tabin x dugmesine tiklanip kaydet secilebilme ihtimali var.
             cModel.saveFilePath = zipDosyaTamAdres
@@ -3283,7 +3283,7 @@ class DefterAnaPencere(QMainWindow):
             compressedBArray = qCompress(tempBArray)
 
             toFileStream = QDataStream(_file)
-            toFileStream.setVersion(QDataStream.Qt_5_7)
+            toFileStream.setVersion(QDataStream.Version.Qt_5_7)
             toFileStream.writeInt32(DEF_MAGIC_NUMBER)
             toFileStream.writeInt16(DEF_FILE_VERSION)
 
@@ -3541,11 +3541,11 @@ class DefterAnaPencere(QMainWindow):
         self.fileMenu = QMenu(self.tr("File"), self.mBar)
 
         self.actionNewFile = QAction(QIcon(':icons/file-base.png'), self.tr("New File"), self.mBar)
-        self.actionNewFile.setShortcut(QKeySequence.New)
+        self.actionNewFile.setShortcut(QKeySequence.StandardKey.New)
         self.actionNewFile.triggered.connect(self.create_tab)
 
         self.actionOpenFile = QAction(QIcon(':icons/folder-base.png'), self.tr("Open File"), self.mBar)
-        self.actionOpenFile.setShortcut(QKeySequence.Open)
+        self.actionOpenFile.setShortcut(QKeySequence.StandardKey.Open)
         self.actionOpenFile.triggered.connect(self.act_open_def_file)
 
         self.actionImportDefFiles = QAction(QIcon(':icons/file-base.png'), self.tr("Import def file(s)"), self.mBar)
@@ -3570,7 +3570,7 @@ class DefterAnaPencere(QMainWindow):
 
         # self.actionSaveFile = QAction(QIcon(':icons/save.png'), "Save File", self.mBar)
         self.actionSaveFile = QAction(QIcon(':icons/file-save.png'), self.tr("Save File"), self.mBar)
-        self.actionSaveFile.setShortcut(QKeySequence.Save)
+        self.actionSaveFile.setShortcut(QKeySequence.StandardKey.Save)
         self.actionSaveFile.triggered.connect(self.act_save_def_file)
         self.actionSaveFile.setEnabled(False)
 
@@ -3629,16 +3629,16 @@ class DefterAnaPencere(QMainWindow):
         self.addAction(self.actionChangeBackgroundColor)
 
         self.actionImportImages = QAction(QIcon(':icons/open-image.png'), self.tr("Import Image(s)"), self.mBar)
-        self.actionImportImages.setShortcut(QKeySequence("Ctrl+I"))
+        self.actionImportImages.setShortcut(QKeySequence("Ctrl+Shift+I"))
         self.actionImportImages.triggered.connect(self.act_add_multiple_images)
 
         # self.actionImportVideos = QAction(QIcon(':icons/file-video.png'), "Import Video(s)", self.mBar)
         self.actionImportVideos = QAction(QIcon(':icons/open-video.png'), self.tr("Import Video(s)"), self.mBar)
-        self.actionImportVideos.setShortcut(QKeySequence("Ctrl+Shift+Alt+I"))
+        self.actionImportVideos.setShortcut(QKeySequence("Ctrl+Shift+Alt+V"))
         self.actionImportVideos.triggered.connect(self.act_add_multiple_videos)
 
         self.actionImportSVGs = QAction(QIcon(':icons/open-svg.png'), self.tr("~Import SVG(s)"), self.mBar)
-        self.actionImportSVGs.setShortcut(QKeySequence("Ctrl+Shift+I"))
+        self.actionImportSVGs.setShortcut(QKeySequence("Ctrl+Shift+Alt+I"))
         self.actionImportSVGs.triggered.connect(self.act_add_multiple_images)
         self.actionImportSVGs.setDisabled(True)
 
@@ -3999,13 +3999,13 @@ class DefterAnaPencere(QMainWindow):
 
         helpMenu = QMenu(self.tr("Help"), self.mBar)
         actionAbout = QAction(QIcon(":icons/info.png"), self.tr("About Defter"), helpMenu)
-        actionAbout.setMenuRole(QAction.AboutRole)
+        actionAbout.setMenuRole(QAction.MenuRole.AboutRole)
         actionAbout.triggered.connect(self.act_about)
 
         actionAboutQt = QAction(self.tr("About Qt"), helpMenu)
         # actionAboutQt.setIcon(self.style().standardIcon(QStyle.SP_TitleBarMenuButton))
         actionAboutQt.triggered.connect(QApplication.aboutQt)
-        actionAboutQt.setMenuRole(QAction.AboutQtRole)
+        actionAboutQt.setMenuRole(QAction.MenuRole.AboutQtRole)
         helpMenu.addActions((actionAbout, actionAboutQt))
 
         self.mBar.addMenu(self.fileMenu)
@@ -4872,7 +4872,7 @@ class DefterAnaPencere(QMainWindow):
                                   self.tr("Bold"),
                                   self,
                                   shortcut="Ctrl+B",
-                                  triggered=self.act_bold,
+                                  triggered=lambda durum:self.act_bold(durum=durum, from_button=False),
                                   checkable=True)
         # bold = QFont()
         # bold.setBold(True)
@@ -4882,43 +4882,31 @@ class DefterAnaPencere(QMainWindow):
                                     self.tr("Italic"),
                                     self,
                                     shortcut="Ctrl+I",
-                                    triggered=self.act_italic,
+                                    triggered=lambda durum:self.act_italic(durum=durum, from_button=False),
                                     checkable=True)
-        # italic = QFont()
-        # italic.setItalic(True)
-        # self.actionItalic.setFont(italic)
 
         self.actionUnderline = QAction(QIcon(':icons/underline.png'),
                                        self.tr("Underline"),
                                        self,
                                        shortcut="Ctrl+U",
-                                       triggered=self.act_underline,
+                                       triggered=lambda durum:self.act_underline(durum=durum, from_button=False),
                                        checkable=True)
-        # underline = QFont()
-        # underline.setUnderline(True)
-        # self.actionUnderline.setFont(underline)
 
         self.actionStrikeOut = QAction(QIcon(':icons/strikeout.png'),
                                        self.tr("Strike Out"),
                                        self,
-                                       priority=QAction.LowPriority,
+                                       priority=QAction.Priority.LowPriority,
                                        # shortcut="Ctrl+U",
-                                       triggered=self.act_strikeout,
+                                       triggered=lambda durum:self.act_strikeout(durum=durum, from_button=False),
                                        checkable=True)
-        # strikeout = QFont()
-        # strikeout.setStrikeOut(True)
-        # self.actionUnderline.setFont(strikeout)
 
         self.actionOverline = QAction(QIcon(':icons/overline.png'),
                                       self.tr("Overline"),
                                       self,
-                                      priority=QAction.LowPriority,
+                                      priority=QAction.Priority.LowPriority,
                                       # shortcut="Ctrl+U",
-                                      triggered=self.act_overline,
+                                      triggered=lambda durum:self.act_overline(durum=durum, from_button=False),
                                       checkable=True)
-        # overline = QFont()
-        # overline.setOverline(True)
-        # self.actionOverline.setFont(overline)
 
         grp = QActionGroup(self.fontToolBar)
         grp.triggered.connect(self.act_yazi_hizala_action)
@@ -4937,20 +4925,20 @@ class DefterAnaPencere(QMainWindow):
 
         self.actionYaziHizalaSola.setShortcut("Ctrl+L")
         self.actionYaziHizalaSola.setCheckable(True)
-        self.actionYaziHizalaSola.setPriority(QAction.LowPriority)
+        self.actionYaziHizalaSola.setPriority(QAction.Priority.LowPriority)
         # self.actionYaziHizalaSola.hovered.connect(lambda: self._statusBar.showMessage("sola yanastir", 500))
 
         self.actionYaziHizalaOrtala.setShortcut("Ctrl+E")
         self.actionYaziHizalaOrtala.setCheckable(True)
-        self.actionYaziHizalaOrtala.setPriority(QAction.LowPriority)
+        self.actionYaziHizalaOrtala.setPriority(QAction.Priority.LowPriority)
 
         self.actionYaziHizalaSaga.setShortcut("Ctrl+R")
         self.actionYaziHizalaSaga.setCheckable(True)
-        self.actionYaziHizalaSaga.setPriority(QAction.LowPriority)
+        self.actionYaziHizalaSaga.setPriority(QAction.Priority.LowPriority)
 
         self.actionYaziHizalaSigdir.setShortcut("Ctrl+J")
         self.actionYaziHizalaSigdir.setCheckable(True)
-        self.actionYaziHizalaSigdir.setPriority(QAction.LowPriority)
+        self.actionYaziHizalaSigdir.setPriority(QAction.Priority.LowPriority)
 
         # self.fontToolBar.addSeparator()
         self.fontCBox_tbarAction = self.fontToolBar.addWidget(self.fontCBox_tbar)
@@ -5031,7 +5019,7 @@ class DefterAnaPencere(QMainWindow):
                 if self.cScene.activeItem.hasFocus():
                     cursor = self.cScene.activeItem.textCursor()
                     if not cursor.hasSelection():
-                        cursor.select(QTextCursor.WordUnderCursor)
+                        cursor.select(QTextCursor.SelectionType.WordUnderCursor)
                     cursor.mergeCharFormat(bicim)
                     self.cScene.activeItem.setTextCursor(cursor)
                     return
@@ -5059,17 +5047,18 @@ class DefterAnaPencere(QMainWindow):
                 self.cScene.undoStack.endMacro()
 
     # ---------------------------------------------------------------------
-    def act_bold(self, from_button=False):
+    def act_bold(self, durum, from_button):
 
         if from_button:
-            self.actionBold.setChecked(self.btnBold.isChecked())
+            self.actionBold.setChecked(durum)
         else:
-            self.btnBold.setChecked(self.actionBold.isChecked())
+            self.btnBold.setChecked(durum)
 
         if len(self.cScene.selectionQueue) == 0:
             self.currentFont.setBold(self.actionBold.isChecked())
             self.cScene.setFont(QFont(self.currentFont))
             self.karakter_bicimi_sozluk["b"] = self.actionBold.isChecked()
+            return
 
         aciklama = self.tr("bold")
         if len(self.cScene.selectionQueue) == 1:
@@ -5077,25 +5066,25 @@ class DefterAnaPencere(QMainWindow):
                 if self.cScene.activeItem.hasFocus():
                     # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
-                    # fmt.setFontWeight(self.actionBold.isChecked() and QFont.Bold or QFont.Normal)
-                    fmt.setFontWeight(self.actionBold.isChecked())
+                    fmt.setFontWeight(QFont.Weight.Bold if self.actionBold.isChecked() else QFont.Weight.Normal)
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
                     return
 
         self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama)
 
     # ---------------------------------------------------------------------
-    def act_underline(self, from_button=False):
+    def act_underline(self, durum, from_button=False):
 
         if from_button:
-            self.actionUnderline.setChecked(self.btnUnderline.isChecked())
+            self.actionUnderline.setChecked(durum)
         else:
-            self.btnUnderline.setChecked(self.actionUnderline.isChecked())
+            self.btnUnderline.setChecked(durum)
 
         if len(self.cScene.selectionQueue) == 0:
             self.currentFont.setUnderline(self.actionUnderline.isChecked())
             self.cScene.setFont(QFont(self.currentFont))
             self.karakter_bicimi_sozluk["u"] = self.actionUnderline.isChecked()
+            return
 
         aciklama = self.tr("underline")
         if len(self.cScene.selectionQueue) == 1:
@@ -5103,25 +5092,25 @@ class DefterAnaPencere(QMainWindow):
                 if self.cScene.activeItem.hasFocus():
                     # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
-                    # fmt.setFontWeight(self.actionBold.isChecked() and QFont.Bold or QFont.Normal)
-                    fmt.setFontWeight(self.actionUnderline.isChecked())
+                    fmt.setFontUnderline(self.actionUnderline.isChecked())
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
                     return
 
         self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama)
 
     # ---------------------------------------------------------------------
-    def act_italic(self, from_button=False):
+    def act_italic(self, durum, from_button=False):
 
         if from_button:
-            self.actionItalic.setChecked(self.btnItalic.isChecked())
+            self.actionItalic.setChecked(durum)
         else:
-            self.btnItalic.setChecked(self.actionItalic.isChecked())
+            self.btnItalic.setChecked(durum)
 
         if len(self.cScene.selectionQueue) == 0:
             self.currentFont.setItalic(self.actionItalic.isChecked())
             self.cScene.setFont(QFont(self.currentFont))
             self.karakter_bicimi_sozluk["i"] = self.actionItalic.isChecked()
+            return
 
         aciklama = self.tr("italic")
         if len(self.cScene.selectionQueue) == 1:
@@ -5129,25 +5118,25 @@ class DefterAnaPencere(QMainWindow):
                 if self.cScene.activeItem.hasFocus():
                     # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
-                    # fmt.setFontWeight(self.actionBold.isChecked() and QFont.Bold or QFont.Normal)
-                    fmt.setFontWeight(self.actionItalic.isChecked())
+                    fmt.setFontItalic(self.actionItalic.isChecked())
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
                     return
 
         self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama)
 
     # ---------------------------------------------------------------------
-    def act_strikeout(self, from_button=False):
+    def act_strikeout(self, durum, from_button=False):
 
         if from_button:
-            self.actionStrikeOut.setChecked(self.btnStrikeOut.isChecked())
+            self.actionStrikeOut.setChecked(durum)
         else:
-            self.btnStrikeOut.setChecked(self.actionStrikeOut.isChecked())
+            self.btnStrikeOut.setChecked(durum)
 
         if len(self.cScene.selectionQueue) == 0:
             self.currentFont.setStrikeOut(self.actionStrikeOut.isChecked())
             self.cScene.setFont(QFont(self.currentFont))
             self.karakter_bicimi_sozluk["s"] = self.actionStrikeOut.isChecked()
+            return
 
         aciklama = self.tr("strikeout")
         if len(self.cScene.selectionQueue) == 1:
@@ -5155,25 +5144,25 @@ class DefterAnaPencere(QMainWindow):
                 if self.cScene.activeItem.hasFocus():
                     # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
-                    # fmt.setFontWeight(self.actionBold.isChecked() and QFont.Bold or QFont.Normal)
-                    fmt.setFontWeight(self.actionStrikeOut.isChecked())
+                    fmt.setFontStrikeOut(self.actionStrikeOut.isChecked())
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
                     return
 
         self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama)
 
     # ---------------------------------------------------------------------
-    def act_overline(self, from_button=False):
+    def act_overline(self, durum, from_button=False):
 
         if from_button:
-            self.actionOverline.setChecked(self.btnOverline.isChecked())
+            self.actionOverline.setChecked(durum)
         else:
-            self.btnOverline.setChecked(self.actionOverline.isChecked())
+            self.btnOverline.setChecked(durum)
 
         if len(self.cScene.selectionQueue) == 0:
             self.currentFont.setOverline(self.actionOverline.isChecked())
             self.cScene.setFont(QFont(self.currentFont))
             self.karakter_bicimi_sozluk["o"] = self.actionOverline.isChecked()
+            return
 
         aciklama = self.tr("overline")
         if len(self.cScene.selectionQueue) == 1:
@@ -5181,8 +5170,7 @@ class DefterAnaPencere(QMainWindow):
                 if self.cScene.activeItem.hasFocus():
                     # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
-                    # fmt.setFontWeight(self.actionBold.isChecked() and QFont.Bold or QFont.Normal)
-                    fmt.setFontWeight(self.actionOverline.isChecked())
+                    fmt.setFontOverline(self.actionOverline.isChecked())
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
                     return
 
@@ -5198,17 +5186,17 @@ class DefterAnaPencere(QMainWindow):
                 cursor = self.cScene.activeItem.textCursor()
                 if styleIndex:
                     styleDict = {
-                        1: QTextListFormat.ListDisc,
-                        2: QTextListFormat.ListCircle,
-                        3: QTextListFormat.ListSquare,
-                        4: QTextListFormat.ListDecimal,
-                        5: QTextListFormat.ListLowerAlpha,
-                        6: QTextListFormat.ListUpperAlpha,
-                        7: QTextListFormat.ListLowerRoman,
-                        8: QTextListFormat.ListUpperRoman,
+                        1: QTextListFormat.Style.ListDisc,
+                        2: QTextListFormat.Style.ListCircle,
+                        3: QTextListFormat.Style.ListSquare,
+                        4: QTextListFormat.Style.ListDecimal,
+                        5: QTextListFormat.Style.ListLowerAlpha,
+                        6: QTextListFormat.Style.ListUpperAlpha,
+                        7: QTextListFormat.Style.ListLowerRoman,
+                        8: QTextListFormat.Style.ListUpperRoman,
                     }
 
-                    style = styleDict.get(styleIndex, QTextListFormat.ListDisc)
+                    style = styleDict.get(styleIndex, QTextListFormat.Style.ListDisc)
                     cursor.beginEditBlock()
                     blockFmt = cursor.blockFormat()
                     listFmt = QTextListFormat()
@@ -5426,11 +5414,11 @@ class DefterAnaPencere(QMainWindow):
         self.actionAlwaysOnTopToggle.setToolTip(self.tr("If checked on, Defter will stay on top of other windows."))
 
         spacerWidget = QWidget(self.utilitiesToolBar)
-        spacerWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        spacerWidget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         ekranGoruntusuMenuPB = QPushButton(self.utilitiesToolBar)
         ekranGoruntusuMenuPB.setFlat(True)
-        ekranGoruntusuMenuPB.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        ekranGoruntusuMenuPB.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         ekranGoruntusuMenuPB.setText(self.tr("ScreenShot"))
         ekranGoruntusuMenu = QMenu(self.utilitiesToolBar)
         ekranGoruntusuMenu.aboutToShow.connect(self.on_ekranGoruntusuMenu_about_to_show)
@@ -6253,7 +6241,7 @@ class DefterAnaPencere(QMainWindow):
         # PyQt4.QtCore.QString('hello')
 
         itemData = QByteArray()
-        stream = QDataStream(itemData, QIODevice.WriteOnly)
+        stream = QDataStream(itemData, QIODevice.OpenModeFlag.WriteOnly)
         # selectedItems = self.cScene.selectedItems()
 
         for item in self.cScene.selectionQueue:
@@ -6585,7 +6573,7 @@ class DefterAnaPencere(QMainWindow):
                 self.lutfen_bekleyin_gizle()
                 return
 
-        stream = QDataStream(itemData, QIODevice.ReadOnly)
+        stream = QDataStream(itemData, QIODevice.OpenModeFlag.ReadOnly)
 
         self.cScene.clearSelection()
 
@@ -6675,7 +6663,7 @@ class DefterAnaPencere(QMainWindow):
         mimeData = self.clipboard.mimeData()
 
         itemData = mimeData.data('scene/items')
-        stream = QDataStream(itemData, QIODevice.ReadOnly)
+        stream = QDataStream(itemData, QIODevice.OpenModeFlag.ReadOnly)
 
         self.cScene.clearSelection()
 
@@ -6727,7 +6715,7 @@ class DefterAnaPencere(QMainWindow):
         mimeData = self.clipboard.mimeData()
 
         itemData = mimeData.data('scene/items')
-        stream = QDataStream(itemData, QIODevice.ReadOnly)
+        stream = QDataStream(itemData, QIODevice.OpenModeFlag.ReadOnly)
 
         self.cScene.clearSelection()
 
@@ -7518,7 +7506,7 @@ class DefterAnaPencere(QMainWindow):
         pix = QPixmap(16, 16)
         # pix.fill(color)
 
-        font = QFont("serif", 13, QFont.Bold)
+        font = QFont("serif", 13, QFont.Weight.Bold)
 
         pix.fill(Qt.GlobalColor.transparent)
         # ~ pixFont = QPixmap(16, 16)
@@ -8126,7 +8114,7 @@ class DefterAnaPencere(QMainWindow):
 
             self.lutfen_bekleyin_goster()
             _file = QSaveFile(filePath)
-            if not _file.open(QIODevice.WriteOnly):
+            if not _file.open(QIODevice.OpenModeFlag.WriteOnly):
                 self.lutfen_bekleyin_gizle()
                 QMessageBox.warning(self,
                                     'Defter',
@@ -8137,7 +8125,7 @@ class DefterAnaPencere(QMainWindow):
 
             try:
                 toFileStream = QDataStream(_file)
-                toFileStream.setVersion(QDataStream.Qt_5_7)
+                toFileStream.setVersion(QDataStream.Version.Qt_5_7)
                 toFileStream.writeInt32(DEFSTYLES_MAGIC_NUMBER)
                 toFileStream.writeInt16(DEFSTYLES_FILE_VERSION)
                 toFileStream.writeQVariant(self.get_style_presets_list_for_saving_binary())
@@ -8172,7 +8160,7 @@ class DefterAnaPencere(QMainWindow):
             self.lutfen_bekleyin_goster()
             _file = QFile(filePath)
             # if not _file.open(QIODevice.ReadOnly | QIODevice.Text): # QIODevice.Text - eger json load edersek diye.
-            if not _file.open(QIODevice.ReadOnly):
+            if not _file.open(QIODevice.OpenModeFlag.ReadOnly):
                 self.lutfen_bekleyin_gizle()
                 QMessageBox.warning(self,
                                     'Defter',
@@ -8182,7 +8170,7 @@ class DefterAnaPencere(QMainWindow):
 
             # # read the serialized data from the file
             fromFileStream = QDataStream(_file)
-            fromFileStream.setVersion(QDataStream.Qt_5_7)
+            fromFileStream.setVersion(QDataStream.Version.Qt_5_7)
             magic = fromFileStream.readInt32()
             if magic != DEFSTYLES_MAGIC_NUMBER:
                 # raise IOError("unrecognized file type")
@@ -9513,7 +9501,7 @@ class DefterAnaPencere(QMainWindow):
 
         t = time.strftime("%H:%M:%S")
         self.logViewer.append("%s :  %s%s" % (t, lvl, txt))
-        self.logViewer.moveCursor(QTextCursor.End)
+        self.logViewer.moveCursor(QTextCursor.MoveOperation.End)
         # self.logCounter += 1
         # if self.splitterMain.sizes()[1] == 0:
         #     self.actionToggleLogViewer.setText(self.tr('Log (%s)' % self.logCounter))
@@ -9530,7 +9518,7 @@ class DefterAnaPencere(QMainWindow):
         fDialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
         fDialog.setOption(QFileDialog.Option.DontUseCustomDirectoryIcons, True)
 
-        fDialog.setFilter(fDialog.filter() | QDir.Hidden)
+        fDialog.setFilter(fDialog.filter() | QDir.Filter.Hidden)
         # fDialog.setAcceptMode(QFileDialog.AcceptOpen)
         fDialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
 

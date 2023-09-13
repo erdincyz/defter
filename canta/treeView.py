@@ -335,7 +335,23 @@ class TreeView(QTreeView):
     #     #     super(TreeWidget, self).dragLeaveEvent(e)
     #
     #     # ---------------------------------------------------------------------
+
+    # #----------------------------------------------------------------------
+    # def dragMoveEvent(self, event):
     #
+    #     print event.mimeData()
+    #
+    #     # self
+    #     # if opened ise:
+    #     #     event.ignore()
+    #     # else:
+    #     #     event.accept()
+    #     # if event.mimeData().hasUrls:
+    #     #     event.setDropAction(QtCore.Qt.CopyAction)
+    #     #     event.accept()
+    #     # else:
+    #     #     event.ignore()
+
     # def wheelEvent(self, event):
     #     # factor = 1.41 ** (event.delta() / 240.0)
     #     # self.scale(factor, factor)
@@ -387,8 +403,8 @@ class TreeView(QTreeView):
         self.model().enSonAktifSayfa = sayfa
         idx = self.model().index_sayfadan(sayfa)
         # self.setCurrentIndex(idx) # bu ayni isi yapiyor alt iki satirin.
-        self.selectionModel().select(idx, QItemSelectionModel.ClearAndSelect)
-        self.selectionModel().setCurrentIndex(idx, QItemSelectionModel.ClearAndSelect)
+        self.selectionModel().select(idx, QItemSelectionModel.SelectionFlag.ClearAndSelect)
+        self.selectionModel().setCurrentIndex(idx, QItemSelectionModel.SelectionFlag.ClearAndSelect)
         self.scrollTo(self.model().index_sayfadan(sayfa), QTreeView.ScrollHint.EnsureVisible)  # PositionAtCenter
 
         # print(self.model().enSonAktifSayfa.adi)
@@ -397,7 +413,7 @@ class TreeView(QTreeView):
     def sayfayi_current_index_yap(self, sayfa):
         # self.setCurrentIndex(self.model().indexFromItem(sayfa))
         idx = self.model().index_sayfadan(sayfa)
-        self.selectionModel().setCurrentIndex(idx, QItemSelectionModel.ClearAndSelect)
+        self.selectionModel().setCurrentIndex(idx, QItemSelectionModel.SelectionFlag.ClearAndSelect)
 
     # # ---------------------------------------------------------------------
     # def sayfayi_secme(self, sayfa):
@@ -441,22 +457,6 @@ class TreeView(QTreeView):
 
         return self.model().kokSayfa
         # return None
-
-    # #----------------------------------------------------------------------
-    # def dragMoveEvent(self, event):
-    #
-    #     print event.mimeData()
-    #
-    #     # self
-    #     # if opened ise:
-    #     #     event.ignore()
-    #     # else:
-    #     #     event.accept()
-    #     # if event.mimeData().hasUrls:
-    #     #     event.setDropAction(QtCore.Qt.CopyAction)
-    #     #     event.accept()
-    #     # else:
-    #     #     event.ignore()
 
     # ------------------------------------------------------------------------------
     def mouseReleaseEvent(self, event):

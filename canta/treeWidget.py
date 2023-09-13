@@ -73,7 +73,7 @@ class TreeWidget(QTreeWidget):
         # pal.setColor(QPalette.Background, Qt.white)
         # self.setPalette(pal)
         # self.setAutoFillBackground(True)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         # self.sayfalarDW.setWidget(self.sayfalarDWBaseWidget)
 
     # ---------------------------------------------------------------------

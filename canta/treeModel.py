@@ -9,7 +9,6 @@ import tempfile
 from typing import Any
 
 from PySide6.QtCore import QAbstractItemModel, QModelIndex, Qt, Signal, QSize, QMimeData, QByteArray
-from PySide6.QtGui import QColor
 
 from canta.treeSayfa import Sayfa
 from canta.shared import renk_degismis_nesne_yazi_rengi
