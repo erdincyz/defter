@@ -117,7 +117,6 @@ class Text(QGraphicsTextItem):
 
         self.zenginYaziBelirteci = QRect(0, 0, 10, 10)
 
-
         # self.cursor_eski_anchor = 0
         # self.cursor_eski_pozisyon = 0
         # self.doc.cursorPositionChanged.connect(self.cursor_pos_degisti)

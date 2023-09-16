@@ -203,6 +203,7 @@ class RenkSeciciWidget(QWidget):
 
         # --------------------
         self.renkSecmeKutusu = RenkSecilenKareW(self.eskiRenk, self)
+        self.renkSecmeKutusu.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.renkSecmeKutusu.setFixedWidth(boyut)
         self.renkSecmeKutusu.setFixedHeight(boyut)
         self.renkSecmeKutusu.renkDegisti.connect(self.renk_degisimi_bildir)

@@ -6,7 +6,7 @@ __date__ = '26/1/22'
 __author__ = 'Erdinç Yılmaz'
 
 from PySide6.QtCore import Signal
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, Qt
 from PySide6.QtWidgets import QHBoxLayout, QButtonGroup, QRadioButton, QLabel
 from canta.renkSecici import RenkSeciciWidget
 from canta.sliderDoubleWithDoubleSpinBox import SliderDoubleWithDoubleSpinBox
@@ -36,6 +36,7 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
         self.olustur_radio()
 
         self.renkSecici = RenkSeciciWidget(self.renk, boyut=64, parent=self)
+        self.renkSecici.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.renkSecici.renkDegisti.connect(self.renkGuncelle)
 
         self.ekleWidget(self.renkSecici)
@@ -56,8 +57,11 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
         self.radioBtnGroup = QButtonGroup(self)
 
         self.radioArkaplan = QRadioButton(self.tr("Background"), self)
+        self.radioArkaplan.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.radioYazi = QRadioButton(self.tr("Text"), self)
+        self.radioYazi.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.radioCizgi = QRadioButton(self.tr("Line && Pen"), self)
+        self.radioCizgi.setFocusPolicy(Qt.FocusPolicy.TabFocus)
 
         self.radioBtnGroup.addButton(self.radioArkaplan)
         self.radioBtnGroup.addButton(self.radioYazi)

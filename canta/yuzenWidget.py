@@ -25,7 +25,7 @@ class YuzenWidget(QWidget):
         self.setStatusTip(self.tr("Move with left mouse button, resize with right mouse button."))
         # self.setToolTip(self.tr("Move with left mouse button, resize with right mouse button."))
 
-        self.setFocusPolicy(Qt.FocusPolicy.WheelFocus)
+        self.setFocusPolicy(Qt.FocusPolicy.TabFocus)
 
         self.mPos = QPoint()
         self.sagClick = False

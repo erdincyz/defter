@@ -29,6 +29,7 @@ class RenkCubuguVeSayiKutusu(QWidget):
         anaLay.setContentsMargins(0, 0, 0, 0)
 
         self.slider = SliderRenk(self)
+        self.slider.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.slider.setOrientation(yerlesim)
         if yerlesim == Qt.Orientation.Horizontal:
             self.slider.setMinimumWidth(100)
@@ -36,6 +37,7 @@ class RenkCubuguVeSayiKutusu(QWidget):
             self.slider.setMinimumHeight(100)
 
         self.dSpinBox = SpinBox(self)
+        self.dSpinBox.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.baslikEtiket = QLabel(baslik, self)
 
         anaLay.addWidget(self.baslikEtiket)
