@@ -407,6 +407,12 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def setFont(self, font):
+        font.setBold(self._font.bold())
+        font.setItalic(self._font.italic())
+        font.setUnderline(self._font.underline())
+        font.setStrikeOut(self._font.strikeOut())
+        font.setOverline(self._font.overline())
+        font.setPointSizeF(self._font.pointSizeF())
         self._font = font
         self.update()
 
@@ -819,6 +825,9 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def changeFontSizeF(self, delta):
 
+        if self.tempTextItem:
+            return
+
         # font = self.font()
         size = self.fontPointSizeF()
 
@@ -847,6 +856,9 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def scaleItemByScalingPath(self, delta):
+
+        if self.tempTextItem:
+            return
 
         scaleFactor = 1.1
         if delta < 0:
@@ -890,6 +902,9 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def changeBackgroundColorAlpha(self, delta):
 
+        if self.tempTextItem:
+            return
+
         col = shared.calculate_alpha(delta, QColor(self.arkaPlanRengi))
 
         # self.setBrush(self.arkaPlanRengi)
@@ -912,6 +927,9 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def changeLineColorAlpha(self, delta):
 
+        if self.tempTextItem:
+            return
+
         col = shared.calculate_alpha(delta, self._pen.color())
 
         # self.scene().undoableSetLineOrTextColorAlpha("Change item's line alpha", self, col)
@@ -929,6 +947,9 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def changeTextColorAlpha(self, delta):
 
+        if self.tempTextItem:
+            return
+
         col = shared.calculate_alpha(delta, self.yaziRengi)
 
         if self.childItems():
@@ -944,7 +965,7 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def changeImageItemTextBackgroundColorAlpha(self, delta):
-        # this is a wrapper method, actual undoableSetItemBackgroundColorAlpha method is in IMAGE class.
+        # grup nesnesinden cagriliyor alt+shift
         if self.childItems():
             startedMacro = False
             for c in self.childItems():

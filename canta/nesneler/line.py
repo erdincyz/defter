@@ -671,6 +671,12 @@ class LineItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def setFont(self, font):
+        font.setBold(self._font.bold())
+        font.setItalic(self._font.italic())
+        font.setUnderline(self._font.underline())
+        font.setStrikeOut(self._font.strikeOut())
+        font.setOverline(self._font.overline())
+        font.setPointSizeF(self._font.pointSizeF())
         self._font = font
         self.update()
 
@@ -952,6 +958,9 @@ class LineItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def changeFontSizeF(self, delta):
 
+        if self.tempTextItem:
+            return
+
         # font = self.font()
         size = self.fontPointSizeF()
 
@@ -980,6 +989,9 @@ class LineItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def scaleItemByScalingLine(self, delta):
+
+        if self.tempTextItem:
+            return
 
         scaleFactor = 1.1
         if delta < 0:
@@ -1067,6 +1079,9 @@ class LineItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def changeLineColorAlpha(self, delta):
 
+        if self.tempTextItem:
+            return
+
         col = shared.calculate_alpha(delta, self._pen.color())
 
         # self.scene().undoableSetLineOrTextColorAlpha("Change item's line alpha", self, col)
@@ -1084,6 +1099,9 @@ class LineItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def changeTextColorAlpha(self, delta):
 
+        if self.tempTextItem:
+            return
+
         col = shared.calculate_alpha(delta, self.yaziRengi)
 
         if self.childItems():
@@ -1099,7 +1117,7 @@ class LineItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def changeImageItemTextBackgroundColorAlpha(self, delta):
-        # this is a wrapper method, actual undoableSetItemBackgroundColorAlpha method is in IMAGE class.
+        # grup nesnesinden cagriliyor alt+shift
         if self.childItems():
             startedMacro = False
             for c in self.childItems():

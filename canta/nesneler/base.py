@@ -372,6 +372,12 @@ class BaseItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def setFont(self, font):
+        font.setBold(self._font.bold())
+        font.setItalic(self._font.italic())
+        font.setUnderline(self._font.underline())
+        font.setStrikeOut(self._font.strikeOut())
+        font.setOverline(self._font.overline())
+        font.setPointSizeF(self._font.pointSizeF())
         self._font = font
         self.update()
 
@@ -1074,6 +1080,9 @@ class BaseItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def changeFontSizeF(self, delta):
 
+        if self.tempTextItem:
+            return
+
         # font = self.font()
         size = self.fontPointSizeF()
 
@@ -1096,13 +1105,16 @@ class BaseItem(QGraphicsItem):
             self.scene().undoStack.beginMacro("change text size")
             self.scene().undoRedo.undoableSetFontSizeF(self.scene().undoStack, "change text size", self, size)
             for c in self.childItems():
-                c.changeFontSize(delta)
+                c.changeFontSizeF(delta)
             self.scene().undoStack.endMacro()
         else:
             self.scene().undoRedo.undoableSetFontSizeF(self.scene().undoStack, "change text size", self, size)
 
     # ---------------------------------------------------------------------
     def scaleItemByResizing(self, delta):
+
+        if self.tempTextItem:
+            return
 
         scaleFactor = 1.1
         if delta < 0:
@@ -1164,6 +1176,9 @@ class BaseItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def changeBackgroundColorAlpha(self, delta):
 
+        if self.tempTextItem:
+            return
+
         col = shared.calculate_alpha(delta, QColor(self.arkaPlanRengi))
 
         if self.childItems():
@@ -1182,6 +1197,9 @@ class BaseItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def changeLineColorAlpha(self, delta):
 
+        if self.tempTextItem:
+            return
+
         # col = shared.calculate_alpha(delta, self._pen.color())
         col = shared.calculate_alpha(delta, self.cizgiRengi)
 
@@ -1199,6 +1217,9 @@ class BaseItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def changeTextColorAlpha(self, delta):
 
+        if self.tempTextItem:
+            return
+
         col = shared.calculate_alpha(delta, self.yaziRengi)
 
         if self.childItems():
@@ -1214,7 +1235,7 @@ class BaseItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def changeImageItemTextBackgroundColorAlpha(self, delta):
-        # this is a wrapper method, actual undoableSetItemBackgroundColorAlpha method is in IMAGE class.
+        # grup nesnesinden cagriliyor alt+shift
         if self.childItems():
             startedMacro = False
             for c in self.childItems():

@@ -10,7 +10,7 @@ import os
 import shutil
 
 from PySide6.QtCore import Qt, QRectF, QPointF, Slot, Signal, QThread, QLineF, QObject
-from PySide6.QtGui import QPixmap, QPen, QImage, QUndoStack, QColor
+from PySide6.QtGui import QPixmap, QPen, QImage, QUndoStack, QColor, QFont
 from PySide6.QtWidgets import QApplication, QGraphicsScene
 from canta.arac import Arac
 from canta.nesneler.yuvarlakFircaBoyutu import YuvarlakFircaBoyutu
@@ -36,7 +36,7 @@ class Scene(QGraphicsScene):
     # textItemSelected = Signal(QGraphicsTextItem)
 
     # ---------------------------------------------------------------------
-    def __init__(self, tempDirPath, yaziTipi, parent=None):
+    def __init__(self, tempDirPath, parent=None):
         super(Scene, self).__init__(parent)
 
         # gradient = QRadialGradient(0, 0, 10)
@@ -64,7 +64,7 @@ class Scene(QGraphicsScene):
         self.setItemIndexMethod(QGraphicsScene.ItemIndexMethod.NoIndex)
 
         self.tempDirPath = tempDirPath
-        self.setFont(yaziTipi)
+        # self.setFont(yaziTipi)
 
         self.sonZDeger = 0
 
@@ -158,7 +158,7 @@ class Scene(QGraphicsScene):
         self.parent().degistir_nesne_arkaplan_rengi_ikonu()
         self.parent().change_font_point_sizef_spinbox_value(self.aktifArac.yaziBoyutu)
         self.parent().change_line_style_options(self.aktifArac.kalem)
-        # self.parent().change_font_combobox_value(self.aktifArac.yaziTipi)
+        self.parent().change_font_combobox_value(self.aktifArac.yaziTipi)
 
     # ---------------------------------------------------------------------
     def aktif_arac_degistir(self, aktifArac, itemText=None, dosyaYolu=None, pos=None):
@@ -200,20 +200,20 @@ class Scene(QGraphicsScene):
         # cursor = QCursor(pixmap.scaled(QSize(20, 20)))
         self.parent().setCursor(self.aktifArac.imlec)
 
-        self.nesne_ozellikleri_guncelle()
-
         if aktifArac == self.SecimAraci:
             # finish_interactive_tools ta alt satir cagriliyor
             # self.parent().setCursor(Qt.ArrowCursor)
             return
 
-        elif aktifArac == self.OkAraci:
+        if aktifArac == self.OkAraci:
             # self.views()[0].setMouseTracking(True)
             self.drawLineItem = None
+            self.nesne_ozellikleri_guncelle()
             return
         elif aktifArac == self.KalemAraci:
             # self.views()[0].setMouseTracking(True)
             self.pathItem = None
+            self.nesne_ozellikleri_guncelle()
             return
 
         elif aktifArac == self.AynalaXAraci:
@@ -244,6 +244,8 @@ class Scene(QGraphicsScene):
         elif aktifArac == self.ResimKirpAraci:
             self.activeItem._isCropping = True
             return
+
+        self.nesne_ozellikleri_guncelle()
 
     # ---------------------------------------------------------------------
     def unite_with_scene_rect(self, rect):
@@ -616,8 +618,10 @@ class Scene(QGraphicsScene):
 
     # ---------------------------------------------------------------------
     def create_empty_text_object_with_double_click(self, scenePos):
-        textItem = Text(scenePos, self.YaziAraci.yaziRengi, self.YaziAraci.arkaPlanRengi, QPen(self.YaziAraci.kalem),
-                        self.font())
+        textItem = Text(scenePos, self.YaziAraci.yaziRengi,
+                        self.YaziAraci.arkaPlanRengi,
+                        QPen(self.YaziAraci.kalem),
+                        QFont(self.YaziAraci.yaziTipi))
         textItem.set_document_url(self.tempDirPath)
         textItem.textItemFocusedOut.connect(self.is_text_item_empty)
         self.parent().increase_zvalue(textItem)
@@ -657,6 +661,8 @@ class Scene(QGraphicsScene):
                 mousePos = event.buttonDownScenePos(Qt.MouseButton.LeftButton)
                 self.tasinanNesne = self.itemAt(mousePos, self.views()[0].transform())
                 if self.tasinanNesne:  # and event.button() == Qt.LeftButton
+                    if self.tasinanNesne.type() == shared.TEMP_TEXT_ITEM_TYPE:
+                        return QGraphicsScene.mousePressEvent(self, event)
 
                     while self.tasinanNesne.ustGrup:
                         self.tasinanNesne = self.tasinanNesne.ustGrup
@@ -699,8 +705,7 @@ class Scene(QGraphicsScene):
                 # rect = QRectF(event.scenePos(), QSizeF(1, 1))
                 rect = QRectF(0, 0, 1, 1)
                 item = Rect(event.scenePos(), rect, self.KutuAraci.yaziRengi, self.KutuAraci.arkaPlanRengi,
-                            QPen(self.KutuAraci.kalem),
-                            self.font())
+                            QPen(self.KutuAraci.kalem), QFont(self.KutuAraci.yaziTipi))
                 self.parent().increase_zvalue(item)
 
                 # if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
@@ -717,7 +722,7 @@ class Scene(QGraphicsScene):
                 rect = QRectF(0, 0, 1, 1)
                 item = Ellipse(event.scenePos(), rect, self.YuvarlakAraci.yaziRengi, self.YuvarlakAraci.arkaPlanRengi,
                                QPen(self.YuvarlakAraci.kalem),
-                               self.font())
+                               QFont(self.YuvarlakAraci.yaziTipi))
                 self.parent().increase_zvalue(item)
                 item.hide_resize_handles()
                 self.lastItem = item
@@ -731,7 +736,7 @@ class Scene(QGraphicsScene):
                                 self.YaziAraci.yaziRengi,
                                 self.YaziAraci.arkaPlanRengi,
                                 QPen(self.YaziAraci.kalem),
-                                self.font(),
+                                QFont(self.YaziAraci.yaziTipi),
                                 text=self.itemText)
                 textItem.set_document_url(self.tempDirPath)
                 self.parent().increase_zvalue(textItem)
@@ -792,7 +797,7 @@ class Scene(QGraphicsScene):
                 if not self.pathItem:
                     self.pathItem = PathItem(event.scenePos(), self.KalemAraci.yaziRengi, self.KalemAraci.arkaPlanRengi,
                                              QPen(self.KalemAraci.kalem),
-                                             self.font())
+                                             QFont(self.KalemAraci.yaziTipi))
                     self.parent().increase_zvalue(self.pathItem)
                     # self.pathItem.move_start_point(event.scenePos())
                     self.pathItem.move_start_point()
@@ -817,7 +822,7 @@ class Scene(QGraphicsScene):
                 if not self.drawLineItem:
                     self.drawLineItem = LineItem(event.scenePos(), QPen(self.OkAraci.kalem),
                                                  yaziRengi=self.OkAraci.yaziRengi,
-                                                 font=self.font())
+                                                 font=QFont(self.OkAraci.yaziTipi))
                     self.parent().increase_zvalue(self.drawLineItem)
                     # self.drawLineItem.move_start_point(event.scenePos())
                     self.drawLineItem.move_start_point()
@@ -1281,7 +1286,7 @@ class Scene(QGraphicsScene):
                         # rectf = QRectF(pixMap.rect())
                         imageItem = Image(imageSavePath, event.scenePos(), None, None, self.ResimAraci.yaziRengi,
                                           self.ResimAraci.arkaPlanRengi,
-                                          QPen(self.ResimAraci.kalem), self.font())
+                                          QPen(self.ResimAraci.kalem), QFont(self.ResimAraci.yaziTipi))
 
                         imageItem.isEmbeded = True
 
@@ -1320,7 +1325,7 @@ class Scene(QGraphicsScene):
                 # for webUrl in webUrlPaths:
                 textItem = Text(event.scenePos(), self.YaziAraci.yaziRengi, self.YaziAraci.arkaPlanRengi,
                                 QPen(self.YaziAraci.kalem),
-                                self.font())
+                                QFont(self.YaziAraci.yaziTipi))
                 textItem.set_document_url(self.tempDirPath)
                 self.parent().increase_zvalue(textItem)
 
@@ -1337,7 +1342,7 @@ class Scene(QGraphicsScene):
         elif event.mimeData().hasHtml():
             textItem = Text(event.scenePos(), self.YaziAraci.yaziRengi, self.YaziAraci.arkaPlanRengi,
                             QPen(self.YaziAraci.kalem),
-                            self.font())
+                            QFont(self.YaziAraci.yaziTipi))
             textItem.set_document_url(self.tempDirPath)
             self.parent().increase_zvalue(textItem)
             # bu ikisi bir onceki eventtek kalan modifieri donduruyor. o yuzden query kullaniyoruz.
@@ -1370,7 +1375,7 @@ class Scene(QGraphicsScene):
         elif event.mimeData().hasText():
             textItem = Text(event.scenePos(), self.YaziAraci.yaziRengi, self.YaziAraci.arkaPlanRengi,
                             QPen(self.YaziAraci.kalem),
-                            self.font())
+                            QFont(self.YaziAraci.yaziTipi))
             textItem.set_document_url(self.tempDirPath)
             # textItem.update_resize_handles()
             self.parent().increase_zvalue(textItem)
@@ -1424,7 +1429,7 @@ class Scene(QGraphicsScene):
             rectf = QRectF(pixMap.rect())
             imageItem = Image(imageSavePath, event.scenePos(), rectf, pixMap, self.ResimAraci.yaziRengi,
                               self.ResimAraci.arkaPlanRengi,
-                              QPen(self.ResimAraci.kalem), self.font())
+                              QPen(self.ResimAraci.kalem), QFont(self.ResimAraci.yaziTipi))
 
             imageItem.isEmbeded = True
 
@@ -1530,7 +1535,7 @@ class Scene(QGraphicsScene):
             rectf = QRectF(pixMap.rect())
             imageItem = Image(imagePath, event.scenePos(), rectf, pixMap, self.ResimAraci.yaziRengi,
                               self.ResimAraci.arkaPlanRengi,
-                              QPen(self.ResimAraci.kalem), self.font())
+                              QPen(self.ResimAraci.kalem), QFont(self.ResimAraci.yaziTipi))
 
             imageItem.isEmbeded = True
 
@@ -1552,8 +1557,11 @@ class Scene(QGraphicsScene):
         # pixMap = QPixmap(image)
         # rectf = QRectF(pixMap.rect())
 
-        imageItem = Image(imagePath, scenePos, None, None, self.ResimAraci.yaziRengi, self.ResimAraci.arkaPlanRengi,
-                          QPen(self.ResimAraci.kalem), self.font())
+        imageItem = Image(imagePath, scenePos, None, None,
+                          self.ResimAraci.yaziRengi,
+                          self.ResimAraci.arkaPlanRengi,
+                          QPen(self.ResimAraci.kalem),
+                          QFont(self.ResimAraci.yaziTipi))
         imageItem.originalSourceFilePath = url
         imageItem.isEmbeded = True
 

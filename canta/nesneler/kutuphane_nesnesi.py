@@ -250,6 +250,12 @@ class KutuphaneNesnesi(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def setFont(self, font):
+        font.setBold(self._font.bold())
+        font.setItalic(self._font.italic())
+        font.setUnderline(self._font.underline())
+        font.setStrikeOut(self._font.strikeOut())
+        font.setOverline(self._font.overline())
+        font.setPointSizeF(self._font.pointSizeF())
         self._font = font
         self.update()
 

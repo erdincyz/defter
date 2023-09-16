@@ -7,7 +7,7 @@ __date__ = '3/28/16'
 
 # from math import fabs
 
-from PySide6.QtCore import Qt, Signal, QSizeF, QRectF, QPointF, Slot, QUrl
+from PySide6.QtCore import Qt, Signal, QSizeF, QRectF, QPointF, Slot, QUrl, QRect
 from PySide6.QtGui import QBrush, QPen, QColor, QPainterPath, QFontMetricsF, QTextCursor
 from PySide6.QtWidgets import QGraphicsTextItem, QStyle
 from canta import shared
@@ -114,6 +114,18 @@ class Text(QGraphicsTextItem):
 
         self.isPlainText = True
         self.oklar_dxdy_nokta = {}
+
+        self.zenginYaziBelirteci = QRect(0, 0, 10, 10)
+
+
+        # self.cursor_eski_anchor = 0
+        # self.cursor_eski_pozisyon = 0
+        # self.doc.cursorPositionChanged.connect(self.cursor_pos_degisti)
+
+    # # ---------------------------------------------------------------------
+    # def cursor_pos_degisti(self, cursor):
+    #     self.cursor_eski_pozisyon = cursor.position()
+    #     self.cursor_eski_anchor = cursor.anchor()
 
     # ---------------------------------------------------------------------
     def type(self):
@@ -398,7 +410,14 @@ class Text(QGraphicsTextItem):
         return self._command
 
     # ---------------------------------------------------------------------
-    def setFont(self, font):
+    def setFont(self, font, yaziTipiMiDegisti=True):
+        if yaziTipiMiDegisti:
+            font.setBold(self.font().bold())
+            font.setItalic(self.font().italic())
+            font.setUnderline(self.font().underline())
+            font.setStrikeOut(self.font().strikeOut())
+            font.setOverline(self.font().overline())
+            # font.setPointSizeF(self.font().pointSizeF())
         super(Text, self).setFont(font)
         if self.parentItem():
             self.yazi_kutusunu_daralt()
@@ -407,7 +426,7 @@ class Text(QGraphicsTextItem):
     def setFontPointSizeF(self, fontPointSizeF):
         font = self.font()
         font.setPointSizeF(fontPointSizeF)
-        self.setFont(font)
+        self.setFont(font, yaziTipiMiDegisti=False)
         self.update()
 
     # ---------------------------------------------------------------------
@@ -443,7 +462,7 @@ class Text(QGraphicsTextItem):
         font.setUnderline(sozluk["u"])
         font.setStrikeOut(sozluk["s"])
         font.setOverline(sozluk["o"])
-        self.setFont(font)
+        self.setFont(font, yaziTipiMiDegisti=False)
         # self.update()
 
     # ---------------------------------------------------------------------
@@ -548,15 +567,21 @@ class Text(QGraphicsTextItem):
 
         # self.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+        self.clear_selection()
 
-        cursor = self.textCursor()
-        cursor.clearSelection()
-        self.setTextCursor(cursor)
         self.textItemFocusedOut.emit(self)
         if self.scene():
             self.scene().parent()._statusBar.clearMessage()
 
         super(Text, self).focusOutEvent(event)
+
+    # ---------------------------------------------------------------------
+    def clear_selection(self):
+        cursor = self.textCursor()
+        self.cursor_eski_pozisyon = cursor.position()
+        self.cursor_eski_anchor = cursor.anchor()
+        cursor.clearSelection()
+        self.setTextCursor(cursor)
 
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
@@ -566,6 +591,10 @@ class Text(QGraphicsTextItem):
         #     self.scene().parent().web_browser_ac("https://www.google.com/search?q=" + self.text())
         if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
             self.yazi_kutusunu_daralt()
+
+        # elif event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
+        #     self.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+        #     self.clear_selection()
 
         else:
             # if self.textInteractionFlags() == Qt.NoTextInteraction:
@@ -783,7 +812,7 @@ class Text(QGraphicsTextItem):
 
     # ---------------------------------------------------------------------
     def changeImageItemTextBackgroundColorAlpha(self, delta):
-        # this is a wrapper method, actual undoableSetItemBackgroundColorAlpha method is in IMAGE class.
+        # grup nesnesinden cagriliyor alt+shift
         if self.childItems():
             startedMacro = False
             for c in self.childItems():
@@ -1210,6 +1239,11 @@ class Text(QGraphicsTextItem):
         if self.isTextOverflowed:
             painter.setPen(QPen(Qt.GlobalColor.red, 2, Qt.PenStyle.DashLine))
             painter.drawLine(self._rect.bottomLeft(), self._rect.bottomRight())
+
+        if not self.isPlainText:
+            # painter.drawEllipse(self.zenginYaziBelirteci)
+            # painter.drawText(5, 5, "📌🎨☼☀®")
+            painter.drawText(0, 10, "*")
 
         # painter.setPen(Qt.blue)
         # painter.drawRect(self.boundingRect())

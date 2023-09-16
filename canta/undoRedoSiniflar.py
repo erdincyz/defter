@@ -1549,8 +1549,7 @@ class UndoableApplyStylePreset(QUndoCommand):
     # ---------------------------------------------------------------------
     def redo(self):
         # self.scene.parent().currentFont=QFont(self.font)
-        self.scene.parent().currentFont = self.font
-        self.scene.setFont(self.font)
+        self.scene.aktifArac.yaziTipi = self.font
 
         self.scene.aktifArac.kalem = self.pen
 
@@ -1568,8 +1567,7 @@ class UndoableApplyStylePreset(QUndoCommand):
     # ---------------------------------------------------------------------
     def undo(self):
         # self.scene.parent().currentFont=QFont(self.font)
-        self.scene.parent().currentFont = self.eskiFont
-        self.scene.setFont(self.eskiFont)
+        self.scene.aktifArac.yaziTipi = self.eskiFont
 
         self.scene.aktifArac.kalem = self.eskiPen
 

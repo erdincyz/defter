@@ -161,9 +161,6 @@ class DefterAnaPencere(QMainWindow):
 
         self.itemSize = QSizeF(25, 25)
 
-        # TODO: self.fontPointSizeF iptal edilebilir . font uzerinden devam edilebilir.
-        self.fontPointSizeF = 10
-
         self.yazi_hizasi = Qt.AlignmentFlag.AlignLeft
 
         self.printer = None
@@ -377,7 +374,7 @@ class DefterAnaPencere(QMainWindow):
         # self.fontCBox_yazidw.currentFontChanged.connect(self.set_text_family)
         # self.fontCBox_yazidw.currentIndexChanged.connect(self.act_change_font)
         self.fontCBox_yazidw.setMaximumWidth(203)
-        self.fontCBox_yazidw.setCurrentFont(self.currentFont)
+        self.fontCBox_yazidw.setCurrentFont(self.cScene.aktifArac.yaziTipi)
         self.fontCBox_yazidw.valueChangedFromFontComboBoxGuiNotByCode.connect(self.act_set_current_font)
         self.fontCBox_yazidw.currentFontChanged.connect(self.fontCBox_tbar.setCurrentFont)
         # bu metod daha sonra cagrildigi ve fontCBox_yazidw daha sonra olusturuldugu icin
@@ -386,7 +383,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.fontPointSizeFDSBox_yazidw = DoubleSpinBox(self.yaziGrupW)
         self.fontPointSizeFDSBox_yazidw.setSuffix(" pt")
-        self.fontPointSizeFDSBox_yazidw.setValue(self.fontPointSizeF)
+        self.fontPointSizeFDSBox_yazidw.setValue(self.cScene.aktifArac.yaziBoyutu)
         self.fontPointSizeFDSBox_yazidw.setMaximumWidth(85)
         self.fontPointSizeFDSBox_yazidw.setMinimum(3)
         self.fontPointSizeFDSBox_yazidw.setMaximum(999)
@@ -1716,29 +1713,13 @@ class DefterAnaPencere(QMainWindow):
             self.sonKlasorDisaAktar = self.settings.value("sonKlasorDisaAktar", KULLANICI_KLASORU)
             self.sonKlasorHTML = self.settings.value("sonKlasorHTML", KULLANICI_KLASORU)
             self.itemSize = self.settings.value("itemSize", QSizeF(25, 25))
-            self.fontPointSizeF = float(self.settings.value("fontPointSizeF", 10))
             self.baskiCerceveRengi = self.settings.value("baskiCerceveRengi", QColor(0, 0, 0))
-
-            font = QFont(self.settings.value("currentFont", QApplication.font().family()))
-            font.setPointSizeF(self.fontPointSizeF)
-            self.currentFont = font
-
-            self.karakter_bicimi_sozluk = {"b": self.currentFont.bold(),
-                                           "i": self.currentFont.italic(),
-                                           "u": self.currentFont.underline(),
-                                           "s": self.currentFont.strikeOut(),
-                                           "o": self.currentFont.overline(),
-                                           }
 
         else:
             self.sonKlasor = self.sonKlasorDisaAktar = self.sonKlasorHTML = KULLANICI_KLASORU
             self.sonKlasorResimler = self.sonKlasorVideolar = self.sonKlasorDosyalar = KULLANICI_KLASORU
             # self.sonKlasorResimler = os.path.expanduser("~")
             # self.sonKlasorDisaAktar = os.path.expanduser("~")
-
-            font = QFont(QApplication.font().family())
-            font.setPointSizeF(10)
-            self.currentFont = font
 
         self.settings.endGroup()
 
@@ -1814,7 +1795,6 @@ class DefterAnaPencere(QMainWindow):
         self.settings.setValue("sonKlasorDisaAktar", self.sonKlasorDisaAktar)
         self.settings.setValue("sonKlasorHTML", self.sonKlasorHTML)
         self.settings.setValue("itemSize", self.itemSize)
-        self.settings.setValue("fontPointSizeF", self.fontPointSizeF)
         self.settings.setValue("baskiCerceveRengi", self.baskiCerceveRengi)
         self.settings.setValue("currentFont", self.fontCBox_tbar.currentFont())
         # self.settings.setValue("currentFont", self.fontCBox_tbar.currentText())
@@ -1874,6 +1854,22 @@ class DefterAnaPencere(QMainWindow):
             self.settingsAraclar.endGroup()
         self.settingsAraclar.endGroup()
         self.cScene.arac_ozellikleri_yukle(sozlukler)
+
+        # font = QFont(self.settings.value("currentFont", QApplication.font().family()))
+        # # font.setPointSizeF(self.fontPointSizeF)
+        # # self.fontPointSizeF = float(self.settings.value("fontPointSizeF", 10))
+        # self.cScene.aktifArac.yaziTipi = font
+        #
+        # self.karakter_bicimi_sozluk = {"b": font.bold(),
+        #                                "i": font.italic(),
+        #                                "u": font.underline(),
+        #                                "s": font.strikeOut(),
+        #                                "o": font.overline(),
+        #                                }
+
+        # font = QFont(QApplication.font().family())
+        # font.setPointSizeF(10)
+        # self.currentFont = font
 
     # ---------------------------------------------------------------------
     def yaz_arac_ayarlari(self):
@@ -2134,7 +2130,7 @@ class DefterAnaPencere(QMainWindow):
 
         # scene = QGraphicsScene(self)  # veya self.cScene =  .. parent etmezsek selfe
 
-        scene = Scene(tempDirPath, QFont(self.currentFont), self)
+        scene = Scene(tempDirPath, self)
         # scene.setSceneRect(QRectF(0, 0, 400, 600))
         # scene.destroyed.connect(self.yazyaz)
 
@@ -4661,11 +4657,8 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def nesne_ozellikleriYW_goster_gizle(self):
 
-        # if not self.yuzenStylePresetsListWidget.isVisible():
         if not self.nesneOzellikleriYW.isVisible():
             self.nesneOzellikleriYW.move(self.cView.mapFromGlobal(QCursor.pos()))
-            # self.yuzenStylePresetsListWidget.resize(250, self.yuzenStylePresetsListWidget.count() * 21)
-            # self.stillerYuzenWidget.adjustSize()
             self.nesneOzellikleriYW.setVisible(True)
         else:
             self.nesneOzellikleriYW.setVisible(False)
@@ -4855,12 +4848,12 @@ class DefterAnaPencere(QMainWindow):
         # self.fontCBox_tbar.activated[str].connect(self.act_set_current_font)
         # self.fontCBox_tbar.currentFontChanged.connect(self.set_text_family)
         # self.fontCBox_tbar.currentIndexChanged.connect(self.act_change_font)
-        self.fontCBox_tbar.setCurrentFont(self.currentFont)
+        self.fontCBox_tbar.setCurrentFont(self.cScene.aktifArac.yaziTipi)
         self.fontCBox_tbar.valueChangedFromFontComboBoxGuiNotByCode.connect(self.act_set_current_font)
 
         self.fontPointSizeFDSBox_tbar = DoubleSpinBox(self.fontToolBar)
         self.fontPointSizeFDSBox_tbar.setSuffix(" pt")
-        self.fontPointSizeFDSBox_tbar.setValue(self.fontPointSizeF)
+        self.fontPointSizeFDSBox_tbar.setValue(self.cScene.aktifArac.yaziBoyutu)
         self.fontPointSizeFDSBox_tbar.setMinimum(3)
         self.fontPointSizeFDSBox_tbar.setMaximum(999)
         self.fontPointSizeFDSBox_tbar.setSingleStep(1)
@@ -5055,12 +5048,10 @@ class DefterAnaPencere(QMainWindow):
             self.btnBold.setChecked(durum)
 
         if len(self.cScene.selectionQueue) == 0:
-            self.currentFont.setBold(self.actionBold.isChecked())
-            self.cScene.setFont(QFont(self.currentFont))
+            self.cScene.aktifArac.yaziTipi.setBold(self.actionBold.isChecked())
             self.karakter_bicimi_sozluk["b"] = self.actionBold.isChecked()
             return
-
-        aciklama = self.tr("bold")
+        
         if len(self.cScene.selectionQueue) == 1:
             if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.hasFocus():
@@ -5069,8 +5060,8 @@ class DefterAnaPencere(QMainWindow):
                     fmt.setFontWeight(QFont.Weight.Bold if self.actionBold.isChecked() else QFont.Weight.Normal)
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
                     return
-
-        self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama)
+                
+        self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama=self.tr("bold"))
 
     # ---------------------------------------------------------------------
     def act_underline(self, durum, from_button=False):
@@ -5081,12 +5072,10 @@ class DefterAnaPencere(QMainWindow):
             self.btnUnderline.setChecked(durum)
 
         if len(self.cScene.selectionQueue) == 0:
-            self.currentFont.setUnderline(self.actionUnderline.isChecked())
-            self.cScene.setFont(QFont(self.currentFont))
+            self.cScene.aktifArac.yaziTipi.setUnderline(self.actionUnderline.isChecked())
             self.karakter_bicimi_sozluk["u"] = self.actionUnderline.isChecked()
             return
-
-        aciklama = self.tr("underline")
+        
         if len(self.cScene.selectionQueue) == 1:
             if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.hasFocus():
@@ -5095,8 +5084,8 @@ class DefterAnaPencere(QMainWindow):
                     fmt.setFontUnderline(self.actionUnderline.isChecked())
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
                     return
-
-        self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama)
+        
+        self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama=self.tr("underline"))
 
     # ---------------------------------------------------------------------
     def act_italic(self, durum, from_button=False):
@@ -5107,12 +5096,10 @@ class DefterAnaPencere(QMainWindow):
             self.btnItalic.setChecked(durum)
 
         if len(self.cScene.selectionQueue) == 0:
-            self.currentFont.setItalic(self.actionItalic.isChecked())
-            self.cScene.setFont(QFont(self.currentFont))
+            self.cScene.aktifArac.yaziTipi.setItalic(self.actionItalic.isChecked())
             self.karakter_bicimi_sozluk["i"] = self.actionItalic.isChecked()
             return
 
-        aciklama = self.tr("italic")
         if len(self.cScene.selectionQueue) == 1:
             if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.hasFocus():
@@ -5122,7 +5109,7 @@ class DefterAnaPencere(QMainWindow):
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
                     return
 
-        self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama)
+        self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama=self.tr("italic"))
 
     # ---------------------------------------------------------------------
     def act_strikeout(self, durum, from_button=False):
@@ -5133,12 +5120,10 @@ class DefterAnaPencere(QMainWindow):
             self.btnStrikeOut.setChecked(durum)
 
         if len(self.cScene.selectionQueue) == 0:
-            self.currentFont.setStrikeOut(self.actionStrikeOut.isChecked())
-            self.cScene.setFont(QFont(self.currentFont))
+            self.cScene.aktifArac.yaziTipi.setStrikeOut(self.actionStrikeOut.isChecked())
             self.karakter_bicimi_sozluk["s"] = self.actionStrikeOut.isChecked()
             return
 
-        aciklama = self.tr("strikeout")
         if len(self.cScene.selectionQueue) == 1:
             if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.hasFocus():
@@ -5148,7 +5133,7 @@ class DefterAnaPencere(QMainWindow):
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
                     return
 
-        self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama)
+        self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama=self.tr("strikeout"))
 
     # ---------------------------------------------------------------------
     def act_overline(self, durum, from_button=False):
@@ -5159,12 +5144,10 @@ class DefterAnaPencere(QMainWindow):
             self.btnOverline.setChecked(durum)
 
         if len(self.cScene.selectionQueue) == 0:
-            self.currentFont.setOverline(self.actionOverline.isChecked())
-            self.cScene.setFont(QFont(self.currentFont))
+            self.cScene.aktifArac.yaziTipi.setOverline(self.actionOverline.isChecked())
             self.karakter_bicimi_sozluk["o"] = self.actionOverline.isChecked()
             return
 
-        aciklama = self.tr("overline")
         if len(self.cScene.selectionQueue) == 1:
             if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.hasFocus():
@@ -5174,7 +5157,7 @@ class DefterAnaPencere(QMainWindow):
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
                     return
 
-        self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama)
+        self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama=self.tr("overline"))
 
     # ---------------------------------------------------------------------
     def act_set_text_style(self, styleIndex):
@@ -7632,8 +7615,8 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def kur_sahne_arac_degerleri(self):
-        self.change_font_point_sizef_spinbox_value(self.currentFont.pointSizeF())
-        self.change_font_combobox_value(self.currentFont)
+        self.change_font_point_sizef_spinbox_value(self.cScene.aktifArac.yaziBoyutu)
+        self.change_font_combobox_value(self.cScene.aktifArac.yaziTipi)
         # self.itemRotationSBox_tbar.setValue(item.rotation())
         # self.itemRotationSBox_nesnedw.setValue(item.rotation())
         self.yazi_hizalama_degisti(self.yazi_hizasi)
@@ -7825,7 +7808,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot(QFont)
     def act_set_current_font(self, font):
         font = QFont(font)
-        font.setPointSizeF(self.fontPointSizeF)
+        font.setPointSizeF(self.fontPointSizeFDSBox_tbar.value())
         if self.cScene.selectionQueue:
             startedMacro = False
             for item in self.cScene.selectionQueue:
@@ -7838,13 +7821,11 @@ class DefterAnaPencere(QMainWindow):
             if startedMacro:
                 self.cScene.undoStack.endMacro()
         else:
-            self.currentFont = font
-            self.cScene.setFont(QFont(font))
+            self.cScene.aktifArac.yaziTipi = QFont(font)
 
     # ---------------------------------------------------------------------
     @Slot(float)
     def act_change_font_point_sizef(self, value):
-        self.fontPointSizeF = value
 
         if self.cScene.selectionQueue:
             startedMacro = False
@@ -7857,8 +7838,8 @@ class DefterAnaPencere(QMainWindow):
             if startedMacro:
                 self.cScene.undoStack.endMacro()
         else:
-            self.currentFont.setPointSizeF(value)
-            self.cScene.setFont(QFont(self.currentFont))
+            # self.cScene.aktifArac.yaziTipi.setPointSizeF(value)
+            self.cScene.aktifArac.yaziBoyutu = value
 
     # ---------------------------------------------------------------------
     @Slot(int)
