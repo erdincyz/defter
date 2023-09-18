@@ -15,8 +15,8 @@ from canta import shared
 class Group(QGraphicsItem):
     Type = shared.GROUP_ITEM_TYPE
 
-    def __init__(self, arkaPlanRengi=QColor(Qt.GlobalColor.transparent),
-                 yaziRengi=QColor(Qt.GlobalColor.transparent), pen=QPen(Qt.PenStyle.DotLine),
+    def __init__(self, arkaPlanRengi=Qt.GlobalColor.transparent,
+                 yaziRengi=Qt.GlobalColor.transparent, pen=QPen(Qt.PenStyle.DotLine),
                  parent=None):
         super(Group, self).__init__(parent)
 
@@ -568,7 +568,7 @@ class Group(QGraphicsItem):
             self.changeLineColorAlpha(event.delta())
 
         elif toplam == ctrlAltShift:
-            self.changeFontSize(event.delta())
+            self.changeFontSizeF(event.delta())
 
         elif toplam == altShift:
             self.changeImageItemTextBackgroundColorAlpha(event.delta())
@@ -640,10 +640,10 @@ class Group(QGraphicsItem):
         self.scene().undoStack.endMacro()
 
     # ---------------------------------------------------------------------
-    def changeFontSize(self, delta):
+    def changeFontSizeF(self, delta):
         self.scene().undoStack.beginMacro("change text size")
         for c in self.childItems():
-            c.changeFontSize(delta)
+            c.changeFontSizeF(delta)
         self.scene().undoStack.endMacro()
 
     # ---------------------------------------------------------------------

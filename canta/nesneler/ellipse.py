@@ -162,6 +162,11 @@ class Ellipse(BaseItem):
 
     # ---------------------------------------------------------------------
     def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
+
+        arkaPlanRengi = self.arkaPlanRengi.toRgb()
+        yaziRengi = self.yaziRengi.toRgb()
+        cizgiRengi = self.cizgiRengi.toRgb()
+
         w = self._rect.width()
         h = self._rect.height()
 
@@ -213,8 +218,8 @@ class Ellipse(BaseItem):
             yazi_str = f"""
             <text 
             style="{dondur_str_eksi}"
-            fill="rgba{self.yaziRengi.toTuple()}" 
-            fill-opacity="{self.yaziRengi.alpha() / 255}" 
+            fill="rgba{yaziRengi.toTuple()}"
+            fill-opacity="{yaziRengi.alpha() / 255}"
             stroke="none" xml:space="preserve" 
             text-anchor="middle"
             alignment-baseline="middle"
@@ -231,18 +236,18 @@ class Ellipse(BaseItem):
             yazi_str = ""
 
         ellipse_str = f"""
-                  <ellipse 
-                    style="fill:rgba{self.arkaPlanRengi.toTuple()};
-                    fill-opacity:{self.arkaPlanRengi.alpha() / 255};
-                    stroke:rgba{self.cizgiRengi.toTuple()};
-                    stroke-opacity:{self.cizgiRengi.alpha() / 255};
+                  <ellipse
+                    style="fill:rgba{arkaPlanRengi.toTuple()};
+                    fill-opacity:{arkaPlanRengi.alpha() / 255};
+                    stroke:rgba{cizgiRengi.toTuple()};
+                    stroke-opacity:{cizgiRengi.alpha() / 255};
                     stroke-width:{self._pen.widthF() * 2};
                     stroke-linecap:round;
                     stroke-dasharray:none;
                     stroke-linejoin:round;
                     paint-order:markers fill stroke;"
                     cx="{w / 2}" cy="{h / 2}" rx="{w / 2 - self._pen.widthF()}" ry="{h / 2 - self._pen.widthF()}"
-                    />
+                   />
         """
 
         svg_str = f"""

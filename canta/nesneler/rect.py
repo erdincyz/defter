@@ -26,6 +26,10 @@ class Rect(BaseItem):
     # ---------------------------------------------------------------------
     def html_dive_cevir(self, html_klasor_kayit_adres, dosya_kopyalaniyor_mu):
 
+        arkaPlanRengi = self.arkaPlanRengi.toRgb()
+        yaziRengi = self.yaziRengi.toRgb()
+        cizgiRengi = self.cizgiRengi.toRgb()
+
         w = self._rect.width()
         h = self._rect.height()
 
@@ -82,7 +86,7 @@ class Rect(BaseItem):
         if self.text():
             yazi_str = f"""
             <text style="{dondur_str_eksi}"
-            fill="rgba{self.yaziRengi.toTuple()}" fill-opacity="{self.yaziRengi.alpha() / 255}" 
+            fill="rgba{yaziRengi.toTuple()}" fill-opacity="{yaziRengi.alpha() / 255}"
             stroke="none" xml:space="preserve" 
             x="{w / 2}" y="{h / 2}" text-anchor="middle" alignment-baseline="middle"
             font-family={self.font().family()} font-size="{self.fontPointSizeF()}pt"
@@ -93,10 +97,10 @@ class Rect(BaseItem):
 
         rect_str = f"""
         <rect width="{w}" height="{h}" x="0" y="0"
-            style="fill:rgba{self.arkaPlanRengi.toTuple()}; 
-                   fill-opacity:{self.arkaPlanRengi.alpha() / 255};
-                   stroke:rgba{self.cizgiRengi.toTuple()};
-                   stroke-opacity:{self.cizgiRengi.alpha() / 255};
+                   style="fill:rgba{arkaPlanRengi.toTuple()};
+                   fill-opacity:{arkaPlanRengi.alpha() / 255};
+                   stroke:rgba{cizgiRengi.toTuple()};
+                   stroke-opacity:{cizgiRengi.alpha() / 255};
                    stroke-width:{self._pen.widthF() * 2};
                    stroke-linecap:round; stroke-dasharray:none; stroke-linejoin:round;
                    paint-order:markers fill stroke;"/>

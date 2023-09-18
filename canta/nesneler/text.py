@@ -115,7 +115,7 @@ class Text(QGraphicsTextItem):
         self.isPlainText = True
         self.oklar_dxdy_nokta = {}
 
-        self.zenginYaziBelirteci = QRect(0, 0, 10, 10)
+        # self.zenginYaziBelirteci = QRect(0, 0, 10, 10)
 
         # self.cursor_eski_anchor = 0
         # self.cursor_eski_pozisyon = 0
@@ -1165,14 +1165,16 @@ class Text(QGraphicsTextItem):
         renk_yazi = f"({self.yaziRengi.red()},{self.yaziRengi.green()},{self.yaziRengi.blue()},{self.yaziRengi.alpha() / 255})"
 
         if self.isPlainText:
-            yazi_str = f'<p style=" background:rgba{renk_arkaPlan}; display: inline-block; color:rgba{renk_yazi}; margin:0; padding:7px;">{self.text()}</p>'
+            yazi_str = f'<p style=" display: inline-block; ' \
+                       f'color:rgba{renk_yazi}; ' \
+                       f'margin:0; padding:7px;">{self.text()}</p>'
         else:
             html = self.toHtml()
             body_baslangic = html.find("<bo")
             bas = html.find('">', body_baslangic)
             son = html.find("</bo")
             # yazi = self.toHtml()
-            yazi_str = self.toHtml()[bas + 2:son]
+            yazi_str = html[bas + 2:son]
 
         hiza = self.ver_yazi_hizasi()
         # if hiza == Qt.AlignLeft or hiza == Qt.AlignLeft | Qt.AlignVCenter:
@@ -1187,8 +1189,9 @@ class Text(QGraphicsTextItem):
             yazi_hiza = "left"
 
         div_str = f"""
-                    <article style="
-
+                    <article style=" 
+                     color:rgba{renk_yazi};
+                     background:rgba{renk_arkaPlan};
                      font-size:{self.fontPointSizeF()}pt; 
                      font-family:{self.font().family()};
                      text-align: {yazi_hiza};
@@ -1239,10 +1242,10 @@ class Text(QGraphicsTextItem):
             painter.setPen(QPen(Qt.GlobalColor.red, 2, Qt.PenStyle.DashLine))
             painter.drawLine(self._rect.bottomLeft(), self._rect.bottomRight())
 
-        if not self.isPlainText:
-            # painter.drawEllipse(self.zenginYaziBelirteci)
-            # painter.drawText(5, 5, "📌🎨☼☀®")
-            painter.drawText(0, 10, "*")
+        # if not self.isPlainText:
+        #     # painter.drawEllipse(self.zenginYaziBelirteci)
+        #     # painter.drawText(5, 5, "📌🎨☼☀®")
+        #     painter.drawText(0, 10, "*")
 
         # painter.setPen(Qt.blue)
         # painter.drawRect(self.boundingRect())

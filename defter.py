@@ -7363,7 +7363,10 @@ class DefterAnaPencere(QMainWindow):
     def act_set_item_text_color(self, col=None, eskiRenk=None, renkSecicidenMi=False):
 
         if not eskiRenk:
-            eskiRenk = self.yaziRengiBtn.renk
+            if self.cScene.activeItem:
+                eskiRenk = self.cScene.activeItem.yaziRengi
+            else:
+                eskiRenk = self.cScene.aktifArac.yaziRengi
 
         if not col:
             #  # eskiRenk=self.yaziRengi, olamiyor cunku dokuman yazi rengi o an secili nesneden farkli olabilir.
@@ -7420,7 +7423,10 @@ class DefterAnaPencere(QMainWindow):
     def act_set_item_line_color(self, col=None, eskiRenk=None, renkSecicidenMi=False):
 
         if not eskiRenk:
-            eskiRenk = self.cScene.aktifArac.cizgiRengi
+            if self.cScene.activeItem:
+                eskiRenk = self.cScene.activeItem.cizgiRengi
+            else:
+                eskiRenk = self.cScene.aktifArac.cizgiRengi
 
         if not col:
             col = self.renk_sec(eskiRenk=eskiRenk,
@@ -7465,7 +7471,10 @@ class DefterAnaPencere(QMainWindow):
     def act_set_item_background_color(self, col=None, eskiRenk=None, renkSecicidenMi=False):
 
         if not eskiRenk:
-            eskiRenk = self.cScene.aktifArac.arkaPlanRengi
+            if self.cScene.activeItem:
+                eskiRenk = self.cScene.activeItem.arkaPlanRengi
+            else:
+                eskiRenk = self.cScene.aktifArac.arkaPlanRengi
 
         if not col:
             col = self.renk_sec(eskiRenk=eskiRenk,
@@ -7509,7 +7518,10 @@ class DefterAnaPencere(QMainWindow):
     def degistir_yazi_rengi_ikonu(self, yaziRengi=None, nesne_arkaplan_ikonu_guncelle=True,
                                   renkSecicidenMi=False):
         if not yaziRengi:
-            yaziRengi = self.cScene.aktifArac.yaziRengi
+            if self.cScene.activeItem:
+                yaziRengi = self.cScene.activeItem.yaziRengi
+            else:
+                yaziRengi = self.cScene.aktifArac.yaziRengi
 
         pix = QPixmap(16, 16)
         # pix.fill(color)
@@ -7548,7 +7560,10 @@ class DefterAnaPencere(QMainWindow):
                                    renkSecicidenMi=False):
 
         if not cizgiRengi:
-            cizgiRengi = self.cScene.aktifArac.cizgiRengi
+            if self.cScene.activeItem:
+                cizgiRengi = self.cScene.activeItem.cizgiRengi
+            else:
+                cizgiRengi = self.cScene.aktifArac.cizgiRengi
 
         pix = QPixmap(16, 16)
         # pix.fill(color)
@@ -7585,11 +7600,14 @@ class DefterAnaPencere(QMainWindow):
             self.degistir_nesne_arkaplan_rengi_ikonu()
 
     # ---------------------------------------------------------------------
-    def degistir_nesne_arkaplan_rengi_ikonu(self, arkaplanRengi=None, yaziRengi=None, cizgiRengi=None,
+    def degistir_nesne_arkaplan_rengi_ikonu(self, arkaPlanRengi=None, yaziRengi=None, cizgiRengi=None,
                                             renkSecicidenMi=False):
 
-        if not arkaplanRengi:
-            arkaplanRengi = self.cScene.aktifArac.arkaPlanRengi
+        if not arkaPlanRengi:
+            if self.cScene.activeItem:
+                arkaPlanRengi = self.cScene.activeItem.arkaPlanRengi
+            else:
+                arkaPlanRengi = self.cScene.aktifArac.arkaPlanRengi
 
         # if not yaziRengi:
         #     yaziRengi = self.cScene.aktifArac.yaziRengi
@@ -7601,7 +7619,7 @@ class DefterAnaPencere(QMainWindow):
         # pix.fill(color)
 
         # pixTextBackgroundColor = QPixmap(16, 16)
-        pix.fill(arkaplanRengi)
+        pix.fill(arkaPlanRengi)
 
         painter = QPainter(pix)
         # pix2 = QPixmap(8, 8)
@@ -7628,12 +7646,12 @@ class DefterAnaPencere(QMainWindow):
         self.actionItemBackgroundColor.setIcon(QIcon(pix))
 
         try:
-            self.nesneArkaplanRengiBtn.renkGuncelle(arkaplanRengi)
+            self.nesneArkaplanRengiBtn.renkGuncelle(arkaPlanRengi)
             if not renkSecicidenMi:
                 if self.renk_tipi == "a":
-                    self.renkSecici.disardan_renk_gir(arkaplanRengi)
+                    self.renkSecici.disardan_renk_gir(arkaPlanRengi)
                 if self.nesneOzellikleriYW.renk_tipi == "a":
-                    self.nesneOzellikleriYW.renkSecici.disardan_renk_gir(arkaplanRengi)
+                    self.nesneOzellikleriYW.renkSecici.disardan_renk_gir(arkaPlanRengi)
 
         except Exception as e:
             pass
@@ -9542,9 +9560,9 @@ class DefterAnaPencere(QMainWindow):
     def html_kayit_klasor_adresi_sec(self, tekSayfaMi):
 
         fDialog = QFileDialog()
-        # fDialog.setFileMode(QFileDialog.Directory)
+        # fDialog.setFileMode(QFileDialog.FileMode.Directory)
         fDialog.setFileMode(QFileDialog.FileMode.AnyFile)
-        # fDialog.setOption(QFileDialog.ShowDirsOnly, True)
+        fDialog.setOption(QFileDialog.ShowDirsOnly, True)
         fDialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
         fDialog.setOption(QFileDialog.Option.DontUseCustomDirectoryIcons, True)
 

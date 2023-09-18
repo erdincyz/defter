@@ -22,6 +22,8 @@
 
 **CTRL + Fare sol tuş ile istenen noktalar tıklanarak** = Çoklu çizgi veya çokgen çizilebilir. Normal kalemle çizime başlandıktan sonra, **CTRL** basılırsa çizime düz çizgi ile devam edilebilir.
 
+**Backspace** = (Çizgi çizilmeye devam ederken) çizilmiş son noktayı siler.
+
 ---
 
 ### Çizgi (Ok) Aracı
