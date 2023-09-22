@@ -84,6 +84,8 @@ class UndoableAddItem(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def redo(self):
+        self.scene.parent().act_aramayi_temizle()
+
         self.scene.addItem(self.item)
         if isinstance(self.item, BaseItem):
             self.item.update_resize_handles()
@@ -112,6 +114,7 @@ class UndoableAddItem(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def undo(self):
+        self.scene.parent().act_aramayi_temizle()
 
         # oklar varsa, oktan bu nesneyi sil, (silinen nesne bir ok nesnesi degil)
         if self.item.oklar_dxdy_nokta:
@@ -143,6 +146,8 @@ class UndoableRemoveItem(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def redo(self):
+        self.scene.parent().act_aramayi_temizle()
+
         self.scene.clearSelection()
         if self.item.type() == shared.VIDEO_ITEM_TYPE:
             self.item.nesne_sahneden_silinmek_uzere()
@@ -180,6 +185,7 @@ class UndoableRemoveItem(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def undo(self):
+        self.scene.parent().act_aramayi_temizle()
 
         # self.scene.selectionQueue.append(self.item)
         # # normalde en alt satirdaki select_all_children_recursively halletmesi lazim
@@ -1735,10 +1741,13 @@ class UndoableItemSetText(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def redo(self):
+        self.scene.parent().act_aramayi_temizle()
         self.item.setText(self.text)
+
 
     # ---------------------------------------------------------------------
     def undo(self):
+        self.scene.parent().act_aramayi_temizle()
         self.item.setText(self.eski_text)
 
 

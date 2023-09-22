@@ -58,6 +58,7 @@ from canta.tabWidget import TabWidget
 from canta.tabBar import TabBar
 from canta.spinBoxlar import SpinBox, SpinBoxForRotation, DoubleSpinBox
 from canta.sliderDoubleWithDoubleSpinBox import SliderDoubleWithDoubleSpinBox
+from canta.lineEdit import AraLineEdit
 from canta.komutPenceresi import CommandDialog
 from canta.nesneler.base import BaseItem
 from canta.nesneler.ellipse import Ellipse
@@ -178,6 +179,7 @@ class DefterAnaPencere(QMainWindow):
         self.olustur_sayfalarDW()
         self.olustur_tab_widget()
         self.olustur_kutuphaneDW()
+        self.olustur_arama_cubugu()
 
         self.olustur_tools_toolbar()
         self.olustur_properties_toolbar()
@@ -501,28 +503,28 @@ class DefterAnaPencere(QMainWindow):
         self.btnYaziHizalaSola = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnYaziHizalaSola.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.btnYaziHizalaSola.setIcon(
-            QIcon.fromTheme('format-justify-left', QIcon(':icons/icons/format-justify-left.png')))
+            QIcon.fromTheme('format-justify-left', QIcon(':icons/format-justify-left.png')))
         self.btnYaziHizalaSola.setFlat(True)
         self.btnYaziHizalaSola.setCheckable(True)
 
         self.btnYaziHizalaOrtala = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnYaziHizalaOrtala.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.btnYaziHizalaOrtala.setIcon(
-            QIcon.fromTheme('format-justify-center', QIcon(':icons/icons/format-justify-center.png')))
+            QIcon.fromTheme('format-justify-center', QIcon(':icons/format-justify-center.png')))
         self.btnYaziHizalaOrtala.setFlat(True)
         self.btnYaziHizalaOrtala.setCheckable(True)
 
         self.btnYaziHizalaSaga = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnYaziHizalaSaga.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.btnYaziHizalaSaga.setIcon(
-            QIcon.fromTheme('format-justify-right', QIcon(':icons/icons/format-justify-right.png')))
+            QIcon.fromTheme('format-justify-right', QIcon(':icons/format-justify-right.png')))
         self.btnYaziHizalaSaga.setFlat(True)
         self.btnYaziHizalaSaga.setCheckable(True)
 
         self.btnYaziHizalaSigdir = PushButton("", 16, 16, parent=self.yaziGrupW)
         self.btnYaziHizalaSigdir.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.btnYaziHizalaSigdir.setIcon(
-            QIcon.fromTheme('format-justify-fill', QIcon(':icons/icons/format-justify-fill.png')))
+            QIcon.fromTheme('format-justify-fill', QIcon(':icons/format-justify-fill.png')))
         self.btnYaziHizalaSigdir.setFlat(True)
         self.btnYaziHizalaSigdir.setCheckable(True)
 
@@ -1302,7 +1304,6 @@ class DefterAnaPencere(QMainWindow):
             fark_liste_adres = [eleman.adres for eleman in fark_liste_eleman]
             fark_liste_str = "\n".join(fark_liste_adres)
 
-
             msgBox.setText(self.tr(f"Do you want to delete {len(fark_liste_eleman)} unused embeded file(s) in the document?"))
             msgBox.setInformativeText(self.tr("This is undoable!"))
             msgBox.setDetailedText(fark_liste_str)
@@ -1430,6 +1431,8 @@ class DefterAnaPencere(QMainWindow):
             sayfalarDWTreeView.mousePressEvent() cagiriyoruz.
 
         """
+
+        self.act_aramayi_temizle()
 
         self.cView = sayfa.view
         self.cScene = sayfa.scene
@@ -1570,6 +1573,11 @@ class DefterAnaPencere(QMainWindow):
 
         msgBox.exec()
         if msgBox.clickedButton() == deleteButton:
+
+            # TODO: ara_eski_nesne silinmeden once burda cagiriyoruz, sayfa degisince de
+            # bir daha cagrilacak ama simdilik boyle
+            self.act_aramayi_temizle()
+
             # klavye ile secilip aktif edilmeden silinebilir sayfa, o yuzden selectedItems[0]
             # idx = self.sayfalarDWTreeView.selectedIndexes()[0]
             # with signals_updates_blocked(self.tabWidget):
@@ -1994,6 +2002,7 @@ class DefterAnaPencere(QMainWindow):
                 cvp = self.do_you_want_to_save()
 
                 if cvp == "d":
+                    self.act_aramayi_temizle()
                     self.clean_download_threads()
                     self._remove_tab(index)
                     if path:
@@ -2003,6 +2012,7 @@ class DefterAnaPencere(QMainWindow):
                     return
 
                 elif cvp == "s":
+                    self.act_aramayi_temizle()
                     self.clean_download_threads()
                     varsa_ayni_adresteki_dosya_silinsin_mi = False
                     if not path:
@@ -2016,7 +2026,7 @@ class DefterAnaPencere(QMainWindow):
                             self.move_or_append_left_in_recent_files_queue(path)
 
             else:
-
+                self.act_aramayi_temizle()
                 self.clean_download_threads()
                 self._remove_tab(index)
                 if path:
@@ -2321,6 +2331,8 @@ class DefterAnaPencere(QMainWindow):
             # mesela kalem aracinda iken sayfa degisirse arac secili kaliyor ama secim araci arkaplanda
             # secilmis oldugudan tekrar kaleme tiklamak gerekiyor cizim icin
             self.cScene.secim_aracina_gec()
+
+            self.act_aramayi_temizle()
 
             try:
                 self.sahneKutuphane.clear()
@@ -3984,6 +3996,14 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleMenuBar.setToolTip(self.tr("Toggles menu bar visibility."))
         self.actionToggleMenuBar.triggered.connect(
             lambda: self.mBar.setVisible(not self.mBar.isVisible()))
+        
+        self.actionAra = QAction(self.tr("Search"), self.viewMenu)
+        self.actionAra.setIcon(QIcon.fromTheme('system-search', QIcon(':icons/ara.png')))
+        self.actionAra.setShortcut("Ctrl+F")
+        # self.actionAra.setShortcutContext(Qt.ApplicationShortcut)
+        self.actionAra.triggered.connect(self.act_arama_cubugu_ac_kapa)
+        self.actionAra.setCheckable(True)
+        # self.actionAra.setChecked(self.araBaseWidget.isVisible())
 
         self.viewMenu.addActions((self.viewMenu.addMenu(self.zoomMenu),
                                   self.viewMenu.addSeparator(),
@@ -4000,7 +4020,9 @@ class DefterAnaPencere(QMainWindow):
                                   self.actionEmbedBackgroundImage,
                                   self.actionChangeBackgroundColor,
                                   self.viewMenu.addSeparator(),
-                                  self.actionReopenLastClosedTab
+                                  self.actionReopenLastClosedTab,
+                                  self.viewMenu.addSeparator(),
+                                  self.actionAra,
                                   ))
 
         self.toolsMenu = QMenu(self.tr("Tools"), self.mBar)
@@ -4060,26 +4082,26 @@ class DefterAnaPencere(QMainWindow):
         # self.actionEditCommand.setShortcutContext(Qt.WindowShortcut)
         self.actionEditCommand.setDisabled(True)
 
-        self.actionAddSelectedItemStyleAsAPreset = QAction(QIcon(':icons/icons/text-html.png'),
+        self.actionAddSelectedItemStyleAsAPreset = QAction(QIcon(':icons/text-html.png'),
                                                            self.tr("Add selected item's style as a preset"),
                                                            self.nesneSagMenu)
         self.actionAddSelectedItemStyleAsAPreset.triggered.connect(self.act_add_style_preset)
 
-        self.actionSeciliNesneStiliniSeciliAracaUygula = QAction(QIcon(':icons/icons/text-html.png'),
+        self.actionSeciliNesneStiliniSeciliAracaUygula = QAction(QIcon(':icons/text-html.png'),
                                                                  self.tr(
                                                                      "Apply selected item's style to the active tool"),
                                                                  self.nesneSagMenu)
         self.actionSeciliNesneStiliniSeciliAracaUygula.triggered.connect(
             self.act_secili_nesne_stilini_secili_araca_uygula)
 
-        self.actionSeciliNesneStiliniKendiAracinaUygula = QAction(QIcon(':icons/icons/text-html.png'),
+        self.actionSeciliNesneStiliniKendiAracinaUygula = QAction(QIcon(':icons/text-html.png'),
                                                                   self.tr(
                                                                       "Set selected item's style as tool default"),
                                                                   self.nesneSagMenu)
         self.actionSeciliNesneStiliniKendiAracinaUygula.triggered.connect(
             self.act_secili_nesne_stilini_kendi_aracina_uygula)
 
-        self.actionShowInFileManager = QAction(QIcon(':icons/icons/text-html.png'), self.tr("Show in file manager"),
+        self.actionShowInFileManager = QAction(QIcon(':icons/text-html.png'), self.tr("Show in file manager"),
                                                self.nesneSagMenu)
         self.actionShowInFileManager.triggered.connect(self.act_show_in_file_manager)
 
@@ -4088,26 +4110,28 @@ class DefterAnaPencere(QMainWindow):
         self.actionConvertToPlainText = QAction(QIcon(":icons/command.png"),
                                                 self.tr("Convert selected item(s) to plain text"),
                                                 self.nesneSagMenu)
-        self.actionConvertToPlainText.setShortcut(QKeySequence("Ctrl+Alt+P"))
+        self.actionConvertToPlainText.setShortcut(QKeySequence("Shift+Alt+P"))
         self.actionConvertToPlainText.triggered.connect(self.act_convert_to_plain_text)
 
-        self.actionShowHTMLSource = QAction(QIcon(':icons/icons/text-html.png'), self.tr("Show HTML source"),
+        self.actionShowHTMLSource = QAction(QIcon(':icons/text-html.png'), self.tr("Show HTML source"),
                                             self.nesneSagMenu)
+        self.actionShowHTMLSource.setShortcut(QKeySequence("Ctrl+U"))
         self.actionShowHTMLSource.triggered.connect(self.act_show_html_source)
 
-        self.actionLocalizeHtml = QAction(QIcon(':icons/icons/text-html.png'), self.tr("Localize HTML"),
+        self.actionLocalizeHtml = QAction(QIcon(':icons/text-html.png'), self.tr("Localize HTML"),
                                           self.nesneSagMenu)
         self.actionLocalizeHtml.triggered.connect(self.act_localize_html)
 
         self.actionResizeTextItemToFitView = QAction(QIcon(':icons/genislik-sigdir.png'),
                                                      self.tr("Resize to fit in view"), self.nesneSagMenu)
+        self.actionShowHTMLSource.setShortcut(QKeySequence("Ctrl+DoubleClick"))
         self.actionResizeTextItemToFitView.triggered.connect(self.act_resize_text_item_to_fit_view)
 
-        self.actionShowAsWebPage = QAction(QIcon(':icons/icons/text-html.png'), self.tr("Show as web page"),
+        self.actionShowAsWebPage = QAction(QIcon(':icons/text-html.png'), self.tr("Show as web page"),
                                            self.nesneSagMenu)
         self.actionShowAsWebPage.triggered.connect(self.act_show_as_web_page)
 
-        self.actionConvertToWebItem = QAction(QIcon(':icons/icons/text-html.png'),
+        self.actionConvertToWebItem = QAction(QIcon(':icons/text-html.png'),
                                               self.tr("~Convert to web item (Experimental && Slow)"),
                                               self.nesneSagMenu)
         self.actionConvertToWebItem.triggered.connect(self.act_convert_to_web_item)
@@ -4426,25 +4450,25 @@ class DefterAnaPencere(QMainWindow):
         self.actionKutEkrChangeBackgroundColor.triggered.connect(self.act_kut_change_background_color)
 
         self.kutuphaneEkranSagMenu.addActions((self.actionKutEkrYenileBelgeGomuluVeLinkli,
-                                                   self.actionKutEkrYenileSahneGomuluVeLinkli,
-                                                   self.kutuphaneEkranSagMenu.addSeparator(),
-                                                   self.actionKutEkrYenileBelgeLinkli,
-                                                   self.actionKutEkrYenileSahneLinkli,
-                                                   self.kutuphaneEkranSagMenu.addSeparator(),
-                                                   self.actionKutEkrYenileBelgeGomulu,
-                                                   self.actionKutEkrYenileSahneGomulu,
-                                                   self.kutuphaneEkranSagMenu.addSeparator(),
-                                                   self.actionKutEkrYenileBelgedeOlmayanGomulu,
-                                                   self.actionKutEkrYenileSahnedeOlmayanGomulu,
-                                                   self.kutuphaneEkranSagMenu.addSeparator(),
-                                                   self.actionKutEkrYenileBelgeHtmlImajTumu,
-                                                   self.kutuphaneEkranSagMenu.addSeparator(),
-                                                   self.actionKutEkrSilBelgedeOlmayanlar,
-                                                   self.kutuphaneEkranSagMenu.addSeparator(),
-                                                   self.actionKutEkrChangeBackgroundColor,
-                                                   self.kutuphaneEkranSagMenu.addSeparator(),
-                                                   self.kutuphaneEkranSagMenu.addMenu(self.kutuphaneZoomMenu),
-                                                   ))
+                                               self.actionKutEkrYenileSahneGomuluVeLinkli,
+                                               self.kutuphaneEkranSagMenu.addSeparator(),
+                                               self.actionKutEkrYenileBelgeLinkli,
+                                               self.actionKutEkrYenileSahneLinkli,
+                                               self.kutuphaneEkranSagMenu.addSeparator(),
+                                               self.actionKutEkrYenileBelgeGomulu,
+                                               self.actionKutEkrYenileSahneGomulu,
+                                               self.kutuphaneEkranSagMenu.addSeparator(),
+                                               self.actionKutEkrYenileBelgedeOlmayanGomulu,
+                                               self.actionKutEkrYenileSahnedeOlmayanGomulu,
+                                               self.kutuphaneEkranSagMenu.addSeparator(),
+                                               self.actionKutEkrYenileBelgeHtmlImajTumu,
+                                               self.kutuphaneEkranSagMenu.addSeparator(),
+                                               self.actionKutEkrSilBelgedeOlmayanlar,
+                                               self.kutuphaneEkranSagMenu.addSeparator(),
+                                               self.actionKutEkrChangeBackgroundColor,
+                                               self.kutuphaneEkranSagMenu.addSeparator(),
+                                               self.kutuphaneEkranSagMenu.addMenu(self.kutuphaneZoomMenu),
+                                               ))
 
         # ---------------------------------------------------------------------
 
@@ -4485,18 +4509,18 @@ class DefterAnaPencere(QMainWindow):
         # self.actionPinItem.setShortcutContext(Qt.ApplicationShortcut)
         self.actionKutuphaneNesneSil.triggered.connect(self.act_kutuphaneden_nesne_sil)
 
-        self.actionKutuphaneDosyaYonetcisindeGoster = QAction(QIcon(":icons/icons/text-html.png"),
+        self.actionKutuphaneDosyaYonetcisindeGoster = QAction(QIcon(":icons/text-html.png"),
                                                               self.tr("Show in file manager"),
                                                               self.kutuphaneNesneSagMenu)
         # self.actionKutuphaneDosyaYonetcisindeGoster.setShortcut(QKeySequence("P"))
         # self.actionKutuphaneDosyaYonetcisindeGoster.setShortcutContext(Qt.ApplicationShortcut)
         self.actionKutuphaneDosyaYonetcisindeGoster.triggered.connect(self.act_kut_dosya_yoneticisinde_goster)
 
-        self.actionKutuphaneSahnedeGoster = QAction(QIcon(":icons/icons/text-html.png"), self.tr("~Show in scene"),
+        self.actionKutuphaneSahnedeGoster = QAction(QIcon(":icons/text-html.png"), self.tr("~Show in scene"),
                                                     self.kutuphaneNesneSagMenu)
         # self.actionKutuphaneDosyaYonetcisindeGoster.setShortcut(QKeySequence("P"))
         # self.actionKutuphaneDosyaYonetcisindeGoster.setShortcutContext(Qt.ApplicationShortcut)
-        self.actionKutuphaneSahnedeGoster.triggered.connect(self.act_kut_dosya_yoneticisinde_goster)
+        self.actionKutuphaneSahnedeGoster.triggered.connect(self.act_kut_sahnede_goster)
         self.actionKutuphaneSahnedeGoster.setDisabled(True)
 
         self.kutuphaneNesneSagMenu.addActions((self.actionKutuphaneNesneSil,
@@ -4585,6 +4609,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionToggleStatusBar,
                                           self.actionToggleMenuBar,
                                           self.actionCleanMode,
+                                          self.actionAra,
                                           # zoom menu actions
                                           self.actionZoomIn,
                                           self.actionZoomOut,
@@ -4697,9 +4722,9 @@ class DefterAnaPencere(QMainWindow):
                                                               self.cScene.aktifArac.cizgiRengi,
                                                               self.cScene.aktifArac.cizgiKalinligi, self)
         self.nesneOzellikleriYW.hide()
-        self.nesneOzellikleriYW.arkaPlanRengiDegisti.connect(lambda color: self.act_set_item_background_color(color,renkSecicidenMi=True))
-        self.nesneOzellikleriYW.yaziRengiDegisti.connect(lambda color: self.act_set_item_text_color(color,renkSecicidenMi=True))
-        self.nesneOzellikleriYW.cizgiRengiDegisti.connect(lambda color: self.act_set_item_line_color(color,renkSecicidenMi=True))
+        self.nesneOzellikleriYW.arkaPlanRengiDegisti.connect(lambda color: self.act_set_item_background_color(color, renkSecicidenMi=True))
+        self.nesneOzellikleriYW.yaziRengiDegisti.connect(lambda color: self.act_set_item_text_color(color, renkSecicidenMi=True))
+        self.nesneOzellikleriYW.cizgiRengiDegisti.connect(lambda color: self.act_set_item_line_color(color, renkSecicidenMi=True))
         self.nesneOzellikleriYW.cizgiKalinligiDegisti.connect(self.act_cizgi_kalinligi_degistir)
         self.nesneOzellikleriYW.cizgiKalinligiDegisti.connect(
             lambda x: self.cizgiKalinligiDSliderWithDSBox_tbar.setValue(x * 10))
@@ -4891,7 +4916,7 @@ class DefterAnaPencere(QMainWindow):
                                   self.tr("Bold"),
                                   self,
                                   shortcut="Ctrl+B",
-                                  triggered=lambda durum:self.act_bold(durum=durum, from_button=False),
+                                  triggered=lambda durum: self.act_bold(durum=durum, from_button=False),
                                   checkable=True)
         # bold = QFont()
         # bold.setBold(True)
@@ -4901,14 +4926,14 @@ class DefterAnaPencere(QMainWindow):
                                     self.tr("Italic"),
                                     self,
                                     shortcut="Ctrl+I",
-                                    triggered=lambda durum:self.act_italic(durum=durum, from_button=False),
+                                    triggered=lambda durum: self.act_italic(durum=durum, from_button=False),
                                     checkable=True)
 
         self.actionUnderline = QAction(QIcon(':icons/underline.png'),
                                        self.tr("Underline"),
                                        self,
                                        shortcut="Ctrl+U",
-                                       triggered=lambda durum:self.act_underline(durum=durum, from_button=False),
+                                       triggered=lambda durum: self.act_underline(durum=durum, from_button=False),
                                        checkable=True)
 
         self.actionStrikeOut = QAction(QIcon(':icons/strikeout.png'),
@@ -4916,7 +4941,7 @@ class DefterAnaPencere(QMainWindow):
                                        self,
                                        priority=QAction.Priority.LowPriority,
                                        # shortcut="Ctrl+U",
-                                       triggered=lambda durum:self.act_strikeout(durum=durum, from_button=False),
+                                       triggered=lambda durum: self.act_strikeout(durum=durum, from_button=False),
                                        checkable=True)
 
         self.actionOverline = QAction(QIcon(':icons/overline.png'),
@@ -4924,7 +4949,7 @@ class DefterAnaPencere(QMainWindow):
                                       self,
                                       priority=QAction.Priority.LowPriority,
                                       # shortcut="Ctrl+U",
-                                      triggered=lambda durum:self.act_overline(durum=durum, from_button=False),
+                                      triggered=lambda durum: self.act_overline(durum=durum, from_button=False),
                                       checkable=True)
 
         grp = QActionGroup(self.fontToolBar)
@@ -5084,7 +5109,7 @@ class DefterAnaPencere(QMainWindow):
                     fmt.setFontWeight(QFont.Weight.Bold if self.actionBold.isChecked() else QFont.Weight.Normal)
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
                     return
-                
+
         self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama=self.tr("bold"))
 
     # ---------------------------------------------------------------------
@@ -5099,7 +5124,7 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.aktifArac.yaziTipi.setUnderline(self.actionUnderline.isChecked())
             self.karakter_bicimi_sozluk["u"] = self.actionUnderline.isChecked()
             return
-        
+
         if len(self.cScene.selectionQueue) == 1:
             if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.hasFocus():
@@ -5108,7 +5133,7 @@ class DefterAnaPencere(QMainWindow):
                     fmt.setFontUnderline(self.actionUnderline.isChecked())
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
                     return
-        
+
         self.nesne_duzeyinde_karakter_bicimi_degistir(aciklama=self.tr("underline"))
 
     # ---------------------------------------------------------------------
@@ -5465,6 +5490,7 @@ class DefterAnaPencere(QMainWindow):
     def on_view_menu_about_to_show(self):
         self.actionToggleStatusBar.setChecked(self._statusBar.isVisible())
         self.actionToggleMenuBar.setChecked(self.mBar.isVisible())
+        self.actionAra.setChecked(self.araBaseWidget.isVisible())
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5915,8 +5941,8 @@ class DefterAnaPencere(QMainWindow):
     def ekle_resim_direkt(self, dosyaYolu, pos, isEmbeded=False):
 
         # yeni TODO: simdi bi de pixmap dosya boyutu icin lazim .. alternatif bi şeyler dusunelim.
-        #viewRectSize = self.cScene.views()[0].get_visible_rect().size().toSize()
-        #pixMap = QPixmap(dosyaYolu).scaled(viewRectSize / 1.5, Qt.AspectRatioMode.KeepAspectRatio)
+        # viewRectSize = self.cScene.views()[0].get_visible_rect().size().toSize()
+        # pixMap = QPixmap(dosyaYolu).scaled(viewRectSize / 1.5, Qt.AspectRatioMode.KeepAspectRatio)
         # pixMap = QPixmap(dosyaYolu)
         # rectf = QRectF(pixMap.rect())
         # rectf.moveTo(pos)
@@ -8485,6 +8511,10 @@ class DefterAnaPencere(QMainWindow):
                                                  self.ekranKutuphane, col)
 
     # ---------------------------------------------------------------------
+    def act_kut_sahnede_goster(self):
+        pass
+
+    # ---------------------------------------------------------------------
     @Slot()
     def act_kut_dosya_yoneticisinde_goster(self):
 
@@ -8498,7 +8528,7 @@ class DefterAnaPencere(QMainWindow):
 
         url = self.sahneKutuphane.selectedItems()[0].dosya_adresi
         norm = os.path.normpath(url)
-        
+
         sistem = platform.system()
         if sistem == "Darwin":
 
@@ -8819,7 +8849,7 @@ class DefterAnaPencere(QMainWindow):
         #             undoRedo.undoableAddItem(self.cScene.undoStack, "convert to web item", self.cScene, webItem)
 
         item = self.cScene.activeItem
-        
+
         # if item.type() == shared.DOSYA_ITEM_TYPE:
         #     webItem = Web(None, item.filePathForSave, item.scenePos(), 
         #                   item.rect(), self.yaziRengi, self.arkaPlanRengi,
@@ -9562,7 +9592,7 @@ class DefterAnaPencere(QMainWindow):
         fDialog = QFileDialog()
         # fDialog.setFileMode(QFileDialog.FileMode.Directory)
         fDialog.setFileMode(QFileDialog.FileMode.AnyFile)
-        fDialog.setOption(QFileDialog.ShowDirsOnly, True)
+        fDialog.setOption(QFileDialog.Option.ShowDirsOnly, True)
         fDialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
         fDialog.setOption(QFileDialog.Option.DontUseCustomDirectoryIcons, True)
 
@@ -10576,6 +10606,243 @@ class DefterAnaPencere(QMainWindow):
                     kaynak_dosya_tam_adres = os.path.join(root, dosya_adi)
                     dosya_zip_icindeki_adres = kaynak_dosya_tam_adres[len_kaynak_klasor:]
                     zipf.write(kaynak_dosya_tam_adres, dosya_zip_icindeki_adres)
+
+    # ---------------------------------------------------------------------
+    def olustur_arama_cubugu(self):
+
+        self.araBaseWidget = QWidget(self)
+        self.araBaseWidget.setObjectName("araBaseWidget")
+        self.araBaseWidget.hide()
+        self.araBaseWidget.setMinimumHeight(35)
+        araLay = QHBoxLayout(self.araBaseWidget)
+        # araLay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+
+        # self.araBaseWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.araLineEdit = AraLineEdit(self.araBaseWidget)
+        # self.araLineEdit.setMinimumWidth(250)
+        self.araLineEdit.returnVeyaEnterBasildi.connect(lambda: self.act_ara(geriyeDogru=False))
+        self.araLineEdit.shiftEnterVeyaReturnBasildi.connect(lambda: self.act_ara(geriyeDogru=True))
+
+        self.araLineEdit.temizleBtnClicked.connect(self.act_aramayi_temizle)
+        self.araLineEdit.aramaMetniDegisti.connect(lambda: self.act_aramayi_temizle(yeniden_ara=True))
+
+        araLay.addWidget(self.araLineEdit)
+
+        self.araGeriBtn = QPushButton("<", self.araBaseWidget)
+        self.araGeriBtn.setMaximumWidth(23)
+        self.araGeriBtn.setFixedHeight(23)
+        self.araGeriBtn.clicked.connect(lambda: self.act_ara(geriyeDogru=True))
+        self.araIleriBtn = QPushButton(">", self.araBaseWidget)
+        self.araIleriBtn.setMaximumWidth(23)
+        self.araIleriBtn.setFixedHeight(23)
+        self.araIleriBtn.clicked.connect(lambda: self.act_ara(geriyeDogru=False))
+
+        araLay.addWidget(self.araGeriBtn)
+        araLay.addWidget(self.araIleriBtn)
+
+        self.buyukKucukHarfDuyarliCBox = QCheckBox(self.tr("Match Case"), self.araBaseWidget)
+        self.buyukKucukHarfDuyarliCBox.setFixedHeight(23)
+        self.buyukKucukHarfDuyarliCBox.stateChanged.connect(lambda: self.act_aramayi_temizle(yeniden_ara=True))
+        # self.regexCBox = QCheckBox(self.tr("Regex"), self.araBaseWidget)
+        # self.regexCBox.stateChanged.connect(lambda: self.act_aramayi_temizle(yeniden_ara=True))
+        self.kelimeAraCBox = QCheckBox(self.tr("Words"), self.araBaseWidget)
+        self.kelimeAraCBox.setFixedHeight(23)
+        self.kelimeAraCBox.stateChanged.connect(lambda: self.act_aramayi_temizle(yeniden_ara=True))
+        # self.isaretleCBox = QCheckBox(self.tr("Mark"), self.araBaseWidget)
+        # self.isaretleCBox.stateChanged.connect(self.act_ara_isaretle_ac_kapa)
+        # araLay.addWidget(self.regexCBox)
+        # araLay.addWidget(self.isaretleCBox)
+        araLay.addWidget(self.buyukKucukHarfDuyarliCBox)
+        araLay.addWidget(self.kelimeAraCBox)
+
+        self.ara_ilk_arama_mi = True
+        self.ara_eski_nesne = None
+
+        self.tabWidget.parent().layout().addWidget(self.araBaseWidget)
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def act_arama_cubugu_ac_kapa(self):
+
+        cursor = None
+        if self.cScene.activeItem:
+            if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
+                cursor = self.cScene.activeItem.textCursor()
+
+        if self.araBaseWidget.isVisible():
+            if cursor:
+                if cursor.hasSelection():
+                    if cursor.selectedText() == self.araLineEdit.text():
+                        self.araBaseWidget.hide()
+                        self._statusBar.clearMessage()
+                    else:
+                        self.araLineEdit.setText(cursor.selectedText())
+                        self.araLineEdit.setFocus()
+                else:
+                    self.araBaseWidget.hide()
+                    self._statusBar.clearMessage()
+            else:
+                self.araBaseWidget.hide()
+                self._statusBar.clearMessage()
+        else:
+            self.araBaseWidget.show()
+            self.araLineEdit.setFocus()
+            if cursor:
+                if cursor.hasSelection():
+                    self.araLineEdit.setText(cursor.selectedText())
+                else:
+                    self.araLineEdit.clear()
+            else:
+                self.araLineEdit.clear()
+
+        self.araLineEdit.temizleBtn_durum_guncelle()
+        if self.araLineEdit.text():
+            yeniden_ara = True
+        else:
+            yeniden_ara = False
+        self.act_aramayi_temizle(yeniden_ara)
+
+    # ---------------------------------------------------------------------
+    def act_aramayi_temizle(self, yeniden_ara=False):
+        # TODO: bu undoRedoSiniflarda 6 yerde var
+        # print("temizlendi")
+        if self.araBaseWidget.isVisible():
+            self.ara_ilk_arama_mi = True
+            self.ara_bulunan_nesneler = []
+            self.ara_bulunan_nesneler_sira = 0
+            self._statusBar.clearMessage()  # TODO: act_arama_cubugu_ac_kapada da ayrica var bu satir..
+            self.ara_eski_nesnenin_cursorunu_temizle()
+            self.ara_eski_nesne = None
+            if yeniden_ara:
+                self.act_ara()
+
+    # ---------------------------------------------------------------------
+    def ara_eski_nesnenin_cursorunu_temizle(self):
+        try:
+            if self.ara_eski_nesne:
+                cursor = self.ara_eski_nesne.textCursor()
+                cursor.clearSelection()
+                # cursor ortada kalıyor diger aramalarda bulamiyor oncesinde ise cursorun
+                cursor.movePosition(QTextCursor.Start, QTextCursor.MoveAnchor)
+                self.ara_eski_nesne.setTextCursor(cursor)
+                # self.ara_eski_nesne.clear_selection()
+        except Exception as e:
+            print(e)  # TODO: gecici:  hata toplayici
+
+    # ---------------------------------------------------------------------
+    def arama_sonucu_isaretle(self, sira):
+        self.ara_eski_nesnenin_cursorunu_temizle()
+
+        nesne = self.ara_bulunan_nesneler[sira][0]
+        if nesne.type() == shared.TEXT_ITEM_TYPE:
+            self.ara_eski_nesne = nesne
+            nesne.setTextCursor(self.ara_bulunan_nesneler[sira][1])
+        if not nesne.isSelected():
+            self.cScene.clearSelection()
+            nesne.setSelected(True)
+        nesne.ensureVisible()
+
+        self.log(f"{sira+1} / {len(self.ara_bulunan_nesneler)}")
+
+    # ---------------------------------------------------------------------
+    def act_ara(self, geriyeDogru=False):
+        
+        if self.ara_ilk_arama_mi:
+            self.ara_bulunan_nesneler = self.act_ara_hepsini_bul()
+            self.ara_ilk_arama_mi = False
+            self.ara_bulunan_nesneler_sira = -1
+
+        if self.ara_bulunan_nesneler:
+            if geriyeDogru:  # en basta ise liste sonuna atla
+                self.ara_bulunan_nesneler_sira -= 1
+                if self.ara_bulunan_nesneler_sira < 0:
+                    self.ara_bulunan_nesneler_sira = len(self.ara_bulunan_nesneler) - 1
+            else:  # ileri dogru
+                self.ara_bulunan_nesneler_sira += 1
+                if self.ara_bulunan_nesneler_sira >= len(self.ara_bulunan_nesneler):
+                    self.ara_bulunan_nesneler_sira = 0
+
+            self.arama_sonucu_isaretle(self.ara_bulunan_nesneler_sira)
+        
+        else:
+            self.log(self.tr("0 results"))
+
+    # ---------------------------------------------------------------------
+    def act_ara_hepsini_bul(self):
+        arananStr = self.araLineEdit.text()
+        if not arananStr:
+            return
+
+        bulunan_nesneler = []
+
+        bulunan_sayi = 0
+        cursor_sayi = 0
+
+        self.lutfen_bekleyin_goster()
+
+        for nesne in self.cScene.items():
+
+            if nesne.type() == shared.GROUP_ITEM_TYPE:
+                continue
+            elif nesne.type() == shared.TEXT_ITEM_TYPE:
+                cursorler = self._ara_yazi_nesnesinde(nesne, arananStr)
+                for cursor in cursorler:
+                    cursor_sayi += 1
+                    bulunan_nesneler.append([nesne, cursor])
+            else:
+                varmi = self._ara_diger_nesnelerde(nesne, arananStr)
+                if varmi:
+                    bulunan_nesneler.append([nesne])
+                    bulunan_sayi += 1
+
+        self.log(f"{bulunan_sayi + cursor_sayi} result(s) in {len(bulunan_nesneler)} item(s)")
+        self.lutfen_bekleyin_gizle()
+
+        return bulunan_nesneler
+
+    # ---------------------------------------------------------------------
+    def _ara_diger_nesnelerde(self, nesne, arananStr):
+        varmi = False
+        if self.buyukKucukHarfDuyarliCBox.isChecked():
+            if self.kelimeAraCBox.isChecked():
+                if nesne.text().startswith(f"{arananStr} ") or \
+                        nesne.text().endswith(f" {arananStr}") or \
+                        f" {arananStr} " in nesne.text():
+                    varmi = True
+            else:
+                if arananStr in nesne.text():
+                    varmi = True
+        else:
+            arananStrCaseFold = arananStr.casefold()
+            nesneYaziCaseFold = nesne.text().casefold()
+            if self.kelimeAraCBox.isChecked():
+                if nesne.text().startswith(f"{arananStrCaseFold} ") or \
+                        nesne.text().endswith(f" {arananStrCaseFold}") or \
+                        f" {arananStrCaseFold} " in nesneYaziCaseFold:
+                    varmi = True
+            else:
+                if arananStrCaseFold in nesneYaziCaseFold:
+                    varmi = True
+
+        return varmi
+
+    # ---------------------------------------------------------------------
+    def _ara_yazi_nesnesinde(self, nesne, arananStr):
+        flags = nesne.doc.FindFlag(0)
+
+        if self.buyukKucukHarfDuyarliCBox.isChecked():
+            flags |= nesne.doc.FindFlag.FindCaseSensitively
+
+        if self.kelimeAraCBox.isChecked():
+            flags |= nesne.doc.FindFlag.FindWholeWords
+
+        cursorler = []
+        cursor = nesne.doc.find(arananStr, nesne.textCursor(), flags)
+        while not cursor.isNull():
+            cursorler.append(cursor)
+            cursor = nesne.doc.find(arananStr, cursor, flags)
+        return cursorler
 
 
 # ---------------------------------------------------------------------

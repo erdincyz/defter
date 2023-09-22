@@ -577,8 +577,8 @@ class Text(QGraphicsTextItem):
     # ---------------------------------------------------------------------
     def clear_selection(self):
         cursor = self.textCursor()
-        self.cursor_eski_pozisyon = cursor.position()
-        self.cursor_eski_anchor = cursor.anchor()
+        # self.cursor_eski_pozisyon = cursor.position()
+        # self.cursor_eski_anchor = cursor.anchor()
         cursor.clearSelection()
         self.setTextCursor(cursor)
 

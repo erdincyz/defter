@@ -106,6 +106,10 @@
         <file>icons/yazi-hizala-ortala.png</file>
         <file>icons/yazi-hizala-saga.png</file>
         <file>icons/yazi-hizala-sigdir.png</file>
+        <file>icons/filtre-temizle-aktif.png</file>
+        <file>icons/filtre-temizle-pasif.png</file>
+        <file>icons/filtre-temizle-uzerinde.png</file>
+        <file>icons/filtre-temizle-basili.png</file>
         <file>icons/stylesheet/branch-closed.png</file>
         <file>icons/stylesheet/branch-end.png</file>
         <file>icons/stylesheet/branch-more.png</file>
