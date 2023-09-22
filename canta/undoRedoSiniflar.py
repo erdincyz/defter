@@ -1741,13 +1741,13 @@ class UndoableItemSetText(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def redo(self):
-        self.scene.parent().act_aramayi_temizle()
+        self.item.scene().parent().act_aramayi_temizle()
         self.item.setText(self.text)
 
 
     # ---------------------------------------------------------------------
     def undo(self):
-        self.scene.parent().act_aramayi_temizle()
+        self.item.scene().parent().act_aramayi_temizle()
         self.item.setText(self.eski_text)
 
 
