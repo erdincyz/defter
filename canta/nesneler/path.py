@@ -46,6 +46,8 @@ class PathItem(QGraphicsItem):
         self.searchBoxSize = QSizeF(15, 15)
         self.intersects = False
 
+        self.isPathClosed = False
+
         self.cizgi_basitlestirme_miktari = 10  # moveCenterda kullanildigi icin yarisi aslinda
 
         self.initialFlags = self.flags()
@@ -103,7 +105,7 @@ class PathItem(QGraphicsItem):
                       # "painterPath": self.path(),
                       "kim": self._kim,
                       "painterPathAsList": self.toList(),
-                      "isPathClosed": self.isPathClosed(),
+                      "isPathClosed": self.isPathClosed,
                       "pos": self.pos(),
                       "rotation": self.rotation(),
                       "zValue": self.zValue(),
@@ -186,10 +188,10 @@ class PathItem(QGraphicsItem):
         # so ...
         pass
 
-    # ---------------------------------------------------------------------
-    def isPathClosed(self):
-        poly = self._path.toSubpathPolygons()
-        return poly[0].isClosed()
+    # # ---------------------------------------------------------------------
+    # def isPathClosed(self):
+    #     poly = self._path.toSubpathPolygons()
+    #     return poly[0].isClosed()
 
     # ---------------------------------------------------------------------
     def itemChange(self, change, value):
@@ -334,6 +336,7 @@ class PathItem(QGraphicsItem):
             path.lineTo(*e)
         if closePath:
             path.closeSubpath()
+            self.isPathClosed = True
             self.setBrush(self.arkaPlanRengi)
         self.setPath(path)
 
@@ -621,6 +624,7 @@ class PathItem(QGraphicsItem):
     def close_path(self, kapat):
         if kapat:
             self.lastPath.closeSubpath()
+            self.isPathClosed = True
             self.setBrush(self.arkaPlanRengi)
         self.basitlestir()
         # basitlestir() -> self.setPath yapiyor
@@ -695,7 +699,7 @@ class PathItem(QGraphicsItem):
         except Exception as e:
             print(e)
         # print(self.lastPath.elementCount(), len(liste))
-        self.fromList(liste, self.isPathClosed())
+        self.fromList(liste, self.isPathClosed)
 
     # # ---------------------------------------------------------------------
     # def pathi_pixmap_yap(self):
