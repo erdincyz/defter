@@ -6233,27 +6233,21 @@ class DefterAnaPencere(QMainWindow):
     def act_copy(self, isMirroring=False):
         self.lutfen_bekleyin_goster()
         eskiMimeData = self.clipboard.mimeData()
-        eskiClipboardText = eskiMimeData.text()
-        eskiClipboardHtml = eskiMimeData.html()
-        eskiClipboardUrls = eskiMimeData.urls()
-        eskiClipboardColor = eskiMimeData.colorData()
-        eskiClipboardImageData = eskiMimeData.imageData()
-        # clipboard.setText(yeniText)
 
         if isMirroring:
             self.beforeMirrorCopyMimeData = QMimeData()
             if eskiMimeData.data('scene/items'):
                 self.beforeMirrorCopyMimeData.setData('scene/items', eskiMimeData.data('scene/items'))
-            if eskiClipboardText:
-                self.beforeMirrorCopyMimeData.setText(eskiClipboardText)
-            if eskiClipboardHtml:
-                self.beforeMirrorCopyMimeData.setHtml(eskiClipboardHtml)
-            if eskiClipboardUrls:
-                self.beforeMirrorCopyMimeData.setUrls(eskiClipboardUrls)
-            if eskiClipboardColor:
-                self.beforeMirrorCopyMimeData.setColorData(eskiClipboardColor)
-            if eskiClipboardImageData:
-                self.beforeMirrorCopyMimeData.setImageData(eskiClipboardImageData)
+            if eskiMimeData.hasText():
+                self.beforeMirrorCopyMimeData.setText(eskiMimeData.text())
+            if eskiMimeData.hasHtml():
+                self.beforeMirrorCopyMimeData.setHtml(eskiMimeData.html())
+            if eskiMimeData.hasUrls():
+                self.beforeMirrorCopyMimeData.setUrls(eskiMimeData.urls())
+            if eskiMimeData.hasColor():
+                self.beforeMirrorCopyMimeData.setColorData(eskiMimeData.colorData())
+            if eskiMimeData.hasImage():
+                self.beforeMirrorCopyMimeData.setImageData(eskiMimeData.imageData())
 
         # "If Qt expects a QByteArray then PySide6 will also accept a bytes"
         # http://pyqt.sourceforge.net/Docs/PySide6/gotchas.html
@@ -6313,16 +6307,16 @@ class DefterAnaPencere(QMainWindow):
         #     itemList.append(item.get_properties_for_save_binary())
         # mimeData.setData("itemList", itemData)
 
-        if eskiClipboardText:
-            mimeData.setText(eskiClipboardText)
-        if eskiClipboardHtml:
-            mimeData.setHtml(eskiClipboardHtml)
-        if eskiClipboardUrls:
-            mimeData.setUrls(eskiClipboardUrls)
-        if eskiClipboardColor:
-            mimeData.setColorData(eskiClipboardColor)
-        if eskiClipboardImageData:
-            mimeData.setImageData(eskiClipboardImageData)
+        if eskiMimeData.hasText():
+            mimeData.setText(eskiMimeData.text())
+        if eskiMimeData.hasHtml():
+            mimeData.setHtml(eskiMimeData.html())
+        if eskiMimeData.hasUrls():
+            mimeData.setUrls(eskiMimeData.urls())
+        if eskiMimeData.hasColor():
+            mimeData.setColorData(eskiMimeData.colorData())
+        if eskiMimeData.hasImage():
+            mimeData.setImageData(eskiMimeData.imageData())
         self.clipboard.setMimeData(mimeData)
         # self.actionPaste.setEnabled(True)
         self.lutfen_bekleyin_gizle()
@@ -10511,7 +10505,7 @@ class DefterAnaPencere(QMainWindow):
                 if eskiMimeData.hasUrls():
                     mimeData.setUrls(eskiMimeData.urls())
                 if eskiMimeData.hasColor():
-                    mimeData.setImageData(eskiMimeData.colorData())
+                    mimeData.setColorData(eskiMimeData.colorData())
                 # if eskiMimeData.hasImage():
                 #     mimeData.setImageData(eskiMimeData.imageData())
 
