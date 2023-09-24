@@ -675,6 +675,11 @@ class Group(QGraphicsItem):
             # painter.drawRect(self.boundingRect())
             painter.drawRect(self._itemsBoundingRect)
 
+        # if option.state & QStyle.StateFlag.State_MouseOver:
+        #     painter.setBrush(Qt.BrushStyle.NoBrush)
+        #     painter.setPen(self.selectionPenBottom)
+        #     painter.drawRect(self._itemsBoundingRect)
+
         # # # # # debug start - pos() # # # # #
         # p = self.pos()
         # s = self.scenePos()
@@ -697,7 +702,7 @@ class Group(QGraphicsItem):
         # painter.drawRect(self.boundingRect())
         # painter.setPen(QPen(Qt.yellow, 1))
         # painter.drawRect(QRectF(0, 0, 50, 50))
-        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
+        # painter.drawText(self._rect.center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
         # # # # # debug end - pos() # # # # #
 
     # ---------------------------------------------------------------------

@@ -155,7 +155,7 @@ class Text(QGraphicsTextItem):
     def get_properties_for_save_binary(self):
         properties = {"type": self.type(),
                       "kim": self._kim,
-                      "rect": self.rect(),
+                      "rect": self._rect,
                       "pos": self.pos(),
                       "rotation": self.rotation(),
                       "zValue": self.zValue(),
@@ -262,10 +262,10 @@ class Text(QGraphicsTextItem):
         else:
             resizeHandleSize = self.resizeHandleSize
 
-        self.topLeftHandle = QRectF(self.rect().topLeft(), resizeHandleSize)
-        self.topRightHandle = QRectF(self.rect().topRight(), resizeHandleSize)
-        self.bottomRightHandle = QRectF(self.rect().bottomRight(), resizeHandleSize)
-        self.bottomLeftHandle = QRectF(self.rect().bottomLeft(), resizeHandleSize)
+        self.topLeftHandle = QRectF(self._rect.topLeft(), resizeHandleSize)
+        self.topRightHandle = QRectF(self._rect.topRight(), resizeHandleSize)
+        self.bottomRightHandle = QRectF(self._rect.bottomRight(), resizeHandleSize)
+        self.bottomLeftHandle = QRectF(self._rect.bottomLeft(), resizeHandleSize)
 
         # self.topLeftHandle.moveTopLeft(self.boundingRect().topLeft())
         self.topRightHandle.moveTopRight(self.boundingRect().topRight())
@@ -874,7 +874,7 @@ class Text(QGraphicsTextItem):
             #     rect.moveTo(0, 0)
             #     self.scene().undoableResizeBaseItem("resize",
             #                                         self,
-            #                                         # yeniRect=self.rect(),
+            #                                         # yeniRect=self._rect,
             #                                         yeniRect=rect,
             #                                         eskiRect=self._eskiRectBeforeResize,
             #                                         eskiPos=self._eskiPosBeforeResize)
@@ -885,7 +885,7 @@ class Text(QGraphicsTextItem):
             # self.scene().unite_with_scene_rect(self.sceneBoundingRect())
 
             # rect = self.boundingRect()
-            rect = self.rect()
+            rect = self._rect
             # self.setPos(self.mapToScene(rect.topLeft()))
             # rect.moveTo(0, 0)
             # self.doc.setTextWidth(rect.width())
@@ -896,7 +896,7 @@ class Text(QGraphicsTextItem):
             self.scene().undoRedo.undoableResizeBaseItem(self.scene().undoStack,
                                                          "resize",
                                                          self,
-                                                         # yeniRect=self.rect(),
+                                                         # yeniRect=self._rect,
                                                          yeniRect=rect,
                                                          eskiRect=self._eskiRectBeforeResize,
                                                          eskiPos=self._eskiPosBeforeResize)
@@ -1004,7 +1004,7 @@ class Text(QGraphicsTextItem):
 
         # path = QPainterPath()
         # # path.addRect(self._rect)
-        # if self.rect().isEmpty():
+        # if self._rect.isEmpty():
         #     return super(Text, self).shape()
         # else:
         #     path.addRect(self._rect)
@@ -1017,11 +1017,11 @@ class Text(QGraphicsTextItem):
 
     # ---------------------------------------------------------------------
     def boundingRectttt(self):
-        if self.rect().isEmpty():
+        if self._rect.isEmpty():
             print("empty")
             return super(Text, self).boundingRect()
             # self.setRect(super(Text, self).boundingRect())
-        return self.rect()
+        return self._rect
 
     # ---------------------------------------------------------------------
     def boundingRecttt(self):
@@ -1238,6 +1238,12 @@ class Text(QGraphicsTextItem):
             #     painter.drawRect(self.bottomLeftHandle)
             ########################################################################
 
+        # if option.state & QStyle.StateFlag.State_MouseOver:
+        #     painter.setBrush(Qt.BrushStyle.NoBrush)
+        #     painter.setPen(self.selectionPenBottom)
+        #     # painter.setPen(QPen(Qt.GlobalColor.red))
+        #     painter.drawRect(option.rect)
+
         if self.isTextOverflowed:
             painter.setPen(QPen(Qt.GlobalColor.red, 2, Qt.PenStyle.DashLine))
             painter.drawLine(self._rect.bottomLeft(), self._rect.bottomRight())
@@ -1250,7 +1256,7 @@ class Text(QGraphicsTextItem):
         # painter.setPen(Qt.blue)
         # painter.drawRect(self.boundingRect())
         # painter.setPen(Qt.green)
-        # painter.drawRect(self.rect())
+        # painter.drawRect(self._rect)
         painter.restore()
 
         # option2 = QStyleOptionGraphicsItem(option)
@@ -1262,7 +1268,7 @@ class Text(QGraphicsTextItem):
         # option.exposedRect = self.boundingRect()
         # option.rect = option.exposedRect.toRect()
 
-        # rect = QRectF(self.rect())
+        # rect = QRectF(self._rect)
         # rect.moveTo(0, 0)
         # option2.exposedRect = rect
 
@@ -1273,28 +1279,28 @@ class Text(QGraphicsTextItem):
         # painter.setClipRect(option.exposedRect)
         super(Text, self).paint(painter, option, widget)
 
-        # self.doc.drawContents(painter, self.rect())
+        # self.doc.drawContents(painter, self._rect)
 
         # # # # # # debug start - pos() # # # # #
         # p = self.pos()
         # s = self.scenePos()
-        # painter.drawText(self.rect(),
+        # painter.drawText(self._rect,
         #                  "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
         # painter.setPen(QPen(Qt.green, 12))
         # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
         # # # t = self.transformOriginPoint()
         # # # painter.drawRect(t.x()-12, t.y()-12,24,24)
-        # mapped = self.mapToScene(self.rect().topLeft())
-        # painter.drawText(self.rect().x(), self.rect().y(), "{0:.2f}  {1:.2f} map".format(mapped.x(), mapped.y()))
+        # mapped = self.mapToScene(self._rect.topLeft())
+        # painter.drawText(self._rect.x(), self._rect.y(), "{0:.2f}  {1:.2f} map".format(mapped.x(), mapped.y()))
         # painter.drawEllipse(self.scenePos(), 10, 10)
         # painter.setPen(Qt.blue)
         # painter.drawEllipse(self.mapFromScene(self.pos()), 10, 10)
         # r = self.textItem.boundingRect()
         # r = self.mapRectFromItem(self.textItem, r)
         # painter.drawRect(r)
-        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
+        # painter.drawText(self._rect.center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
         # painter.setPen(QPen(Qt.red,17))
-        # painter.drawPoint(self.rect().center())
+        # painter.drawPoint(self._rect.center())
         # painter.setPen(QPen(Qt.green,12))
         # painter.drawPoint(self.boundingRect().center())
         # painter.setPen(QPen(Qt.blue,8))

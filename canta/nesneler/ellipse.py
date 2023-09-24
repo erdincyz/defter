@@ -115,19 +115,19 @@ class Ellipse(BaseItem):
             painter.setBrush(Qt.BrushStyle.NoBrush)
 
             painter.setPen(selectionPenBottom)
-            painter.drawEllipse(self.rect())
+            painter.drawEllipse(self._rect)
 
             # painter.setPen(self.selectionPenTop)
-            # painter.drawEllipse(self.rect())
+            # painter.drawEllipse(self._rect)
 
             if not self.isPinned:
                 painter.setPen(selectionPenBottom)
                 # painter.drawRect(self.boundingRect())
-                painter.drawRect(self.rect())
+                painter.drawRect(self._rect)
 
                 # painter.setPen(self.selectionPenTop)
                 # painter.drawRect(self.boundingRect())
-                # painter.drawRect(self.rect())
+                # painter.drawRect(self._rect)
 
                 # draw handles
                 painter.drawRect(self.topLeftHandle)
@@ -135,24 +135,29 @@ class Ellipse(BaseItem):
                 painter.drawRect(self.bottomRightHandle)
                 painter.drawRect(self.bottomLeftHandle)
 
+        # if option.state & QStyle.StateFlag.State_MouseOver:
+        #     painter.setBrush(Qt.BrushStyle.NoBrush)
+        #     painter.setPen(self.selectionPenBottom)
+        #     painter.drawEllipse(self._rect)
+
         # # # # # # debug start - pos() # # # # #
         # p = self.pos()
         # s = self.scenePos()
-        # painter.drawText(self.rect(),
+        # painter.drawText(self._rect,
         #                  "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
         # # # t = self.transformOriginPoint()
         # # # painter.drawRect(t.x()-12, t.y()-12,24,24)
-        # mapped = self.mapToScene(self.rect().topLeft())
-        # painter.drawText(self.rect().x(), self.rect().y(), "{0:.2f}  {1:.2f} map".format(mapped.x(), mapped.y()))
+        # mapped = self.mapToScene(self._rect.topLeft())
+        # painter.drawText(self._rect.x(), self._rect.y(), "{0:.2f}  {1:.2f} map".format(mapped.x(), mapped.y()))
         # painter.drawEllipse(self.scenePos(), 10, 10)
         # painter.setPen(Qt.blue)
         # painter.drawEllipse(self.mapFromScene(self.pos()), 10, 10)
         # r = self.textItem.boundingRect()
         # r = self.mapRectFromItem(self.textItem, r)
         # painter.drawRect(r)
-        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
+        # painter.drawText(self._rect.center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
         # painter.setPen(QPen(Qt.red,17))
-        # painter.drawPoint(self.rect().center())
+        # painter.drawPoint(self._rect.center())
         # painter.setPen(QPen(Qt.green,12))
         # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
         # painter.setPen(QPen(Qt.blue,8))

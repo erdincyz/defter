@@ -145,7 +145,7 @@ class BaseItem(QGraphicsItem):
     def get_properties_for_save_binary(self):
         properties = {"type": self.type(),
                       "kim": self._kim,
-                      "rect": self.rect(),
+                      "rect": self._rect,
                       "pos": self.pos(),
                       "rotation": self.rotation(),
                       "zValue": self.zValue(),
@@ -172,8 +172,8 @@ class BaseItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def sceneCenter(self):
         if self.parentItem():
-            return self.mapToParent(self.rect().center())
-        return self.mapToScene(self.rect().center())
+            return self.mapToParent(self._rect.center())
+        return self.mapToScene(self._rect.center())
 
     # ---------------------------------------------------------------------
     def sceneWidth(self):
@@ -188,7 +188,7 @@ class BaseItem(QGraphicsItem):
         # 4 koseyi de dikkate aliyoruz, mesela sadece sagdakileri degil,
         # cunku nesneyi saga veya sola dogru cizebiliyoruz. Ya da saga veya sola dogru boyutunu degistirebiliyoruz.
 
-        r = self.mapRectToScene(self.rect())
+        r = self.mapRectToScene(self._rect)
         return max(r.topLeft().x(),
                    r.topRight().x(),
                    r.bottomRight().x(),
@@ -196,7 +196,7 @@ class BaseItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def sceneLeft(self):
-        r = self.mapRectToScene(self.rect())
+        r = self.mapRectToScene(self._rect)
         return min(r.topLeft().x(),
                    r.topRight().x(),
                    r.bottomRight().x(),
@@ -204,7 +204,7 @@ class BaseItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def sceneTop(self):
-        r = self.mapRectToScene(self.rect())
+        r = self.mapRectToScene(self._rect)
         return min(r.topLeft().y(),
                    r.topRight().y(),
                    r.bottomRight().y(),
@@ -212,7 +212,7 @@ class BaseItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def sceneBottom(self):
-        r = self.mapRectToScene(self.rect())
+        r = self.mapRectToScene(self._rect)
         return max(r.topLeft().y(),
                    r.topRight().y(),
                    r.bottomRight().y(),
@@ -248,7 +248,7 @@ class BaseItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def flipHorizontal(self, mposx):
-        rc = self.mapToScene(self.rect().center())
+        rc = self.mapToScene(self._rect.center())
         diff = mposx - rc.x()
         ipos = self.scenePos()
         ipos.setX(ipos.x() + 2 * diff)
@@ -290,7 +290,7 @@ class BaseItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def flipVertical(self, mposy):
-        rc = self.mapToScene(self.rect().center())
+        rc = self.mapToScene(self._rect.center())
         diff = mposy - rc.y()
         ipos = self.scenePos()
         ipos.setY(ipos.y() + 2 * diff)
@@ -321,15 +321,15 @@ class BaseItem(QGraphicsItem):
         else:
             resizeHandleSize = self.resizeHandleSize
 
-        self.topLeftHandle = QRectF(self.rect().topLeft(), resizeHandleSize)
-        self.topRightHandle = QRectF(self.rect().topRight(), resizeHandleSize)
-        self.bottomRightHandle = QRectF(self.rect().bottomRight(), resizeHandleSize)
-        self.bottomLeftHandle = QRectF(self.rect().bottomLeft(), resizeHandleSize)
+        self.topLeftHandle = QRectF(self._rect.topLeft(), resizeHandleSize)
+        self.topRightHandle = QRectF(self._rect.topRight(), resizeHandleSize)
+        self.bottomRightHandle = QRectF(self._rect.bottomRight(), resizeHandleSize)
+        self.bottomLeftHandle = QRectF(self._rect.bottomLeft(), resizeHandleSize)
 
-        # self.topLeftHandle.moveTopLeft(self.rect().topLeft())
-        self.topRightHandle.moveTopRight(self.rect().topRight())
-        self.bottomRightHandle.moveBottomRight(self.rect().bottomRight())
-        self.bottomLeftHandle.moveBottomLeft(self.rect().bottomLeft())
+        # self.topLeftHandle.moveTopLeft(self._rect.topLeft())
+        self.topRightHandle.moveTopRight(self._rect.topRight())
+        self.bottomRightHandle.moveBottomRight(self._rect.bottomRight())
+        self.bottomLeftHandle.moveBottomLeft(self._rect.bottomLeft())
 
     # ---------------------------------------------------------------------
     def hide_resize_handles(self):
@@ -549,12 +549,12 @@ class BaseItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def boundingRect(self):
         # if self._boundingRect.isNull():
-        self._boundingRect = QRectF(self.rect())
+        self._boundingRect = QRectF(self._rect)
         return self._boundingRect.adjusted(-self.boundingRectTasmaDegeri, -self.boundingRectTasmaDegeri,
                                            self.boundingRectTasmaDegeri, self.boundingRectTasmaDegeri)
 
         # path = QPainterPath()
-        # path.addRect(self.rect())
+        # path.addRect(self._rect)
         # # path.moveTo(0,0)
         # return path.boundingRect()
 
@@ -669,26 +669,31 @@ class BaseItem(QGraphicsItem):
             painter.setBrush(Qt.BrushStyle.NoBrush)
 
             painter.setPen(selectionPenBottom)
-            painter.drawRect(self.rect())
+            painter.drawRect(self._rect)
 
             # painter.setPen(self.selectionPenTop)
-            # painter.drawRect(self.rect())
+            # painter.drawRect(self._rect)
 
             #######################################################################
             # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
             #######################################################################
             # if not self.isPinned and self.isActiveItem:
-            #     painter.setPen(self.handlePen)
-            #     painter.drawRect(self.topLeftHandle)
-            #     painter.drawRect(self.topRightHandle)
-            #     painter.drawRect(self.bottomRightHandle)
-            #     painter.drawRect(self.bottomLeftHandle)
-            #
-            #     painter.setPen(QPen(Qt.red, 3))
-            #     painter.drawPoint(self.topLeftHandle.center())
-            #     painter.drawPoint(self.topRightHandle.center())
-            #     painter.drawPoint(self.bottomRightHandle.center())
-            #     painter.drawPoint(self.bottomLeftHandle.center())
+            # painter.setPen(self.handlePen)
+            # painter.drawRect(self.topLeftHandle)
+            # painter.drawRect(self.topRightHandle)
+            # painter.drawRect(self.bottomRightHandle)
+            # painter.drawRect(self.bottomLeftHandle)
+
+            # painter.setPen(QPen(Qt.GlobalColor.red, 3))
+            # painter.drawPoint(self.topLeftHandle.center())
+            # painter.drawPoint(self.topRightHandle.center())
+            # painter.drawPoint(self.bottomRightHandle.center())
+            # painter.drawPoint(self.bottomLeftHandle.center())
+
+        # if option.state & QStyle.StateFlag.State_MouseOver:
+        #     painter.setBrush(Qt.BrushStyle.NoBrush)
+        #     painter.setPen(self.selectionPenBottom)
+        #     painter.drawRect(self._rect)
 
             #######################################################################
 
@@ -706,21 +711,21 @@ class BaseItem(QGraphicsItem):
         # # # # # # debug start - pos() # # # # #
         # p = self.pos()
         # s = self.scenePos()
-        # painter.drawText(self.rect(),
+        # painter.drawText(self._rect,
         #                  "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
         # # # # t = self.transformOriginPoint()
         # # # painter.drawRect(t.x()-12, t.y()-12,24,24)
-        # mapped = self.mapToScene(self.rect().topLeft())
-        # painter.drawText(self.rect().x(), self.rect().y(), "{0:.2f}  {1:.2f} map".format(mapped.x(), mapped.y()))
+        # mapped = self.mapToScene(self._rect.topLeft())
+        # painter.drawText(self._rect.x(), self._rect.y(), "{0:.2f}  {1:.2f} map".format(mapped.x(), mapped.y()))
         # painter.drawEllipse(self.scenePos(), 10, 10)
         # painter.setPen(Qt.blue)
         # painter.drawEllipse(self.mapFromScene(self.pos()), 10, 10)
         # r = self.textItem.boundingRect()
         # r = self.mapRectFromItem(self.textItem, r)
         # painter.drawRect(r)
-        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
+        # painter.drawText(self._rect.center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
         # painter.setPen(QPen(Qt.red,17))
-        # painter.drawPoint(self.rect().center())
+        # painter.drawPoint(self._rect.center())
         # painter.setPen(QPen(Qt.green,12))
         # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
         # painter.setPen(QPen(Qt.blue,8))
@@ -791,7 +796,7 @@ class BaseItem(QGraphicsItem):
         self.setText("")
         self.tempTextItem.setRotation(360 - self.rotation())
         # self.tempTextItem.rotateWithOffset(360 - self.rotation())
-        self.tempTextItem.setCenter(self.rect().center())
+        self.tempTextItem.setCenter(self._rect.center())
         self.tempTextItem.setFocus()
 
         # !! burda lambda kullanmazsak, self.is_temp_text_item_empty ,self daha olsumadigi icin,
@@ -829,21 +834,21 @@ class BaseItem(QGraphicsItem):
 
         if self.topLeftHandle.contains(event.pos()):
             self._resizing = True
-            self._fixedResizePoint = self.rect().bottomRight()
+            self._fixedResizePoint = self._rect.bottomRight()
             self._resizingFrom = 1
         elif self.topRightHandle.contains(event.pos()):
             self._resizing = True
-            self._fixedResizePoint = self.rect().bottomLeft()
+            self._fixedResizePoint = self._rect.bottomLeft()
             self._resizingFrom = 2
         elif self.bottomRightHandle.contains(event.pos()):
             self._resizing = True
-            self._fixedResizePoint = self.rect().topLeft()
+            self._fixedResizePoint = self._rect.topLeft()
             self._resizingFrom = 3
         elif self.bottomLeftHandle.contains(event.pos()):
             self._resizing = True
-            self._fixedResizePoint = self.rect().topRight()
+            self._fixedResizePoint = self._rect.topRight()
             self._resizingFrom = 4
-        self._eskiRectBeforeResize = self.rect()
+        self._eskiRectBeforeResize = self._rect
 
         super(BaseItem, self).mousePressEvent(event)
 
@@ -859,13 +864,13 @@ class BaseItem(QGraphicsItem):
         if self._resizing:
             # sahneye ilk cizim kontrolu,(undoya eklemesin diye)
             if not self._eskiRectBeforeResize.size() == QSizeF(1, 1):
-                rect = self.rect()
+                rect = self._rect
                 # self.setPos(self.mapToScene(rect.topLeft()))
                 # rect.moveTo(0, 0)
                 self.scene().undoRedo.undoableResizeBaseItem(self.scene().undoStack,
                                                              "resize",
                                                              self,
-                                                             # yeniRect=self.rect(),
+                                                             # yeniRect=self._rect,
                                                              yeniRect=rect,
                                                              eskiRect=self._eskiRectBeforeResize,
                                                              eskiPos=self._eskiPosBeforeResize)
@@ -905,7 +910,7 @@ class BaseItem(QGraphicsItem):
 
             rect = QRectF(topLeft, bottomRight)
 
-            c = self.rect().center()
+            c = self._rect.center()
 
             # Alt Key - to resize around center.
             # if event.modifiers() & Qt.AltModifier:
@@ -915,14 +920,14 @@ class BaseItem(QGraphicsItem):
             # ---------------------------------------------------------------------
             #  Ctrl Key - to keep aspect ratio while resizing.
             if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                tl = self.rect().topLeft()
-                tr = self.rect().topRight()
-                br = self.rect().bottomRight()
-                bl = self.rect().bottomLeft()
-                c = self.rect().center()
+                tl = self._rect.topLeft()
+                tr = self._rect.topRight()
+                br = self._rect.bottomRight()
+                bl = self._rect.bottomLeft()
+                c = self._rect.center()
 
                 yeniSize = rect.size()
-                eskiSize = self.rect().size()
+                eskiSize = self._rect.size()
                 # eskiSize.scale(yeniSize, Qt.KeepAspectRatio)
                 eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.AspectRatioMode.KeepAspectRatioByExpanding)
                 # eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.KeepAspectRatio)
@@ -1121,9 +1126,9 @@ class BaseItem(QGraphicsItem):
             scaleFactor = 1 / scaleFactor
 
         # eskiTamCerceve = self.boundingRect() | self.childrenBoundingRect()
-        center = self.rect().center()
+        center = self._rect.center()
 
-        rect = QRectF(self.rect().topLeft(), self.rect().size() * scaleFactor)
+        rect = QRectF(self._rect.topLeft(), self._rect.size() * scaleFactor)
         rect.moveCenter(center)
         yeniPos = self.mapToScene(rect.topLeft())
         if self.parentItem():

@@ -157,7 +157,7 @@ class LineItem(QGraphicsItem):
         self.isDrawingFinished = False
         # point = self.mapFromScene(point)
         point = QPointF(0, 0)
-        self.line().setP1(point)
+        self._line.setP1(point)
 
     # ---------------------------------------------------------------------
     def temp_prepend(self, point):
@@ -273,7 +273,7 @@ class LineItem(QGraphicsItem):
             self._resizing = True
             self._fixedResizePoint = self._line.p1()
             self._resizingFrom = 2
-        self._eskiLineBeforeResize = self.line()
+        self._eskiLineBeforeResize = self._line
 
         super(LineItem, self).mousePressEvent(event)
 
@@ -286,7 +286,7 @@ class LineItem(QGraphicsItem):
         if self._resizing:
             # sahneye ilk cizim kontrolu,(undoya eklemesin diye)
             if not self._eskiLineBeforeResize.length() == 0:
-                line = self.line()
+                line = self._line
                 self.scene().undoRedo.undoableResizeLineItem(self.scene().undoStack,
                                                              "resize",
                                                              self,
@@ -332,7 +332,7 @@ class LineItem(QGraphicsItem):
             # Alt Key - to resize around center.
             if event.modifiers() == Qt.KeyboardModifier.AltModifier:
                 # burda da orta nokta sabit
-                # c = self.line().center() # ile
+                # c = self._line.center() # ile
                 # ve de eski aci ile, belki bir cizgi hareket eden noktadan merkeze
                 # sonra da length *2, tabi hangi nokta tutuldu ise p2, p2 ona gore ayarlanmali ok icin
                 pass
@@ -490,8 +490,8 @@ class LineItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def sceneCenter(self):
         if self.parentItem():
-            return self.mapToParent(self.line().center())
-        return self.mapToScene(self.line().center())
+            return self.mapToParent(self._line.center())
+        return self.mapToScene(self._line.center())
 
     # ---------------------------------------------------------------------
     def sceneWidth(self):
@@ -881,7 +881,7 @@ class LineItem(QGraphicsItem):
     def shape(self):
 
         path = QPainterPath()
-        if self.line() == QLineF():
+        if self._line == QLineF():
             return path
         path.moveTo(self._line.p1())
         path.lineTo(self._line.p2())
@@ -999,7 +999,7 @@ class LineItem(QGraphicsItem):
 
         scaleMatrix = QTransform()
         scaleMatrix.scale(scaleFactor, scaleFactor)
-        scaledLine = self.line() * scaleMatrix
+        scaledLine = self._line * scaleMatrix
         # if scaledLine.length() < 5:
         #     return
         self.scene().undoRedo.undoableScaleLineItemByScalingLine(self.scene().undoStack,
@@ -1158,12 +1158,12 @@ class LineItem(QGraphicsItem):
             painter.setFont(self._font)
             # painter.setPen(self.textPen)
             painter.setPen(self.yaziRengi)
-            painter.translate(self.line().center())
+            painter.translate(self._line.center())
             # aci = math.atan2(-self._line.dy(), self._line.dx())
             # aci = aci * 180 / math.pi
             # painter.rotate(- aci)
             painter.rotate(- self._line.angle())
-            painter.translate(-self.line().center())
+            painter.translate(-self._line.center())
             # painter.drawText(self.boundingRect(), Qt.AlignCenter | Qt.AlignVCenter, self._text)
             # painter.drawText(self.boundingRect(), self._text, self.painterTextOption)
             painter.drawText(self.painterTextRect, self._text, self.painterTextOption)
@@ -1190,6 +1190,11 @@ class LineItem(QGraphicsItem):
                 painter.drawEllipse(self.p1Handle)
                 painter.drawEllipse(self.p2Handle)
             ########################################################################
+
+        if option.state & QStyle.StateFlag.State_MouseOver:
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            painter.setPen(self.selectionPenBottom)
+            painter.drawLine(self._line)
 
             # painter.setPen(self.selectionPenTop)
             # painter.drawLine(self._line)

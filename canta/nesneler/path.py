@@ -102,7 +102,7 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def get_properties_for_save_binary(self):
         properties = {"type": self.type(),
-                      # "painterPath": self.path(),
+                      # "painterPath": self._path,
                       "kim": self._kim,
                       "painterPathAsList": self.toList(),
                       "isPathClosed": self.isPathClosed,
@@ -228,8 +228,8 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def sceneCenter(self):
         if self.parentItem():
-            return self.mapToParent(self.path().controlPointRect().center())
-        return self.mapToScene(self.path().controlPointRect().center())
+            return self.mapToParent(self._path.controlPointRect().center())
+        return self.mapToScene(self._path.controlPointRect().center())
 
     # ---------------------------------------------------------------------
     def sceneWidth(self):
@@ -242,7 +242,7 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def sceneRight(self):
 
-        path = self.mapToScene(self.path())
+        path = self.mapToScene(self._path)
         liste = self.toList(path)
         right = liste[0]
         for i in range(path.elementCount()):
@@ -253,7 +253,7 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def sceneLeft(self):
 
-        path = self.mapToScene(self.path())
+        path = self.mapToScene(self._path)
         liste = self.toList(path)
         left = liste[0]
         for i in range(path.elementCount()):
@@ -263,7 +263,7 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def sceneTop(self):
-        path = self.mapToScene(self.path())
+        path = self.mapToScene(self._path)
         liste = self.toList(path)
         top = liste[1]
         for i in range(path.elementCount()):
@@ -273,7 +273,7 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def sceneBottom(self):
-        path = self.mapToScene(self.path())
+        path = self.mapToScene(self._path)
         liste = self.toList(path)
         bottom = liste[1]
         for i in range(path.elementCount()):
@@ -321,7 +321,7 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def toList(self, path=None):
         if not path:
-            path = self.path()
+            path = self._path
         liste = []
         for i in range(path.elementCount()):
             element = path.elementAt(i)
@@ -503,8 +503,8 @@ class PathItem(QGraphicsItem):
             if y:
                 mirrorMatrix.scale(1, -1)
 
-        mirroredPath = self.path() * mirrorMatrix
-        # mirroredPath = mirrorMatrix.map(self.path())
+        mirroredPath = self._path * mirrorMatrix
+        # mirroredPath = mirrorMatrix.map(self._path)
         self.setPath(mirroredPath)
 
     # ---------------------------------------------------------------------
@@ -556,7 +556,7 @@ class PathItem(QGraphicsItem):
         # point = self.mapFromScene(point)
         self.isDrawingFinished = False
         point = QPointF(0, 0)
-        path = QPainterPath(self.path())
+        path = QPainterPath(self._path)
         if not path.elementCount():
             path.moveTo(point)
             self.realCount = path.elementCount()
@@ -568,7 +568,7 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def append(self, point):
         point = self.mapFromScene(point)
-        path = QPainterPath(self.path())
+        path = QPainterPath(self._path)
         path.lineTo(point)
         self.lastPath = QPainterPath(path)
         self.setPath(path)
@@ -577,7 +577,7 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def temp_append_and_replace_last(self, point):
         point = self.mapFromScene(point)
-        path = QPainterPath(self.path())
+        path = QPainterPath(self._path)
         # print(path.elementCount(), self.realCount)
         # if path.elementCount() == 0:
         #     path.lineTo(point)
@@ -601,7 +601,7 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def sonNoktaSil(self):
-        # path = QPainterPath(self.path())
+        # path = QPainterPath(self._path)
         nokta_listesi = self.toList()
         self.fromList(nokta_listesi[:-1], closePath=False)
         self.realCount = len(nokta_listesi) - 1
@@ -636,12 +636,12 @@ class PathItem(QGraphicsItem):
         # self.setSelected(True)
 
         # update pos - bu onemli
-        crect = self.path().controlPointRect()
+        crect = self._path.controlPointRect()
         crect = self.mapRectToScene(crect)
         # cunku pos noktasi merkezde
         diff = self.scenePos() - crect.center()
         self.setPos(crect.center())
-        self.path().translate(diff)
+        self._path.translate(diff)
         self.update_painter_text_rect()
         self.isDrawingFinished = True
 
@@ -721,7 +721,7 @@ class PathItem(QGraphicsItem):
     #         painter.setRenderHint(QPainter.Antialiasing)
     #         # painter.scale(.3, .3)
     #         painter.translate(-self.boundingRect().topLeft())
-    #         painter.drawPath(self.path())
+    #         painter.drawPath(self._path)
     #         self.pixmap = pix
     #         painter.end()
     #         painter = None
@@ -754,7 +754,7 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def boundingRect(self):
         return self.shape().controlPointRect()
-        # return self.path().controlPointRect()
+        # return self._path.controlPointRect()
 
         # if self._boundingRect.isNull():
         #     if self.pen().widthF() == 0.0:
@@ -766,7 +766,7 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def shape(self):
-        return self.qt_graphicsItem_shapeFromPath(QPainterPath(self.path()), self.pen())
+        return self.qt_graphicsItem_shapeFromPath(QPainterPath(self._path), self.pen())
         # return self.qt_graphicsItem_shapeFromPath(self._path, self.pen())
 
     # ---------------------------------------------------------------------
@@ -870,7 +870,7 @@ class PathItem(QGraphicsItem):
 
         scaleMatrix = QTransform()
         scaleMatrix.scale(scaleFactor, scaleFactor)
-        scaledPath = self.path() * scaleMatrix
+        scaledPath = self._path * scaleMatrix
         # self.setPath(scaledPath)
         self.scene().undoRedo.undoableScalePathItemByScalingPath(self.scene().undoStack, "scale", self,
                                                                  scaledPath, scaleFactor)
@@ -1060,7 +1060,7 @@ class PathItem(QGraphicsItem):
     def mouseMoveEvent(self, event):
         if self.editMode:
             if self.secilen_nokta:
-                path = QPainterPath(self.path())
+                path = QPainterPath(self._path)
                 path.setElementPositionAt(self.secilen_nokta_idx, event.pos().x(), event.pos().y())
                 self._path.swap(path)
 
@@ -1159,7 +1159,7 @@ class PathItem(QGraphicsItem):
                 # painter.setPen(self.selectionPenTop)
                 # painter.drawPath(self._path)
 
-                path = self.path()
+                path = self._path
                 painter.setPen(QPen(self.cizgiRengi, 5))
                 for i in range(path.elementCount()):
                     painter.drawPoint(QPointF(path.elementAt(i).x, path.elementAt(i).y))
@@ -1172,12 +1172,17 @@ class PathItem(QGraphicsItem):
                 painter.setPen(selectionPenBottom)
                 painter.drawRect(self.boundingRect())
 
+        if option.state & QStyle.StateFlag.State_MouseOver:
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            painter.setPen(self.selectionPenBottom)
+            painter.drawPath(self._path)
+
                 # painter.setPen(self.selectionPenTop)
                 # painter.drawRect(self.boundingRect())
 
             # if self.editMode:
             #     # for a future release, draw points
-            #     path = self.path()
+            #     path = self._path
             #     painter.setPen(QPen(self.cizgiRengi, 10))
             #     for i in range(path.elementCount()):
             #         painter.drawPoint(QPointF(path.elementAt(i).x, path.elementAt(i).y))
@@ -1192,7 +1197,7 @@ class PathItem(QGraphicsItem):
         # painter.drawRect(p.x(),p.y(),100,100)
         # painter.drawRect(s.x(),s.y(),100,100)
         # painter.drawRect(0,0,15,15)
-        # painter.drawRect(self.path().controlPointRect())
+        # painter.drawRect(self._path.controlPointRect())
         # painter.drawRect(self.boundingRect())
         # # # # # debug end - pos() # # # # #
 

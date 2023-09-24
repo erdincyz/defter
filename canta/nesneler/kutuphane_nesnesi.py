@@ -117,7 +117,7 @@ class KutuphaneNesnesi(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def sceneCenter(self):
-        return self.mapToScene(self.rect().center())
+        return self.mapToScene(self._rect.center())
 
     # ---------------------------------------------------------------------
     def sceneWidth(self):
@@ -129,31 +129,31 @@ class KutuphaneNesnesi(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def sceneRight(self):
-        return max(self.mapToScene(self.rect().topLeft()).x(),
-                   self.mapToScene(self.rect().topRight()).x(),
-                   self.mapToScene(self.rect().bottomRight()).x(),
-                   self.mapToScene(self.rect().bottomLeft()).x())
+        return max(self.mapToScene(self._rect.topLeft()).x(),
+                   self.mapToScene(self._rect.topRight()).x(),
+                   self.mapToScene(self._rect.bottomRight()).x(),
+                   self.mapToScene(self._rect.bottomLeft()).x())
 
     # ---------------------------------------------------------------------
     def sceneLeft(self):
-        return min(self.mapToScene(self.rect().topLeft()).x(),
-                   self.mapToScene(self.rect().topRight()).x(),
-                   self.mapToScene(self.rect().bottomRight()).x(),
-                   self.mapToScene(self.rect().bottomLeft()).x())
+        return min(self.mapToScene(self._rect.topLeft()).x(),
+                   self.mapToScene(self._rect.topRight()).x(),
+                   self.mapToScene(self._rect.bottomRight()).x(),
+                   self.mapToScene(self._rect.bottomLeft()).x())
 
     # ---------------------------------------------------------------------
     def sceneTop(self):
-        return min(self.mapToScene(self.rect().topLeft()).y(),
-                   self.mapToScene(self.rect().topRight()).y(),
-                   self.mapToScene(self.rect().bottomRight()).y(),
-                   self.mapToScene(self.rect().bottomLeft()).y())
+        return min(self.mapToScene(self._rect.topLeft()).y(),
+                   self.mapToScene(self._rect.topRight()).y(),
+                   self.mapToScene(self._rect.bottomRight()).y(),
+                   self.mapToScene(self._rect.bottomLeft()).y())
 
     # ---------------------------------------------------------------------
     def sceneBottom(self):
-        return max(self.mapToScene(self.rect().topLeft()).y(),
-                   self.mapToScene(self.rect().topRight()).y(),
-                   self.mapToScene(self.rect().bottomRight()).y(),
-                   self.mapToScene(self.rect().bottomLeft()).y())
+        return max(self.mapToScene(self._rect.topLeft()).y(),
+                   self.mapToScene(self._rect.topRight()).y(),
+                   self.mapToScene(self._rect.bottomRight()).y(),
+                   self.mapToScene(self._rect.bottomLeft()).y())
 
     # ---------------------------------------------------------------------
     def setSceneLeft(self, left):
@@ -202,11 +202,11 @@ class KutuphaneNesnesi(QGraphicsItem):
         # cunku self.rect ile paint ediyoruz. ellipsete yok bu problem.
         # pad = self.pen().widthF() / 2 + self.handleSize
         pad = self.pen().widthF() / 2
-        self._boundingRect = QRectF(self.rect())
+        self._boundingRect = QRectF(self._rect)
         return self._boundingRect.adjusted(-pad, -pad, pad, pad)
 
         # path = QPainterPath()
-        # path.addRect(self.rect())
+        # path.addRect(self._rect)
         # # path.moveTo(0,0)
         # return path.boundingRect()
 
@@ -507,10 +507,10 @@ class KutuphaneNesnesi(QGraphicsItem):
             painter.setBrush(Qt.BrushStyle.NoBrush)
 
             painter.setPen(selectionPenBottom)
-            painter.drawRect(self.rect())
+            painter.drawRect(self._rect)
 
             # painter.setPen(self.selectionPenTop)
-            # painter.drawRect(self.rect())
+            # painter.drawRect(self._rect)
 
         if self.isHtmlImage:
             painter.setBrush(Qt.GlobalColor.cyan)

@@ -65,7 +65,7 @@ class DosyaNesnesi(BaseItem):
                       "isEmbeded": self.isEmbeded,
                       "filePath": self.filePathForSave,
                       "originalSourceFilePath": self.originalSourceFilePath,
-                      "rect": self.rect(),
+                      "rect": self._rect,
                       "pos": self.pos(),
                       "rotation": self.rotation(),
                       "zValue": self.zValue(),
@@ -183,10 +183,10 @@ class DosyaNesnesi(BaseItem):
             painter.setBrush(Qt.BrushStyle.NoBrush)
 
             painter.setPen(selectionPenBottom)
-            painter.drawRect(self.rect())
+            painter.drawRect(self._rect)
 
             # painter.setPen(self.selectionPenTop)
-            # painter.drawRect(self.rect())
+            # painter.drawRect(self._rect)
 
             ########################################################################
             # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
@@ -198,6 +198,11 @@ class DosyaNesnesi(BaseItem):
             #     painter.drawRect(self.bottomRightHandle)
             #     painter.drawRect(self.bottomLeftHandle)
             ########################################################################
+
+        # if option.state & QStyle.StateFlag.State_MouseOver:
+        #     painter.setBrush(Qt.BrushStyle.NoBrush)
+        #     painter.setPen(self.selectionPenBottom)
+        #     painter.drawRect(self._rect)
 
         # font = painter.font()
         # font.setPointSize(self.fontPointSize)
@@ -213,15 +218,15 @@ class DosyaNesnesi(BaseItem):
         # # # # # # debug start - pos() # # # # #
         # p = self.pos()
         # s = self.scenePos()
-        # painter.drawText(self.rect(), "{0:.2f},  {1:.2f}\n{2:.2f},  {3:.2f}".format(p.x(), p.y(), s.x(), s.y()))
+        # painter.drawText(self._rect, "{0:.2f},  {1:.2f}\n{2:.2f},  {3:.2f}".format(p.x(), p.y(), s.x(), s.y()))
         # # t = self.transformOriginPoint()
         # # painter.drawRect(t.x()-12, t.y()-12,24,24)
-        # mapped = self.mapToScene(self.rect().topLeft())
-        # painter.drawText(self.rect().x(), self.rect().y(), "{0:.2f}  {1:.2f}".format(mapped.x(), mapped.y()))
+        # mapped = self.mapToScene(self._rect.topLeft())
+        # painter.drawText(self._rect.x(), self._rect.y(), "{0:.2f}  {1:.2f}".format(mapped.x(), mapped.y()))
         # r = self.textItem.boundingRect()
         # r = self.mapRectFromItem(self.textItem, r)
         # painter.drawRect(r)
-        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
+        # painter.drawText(self._rect.center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
         # # # # # # debug end - pos() # # # # #
 
     # ---------------------------------------------------------------------

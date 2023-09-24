@@ -8,7 +8,7 @@ __date__ = '04/Sep/2016'
 import os
 
 from PySide6.QtCore import Qt, QUrl, QSizeF, QRectF, QPointF, QPoint, QLine
-from PySide6.QtGui import QPen, QPixmap, QPixmapCache, QPainterPath
+from PySide6.QtGui import QPen, QPixmap, QPixmapCache, QPainterPath, QColor
 from PySide6.QtWidgets import QStyle
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PySide6.QtMultimediaWidgets import QGraphicsVideoItem
@@ -43,6 +43,9 @@ class VideoItem(BaseItem):
         self.videoItem = GraphicsVideoItem()
         self.videoItem.setFlag(QGraphicsVideoItem.GraphicsItemFlag.ItemStacksBehindParent)
         rect.setSize(self.videoItem.size())
+
+        #
+        arkaPlanRengi = QColor(0, 0, 0, 0)
         super(VideoItem, self).__init__(pos, rect, yaziRengi, arkaPlanRengi, pen, font, parent)
         # QGraphicsVideoItem.__init__(parent)
         # super(VideoItem, self).__init__(parent)
@@ -51,6 +54,8 @@ class VideoItem(BaseItem):
         # self.videoItem = QGraphicsVideoItem(self)
         # self.videoItem = GraphicsVideoItem(self)
         # self.videoItem.setFlag(QGraphicsVideoItem.ItemStacksBehindParent)
+
+        self.kenarPen = QPen(pen.color(), 3, Qt.PenStyle.SolidLine)
 
         self.videoItem.nativeSizeChanged.connect(self.act_native_size_changed)
         # resolution = media.canonicalResource().resolution()
@@ -148,6 +153,13 @@ class VideoItem(BaseItem):
             self.hoverMoveEvent = super(VideoItem, self).hoverMoveEvent
 
     # ---------------------------------------------------------------------
+    def kareAl(self):
+
+        # self.player.setPosition()
+        image = self.player.videoSink().videoFrame().toImage()
+        return image
+
+    # ---------------------------------------------------------------------
     def setRect(self, rect):
         if self._rect == rect:
             return
@@ -225,7 +237,7 @@ class VideoItem(BaseItem):
                       "isEmbeded": self.isEmbeded,
                       "filePath": self.filePathForSave,
                       "originalSourceFilePath": self.originalSourceFilePath,
-                      "rect": self.rect(),
+                      "rect": self._rect,
                       "pos": self.pos(),
                       "rotation": self.rotation(),
                       "zValue": self.zValue(),
@@ -486,21 +498,21 @@ class VideoItem(BaseItem):
 
             rect = QRectF(topLeft, bottomRight)
 
-            c = self.rect().center()
+            c = self._rect.center()
 
             # Alt Key - to resize around center.
             if event.modifiers() == Qt.KeyboardModifier.AltModifier:
                 rect.moveCenter(c)
 
             # ---------------------------------------------------------------------
-            tl = self.rect().topLeft()
-            tr = self.rect().topRight()
-            br = self.rect().bottomRight()
-            bl = self.rect().bottomLeft()
-            c = self.rect().center()
+            tl = self._rect.topLeft()
+            tr = self._rect.topRight()
+            br = self._rect.bottomRight()
+            bl = self._rect.bottomLeft()
+            c = self._rect.center()
 
             yeniSize = rect.size()
-            eskiSize = self.rect().size()
+            eskiSize = self._rect.size()
             # eskiSize.scale(yeniSize, Qt.KeepAspectRatio)
             eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.AspectRatioMode.KeepAspectRatioByExpanding)
             # eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.KeepAspectRatio)
@@ -662,13 +674,48 @@ class VideoItem(BaseItem):
 
     # ---------------------------------------------------------------------
     def paint(self, painter, option, widget=None):
-        super(VideoItem, self).paint(painter, option, widget)
+        # super(VideoItem, self).paint(painter, option, widget)
 
-        # painter.drawRect(self.sliderRect)
-        # painter.drawEllipse(self.sliderEllipse)
+        if not self._pen.width():
+            painter.setPen(Qt.PenStyle.NoPen)
+        else:
+            painter.setPen(self._pen)
+        painter.setBrush(self._brush)
 
-        # painter.drawEllipse(self.videoSliderEllipseRect)
-        # painter.drawRect(self.boundingRect())
+        painter.setPen(self.kenarPen)
+        painter.drawRect(self._rect)
+
+        if self._text:
+            # painter.setWorldMatrixEnabled(False)
+            painter.save()
+            painter.setFont(self._font)
+            # we recreate textPen from same exact color. otherwise, color's alpha not working.
+            painter.setPen(self.textPen)
+            painter.translate(self._rect.center())
+            painter.rotate(-self.rotation())
+
+            painter.translate(-self._rect.center())
+
+            painter.drawText(self.painterTextRect, self._text, self.painterTextOption)
+
+            # painter.drawText(10,10, txt)
+            painter.restore()
+            # painter.setWorldMatrixEnabled(True)
+
+        # if option.state & QStyle.State_MouseOver:
+        if option.state & QStyle.StateFlag.State_Selected or self.cosmeticSelect:
+            # painter.setPen(QPen(option.palette.windowText(), 0, Qt.DashLine))
+            # painter.setPen(QPen(option.palette.highlight(), 0, Qt.DashLine))
+
+            if self.isActiveItem:
+                selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
+            else:
+                selectionPenBottom = self.selectionPenBottom
+
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+
+            painter.setPen(selectionPenBottom)
+            painter.drawRect(self.rect())
 
         if option.state & QStyle.StateFlag.State_MouseOver:
             painter.setOpacity(0.7)
@@ -694,20 +741,20 @@ class VideoItem(BaseItem):
         # # # # # # debug start - pos() # # # # #
         # p = self.pos()
         # s = self.scenePos()
-        # painter.drawText(self.rect(), "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
+        # painter.drawText(self._rect, "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
         # # # t = self.transformOriginPoint()
         # # # painter.drawRect(t.x()-12, t.y()-12,24,24)
-        # mapped = self.mapToScene(self.rect().topLeft())
-        # painter.drawText(self.rect().x(), self.rect().y(), "{0:.2f}  {1:.2f} map".format(mapped.x(), mapped.y()))
+        # mapped = self.mapToScene(self._rect.topLeft())
+        # painter.drawText(self._rect.x(), self._rect.y(), "{0:.2f}  {1:.2f} map".format(mapped.x(), mapped.y()))
         # painter.drawEllipse(self.scenePos(), 10, 10)
         # painter.setPen(Qt.blue)
         # painter.drawEllipse(self.mapFromScene(self.pos()), 10, 10)
         # r = self.textItem.boundingRect()
         # r = self.mapRectFromItem(self.textItem, r)
         # painter.drawRect(r)
-        # painter.drawText(self.rect().center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
+        # painter.drawText(self._rect.center(), "{0:f}  {1:f}".format(self.sceneWidth(), self.sceneHeight()))
         # painter.setPen(QPen(Qt.red,17))
-        # painter.drawPoint(self.rect().center())
+        # painter.drawPoint(self._rect.center())
         # painter.setPen(QPen(Qt.green,12))
         # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
         # painter.setPen(QPen(Qt.blue,8))
