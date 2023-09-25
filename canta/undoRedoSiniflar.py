@@ -300,6 +300,29 @@ class UndoableMovePathPoint(QUndoCommand):
 
 
 ########################################################################
+class UndoableDeletePathPoint(QUndoCommand):
+
+    # ---------------------------------------------------------------------
+    def __init__(self, description, item, eskiPath, yeniPath, parent=None):
+        """ """
+        super(UndoableDeletePathPoint, self).__init__(description, parent)
+
+        self.item = item
+        self.eskiPath = eskiPath
+        self.yeniPath = yeniPath
+
+    # ---------------------------------------------------------------------
+    def undo(self):
+        self.item.setPath(self.eskiPath)
+        # self.item.update()
+
+    # ---------------------------------------------------------------------
+    def redo(self):
+        self.item.setPath(self.yeniPath)
+        # self.item.update()
+
+
+########################################################################
 class UndoableGroup(QUndoCommand):
     """ """
 

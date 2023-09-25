@@ -5,7 +5,7 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
-from PySide6.QtCore import Qt, QRectF, QRect, QSizeF, QSize, QPointF, Slot, QBuffer, QIODevice
+from PySide6.QtCore import Qt, QRectF, QSizeF, QPointF, Slot, QBuffer, QIODevice
 from PySide6.QtGui import QPainterPath, QPainterPathStroker, QPen, QBrush, QColor, QTransform, QTextOption, QPainter
 from PySide6.QtSvg import QSvgGenerator
 from PySide6.QtWidgets import QGraphicsItem, QStyle
@@ -245,7 +245,7 @@ class PathItem(QGraphicsItem):
         path = self.mapToScene(self._path)
         liste = self.toList(path)
         right = liste[0]
-        for i in range(path.elementCount()):
+        for _ in range(path.elementCount()):
             right = max(liste, key=lambda e: e[0])
 
         return right[0]
@@ -256,7 +256,7 @@ class PathItem(QGraphicsItem):
         path = self.mapToScene(self._path)
         liste = self.toList(path)
         left = liste[0]
-        for i in range(path.elementCount()):
+        for _ in range(path.elementCount()):
             left = min(liste, key=lambda e: e[0])
 
         return left[0]
@@ -266,7 +266,7 @@ class PathItem(QGraphicsItem):
         path = self.mapToScene(self._path)
         liste = self.toList(path)
         top = liste[1]
-        for i in range(path.elementCount()):
+        for _ in range(path.elementCount()):
             top = min(liste, key=lambda e: e[1])
 
         return top[1]
@@ -276,7 +276,7 @@ class PathItem(QGraphicsItem):
         path = self.mapToScene(self._path)
         liste = self.toList(path)
         bottom = liste[1]
-        for i in range(path.elementCount()):
+        for _ in range(path.elementCount()):
             bottom = max(liste, key=lambda e: e[1])
 
         return bottom[1]
@@ -1046,7 +1046,7 @@ class PathItem(QGraphicsItem):
             if en_yakin_nokta_degeri < 7:
                 self.secilen_nokta_idx = liste.index(en_yakin_nokta_degeri)
                 self.secilen_nokta = self._path.elementAt(self.secilen_nokta_idx)
-                print(self.secilen_nokta.x, self.secilen_nokta.y)
+                # print(self.secilen_nokta.x, self.secilen_nokta.y)
                 self.movedPointsList.append((self.secilen_nokta_idx, self.secilen_nokta.x, self.secilen_nokta.y))
                 self.update()
 
@@ -1075,24 +1075,15 @@ class PathItem(QGraphicsItem):
         super(PathItem, self).mouseReleaseEvent(event)
 
         if self.secilen_nokta:
-
-            self.scene().undoStack.beginMacro("move {} point(s)".format(len(self.movedPointsList)))
-            for secilen_nokta_idx, eskiX, eskiY in self.movedPointsList:
-                self.scene().undoRedo.undoableMovePathPoint(undoStack=self.scene().undoStack,
-                                                            description=self.scene().tr("Path point moved"),
-                                                            item=self,
-                                                            movedPointIndex=secilen_nokta_idx,
-                                                            eskiPosTuple=(eskiX, eskiY),
-                                                            yeniPosTuple=(self._path.elementAt(secilen_nokta_idx).x,
-                                                                          self._path.elementAt(secilen_nokta_idx).y)
-                                                            )
-            self.scene().undoStack.endMacro()
-
-            # TODO: bu yukarda for dongusu ve macro yokmus gib su an tek nesne varmis gibi secilen nokta none diyor
-            # bir cok nokta secmek ozelligi eklenirse bunu degistirmek lazim
+            if event.modifiers() == Qt.KeyboardModifier.AltModifier:
+                self.secilen_noktalari_sil()
+            else:
+                self.secilen_noktalari_tasi()
 
             self.movedPointsList = []
-            self.secilen_nokta = None
+            # TODO: bu yukarda for dongusu ve macro yokmus gib su an tek nesne varmis gibi secilen nokta none diyor
+            # bir cok nokta secmek ozelligi eklenirse bunu degistirmek lazim
+            # self.secilen_nokta = None
             # self.update()
 
         self.scene().unite_with_scene_rect(self.sceneBoundingRect())
@@ -1102,6 +1093,45 @@ class PathItem(QGraphicsItem):
                 self.scene().select_all_children_recursively(self, cosmeticSelect=False, topmostParent=True)
             else:
                 self.scene().select_all_children_recursively(self, cosmeticSelect=False)
+
+    # ---------------------------------------------------------------------
+    def secilen_noktalari_tasi(self):
+        self.scene().undoStack.beginMacro("move {} point(s)".format(len(self.movedPointsList)))
+        for secilen_nokta_idx, eskiX, eskiY in self.movedPointsList:
+            self.scene().undoRedo.undoableMovePathPoint(undoStack=self.scene().undoStack,
+                                                        description=self.scene().tr("Path point moved"),
+                                                        item=self,
+                                                        movedPointIndex=secilen_nokta_idx,
+                                                        eskiPosTuple=(eskiX, eskiY),
+                                                        yeniPosTuple=(self._path.elementAt(secilen_nokta_idx).x,
+                                                                      self._path.elementAt(secilen_nokta_idx).y)
+                                                        )
+        self.scene().undoStack.endMacro()
+
+    # ---------------------------------------------------------------------
+    def secilen_noktalari_sil(self):
+        """Deneysel, ilk versiyon"""
+        # TODO: bas ve son noktalar, ve de bunlara bagli degisebilecek isPathClosed durumu
+        # print("noktalar", secilenNoktalar)
+
+        # 2 for , slice ile, iflerden kurtulunulabilir
+        secilenNoktalar = [idx[0] for idx in self.movedPointsList]
+        yeniPath = QPainterPath()
+        e0 = self._path.elementAt(0)
+        yeniPath.moveTo(e0.x, e0.y)
+        for i in range(self._path.elementCount()):
+            if i not in secilenNoktalar:
+                e = self._path.elementAt(i)
+                yeniPath.lineTo(e.x, e.y)
+        if self.isPathClosed:
+            yeniPath.closeSubpath()
+            self.setBrush(self.arkaPlanRengi)
+
+        self.scene().undoRedo.undoableDeletePathPoint(undoStack=self.scene().undoStack,
+                                                      description=self.scene().tr("Path point deleted"),
+                                                      item=self,
+                                                      eskiPath=self._path,
+                                                      yeniPath=yeniPath)
 
     # ---------------------------------------------------------------------
     def paint(self, painter, option, widget=None):
@@ -1160,7 +1190,8 @@ class PathItem(QGraphicsItem):
                 # painter.drawPath(self._path)
 
                 path = self._path
-                painter.setPen(QPen(self.cizgiRengi, 5))
+                # painter.setPen(QPen(self.cizgiRengi, 5))
+                painter.setPen(QPen(Qt.GlobalColor.white, 5))
                 for i in range(path.elementCount()):
                     painter.drawPoint(QPointF(path.elementAt(i).x, path.elementAt(i).y))
                 if self.secilen_nokta:
@@ -1172,20 +1203,20 @@ class PathItem(QGraphicsItem):
                 painter.setPen(selectionPenBottom)
                 painter.drawRect(self.boundingRect())
 
-        if option.state & QStyle.StateFlag.State_MouseOver:
-            painter.setBrush(Qt.BrushStyle.NoBrush)
-            painter.setPen(self.selectionPenBottom)
-            painter.drawPath(self._path)
+        # if option.state & QStyle.StateFlag.State_MouseOver:
+        #     painter.setBrush(Qt.BrushStyle.NoBrush)
+        #     painter.setPen(self.selectionPenBottom)
+        #     painter.drawPath(self._path)
 
-                # painter.setPen(self.selectionPenTop)
-                # painter.drawRect(self.boundingRect())
+        # painter.setPen(self.selectionPenTop)
+        # painter.drawRect(self.boundingRect())
 
-            # if self.editMode:
-            #     # for a future release, draw points
-            #     path = self._path
-            #     painter.setPen(QPen(self.cizgiRengi, 10))
-            #     for i in range(path.elementCount()):
-            #         painter.drawPoint(QPointF(path.elementAt(i).x, path.elementAt(i).y))
+        # if self.editMode:
+        #     # for a future release, draw points
+        #     path = self._path
+        #     painter.setPen(QPen(self.cizgiRengi, 10))
+        #     for i in range(path.elementCount()):
+        #         painter.drawPoint(QPointF(path.elementAt(i).x, path.elementAt(i).y))
 
         # # # # # debug start - pos() # # # # #
         # p = self.pos()

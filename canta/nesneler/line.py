@@ -19,7 +19,7 @@ from canta.nesneler.tempTextItem import TempTextItem
 class LineItem(QGraphicsItem):
     Type = shared.LINE_ITEM_TYPE
 
-    def __init__(self, pos, pen, yaziRengi=None, arkaPlanRengi=QColor(Qt.GlobalColor.transparent),
+    def __init__(self, pos, pen, yaziRengi=None, arkaPlanRengi=Qt.GlobalColor.transparent,
                  font=None, line=None,
                  parent=None):
         super(LineItem, self).__init__(parent)

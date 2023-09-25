@@ -5,19 +5,19 @@ __project_name__ = 'Defter'
 __date__ = '05/Nov/2018'
 __author__ = 'Erdinç Yılmaz'
 
-from canta.undoRedoSiniflar import UndoableSayfaAdiDegistir, UndoableAddItem, UndoableRemoveItem, UndoableGroup, \
-    UndoableUnGroup, UndoableParent, UndoableUnParent, UndoableResizeBaseItem, UndoableScaleBaseItemByResizing, \
-    UndoableScalePathItemByScalingPath, UndoableSetFont, UndoableSetFontSizeF, UndoableRotate, \
-    UndoableRotateWithOffset, UndoableSetZValue, UndoableSetLineStyle, UndoableSetLineJoinStyle, \
-    UndoableSetLineCapStyle, UndoableSetLineColor, UndoableSetTextColor, \
-    UndoableSetLineColorAlpha, UndoableSetTextColorAlpha, UndoableSetItemBackgroundColor, \
-    UndoableSetItemBackgroundColorAlpha, UndoableApplyStylePresetToItem, UndoableApplyStylePreset, \
-    UndoableSetImageOpacity, UndoableSetSceneBackgroundBrush, UndoableSetSceneBackgroundImage, \
-    UndoableEmbedSceneBackgroundImage, UndoableSetPinStatus, UndoableItemSetText, UndoableItemCustomCommand, \
-    UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, UndoableResizeLineItem, \
-    UndoableMovePathPoint, UndoableSetTextAlignment, UndoableSetCharacterFormat, UndoableSetLineWidthF, \
-    UndoableConvertToPlainText, UndoRedoBaglantisiYaziNesnesiDocuna, UndoableScaleLineItemByScalingLine, \
-    UndoableScaleTextItemByResizing, UndoableScaleGroupItemByResizing
+from canta.undoRedoSiniflar import (UndoableSayfaAdiDegistir, UndoableAddItem, UndoableRemoveItem, UndoableGroup,
+                                    UndoableUnGroup, UndoableParent, UndoableUnParent, UndoableResizeBaseItem, UndoableScaleBaseItemByResizing,
+                                    UndoableScalePathItemByScalingPath, UndoableSetFont, UndoableSetFontSizeF, UndoableRotate,
+                                    UndoableRotateWithOffset, UndoableSetZValue, UndoableSetLineStyle, UndoableSetLineJoinStyle,
+                                    UndoableSetLineCapStyle, UndoableSetLineColor, UndoableSetTextColor,
+                                    UndoableSetLineColorAlpha, UndoableSetTextColorAlpha, UndoableSetItemBackgroundColor,
+                                    UndoableSetItemBackgroundColorAlpha, UndoableApplyStylePresetToItem, UndoableApplyStylePreset,
+                                    UndoableSetImageOpacity, UndoableSetSceneBackgroundBrush, UndoableSetSceneBackgroundImage,
+                                    UndoableEmbedSceneBackgroundImage, UndoableSetPinStatus, UndoableItemSetText, UndoableItemCustomCommand,
+                                    UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, UndoableResizeLineItem,
+                                    UndoableMovePathPoint, UndoableSetTextAlignment, UndoableSetCharacterFormat, UndoableSetLineWidthF,
+                                    UndoableConvertToPlainText, UndoRedoBaglantisiYaziNesnesiDocuna, UndoableScaleLineItemByScalingLine,
+                                    UndoableScaleTextItemByResizing, UndoableScaleGroupItemByResizing, UndoableDeletePathPoint)
 
 
 # ---------------------------------------------------------------------
@@ -304,4 +304,9 @@ def undoableMove(undoStack, description, movedItem, eskiPosition):
 # ---------------------------------------------------------------------
 def undoableMovePathPoint(undoStack, description, item, movedPointIndex, eskiPosTuple, yeniPosTuple):
     command = UndoableMovePathPoint(description, item, movedPointIndex, eskiPosTuple, yeniPosTuple)
+    undoStack.push(command)
+
+# ---------------------------------------------------------------------
+def undoableDeletePathPoint(undoStack, description, item, eskiPath, yeniPath):
+    command = UndoableDeletePathPoint(description, item, eskiPath, yeniPath)
     undoStack.push(command)
