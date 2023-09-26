@@ -17,6 +17,7 @@ import zipfile
 import shutil
 import tempfile
 import platform
+from math import sqrt
 from collections import deque
 
 # from PySide6.QtOpenGL import QGLWidget
@@ -186,7 +187,7 @@ class DefterAnaPencere(QMainWindow):
         self.olustur_cizgi_ozellikleri_toolbar()
         self.olustur_font_toolbar()
         self.olustur_renk_toolbar()
-        self.olustur_align_toolbar()
+        self.olustur_nesne_hizalama_arac_cubugu()
         self.olustur_menu_bar()
         self.olustur_utilities_toolbar()
         self.olustur_status_bar()
@@ -3863,13 +3864,13 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleRenkAracCubugu.triggered.connect(
             lambda: self.renkAracCubugu.setVisible(not self.renkAracCubugu.isVisible()))
 
-        self.actionToggleAlignToolbar = QAction(QIcon(':icons/align-top-edges.png'),
+        self.actionToggleHizalaAracCubugu = QAction(QIcon(':icons/align-top-edges.png'),
                                                 self.tr('Mirror - Align - Distribute'),
                                                 toolBarsMenu)
-        self.actionToggleAlignToolbar.setShortcut(QKeySequence("Ctrl+6"))
-        self.actionToggleAlignToolbar.setCheckable(True)
-        self.actionToggleAlignToolbar.triggered.connect(
-            lambda: self.alignToolBar.setVisible(not self.alignToolBar.isVisible()))
+        self.actionToggleHizalaAracCubugu.setShortcut(QKeySequence("Ctrl+6"))
+        self.actionToggleHizalaAracCubugu.setCheckable(True)
+        self.actionToggleHizalaAracCubugu.triggered.connect(
+            lambda: self.hizalaAracCubugu.setVisible(not self.hizalaAracCubugu.isVisible()))
 
         self.actionToggleUtilitiesToolbar = QAction(QIcon(':icons/properties.png'), self.tr('Utilities'), toolBarsMenu)
         self.actionToggleUtilitiesToolbar.setShortcut(QKeySequence("Ctrl+7"))
@@ -3883,7 +3884,7 @@ class DefterAnaPencere(QMainWindow):
                                  self.actionToggleFontToolbar,
                                  self.actionTogglecizgiOzellikleriToolBar,
                                  self.actionToggleRenkAracCubugu,
-                                 self.actionToggleAlignToolbar,
+                                 self.actionToggleHizalaAracCubugu,
                                  self.actionToggleUtilitiesToolbar))
 
         dockWidgetsMenu = QMenu(self.tr("Panels"), self.viewMenu)
@@ -4173,6 +4174,9 @@ class DefterAnaPencere(QMainWindow):
         self.actionShowVideoInfo = QAction(QIcon(':icons/info.png'), self.tr("Show video info"), self.nesneSagMenu)
         self.actionShowVideoInfo.triggered.connect(self.act_show_video_info)
 
+        self.actionVideoyuResmeCevir = QAction(QIcon(':icons/file-image.png'), self.tr("Video to image(s)"), self.nesneSagMenu)
+        self.actionVideoyuResmeCevir.triggered.connect(self.act_videoyu_resme_cevir)
+
         # ---------------------------------------------------------------------
         self.actionEmbedDosya = QAction(QIcon(":icons/command.png"), self.tr("Embed file(s) to document"),
                                         self.nesneSagMenu)
@@ -4297,6 +4301,7 @@ class DefterAnaPencere(QMainWindow):
                                       self.actionEditCommand,
                                       self.videoSagMenu.addSeparator(),
                                       self.actionShowVideoInfo,
+                                      self.actionVideoyuResmeCevir,
                                       self.videoSagMenu.addSeparator(),
                                       self.actionEmbedVideo,
                                       self.actionExportVideo,
@@ -4544,6 +4549,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionEmbedVideo,
                                           self.actionExportVideo,
                                           self.actionShowVideoInfo,
+                                          self.actionVideoyuResmeCevir,
                                           self.actionEmbedDosya,
                                           self.actionExportDosya,
                                           self.actionPdfyiResmeCevir,
@@ -4593,7 +4599,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionTumAracCubuklariniGoster,
                                           self.actionToggleToolsToolbar,
                                           self.actionTogglePropertiesToolbar,
-                                          self.actionToggleAlignToolbar,
+                                          self.actionToggleHizalaAracCubugu,
                                           self.actionToggleFontToolbar,
                                           self.actionToggleRenkAracCubugu,
                                           self.actionTogglecizgiOzellikleriToolBar,
@@ -4638,8 +4644,9 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionAlignHorizontalCenter,
                                           self.actionEqualizeHorizontalGaps,
                                           self.actionEqualizeVerticalGaps,
-                                          self.actionDistributeItemsVertically,
-                                          self.actionDistributeItemsHorizontally,
+                                          self.actionNesneleriDagitDikeyde,
+                                          self.actionNesneleriDagitYatayda,
+                                          self.actionNesneleriDagit,
                                           # utilities menu
                                           self.actionSecimEkranGoruntusuAlCmOn
                                           ))
@@ -5334,87 +5341,92 @@ class DefterAnaPencere(QMainWindow):
             self.btnYaziHizalaSigdir.setChecked(True)
 
     # ---------------------------------------------------------------------
-    def olustur_align_toolbar(self):
-        self.alignToolBar = QToolBar(self)
-        self.alignToolBar.setObjectName("alignToolBar")
-        self.alignToolBar.setWindowTitle(self.tr("Align Tool Bar"))
-        self.alignToolBar.setIconSize(QSize(16, 16))
+    def olustur_nesne_hizalama_arac_cubugu(self):
+        self.hizalaAracCubugu = QToolBar(self)
+        self.hizalaAracCubugu.setObjectName("hizalaAracCubugu")
+        self.hizalaAracCubugu.setWindowTitle(self.tr("Align Tool Bar"))
+        self.hizalaAracCubugu.setIconSize(QSize(16, 16))
 
-        self.actionMirrorX = QAction(QIcon(':icons/mirror-x.png'), self.tr("Mirror X"), self.alignToolBar)
+        self.actionMirrorX = QAction(QIcon(':icons/mirror-x.png'), self.tr("Mirror X"), self.hizalaAracCubugu)
         self.actionMirrorX.setShortcut(QKeySequence("M"))
         self.actionMirrorX.triggered.connect(self.act_pre_mirror_x)
 
-        self.actionMirrorY = QAction(QIcon(':icons/mirror-y.png'), self.tr("Mirror Y"), self.alignToolBar)
+        self.actionMirrorY = QAction(QIcon(':icons/mirror-y.png'), self.tr("Mirror Y"), self.hizalaAracCubugu)
         self.actionMirrorY.setShortcut(QKeySequence("B"))
         self.actionMirrorY.triggered.connect(self.act_pre_mirror_y)
 
         self.actionAlignLeft = QAction(QIcon(':icons/align-left-edges.png'), self.tr("Align left edges"),
-                                       self.alignToolBar)
+                                       self.hizalaAracCubugu)
         self.actionAlignLeft.setShortcut(QKeySequence("Shift+Ctrl+Left"))
         self.actionAlignLeft.triggered.connect(self.act_align_left)
 
         self.actionAlignRight = QAction(QIcon(':icons/align-right-edges.png'), self.tr("Align right edges"),
-                                        self.alignToolBar)
+                                        self.hizalaAracCubugu)
         self.actionAlignRight.setShortcut(QKeySequence("Shift+Ctrl+Right"))
         self.actionAlignRight.triggered.connect(self.act_align_right)
 
         self.actionAlignTop = QAction(QIcon(':icons/align-top-edges.png'), self.tr("Align top edges"),
-                                      self.alignToolBar)
+                                      self.hizalaAracCubugu)
         self.actionAlignTop.setShortcut(QKeySequence("Shift+Ctrl+Up"))
         self.actionAlignTop.triggered.connect(self.act_align_top)
 
         self.actionAlignBottom = QAction(QIcon(':icons/align-bottom-edges.png'), self.tr("Align bottom edges"),
-                                         self.alignToolBar)
+                                         self.hizalaAracCubugu)
         self.actionAlignBottom.setShortcut(QKeySequence("Shift+Ctrl+Down"))
         self.actionAlignBottom.triggered.connect(self.act_align_bottom)
 
         self.actionAlignVerticalCenter = QAction(QIcon(':icons/align-centers-vertically.png'),
-                                                 self.tr("Align centers vertically"), self.alignToolBar)
+                                                 self.tr("Align centers vertically"), self.hizalaAracCubugu)
         self.actionAlignVerticalCenter.setShortcut(QKeySequence("Shift+Ctrl+V"))
         self.actionAlignVerticalCenter.triggered.connect(self.act_align_vertical_center)
 
         self.actionAlignHorizontalCenter = QAction(QIcon(':icons/align-centers-horizontally.png'),
-                                                   self.tr("Align centers horizontally"), self.alignToolBar)
+                                                   self.tr("Align centers horizontally"), self.hizalaAracCubugu)
         self.actionAlignHorizontalCenter.setShortcut(QKeySequence("Shift+Ctrl+H"))
         self.actionAlignHorizontalCenter.triggered.connect(self.act_align_horizontal_center)
 
         self.actionEqualizeHorizontalGaps = QAction(QIcon(':icons/equalize-horizontal-gaps.png'),
-                                                    self.tr("Make horizontal gaps between objects equal"),
-                                                    self.alignToolBar)
+                                                    self.tr("Make horizontal gaps between items equal"),
+                                                    self.hizalaAracCubugu)
         self.actionEqualizeHorizontalGaps.setShortcut(QKeySequence("Shift+Ctrl+X"))
         self.actionEqualizeHorizontalGaps.triggered.connect(self.act_equalize_horizontal_gaps)
 
         self.actionEqualizeVerticalGaps = QAction(QIcon(':icons/equalize-vertical-gaps.png'),
-                                                  self.tr("Make vertical gaps between objects equal"),
-                                                  self.alignToolBar)
+                                                  self.tr("Make vertical gaps between items equal"),
+                                                  self.hizalaAracCubugu)
         self.actionEqualizeVerticalGaps.setShortcut(QKeySequence("Shift+Ctrl+Y"))
         self.actionEqualizeVerticalGaps.triggered.connect(self.act_equalize_vertical_gaps)
 
-        self.actionDistributeItemsVertically = QAction(QIcon(':icons/distribute-vertically.png'),
-                                                       self.tr("Distribute objects"),
-                                                       self.alignToolBar)
-        self.actionDistributeItemsVertically.setShortcut(QKeySequence("Shift+Ctrl+D"))
-        self.actionDistributeItemsVertically.triggered.connect(self.act_distribute_items_vertically)
+        self.actionNesneleriDagitDikeyde = QAction(QIcon(':icons/distribute-vertically.png'),
+                                                   self.tr("Distribute items vertically"),
+                                                   self.hizalaAracCubugu)
+        self.actionNesneleriDagitDikeyde.setShortcut(QKeySequence("Shift+Ctrl+D"))
+        self.actionNesneleriDagitDikeyde.triggered.connect(self.act_nesneleri_dagit_dikeyde)
 
-        self.actionDistributeItemsHorizontally = QAction(QIcon(':icons/distribute-horizontally.png'),
-                                                         self.tr("Distribute objects"), self.alignToolBar)
-        self.actionDistributeItemsHorizontally.setShortcut(QKeySequence("Shift+Ctrl+F"))
-        self.actionDistributeItemsHorizontally.triggered.connect(self.act_distribute_items_horizontally)
+        self.actionNesneleriDagitYatayda = QAction(QIcon(':icons/distribute-horizontally.png'),
+                                                   self.tr("Distribute items horizontally"), self.hizalaAracCubugu)
+        self.actionNesneleriDagitYatayda.setShortcut(QKeySequence("Shift+Ctrl+F"))
+        self.actionNesneleriDagitYatayda.triggered.connect(self.act_nesneleri_dagit_yatayda)
 
-        self.alignToolBar.addActions((self.actionMirrorX,
-                                      self.actionMirrorY,
-                                      self.actionAlignLeft,
-                                      self.actionAlignVerticalCenter,
-                                      self.actionAlignRight,
-                                      self.actionEqualizeVerticalGaps,
-                                      self.actionAlignTop,
-                                      self.actionAlignHorizontalCenter,
-                                      self.actionAlignBottom,
-                                      self.actionEqualizeHorizontalGaps,
-                                      self.actionDistributeItemsVertically,
-                                      self.actionDistributeItemsHorizontally
+        self.actionNesneleriDagit = QAction(QIcon(':icons/distribute.png'),
+                                            self.tr("Distribute items"), self.hizalaAracCubugu)
+        self.actionNesneleriDagit.setShortcut(QKeySequence("Shift+Ctrl+M"))
+        self.actionNesneleriDagit.triggered.connect(self.act_nesneleri_dagit)
 
-                                      ))
+        self.hizalaAracCubugu.addActions((self.actionMirrorX,
+                                          self.actionMirrorY,
+                                          self.actionAlignLeft,
+                                          self.actionAlignVerticalCenter,
+                                          self.actionAlignRight,
+                                          self.actionEqualizeVerticalGaps,
+                                          self.actionAlignTop,
+                                          self.actionAlignHorizontalCenter,
+                                          self.actionAlignBottom,
+                                          self.actionEqualizeHorizontalGaps,
+                                          self.actionNesneleriDagitDikeyde,
+                                          self.actionNesneleriDagitYatayda,
+                                          self.actionNesneleriDagit
+                                          ))
 
         # alignLeft, right, top ,bottom, yatay merkez , dikey merkez
 
@@ -5422,7 +5434,7 @@ class DefterAnaPencere(QMainWindow):
 
         # distrubute space(yatay dikey , spacing , bu boslugu boluyor,)
 
-        self.addToolBar(self.alignToolBar)
+        self.addToolBar(self.hizalaAracCubugu)
 
         # self.alignMenu = QMenu()
 
@@ -5498,7 +5510,7 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleToolsToolbar.setChecked(self.toolsToolBar.isVisible())
         self.actionTogglePropertiesToolbar.setChecked(self.propertiesToolBar.isVisible())
         self.actionToggleUtilitiesToolbar.setChecked(self.utilitiesToolBar.isVisible())
-        self.actionToggleAlignToolbar.setChecked(self.alignToolBar.isVisible())
+        self.actionToggleHizalaAracCubugu.setChecked(self.hizalaAracCubugu.isVisible())
         self.actionToggleFontToolbar.setChecked(self.fontToolBar.isVisible())
         self.actionToggleRenkAracCubugu.setChecked(self.renkAracCubugu.isVisible())
         self.actionTogglecizgiOzellikleriToolBar.setChecked(self.cizgiOzellikleriToolBar.isVisible())
@@ -5508,7 +5520,7 @@ class DefterAnaPencere(QMainWindow):
         self.toolsToolBar.setVisible(True)
         self.propertiesToolBar.setVisible(True)
         self.utilitiesToolBar.setVisible(True)
-        self.alignToolBar.setVisible(True)
+        self.hizalaAracCubugu.setVisible(True)
         self.fontToolBar.setVisible(True)
         self.renkAracCubugu.setVisible(True)
         self.cizgiOzellikleriToolBar.setVisible(True)
@@ -7000,7 +7012,7 @@ class DefterAnaPencere(QMainWindow):
         self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
-    def act_distribute_items_vertically(self):
+    def act_nesneleri_dagit_dikeyde(self):
         self.lutfen_bekleyin_goster()
         items = self.cScene.get_selected_top_level_items()
 
@@ -7026,7 +7038,7 @@ class DefterAnaPencere(QMainWindow):
         self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
-    def act_distribute_items_horizontally(self):
+    def act_nesneleri_dagit_yatayda(self):
         self.lutfen_bekleyin_goster()
         items = self.cScene.get_selected_top_level_items()
 
@@ -7046,6 +7058,49 @@ class DefterAnaPencere(QMainWindow):
             eskiPos = item.pos()
             item.setSceneLeft(prevItemRightX + 5)
             prevItemRightX = item.sceneRight()
+            self.cScene.sinyal_nesne_tasindi(item, eskiPos)
+            self.cScene.unite_with_scene_rect(item.sceneBoundingRect())
+        self.cScene.undoStack.endMacro()
+        self.lutfen_bekleyin_gizle()
+
+    # ---------------------------------------------------------------------
+    def act_nesneleri_dagit(self):
+        self.lutfen_bekleyin_goster()
+        items = self.cScene.get_selected_top_level_items()
+
+        if not len(items) > 1:
+            self.lutfen_bekleyin_gizle()
+            if len(self.cScene.selectionQueue) > 1:
+                self.log(self.tr("Please select at least 2 (non-parented) items!"), 5000, toStatusBarOnly=True)
+            else:
+                self.log(self.tr("Please select at least 2 items!"), 5000, toStatusBarOnly=True)
+            return
+
+        kacaKac = int(sqrt(len(items))) + 1
+        kacaKacEksiBir = kacaKac - 1
+        satirMaxYukseklik = 0
+
+        # EKRANA GORE MI pozisyonlasak
+
+        # items.sort(key=operator.methodcaller('sceneTop'))
+        satirPosY = items[0].sceneTop()
+        # items.sort(key=operator.methodcaller('sceneLeft'))
+        prevItemRightX = items[0].sceneLeft()
+
+        self.cScene.undoStack.beginMacro(self.tr("distribute"))
+
+        # for i, item in enumerate(items[1:]):
+        for i, item in enumerate(items):
+            eskiPos = item.pos()
+            item.setSceneTop(satirPosY)
+            item.setSceneLeft(prevItemRightX)
+            prevItemRightX = item.sceneRight() + 5
+            if i % kacaKac == kacaKacEksiBir:
+                satirPosY += satirMaxYukseklik + 5
+                prevItemRightX = items[0].sceneLeft()
+                satirMaxYukseklik = 0
+            else:
+                satirMaxYukseklik = max(satirMaxYukseklik, item.sceneHeight())
             self.cScene.sinyal_nesne_tasindi(item, eskiPos)
             self.cScene.unite_with_scene_rect(item.sceneBoundingRect())
         self.cScene.undoStack.endMacro()
@@ -7241,7 +7296,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_about(self):
         QMessageBox.about(self, self.tr(f'About Defter {VERSION}'),
-                          self.tr('"Defter" is developed by Erdinc Yilmaz. Copyright (C) 2022 '))
+                          self.tr('"Defter" is developed by Erdinc Yilmaz. Copyright (C) 2023 '))
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -8415,7 +8470,7 @@ class DefterAnaPencere(QMainWindow):
             self.fontToolBar.hide()
             self.renkAracCubugu.hide()
             self.cizgiOzellikleriToolBar.hide()
-            self.alignToolBar.hide()
+            self.hizalaAracCubugu.hide()
             self.utilitiesToolBar.hide()
             self._statusBar.hide()
             self.mBar.hide()
@@ -9320,6 +9375,44 @@ class DefterAnaPencere(QMainWindow):
             # pdf.deleteLater()
 
         widget.show()
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def act_videoyu_resme_cevir(self):
+        videoNesne = self.cScene.activeItem
+        self.videoPos = videoNesne.scenePos() + QPoint(0, videoNesne.rect().height())
+
+        sablon_dosya_adi = "image-from-video.png"
+        imageSavePath = self.cScene.get_unique_path_for_embeded_image(sablon_dosya_adi)
+
+        video_img = videoNesne.kareAl()
+        video_img.save(imageSavePath)
+        # print(image.byteCount())
+
+        # pixMap = QPixmap(imageSavePath)
+        # pixMap = QPixmap(sayfa_img)
+        pixMap = QPixmap.fromImage(video_img)
+        rectf = QRectF(pixMap.rect())
+        imageItem = Image(imageSavePath, self.videoPos, rectf, pixMap,
+                          self.cScene.ResimAraci.yaziRengi,
+                          self.cScene.ResimAraci.arkaPlanRengi,
+                          QPen(self.cScene.ResimAraci.kalem),
+                          self.cScene.ResimAraci.yaziTipi)
+
+        imageItem.isEmbeded = True
+
+        self.increase_zvalue(imageItem)
+        self.cScene.undoRedo.undoableAddItem(self.cScene.undoStack, description=self.tr("Video to image"),
+                                             scene=self.cScene,
+                                             item=imageItem)
+        imageItem.reload_image_after_scale()
+        self.cScene.unite_with_scene_rect(imageItem.sceneBoundingRect())
+
+        # self.videoPos += QPoint(0, videoNesne.rect().height() + self.sayfa_arasi_bosluk)
+        # 
+        # self.lutfenBekleyinWidget.simdiki_deger_gir(sayfa_no)
+        # if sayfa_no == self.lutfenBekleyinWidget.yuzdeCubukEnCokDeger():
+        #     self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
     @Slot()
