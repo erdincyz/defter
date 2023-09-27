@@ -40,5 +40,6 @@ python3 defter.py
 ```
 komutu ile programı çalıştırabilirsiniz.
 
+### [YARDIM SAYFALARI](https://github.com/erdincyz/defter/wiki)
 
 ### Teşekkürler.
