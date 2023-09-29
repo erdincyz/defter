@@ -3475,8 +3475,8 @@ class DefterAnaPencere(QMainWindow):
         hot_close_active_tab.setContext(Qt.ShortcutContext.ApplicationShortcut)
 
         # hot_tercume_YW_goster_gizle = QShortcut(QKeySequence("Alt+0"),
-                                                                  self,
-                                                                  self.tercumeYW_goster_gizle)
+        #                                                          self,
+        #                                                          self.tercumeYW_goster_gizle)
         # hot_tercume_YW_goster_gizle.setContext(Qt.ShortcutContext.ApplicationShortcut)
 
     # ---------------------------------------------------------------------
