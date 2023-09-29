@@ -47,7 +47,7 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
         self.radioArkaplan.setChecked(True)
 
         self.setMinimumWidth(250)
-        self.setMinimumHeight(170)
+        self.setMinimumHeight(175)
 
     # ---------------------------------------------------------------------
     def olustur_radio(self):
@@ -74,6 +74,7 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
         radioLay.addWidget(self.radioYazi)
         radioLay.addWidget(self.radioCizgi)
 
+        self.anaLay.addSpacing(5)
         self.anaLay.addLayout(radioLay)
 
         self.radioBtnGroup.buttonToggled.connect(self.act_radio_secim_degisti)

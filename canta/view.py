@@ -81,6 +81,10 @@ class View(QGraphicsView):
             self.scene().parent().nesne_ozellikleriYW_goster_gizle()
             return
 
+        if event.modifiers() == Qt.KeyboardModifier.AltModifier:
+            self.scene().parent().stil_uygulaYW_goster_gizle()
+            return
+
         QGraphicsView.contextMenuEvent(self, event)
         # mouse altinda bir nesne varsa ve sag click menusunu gosterdiyse event.accepted() doner.
         if not event.isAccepted():

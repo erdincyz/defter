@@ -760,6 +760,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.stillerYuzenWidget = YuzenWidget(self)
         self.stillerYuzenWidget.hide()
+        self.stillerYuzenWidget.yazBaslik(self.tr("Style Presets"))
 
         self.yuzenStylePresetsListWidget = QListWidget(self.stillerYuzenWidget)
         self.yuzenStylePresetsListWidget.setMinimumWidth(100)

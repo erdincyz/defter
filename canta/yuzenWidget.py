@@ -6,6 +6,7 @@ __date__ = '26/1/22'
 __author__ = 'Erdinç Yılmaz'
 
 from PySide6.QtCore import Qt, QPoint
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSizePolicy
 
 
@@ -15,6 +16,10 @@ class YuzenWidget(QWidget):
     # ---------------------------------------------------------------------
     def __init__(self, parent=None):
         super(YuzenWidget, self).__init__(parent)
+
+        self.renkYazi = QColor(255, 255, 255)
+        # self.renkArkaplan = QColor(200, 205, 210)
+        self.renkArkaplan = QColor(153, 170, 187)
 
         # self.setMinimumHeight(400)
         self.setAutoFillBackground(True)
@@ -36,34 +41,41 @@ class YuzenWidget(QWidget):
         self.anaLay.setContentsMargins(1, 0, 1, 1)
         self.anaLay.setSpacing(1)
         # self.anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
-        baslikLay = QHBoxLayout()
-        baslikLay.setContentsMargins(0, 0, 0, 0)
-        baslikLay.setSpacing(0)
 
-        # tasiWidget = QWidget(self)
-        # tasiWidget.setMinimumHeight(30)
-        # tasiWidget.setMinimumWidth(50)
+        self.baslikWidget = QWidget(self)
+        self.baslikWidget.setFixedHeight(20)
+        self.baslikWidget.setContentsMargins(0, 0, 0, 0)
+        self.baslikWidget.setAutoFillBackground(True)
 
-        self.kapatBtn = QPushButton(self)
-        self.kapatBtn.setFlat(True)
-        self.kapatBtn.setText("X")
-        self.kapatBtn.setStyleSheet("QPushButton {background-color: #ddd;}")
-        # self.kapatBtn.setMinimumHeight(15)
-        # self.kapatBtn.setMinimumWidth(30)
-        self.kapatBtn.setMaximumWidth(30)
-        # self.kapatBtn.clicked.connect(self.close)
-        self.kapatBtn.clicked.connect(self.hide)
+        p = self.baslikWidget.palette()
+        p.setColor(self.baslikWidget.foregroundRole(), self.renkYazi)
+        p.setColor(self.baslikWidget.backgroundRole(), self.renkArkaplan)
+        self.baslikWidget.setPalette(p)
 
-        self.baslikEtiket = QLabel(self)
-        self.baslikEtiket.setStyleSheet("QLabel {background-color: #ddd;}")
-        baslikLay.addWidget(self.baslikEtiket)
-        # baslikLay.addStretch()
-        # baslikLay.addWidget(tasiWidget)
-        baslikLay.addWidget(self.kapatBtn)
+        self.baslikEtiket = QLabel(self.baslikWidget)
+        self.baslikEtiket.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.anaLay.addLayout(baslikLay)
+        lay = QHBoxLayout(self.baslikWidget)
+        lay.setContentsMargins(0, 0, 0, 0)
 
-        self.baslikEtiket.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        btnKapat = QPushButton("x", self.baslikWidget)
+        btnKapat.setFixedWidth(20)
+        btnKapat.setFlat(True)
+        btnKapat.setAutoFillBackground(True)
+        btnKapat.clicked.connect(self.hide)
+
+        p = btnKapat.palette()
+        p.setColor(btnKapat.foregroundRole(), self.renkYazi)
+        p.setColor(btnKapat.backgroundRole(), self.renkArkaplan)
+        btnKapat.setPalette(p)
+
+        # lay.addStretch()
+        lay.addSpacing(36)
+        lay.addWidget(self.baslikEtiket)
+        lay.addWidget(btnKapat)
+
+        self.anaLay.addWidget(self.baslikWidget)
+
         self.icerikToplamMinWidth = 0
         self.icerikToplamMinHeight = 0
 
