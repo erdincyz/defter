@@ -334,7 +334,7 @@ class DefterAnaPencere(QMainWindow):
         boyutLay.addWidget(self.itemRotationSBox_nesnedw)
         # ---------------------------------------------------------------------
 
-        self.nesneArkaplanRengiBtn = PushButtonRenk("", 36, 36, self.cScene.aktifArac.arkaPlanRengi, self.nesneGrupW)
+        self.nesneArkaplanRengiBtn = PushButtonRenk("", 40, 20, self.cScene.aktifArac.arkaPlanRengi, self.nesneGrupW)
         self.nesneArkaplanRengiBtn.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.nesneArkaplanRengiBtn.clicked.connect(self.act_set_item_background_color)
 
@@ -345,7 +345,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.nesne_arkaplan_rengi_btn_liste = []
 
-        for i in range(8):
+        for i in range(10):
             btn = self.ver_renk_palet_buton(tip="a", gen=15, yuk=15,
                                             renk=self.nesne_arkaplan_rengi_btn_liste_acilis_renkleri[i],
                                             parent=self.nesneGrupW)
@@ -354,23 +354,24 @@ class DefterAnaPencere(QMainWindow):
 
             self.nesne_arkaplan_rengi_btn_liste.append(btn)
 
-        for i in range(8, 16):
-            btn = self.ver_renk_palet_buton(tip="a", gen=15, yuk=15,
-                                            renk=self.nesne_arkaplan_rengi_btn_liste_acilis_renkleri[i],
-                                            parent=self.nesneGrupW)
-            btn.setFocusPolicy(Qt.FocusPolicy.TabFocus)
-            renklerSatir2Lay.addWidget(btn)
-
-            self.nesne_arkaplan_rengi_btn_liste.append(btn)
+        # for i in range(10, 20):
+        #     btn = self.ver_renk_palet_buton(tip="a", gen=16, yuk=16,
+        #                                     renk=self.nesne_arkaplan_rengi_btn_liste_acilis_renkleri[i],
+        #                                     parent=self.nesneGrupW)
+        #     btn.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+        #     renklerSatir2Lay.addWidget(btn)
+        #
+        #     self.nesne_arkaplan_rengi_btn_liste.append(btn)
 
         renklerSatirlarLay.addLayout(renklerSatir1Lay)
-        renklerSatirlarLay.addLayout(renklerSatir2Lay)
+        # renklerSatirlarLay.addLayout(renklerSatir2Lay)
         renklerDisLay.addWidget(self.nesneArkaplanRengiBtn)
         renklerDisLay.addLayout(renklerSatirlarLay)
         renklerDisLay.addStretch()
 
-        nesneLay.addLayout(renklerDisLay)
         nesneLay.addSpacing(5)
+        nesneLay.addLayout(renklerDisLay)
+        nesneLay.addSpacing(10)
         nesneLay.addLayout(boyutLay)
         nesneLay.addStretch()
         #######################################################################
@@ -422,18 +423,17 @@ class DefterAnaPencere(QMainWindow):
         # self.yaziListeBicmiAction = self.fontToolBar.addWidget(self.yaziListeBicimiCBox)
 
         # ---------------------------------------------------------------------
-        self.yaziRengiBtn = PushButtonRenk("", 36, 36, self.cScene.aktifArac.yaziRengi, self.yaziGrupW)
+        self.yaziRengiBtn = PushButtonRenk("", 40, 20, self.cScene.aktifArac.yaziRengi, self.yaziGrupW)
         self.yaziRengiBtn.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.yaziRengiBtn.clicked.connect(self.act_set_item_text_color)
 
         renklerDisLay = QHBoxLayout()
         renklerSatirlarLay = QVBoxLayout()
         renklerSatir1Lay = QHBoxLayout()
-        renklerSatir2Lay = QHBoxLayout()
 
         self.yazi_rengi_btn_liste = []
 
-        for i in range(8):
+        for i in range(10):
             btn = self.ver_renk_palet_buton(tip="y", gen=15, yuk=15, renk=self.yazi_rengi_btn_liste_acilis_renkleri[i],
                                             parent=self.yaziGrupW)
             btn.setFocusPolicy(Qt.FocusPolicy.TabFocus)
@@ -441,16 +441,7 @@ class DefterAnaPencere(QMainWindow):
 
             self.yazi_rengi_btn_liste.append(btn)
 
-        for i in range(8, 16):
-            btn = self.ver_renk_palet_buton(tip="y", gen=15, yuk=15, renk=self.yazi_rengi_btn_liste_acilis_renkleri[i],
-                                            parent=self.yaziGrupW)
-            btn.setFocusPolicy(Qt.FocusPolicy.TabFocus)
-            renklerSatir2Lay.addWidget(btn)
-
-            self.yazi_rengi_btn_liste.append(btn)
-
         renklerSatirlarLay.addLayout(renklerSatir1Lay)
-        renklerSatirlarLay.addLayout(renklerSatir2Lay)
         renklerDisLay.addWidget(self.yaziRengiBtn)
         renklerDisLay.addLayout(renklerSatirlarLay)
         renklerDisLay.addStretch()
@@ -552,8 +543,9 @@ class DefterAnaPencere(QMainWindow):
         lay.addWidget(self.yaziListeBicimiCBox)
         lay.addStretch()
 
-        yaziLay.addLayout(renklerDisLay)
         yaziLay.addSpacing(5)
+        yaziLay.addLayout(renklerDisLay)
+        yaziLay.addSpacing(10)
         yaziLay.addLayout(btnBicimlerLay)
         yaziLay.addSpacing(5)
         yaziLay.addWidget(self.fontCBox_yazidw)
@@ -641,31 +633,28 @@ class DefterAnaPencere(QMainWindow):
         cizgiOzellikleriniSifirlaBtn = QPushButton(self.tr("Reset"), self.cizgiGrupW)
         cizgiOzellikleriniSifirlaBtn.clicked.connect(self.act_cizgi_ozelliklerini_sifirla)
 
-        self.cizgiRengiBtn = PushButtonRenk("", 36, 36, self.cScene.aktifArac.cizgiRengi, self.cizgiGrupW)
+        self.cizgiRengiBtn = PushButtonRenk("", 40, 20, self.cScene.aktifArac.cizgiRengi, self.cizgiGrupW)
         self.cizgiRengiBtn.clicked.connect(self.act_set_item_line_color)
 
         renklerDisLay = QHBoxLayout()
         renklerSatirlarLay = QVBoxLayout()
         renklerSatir1Lay = QHBoxLayout()
-        renklerSatir2Lay = QHBoxLayout()
 
         self.cizgi_rengi_btn_liste = []
 
-        for i in range(8):
+        for i in range(10):
             btn = self.ver_renk_palet_buton(tip="c", gen=15, yuk=15, renk=self.cizgi_rengi_btn_liste_acilis_renkleri[i],
                                             parent=self.cizgiGrupW)
             renklerSatir1Lay.addWidget(btn)
 
             self.cizgi_rengi_btn_liste.append(btn)
 
-        for i in range(8, 16):
-            btn = self.ver_renk_palet_buton(tip="c", gen=15, yuk=15, renk=self.cizgi_rengi_btn_liste_acilis_renkleri[i],
-                                            parent=self.cizgiGrupW)
+        renklerSatirlarLay.addLayout(renklerSatir1Lay)
+        renklerDisLay.addWidget(self.cizgiRengiBtn)
+        renklerDisLay.addLayout(renklerSatirlarLay)
+        renklerDisLay.addStretch()
 
-            renklerSatir2Lay.addWidget(btn)
-
-            self.cizgi_rengi_btn_liste.append(btn)
-
+        cizgiLay.addSpacing(5)
         cizgiLay.addLayout(renklerDisLay)
         cizgiLay.addSpacing(5)
         cizgiLay.addWidget(self.cizgiKalinligiDSliderWithDSBox)
@@ -675,12 +664,6 @@ class DefterAnaPencere(QMainWindow):
         cizgiLay.addWidget(cizgiOzellikleriniSifirlaBtn)
         cizgiLay.addStretch()
         # anaLay.addStretch()
-
-        renklerSatirlarLay.addLayout(renklerSatir1Lay)
-        renklerSatirlarLay.addLayout(renklerSatir2Lay)
-        renklerDisLay.addWidget(self.cizgiRengiBtn)
-        renklerDisLay.addLayout(renklerSatirlarLay)
-        renklerDisLay.addStretch()
 
         # Renk Secici
         # ---------------------------------------------------------------------
@@ -1763,19 +1746,19 @@ class DefterAnaPencere(QMainWindow):
 
         self.yazi_rengi_btn_liste_acilis_renkleri = []
         self.settings.beginGroup("YaziRengiButonlari")
-        for i in range(16):
+        for i in range(10):
             self.yazi_rengi_btn_liste_acilis_renkleri.append(self.settings.value("{}".format(i)))
         self.settings.endGroup()
 
         self.nesne_arkaplan_rengi_btn_liste_acilis_renkleri = []
         self.settings.beginGroup("NesneArkaplanRengiButonlari")
-        for i in range(16):
+        for i in range(10):
             self.nesne_arkaplan_rengi_btn_liste_acilis_renkleri.append(self.settings.value("{}".format(i)))
         self.settings.endGroup()
 
         self.cizgi_rengi_btn_liste_acilis_renkleri = []
         self.settings.beginGroup("CizgiRengiButonlari")
-        for i in range(16):
+        for i in range(10):
             self.cizgi_rengi_btn_liste_acilis_renkleri.append(self.settings.value("{}".format(i)))
         self.settings.endGroup()
 
@@ -3491,18 +3474,10 @@ class DefterAnaPencere(QMainWindow):
                                          lambda throw_away=0: self.close_selected_tab(self.tabWidget.currentIndex()))
         hot_close_active_tab.setContext(Qt.ShortcutContext.ApplicationShortcut)
 
-        hot_stil_uygula_yuzen_listwidget_goster_gizle = QShortcut(QKeySequence("Alt+0"),
+        # hot_tercume_YW_goster_gizle = QShortcut(QKeySequence("Alt+0"),
                                                                   self,
-                                                                  self.stil_uygula_yuzen_listwidget_goster_gizle)
-        hot_stil_uygula_yuzen_listwidget_goster_gizle.setContext(Qt.ShortcutContext.ApplicationShortcut)
-
-        # lambda: self.toolsToolBar.setVisible(not self.toolsToolBar.isVisible())
-
-        # hot_clean_mode = QShortcut(QKeySequence("Ctrl+H"),
-        #                            self,
-        #                            # lambda: self.actionCleanMode.setChecked(not self.actionCleanMode.isChecked()))
-        #                            self.actionCleanMode.trigger)
-        # hot_clean_mode.setContext(Qt.ShortcutContext.ApplicationShortcut)
+                                                                  self.tercumeYW_goster_gizle)
+        # hot_tercume_YW_goster_gizle.setContext(Qt.ShortcutContext.ApplicationShortcut)
 
     # ---------------------------------------------------------------------
     def olustur_status_bar(self):
@@ -4686,7 +4661,7 @@ class DefterAnaPencere(QMainWindow):
         # menu.popup(pos)  # async , does not block main lopp, non modal
 
     # ---------------------------------------------------------------------
-    def stil_uygula_yuzen_listwidget_goster_gizle(self):
+    def stil_uygulaYW_goster_gizle(self):
 
         # if not self.yuzenStylePresetsListWidget.isVisible():
         if not self.stillerYuzenWidget.isVisible():
@@ -4697,18 +4672,29 @@ class DefterAnaPencere(QMainWindow):
         else:
             self.stillerYuzenWidget.setVisible(False)
 
-    # ---------------------------------------------------------------------
-    def stil_uygula_yuzen_listwidget_goster_gizle2(self):
+    # # ---------------------------------------------------------------------
+    # def stil_uygulaYW_goster_gizle2(self):
+    #
+    #     # if not self.yuzenStylePresetsListWidget.isVisible():
+    #     if not self.stillerDW.isVisible():
+    #         self.stillerDW.setFloating(True)
+    #         self.stillerDW.move(self.cView.mapFromGlobal(QCursor.pos()))
+    #         # self.yuzenStylePresetsListWidget.resize(250, self.yuzenStylePresetsListWidget.count() * 21)
+    #         # self.stillerYuzenWidget.adjustSize()
+    #         self.stillerDW.setVisible(True)
+    #     else:
+    #         self.stillerDW.setVisible(False)
 
-        # if not self.yuzenStylePresetsListWidget.isVisible():
-        if not self.stillerDW.isVisible():
-            self.stillerDW.setFloating(True)
-            self.stillerDW.move(self.cView.mapFromGlobal(QCursor.pos()))
-            # self.yuzenStylePresetsListWidget.resize(250, self.yuzenStylePresetsListWidget.count() * 21)
-            # self.stillerYuzenWidget.adjustSize()
-            self.stillerDW.setVisible(True)
-        else:
-            self.stillerDW.setVisible(False)
+    # ---------------------------------------------------------------------
+    # def tercumeYW_goster_gizle(self):
+    #
+    #    if not self.tercumeYW.isVisible():
+    #        self.tercumeYW.move(self.cView.mapFromGlobal(QCursor.pos()))
+    #        # self.yuzenStylePresetsListWidget.resize(250, self.yuzenStylePresetsListWidget.count() * 21)
+    #        # self.stillerYuzenWidget.adjustSize()
+    #        self.tercumeYW.setVisible(True)
+    #    else:
+    #        self.tercumeYW.setVisible(False)
 
     # ---------------------------------------------------------------------
     def nesne_ozellikleriYW_goster_gizle(self):
