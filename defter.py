@@ -762,18 +762,21 @@ class DefterAnaPencere(QMainWindow):
         self.stillerYuzenWidget.hide()
         self.stillerYuzenWidget.yazBaslik(self.tr("Style Presets"))
 
-        self.yuzenStylePresetsListWidget = QListWidget(self.stillerYuzenWidget)
-        self.yuzenStylePresetsListWidget.setMinimumWidth(100)
-        self.yuzenStylePresetsListWidget.setMinimumHeight(100)
-        # self.yuzenStylePresetsListWidget.setMaximumHeight(500)
-        # self.yuzenStylePresetsListWidget.resize(250, 100)
-        self.yuzenStylePresetsListWidget.setSpacing(3)
-        self.yuzenStylePresetsListWidget.itemDoubleClicked.connect(self.act_apply_selected_style)
+        self.stillerYLW = QListWidget(self.stillerYuzenWidget)
+        self.stillerYLW.setMinimumWidth(100)
+        self.stillerYLW.setMinimumHeight(100)
+        # self.stillerYLW.setMaximumHeight(500)
+        # self.stillerYLW.resize(250, 100)
+        self.stillerYLW.setSpacing(3)
+        self.stillerYLW.itemDoubleClicked.connect(self.act_apply_selected_style)
 
-        delegate = ListWidgetItemDelegate(self.yuzenStylePresetsListWidget)
-        self.yuzenStylePresetsListWidget.setItemDelegate(delegate)
+        self.stillerYLW.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.stillerYLW.customContextMenuRequested.connect(self.act_stillerYW_sag_menu_goster)
 
-        self.stillerYuzenWidget.ekleWidget(self.yuzenStylePresetsListWidget)
+        delegate = ListWidgetItemDelegate(self.stillerYLW)
+        self.stillerYLW.setItemDelegate(delegate)
+
+        self.stillerYuzenWidget.ekleWidget(self.stillerYLW)
 
     # ---------------------------------------------------------------------
     def olustur_stillerDW(self):
@@ -806,72 +809,81 @@ class DefterAnaPencere(QMainWindow):
         scroll.setWidget(self.stillerDWBaseWidget)
         # scroll.setLayout(layout)
 
-        self.stylePresetsListWidget = QListWidget(self.stillerDWBaseWidget)
+        self.stillerLW = QListWidget(self.stillerDWBaseWidget)
 
-        delegate = ListWidgetItemDelegate(self.stylePresetsListWidget)
-        self.stylePresetsListWidget.setItemDelegate(delegate)
-        # self.stylePresetsListWidget.setItemDelegateForRow()
-        # self.stylePresetsListWidget.setLineWidth(100)
-        # self.stylePresetsListWidget.setViewMode(self.stylePresetsListWidget.IconMode)
-        # self.stylePresetsListWidget.setMovement(self.stylePresetsListWidget.Free)
-        self.stylePresetsListWidget.setSpacing(3)
-        # self.stylePresetsListWidget.setSelectionMode(self.stylePresetsListWidget.ExtendedSelection)
-        self.stylePresetsListWidget.itemDoubleClicked.connect(self.act_apply_selected_style)
-        self.stylePresetsListWidget.itemSelectionChanged.connect(self.act_stylePresetsListWidget_secim_degisti)
-        # self.stylePresetsListWidget.addItem(ListWidgetItem("asd"))
+        delegate = ListWidgetItemDelegate(self.stillerLW)
+        self.stillerLW.setItemDelegate(delegate)
+        # self.stillerLW.setItemDelegateForRow()
+        # self.stillerLW.setLineWidth(100)
+        # self.stillerLW.setViewMode(self.stillerLW.IconMode)
+        # self.stillerLW.setMovement(self.stillerLW.Free)
+        self.stillerLW.setSpacing(3)
+        # self.stillerLW.setSelectionMode(self.stillerLW.ExtendedSelection)
+        self.stillerLW.itemDoubleClicked.connect(self.act_apply_selected_style)
+        self.stillerLW.itemSelectionChanged.connect(self.act_stylePresetsListWidget_secim_degisti)
+        self.stillerLW.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.stillerLW.customContextMenuRequested.connect(self.act_stiller_sag_menu_goster)
 
-        anaLay.addWidget(self.stylePresetsListWidget)
+        anaLay.addWidget(self.stillerLW)
 
         btnLayout = QHBoxLayout()
 
-        addStylePresetBtn = QPushButton(self.tr("Add"), self.stillerDWBaseWidget)
-        # addStylePresetBtn.setFixedWidth(50)
-        addStylePresetBtn.clicked.connect(self.act_add_style_preset)
-        self.removeStylePresetBtn = QPushButton(self.tr("Remove"), self.stillerDWBaseWidget)
-        # self.removeStylePresetBtn.setFixedWidth(50)
-        self.removeStylePresetBtn.clicked.connect(self.act_remove_style_preset)
-        self.removeStylePresetBtn.setDisabled(True)
-        stylePrestesMenuBtn = QPushButton("☰", self.stillerDWBaseWidget)
-        stylePrestesMenuBtn.setFixedWidth(30)
+        stilEkleBtn = QPushButton(self.tr("Add"), self.stillerDWBaseWidget)
+        stilEkleBtn.setMinimumWidth(50)
+        stilEkleBtn.clicked.connect(self.act_stil_ekle)
 
-        stylePresetsMenu = QMenu(self.tr("Presets"), stylePrestesMenuBtn)
-        stylePresetsMenu.aboutToShow.connect(self.on_style_presets_menu_about_to_show)
+        self.stilYenidenAdlandirBtn = QPushButton(self.tr("Rename"), self.stillerDWBaseWidget)
+        self.stilYenidenAdlandirBtn.setMinimumWidth(75)
+        self.stilYenidenAdlandirBtn.clicked.connect(self.act_stil_yeniden_adlandir)
+        self.stilYenidenAdlandirBtn.setDisabled(True)
 
-        actionLoadAndReplaceStylePrests = QAction(QIcon(':icons/folder-base.png'), self.tr("Load and replace"),
-                                                  stylePresetsMenu)
-        actionLoadAndReplaceStylePrests.triggered.connect(self.act_load_and_replace_style_presets)
+        self.stilSilBtn = QPushButton(self.tr("Delete"), self.stillerDWBaseWidget)
+        self.stilSilBtn.setMinimumWidth(75)
+        self.stilSilBtn.clicked.connect(self.act_stil_sil)
+        self.stilSilBtn.setDisabled(True)
+        
+        stillerMenuBtn = QPushButton("☰", self.stillerDWBaseWidget)
+        stillerMenuBtn.setFixedWidth(30)
 
-        actionLoadAndAppendStylePrests = QAction(QIcon(':icons/folder-base.png'), self.tr("Load and append"),
-                                                 stylePresetsMenu)
-        actionLoadAndAppendStylePrests.triggered.connect(self.act_load_and_append_style_presets)
+        stillerBtnMenu = QMenu(self.tr("Presets"), stillerMenuBtn)
+        stillerBtnMenu.aboutToShow.connect(self.on_stiller_btn_menu_about_to_show)
 
-        self.actionSaveStylePrests = QAction(QIcon(':icons/folder-base.png'), self.tr("Save presets"),
-                                             stylePresetsMenu)
-        self.actionSaveStylePrests.triggered.connect(self.act_save_style_presets_to_file)
+        actionStilleriSifirlaVeYukle = QAction(QIcon(':icons/folder-base.png'), self.tr("Load and replace"),
+                                                  stillerBtnMenu)
+        actionStilleriSifirlaVeYukle.triggered.connect(self.act_stilleri_sifirla_ve_yukle)
 
-        self.clearStylePresetsMenu = QMenu("Remove All", stylePresetsMenu)
-        actionClearStylePresets = QAction(QIcon(':icons/folder-base.png'), self.tr("Yes"), stylePresetsMenu)
-        actionClearStylePresets.setToolTip(self.tr("Can not undo!"))
-        actionClearStylePresets.triggered.connect(self.act_clear_style_presets)
-        self.clearStylePresetsMenu.addAction(actionClearStylePresets)
+        actionStilleriYukleVeEkle = QAction(QIcon(':icons/folder-base.png'), self.tr("Load and append"),
+                                                 stillerBtnMenu)
+        actionStilleriYukleVeEkle.triggered.connect(self.act_stilleri_yukle_ve_ekle)
 
-        stylePresetsMenu.addActions((
-            stylePresetsMenu.addSection(self.tr("Load")),
-            actionLoadAndReplaceStylePrests,
-            actionLoadAndAppendStylePrests,
-            # stylePresetsMenu.addSeparator(),
-            stylePresetsMenu.addSection(self.tr("Save")),
-            self.actionSaveStylePrests,
-            # stylePresetsMenu.addSeparator(),
-            stylePresetsMenu.addSection(self.tr("Remove")),
-            stylePresetsMenu.addMenu(self.clearStylePresetsMenu)
+        self.actionStilleriKaydet = QAction(QIcon(':icons/folder-base.png'), self.tr("Save presets"),
+                                             stillerBtnMenu)
+        self.actionStilleriKaydet.triggered.connect(self.act_stilleri_dosyaya_kaydet)
+
+        self.stilleriSifirlaMenu = QMenu("Remove All", stillerBtnMenu)
+        actionStilleriSifirla = QAction(QIcon(':icons/folder-base.png'), self.tr("Yes"), stillerBtnMenu)
+        actionStilleriSifirla.setToolTip(self.tr("Can not undo!"))
+        actionStilleriSifirla.triggered.connect(self.act_stilleri_sifirla)
+        self.stilleriSifirlaMenu.addAction(actionStilleriSifirla)
+
+        stillerBtnMenu.addActions((
+            stillerBtnMenu.addSection(self.tr("Load")),
+            actionStilleriSifirlaVeYukle,
+            actionStilleriYukleVeEkle,
+            # stillerBtnMenu.addSeparator(),
+            stillerBtnMenu.addSection(self.tr("Save")),
+            self.actionStilleriKaydet,
+            # stillerBtnMenu.addSeparator(),
+            stillerBtnMenu.addSection(self.tr("Remove")),
+            stillerBtnMenu.addMenu(self.stilleriSifirlaMenu)
         ))
 
-        stylePrestesMenuBtn.setMenu(stylePresetsMenu)
+        stillerMenuBtn.setMenu(stillerBtnMenu)
 
-        btnLayout.addWidget(addStylePresetBtn)
-        btnLayout.addWidget(self.removeStylePresetBtn)
-        btnLayout.addWidget(stylePrestesMenuBtn)
+        btnLayout.addWidget(stilEkleBtn)
+        btnLayout.addWidget(self.stilYenidenAdlandirBtn)
+        btnLayout.addWidget(self.stilSilBtn)
+        btnLayout.addWidget(stillerMenuBtn)
         anaLay.addLayout(btnLayout)
 
     # ---------------------------------------------------------------------
@@ -4062,7 +4074,7 @@ class DefterAnaPencere(QMainWindow):
         self.actionAddSelectedItemStyleAsAPreset = QAction(QIcon(':icons/text-html.png'),
                                                            self.tr("Add selected item's style as a preset"),
                                                            self.nesneSagMenu)
-        self.actionAddSelectedItemStyleAsAPreset.triggered.connect(self.act_add_style_preset)
+        self.actionAddSelectedItemStyleAsAPreset.triggered.connect(self.act_stil_ekle)
 
         self.actionSeciliNesneStiliniSeciliAracaUygula = QAction(QIcon(':icons/text-html.png'),
                                                                  self.tr(
@@ -4664,10 +4676,10 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def stil_uygulaYW_goster_gizle(self):
 
-        # if not self.yuzenStylePresetsListWidget.isVisible():
+        # if not self.stillerYLW.isVisible():
         if not self.stillerYuzenWidget.isVisible():
             self.stillerYuzenWidget.move(self.cView.mapFromGlobal(QCursor.pos()))
-            # self.yuzenStylePresetsListWidget.resize(250, self.yuzenStylePresetsListWidget.count() * 21)
+            # self.stillerYLW.resize(250, self.stillerYLW.count() * 21)
             # self.stillerYuzenWidget.adjustSize()
             self.stillerYuzenWidget.setVisible(True)
         else:
@@ -4676,26 +4688,26 @@ class DefterAnaPencere(QMainWindow):
     # # ---------------------------------------------------------------------
     # def stil_uygulaYW_goster_gizle2(self):
     #
-    #     # if not self.yuzenStylePresetsListWidget.isVisible():
+    #     # if not self.stillerYLW.isVisible():
     #     if not self.stillerDW.isVisible():
     #         self.stillerDW.setFloating(True)
     #         self.stillerDW.move(self.cView.mapFromGlobal(QCursor.pos()))
-    #         # self.yuzenStylePresetsListWidget.resize(250, self.yuzenStylePresetsListWidget.count() * 21)
+    #         # self.stillerYLW.resize(250, self.stillerYLW.count() * 21)
     #         # self.stillerYuzenWidget.adjustSize()
     #         self.stillerDW.setVisible(True)
     #     else:
     #         self.stillerDW.setVisible(False)
 
     # ---------------------------------------------------------------------
-    # def tercumeYW_goster_gizle(self):
-    #
-    #    if not self.tercumeYW.isVisible():
-    #        self.tercumeYW.move(self.cView.mapFromGlobal(QCursor.pos()))
-    #        # self.yuzenStylePresetsListWidget.resize(250, self.yuzenStylePresetsListWidget.count() * 21)
-    #        # self.stillerYuzenWidget.adjustSize()
-    #        self.tercumeYW.setVisible(True)
-    #    else:
-    #        self.tercumeYW.setVisible(False)
+    def tercumeYW_goster_gizle(self):
+
+        if not self.tercumeYW.isVisible():
+            self.tercumeYW.move(self.cView.mapFromGlobal(QCursor.pos()))
+            # self.stillerYLW.resize(250, self.stillerYLW.count() * 21)
+            # self.stillerYuzenWidget.adjustSize()
+            self.tercumeYW.setVisible(True)
+        else:
+            self.tercumeYW.setVisible(False)
 
     # ---------------------------------------------------------------------
     def nesne_ozellikleriYW_goster_gizle(self):
@@ -5480,9 +5492,30 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def on_style_presets_menu_about_to_show(self):
-        self.actionSaveStylePrests.setEnabled(self.stylePresetsListWidget.count())
-        self.clearStylePresetsMenu.setEnabled(self.stylePresetsListWidget.count())
+    def on_stiller_btn_menu_about_to_show(self):
+        if self.stillerLW.count():
+            durum = True
+        else:
+            durum = False
+
+        self.actionStilleriKaydet.setEnabled(durum)
+        self.stilleriSifirlaMenu.setEnabled(durum)
+
+    # ---------------------------------------------------------------------
+    def act_stiller_sag_menu_goster(self, pos):
+        globalPos = self.stillerLW.mapToGlobal(pos)
+        menu = QMenu()
+        yeniden_adlandir = menu.addAction(self.tr("Rename"), self.act_stil_yeniden_adlandir)
+        sil = menu.addAction(self.tr("Delete"), self.act_stil_sil)
+        menu.exec(globalPos)
+
+    # ---------------------------------------------------------------------
+    def act_stillerYW_sag_menu_goster(self, pos):
+        globalPos = self.stillerYLW.mapToGlobal(pos)
+        menu = QMenu()
+        yeniden_adlandir = menu.addAction(self.tr("Rename"), lambda :self.act_stil_yeniden_adlandir(yw=True))
+        sil = menu.addAction(self.tr("Delete"), lambda :self.act_stil_sil(yw=True))
+        menu.exec(globalPos)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -8043,8 +8076,8 @@ class DefterAnaPencere(QMainWindow):
         self.cizgiKalinligiDSliderWithDSBox_tbar.setValue(widthFx10)
 
     # ---------------------------------------------------------------------
-    def _add_style_preset_to_list_widget(self, presetName=None, fg=None, bg=None, cizgiRengi=None, pen=None,
-                                         font=None):
+    def _add_style_preset_to_list_widget(self, presetName=None, fg=None, bg=None,
+                                         cizgiRengi=None, pen=None, font=None):
 
         preset = ListWidgetItem(presetName)
 
@@ -8058,7 +8091,7 @@ class DefterAnaPencere(QMainWindow):
         preset.setFont(font2)
         # preset.setText("{}: {}pt - {}px".format(presetName, self.fontPointSizeF, self._pen.widthF()))
 
-        self.stylePresetsListWidget.addItem(preset)
+        self.stillerLW.addItem(preset)
 
         preset2 = ListWidgetItem(presetName)
         preset2.setForeground(fg)
@@ -8067,9 +8100,9 @@ class DefterAnaPencere(QMainWindow):
         preset2.setPen(QPen(pen))
         preset2.setPresetFont(font)
         preset2.setFont(font2)
-        self.yuzenStylePresetsListWidget.addItem(preset2)
+        self.stillerYLW.addItem(preset2)
 
-        count = self.stylePresetsListWidget.count()
+        count = self.stillerLW.count()
 
         # ! burayi for dongusune cevirmeyin...
         if count < 10:
@@ -8087,7 +8120,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_add_style_preset(self):
+    def act_stil_ekle(self):
         # stiller pencersi ,stil ekle butonu da,
         # secili nesne sag tik menusundeki secili nesnenin stilini ekle de buraya geliyor.
         text, ok = QInputDialog.getText(self,
@@ -8118,16 +8151,48 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def act_stylePresetsListWidget_secim_degisti(self):
-        if self.stylePresetsListWidget.selectedItems():
-            self.removeStylePresetBtn.setEnabled(True)
+        if self.stillerLW.selectedItems():
+            self.stilSilBtn.setEnabled(True)
+            self.stilYenidenAdlandirBtn.setEnabled(True)
         else:
-            self.removeStylePresetBtn.setEnabled(False)
+            self.stilSilBtn.setEnabled(False)
+            self.stilYenidenAdlandirBtn.setEnabled(False)
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_remove_style_preset(self):
+    def act_stil_yeniden_adlandir(self, yw=False):
+        text, ok = QInputDialog.getText(self,
+                                        self.tr('Rename style preset'),
+                                        self.tr('Preset name:'),
+                                        text=self.tr("style"))
+        if ok:
+            if text == "":
+                text = self.tr("style")
+            if yw:
+                nesne = self.stillerYLW.currentItem()
+                satir = self.stillerYLW.row(nesne)
+                nesne2 = self.stillerLW.item(satir)
+            else:
+                nesne = self.stillerLW.currentItem()
+                satir = self.stillerLW.row(nesne)
+                nesne2 = self.stillerYLW.item(satir)
+            yeni_isim = "  {}:  {}pt  {:.1f}px".format(text, nesne.presetFont().pointSizeF(), nesne.pen().widthF())
+            # item.setFlags(item.flags() | Qt.ItemFlags.ItemIsEditable)
+            # self.stillerLW.editItem(item)
+            # item.setFlags(item.flags() ^ Qt.ItemFlags.ItemIsEditable)
 
-        # if self.stylePresetsListWidget.selectedItems():
+            undoRedo.undoableRenameStylePreset(self.cScene.undoStack,
+                                               self.tr('rename style preset'),
+                                               nesne=nesne,
+                                               nesne2=nesne2,
+                                               yeni_isim=yeni_isim
+                                               )
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def act_stil_sil(self, yw=False):
+
+        # if self.stillerLW.selectedItems():
 
         msgBox = QMessageBox(self)
         msgBox.setWindowTitle(self.tr("Defter: Delete style preset?"))
@@ -8144,15 +8209,27 @@ class DefterAnaPencere(QMainWindow):
         msgBox.exec()
         if msgBox.clickedButton() == deleteButton:
 
-            for item in self.stylePresetsListWidget.selectedItems():
-                row = self.stylePresetsListWidget.row(item)
-                itemToDelete = self.stylePresetsListWidget.takeItem(row)
-                # itemToDelete = None
-                del itemToDelete
 
-                itemToDelete2 = self.yuzenStylePresetsListWidget.takeItem(row)
-                # itemToDelete = None
-                del itemToDelete2
+            if yw:
+                for item in self.stillerYLW.selectedItems():
+                    row = self.stillerYLW.row(item)
+                    itemToDelete = self.stillerYLW.takeItem(row)
+                    # itemToDelete = None
+                    del itemToDelete
+
+                    itemToDelete2 = self.stillerLW.takeItem(row)
+                    # itemToDelete = None
+                    del itemToDelete2
+            else:
+                for item in self.stillerLW.selectedItems():
+                    row = self.stillerLW.row(item)
+                    itemToDelete = self.stillerLW.takeItem(row)
+                    # itemToDelete = None
+                    del itemToDelete
+
+                    itemToDelete2 = self.stillerYLW.takeItem(row)
+                    # itemToDelete = None
+                    del itemToDelete2
 
     # ---------------------------------------------------------------------
     @Slot(QListWidgetItem)
@@ -8207,7 +8284,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_save_style_presets_to_file(self):
+    def act_stilleri_dosyaya_kaydet(self):
         filtre = self.tr('*.defstyles files (*.defstyles)')
         fn = QFileDialog.getSaveFileName(self,
                                          self.tr('Save style presets'),
@@ -8308,7 +8385,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_load_and_replace_style_presets(self):
+    def act_stilleri_sifirla_ve_yukle(self):
         presetList = self.load_style_presets_file_and_return_a_list()
         if presetList:
             self.populate_style_presets_from_saved_file(presetList, clearAll=True)
@@ -8316,7 +8393,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_load_and_append_style_presets(self):
+    def act_stilleri_yukle_ve_ekle(self):
         presetList = self.load_style_presets_file_and_return_a_list()
         if presetList:
             self.populate_style_presets_from_saved_file(presetList, clearAll=False)
@@ -8324,15 +8401,15 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_clear_style_presets(self):
-        self.stylePresetsListWidget.clear()
-        self.yuzenStylePresetsListWidget.clear()
+    def act_stilleri_sifirla(self):
+        self.stillerLW.clear()
+        self.stillerYLW.clear()
 
     # ---------------------------------------------------------------------
     def get_style_presets_list_for_saving_binary(self):
         presetList = []
-        for i in range(self.stylePresetsListWidget.count()):
-            preset = self.stylePresetsListWidget.item(i)
+        for i in range(self.stillerLW.count()):
+            preset = self.stillerLW.item(i)
             presetList.append([
                 preset.text(),
                 preset.foreground(),
@@ -8346,7 +8423,7 @@ class DefterAnaPencere(QMainWindow):
     def populate_style_presets_from_saved_file(self, presetList, clearAll=True):
 
         if clearAll:
-            self.stylePresetsListWidget.clear()
+            self.stillerLW.clear()
 
         for savedPreset in presetList:
             self._add_style_preset_to_list_widget(presetName=savedPreset[0],

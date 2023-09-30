@@ -1537,6 +1537,30 @@ class UndoableSetItemBackgroundColorAlpha(QUndoCommand):
 
 
 ########################################################################
+class UndoableRenameStylePreset(QUndoCommand):
+    """ """
+
+    # ---------------------------------------------------------------------
+    def __init__(self, description, nesne, nesne2, yeni_isim, parent=None):
+        super(UndoableRenameStylePreset, self).__init__(description, parent)
+
+        self.nesne = nesne
+        self.nesne2 = nesne2
+        self.eski_isim = nesne.text()
+        self.yeni_isim = yeni_isim
+
+    # ---------------------------------------------------------------------
+    def redo(self):
+        self.nesne.setText(self.yeni_isim)
+        self.nesne2.setText(self.yeni_isim)
+
+    # ---------------------------------------------------------------------
+    def undo(self):
+        self.nesne.setText(self.eski_isim)
+        self.nesne2.setText(self.eski_isim)
+
+
+########################################################################
 class UndoableApplyStylePreset(QUndoCommand):
     """ """
 

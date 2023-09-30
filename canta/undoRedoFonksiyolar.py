@@ -11,7 +11,7 @@ from canta.undoRedoSiniflar import (UndoableSayfaAdiDegistir, UndoableAddItem, U
                                     UndoableRotateWithOffset, UndoableSetZValue, UndoableSetLineStyle, UndoableSetLineJoinStyle,
                                     UndoableSetLineCapStyle, UndoableSetLineColor, UndoableSetTextColor,
                                     UndoableSetLineColorAlpha, UndoableSetTextColorAlpha, UndoableSetItemBackgroundColor,
-                                    UndoableSetItemBackgroundColorAlpha, UndoableApplyStylePresetToItem, UndoableApplyStylePreset,
+                                    UndoableSetItemBackgroundColorAlpha, UndoableRenameStylePreset, UndoableApplyStylePresetToItem, UndoableApplyStylePreset,
                                     UndoableSetImageOpacity, UndoableSetSceneBackgroundBrush, UndoableSetSceneBackgroundImage,
                                     UndoableEmbedSceneBackgroundImage, UndoableSetPinStatus, UndoableItemSetText, UndoableItemCustomCommand,
                                     UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, UndoableResizeLineItem,
@@ -209,6 +209,12 @@ def undoableSetLineColorAlpha(undoStack, description, item, color):
 # ---------------------------------------------------------------------
 def undoableSetTextColorAlpha(undoStack, description, item, color):
     command = UndoableSetTextColorAlpha(description, item, color)
+    undoStack.push(command)
+
+
+# ---------------------------------------------------------------------
+def undoableRenameStylePreset(undoStack, description, nesne, nesne2, yeni_isim):
+    command = UndoableRenameStylePreset(description, nesne, nesne2, yeni_isim)
     undoStack.push(command)
 
 
