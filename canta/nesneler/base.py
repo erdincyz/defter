@@ -1056,7 +1056,7 @@ class BaseItem(QGraphicsItem):
 
         # elif event.modifiers() & Qt.ShiftModifier:
         if toplam == shift:
-            self.rotateItem(event.delta())
+            self.changeFontSizeF(event.delta())
 
         # elif event.modifiers() & Qt.AltModifier:
         elif toplam == alt:
@@ -1074,7 +1074,7 @@ class BaseItem(QGraphicsItem):
             self.changeLineColorAlpha(event.delta())
 
         elif toplam == ctrlAltShift:
-            self.changeFontSizeF(event.delta())
+            self.rotateItem(event.delta())
 
         # elif toplam == ctrlAltShift:
         #     self.scaleItemByResizing(event.delta())

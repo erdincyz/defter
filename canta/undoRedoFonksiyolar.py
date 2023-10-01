@@ -11,7 +11,7 @@ from canta.undoRedoSiniflar import (UndoableSayfaAdiDegistir, UndoableAddItem, U
                                     UndoableRotateWithOffset, UndoableSetZValue, UndoableSetLineStyle, UndoableSetLineJoinStyle,
                                     UndoableSetLineCapStyle, UndoableSetLineColor, UndoableSetTextColor,
                                     UndoableSetLineColorAlpha, UndoableSetTextColorAlpha, UndoableSetItemBackgroundColor,
-                                    UndoableSetItemBackgroundColorAlpha, UndoableRenameStylePreset, UndoableApplyStylePresetToItem, UndoableApplyStylePreset,
+                                    UndoableSetItemBackgroundColorAlpha, UndoableStilAdiDegistir, UndoableStiliNesneyeUygula, UndoableStiliUygula,
                                     UndoableSetImageOpacity, UndoableSetSceneBackgroundBrush, UndoableSetSceneBackgroundImage,
                                     UndoableEmbedSceneBackgroundImage, UndoableSetPinStatus, UndoableItemSetText, UndoableItemCustomCommand,
                                     UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, UndoableResizeLineItem,
@@ -213,25 +213,25 @@ def undoableSetTextColorAlpha(undoStack, description, item, color):
 
 
 # ---------------------------------------------------------------------
-def undoableRenameStylePreset(undoStack, description, nesne, nesne2, yeni_isim):
-    command = UndoableRenameStylePreset(description, nesne, nesne2, yeni_isim)
+def undoableStilAdiDegistir(undoStack, description, nesne, nesne2, yeni_isim):
+    command = UndoableStilAdiDegistir(description, nesne, nesne2, yeni_isim)
     undoStack.push(command)
 
 
 # ---------------------------------------------------------------------
-def undoableApplyStylePresetToItem(undoStack, description, item, pen, brush, font, yaziRengi, cizgiRengi):
-    command = UndoableApplyStylePresetToItem(description, item, pen, brush, font, yaziRengi, cizgiRengi)
+def undoableStiliNesneyeUygula(undoStack, description, item, pen, brush, font, yaziRengi, cizgiRengi):
+    command = UndoableStiliNesneyeUygula(description, item, pen, brush, font, yaziRengi, cizgiRengi)
     undoStack.push(command)
 
 
 # ---------------------------------------------------------------------
-def undoableApplyStylePreset(undoStack, description, eskiPen, yeniPen, yaziRengi, eskiYaziRengi, cizgiRengi,
-                             eskiCizgiRengi,
-                             eskiArkaPlanRengi, yeniArkaPlanRengi, eskiFont, yeniFont, scene):
-    command = UndoableApplyStylePreset(description, eskiPen, yeniPen, yaziRengi, eskiYaziRengi, cizgiRengi,
-                                       eskiCizgiRengi,
-                                       eskiArkaPlanRengi, yeniArkaPlanRengi, eskiFont, yeniFont,
-                                       scene)
+def undoableStiliUygula(undoStack, description, eskiPen, yeniPen, yaziRengi, eskiYaziRengi, cizgiRengi,
+                        eskiCizgiRengi,
+                        eskiArkaPlanRengi, yeniArkaPlanRengi, eskiFont, yeniFont, scene):
+    command = UndoableStiliUygula(description, eskiPen, yeniPen, yaziRengi, eskiYaziRengi, cizgiRengi,
+                                  eskiCizgiRengi,
+                                  eskiArkaPlanRengi, yeniArkaPlanRengi, eskiFont, yeniFont,
+                                  scene)
     undoStack.push(command)
 
 

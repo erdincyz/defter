@@ -927,7 +927,7 @@ class LineItem(QGraphicsItem):
 
         # elif event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
         elif toplam == shift:
-            self.rotateItem(event.delta())
+            self.changeFontSizeF(event.delta())
 
         # elif event.modifiers() == Qt.KeyboardModifier.AltModifier:
         elif toplam == alt:
@@ -938,7 +938,7 @@ class LineItem(QGraphicsItem):
             self.changeTextColorAlpha(event.delta())
 
         elif toplam == ctrlAltShift:
-            self.changeFontSizeF(event.delta())
+            self.rotateItem(event.delta())
 
         elif toplam == altShift:
             if self.isDrawingFinished:

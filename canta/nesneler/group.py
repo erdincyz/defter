@@ -559,7 +559,7 @@ class Group(QGraphicsItem):
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
-            self.rotateItem(event.delta())
+            self.changeFontSizeF(event.delta())
 
         elif toplam == alt:
             self.changeBackgroundColorAlpha(event.delta())
@@ -568,7 +568,7 @@ class Group(QGraphicsItem):
             self.changeLineColorAlpha(event.delta())
 
         elif toplam == ctrlAltShift:
-            self.changeFontSizeF(event.delta())
+            self.rotatItem(event.delta())
 
         elif toplam == altShift:
             self.changeImageItemTextBackgroundColorAlpha(event.delta())

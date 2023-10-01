@@ -1537,12 +1537,12 @@ class UndoableSetItemBackgroundColorAlpha(QUndoCommand):
 
 
 ########################################################################
-class UndoableRenameStylePreset(QUndoCommand):
+class UndoableStilAdiDegistir(QUndoCommand):
     """ """
 
     # ---------------------------------------------------------------------
     def __init__(self, description, nesne, nesne2, yeni_isim, parent=None):
-        super(UndoableRenameStylePreset, self).__init__(description, parent)
+        super(UndoableStilAdiDegistir, self).__init__(description, parent)
 
         self.nesne = nesne
         self.nesne2 = nesne2
@@ -1561,14 +1561,14 @@ class UndoableRenameStylePreset(QUndoCommand):
 
 
 ########################################################################
-class UndoableApplyStylePreset(QUndoCommand):
+class UndoableStiliUygula(QUndoCommand):
     """ """
 
     # ---------------------------------------------------------------------
     def __init__(self, description, eskiPen, yeniPen, yaziRengi, eskiYaziRengi, cizgiRengi, eskiCizgiRengi,
                  eskiArkaPlanRengi, yeniArkaPlanRengi, eskiFont, yeniFont,
                  scene, parent=None):
-        super(UndoableApplyStylePreset, self).__init__(description, parent)
+        super(UndoableStiliUygula, self).__init__(description, parent)
         self.font = yeniFont
         self.eskiFont = eskiFont
         self.pen = yeniPen
@@ -1637,12 +1637,12 @@ class UndoableApplyStylePreset(QUndoCommand):
 
 
 ########################################################################
-class UndoableApplyStylePresetToItem(QUndoCommand):
+class UndoableStiliNesneyeUygula(QUndoCommand):
     """ """
 
     # ---------------------------------------------------------------------
     def __init__(self, description, item, pen, brush, font, yaziRengi, cizgiRengi, parent=None):
-        super(UndoableApplyStylePresetToItem, self).__init__(description, parent)
+        super(UndoableStiliNesneyeUygula, self).__init__(description, parent)
         self.item = item
         self.font = font
         self.eskiFont = item.font()

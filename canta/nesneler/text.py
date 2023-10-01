@@ -542,7 +542,7 @@ class Text(QGraphicsTextItem):
             if value:
                 self.scene().parent().text_item_selected(self)
             else:
-                self.scene().parent().item_deselected(self)
+                self.scene().parent().text_item_deselected(self)
 
         # return QGraphicsRectItem.itemChange(self, change, value)
         return value
@@ -565,8 +565,10 @@ class Text(QGraphicsTextItem):
     def focusOutEvent(self, event):
 
         # self.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        self.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
-        self.clear_selection()
+        # self.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+        # self.clear_selection()
+        if self.textCursor().hasSelection():
+            return QGraphicsTextItem.focusOutEvent(self, event)
 
         self.textItemFocusedOut.emit(self)
         if self.scene():
@@ -664,7 +666,7 @@ class Text(QGraphicsTextItem):
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
-            self.rotateItem(event.delta())
+            self.changeFontSizeF(event.delta())
 
         # elif event.modifiers() & Qt.AltModifier:
         elif toplam == alt:
@@ -674,7 +676,7 @@ class Text(QGraphicsTextItem):
             self.changeTextColorAlpha(event.delta())
 
         elif toplam == ctrlAltShift:
-            self.changeFontSizeF(event.delta())
+            self.rotateItem(event.delta())
 
         elif toplam == altShift:
             # self.changeImageItemTextBackgroundColorAlpha(event.delta())
@@ -958,7 +960,8 @@ class Text(QGraphicsTextItem):
         # r.setSize(QSizeF(self.textWidth(), self.doc.size().height()))
 
         fm = QFontMetricsF(self.font())
-        yaziGenislik = fm.horizontalAdvance(self.text())
+        # yaziGenislik = fm.horizontalAdvance(self.text(), QTextOption())
+        yaziGenislik = fm.boundingRect(r, 0, self.text()).size().width()
         # yaziYukseklik = fm.height()
         # self.doc.adjustSize()
         # self.doc.setTextWidth(yaziGenislik + 10)

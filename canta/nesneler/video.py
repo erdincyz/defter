@@ -644,7 +644,7 @@ class VideoItem(BaseItem):
 
         # elif event.modifiers() & Qt.ShiftModifier:
         elif toplam == shift:
-            self.rotateItem(event.delta())
+            self.changeFontSizeF(event.delta())
 
         # elif event.modifiers() & Qt.AltModifier:
         elif toplam == alt:
@@ -654,7 +654,7 @@ class VideoItem(BaseItem):
             self.changeTextColorAlpha(event.delta())
 
         elif toplam == ctrlAltShift:
-            self.changeFontSizeF(event.delta())
+            self.rotateItem(event.delta())
         #
         elif toplam == altShift:
             # self.changeImageItemTextBackgroundColorAlpha(event.delta())
