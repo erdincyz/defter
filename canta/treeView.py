@@ -5,9 +5,9 @@ __project_name__ = 'Defter'
 __date__ = '18/May/2018'
 __author__ = 'Erdinç Yılmaz'
 
-from PySide6.QtCore import Signal, Qt, QSize, QItemSelectionModel, QMimeData
+from PySide6.QtCore import Signal, Qt, QSize, QItemSelectionModel
 from PySide6.QtWidgets import QTreeView, QAbstractItemView, QHeaderView, QMenu, QProxyStyle
-from PySide6.QtGui import QDrag, QPen
+from PySide6.QtGui import QPen
 from canta.treeSayfa import Sayfa
 
 
@@ -125,22 +125,6 @@ class TreeView(QTreeView):
             self.setIconSize(size)
             self.model().treeViewIconSize = size
 
-    # # ---------------------------------------------------------------------
-    # def mousePressEvent(self, e):
-    #     """selection changed icinde hallediliyor.."""
-    #     # to disable ctrl deselect
-    #     idx = self.indexAt(e.pos())
-    #     print(idx)
-    #     if not idx.isValid():
-    #         return
-    #         # e.accept()
-    #     super(TreeView, self).mousePressEvent(e)
-    #
-    #     if idx.isValid():  # eski bu aciklama, item yazisina cift tiklayip edit edince hata oluyor.
-    #                        item yok diyor. o yuzden if kontrolu.
-    #         self.selectionModel().select(idx, self.selectionModel().Select)
-    #         self.parent().parent().parent().tv_sayfa_degistir(self.model().itemFromIndex(idx))
-
     # ---------------------------------------------------------------------
     def mousePressEvent(self, e):
         self.draggedItemIndex = self.indexAt(e.pos())
@@ -175,8 +159,8 @@ class TreeView(QTreeView):
         sayfa = self.get_selected_sayfa()
         if sayfa:
             self.secimDegisti.emit(sayfa)
-            # TODO: performans optimize et, direkt inde mi kullanmak ,veya key pressed ile secilince scroll etmeceç
-            # bi de gerek ok ztaen
+            # TODO: performans optimize et, direkt inde mi kullanmak ,veya key pressed ile secilince scroll etmece
+            # bi de gerek yok zaten
             self.scrollTo(self.model().index_sayfadan(sayfa),
                           QTreeView.ScrollHint.EnsureVisible)  # PositionAtCenter
 
@@ -190,81 +174,6 @@ class TreeView(QTreeView):
     #     if QKeyEvent.key() == Qt.Key_F2:
     #         self.itemIsAboutToEdited.emit(self.currentItem().text(0))
     #     super(TreeView, self).keyPressEvent(QKeyEvent)
-
-    #
-    # def startDrag(self, dropAction):
-    #     print('tree start drag')
-    #
-    #     icon = QIcon('/home/image.png')
-    #     pixmap = icon.pixmap(64, 64)
-    #
-    #     mime = QMimeData()
-    #     mime.setData('application/x-item', '???')
-    #
-    #     drag = QDrag(self)
-    #     drag.setMimeData(mime)
-    #     drag.setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2))
-    #     drag.setPixmap(pixmap)
-    #     drag.start(Qt.CopyAction)
-
-    ########################################################################
-    def startDraag(self, Union, Qt_DropActions=None, Qt_DropAction=None):
-        # create mime data object
-        mime = QMimeData()
-        mime.setData('text/sayfa', b'btreeviewdan')
-        # start drag
-        drag = QDrag(self)
-        drag.setMimeData(mime)
-
-        # modeldeki supportedDragActions lari parametre olarak kullanir
-        if drag.exec(Qt.DropAction.MoveAction) == Qt.DropAction.MoveAction:
-            print(drag.target(), "asdlşıafslkdfjiklsdjfilkasjdkfjailskdjf")
-
-    # def dragMoveEvent(self, event):
-    #     print(event.mimeData.formats())
-    #     event.setDropAction(Qt.MoveAction)
-    #     event.accept()
-    # if event.mimeData().hasFormat("application/x-item"):
-    #     event.setDropAction(Qt.MoveAction)
-    #     event.accept()
-    # else:
-    #     event.ignore()
-
-    # def dragEnterEvent(self, event):
-    #     if (event.mimeData().hasFormat('application/x-item')):
-    #         event.accept()
-    #     else:
-    #         event.ignore()
-    #
-    # def dropEvent(self, event):
-    #     if (event.mimeData().hasFormat('application/x-item')):
-    #         event.acceptProposedAction()
-    #         data = QString(event.mimeData().data("application/x-item"))
-    #         item = QTreeWidgetItem(self)
-    #         item.setText(0, data)
-    #         self.addTopLevelItem(item)
-    #     else:
-    #         event.ignore()
-    ########################################################################
-    def dragEnteerEvent(self, event):
-        # event.setDropAction(Qt.MoveAction)
-        # event.acceptProposedAction()
-        # if event.mimeData().hasFormat('object/x-standart-item'):
-
-        # print(event.mimeData().data("application/x-qabstractitemmodeldatalist").data())
-        if True:
-            event.setDropAction(Qt.DropAction.MoveAction)
-            event.accept()
-        else:
-            event.ignore()
-
-    # ---------------------------------------------------------------------
-    def dragMooveEvent(self, event):
-        # print(event.mimeData().formats())
-        event.setDropAction(Qt.DropAction.MoveAction)
-        dropIndicatorPos = self.dropIndicatorPosition()
-        # print(dropIndicatorPos)
-        event.accept()
 
     # ---------------------------------------------------------------------
     def dropEvent(self, event):
@@ -309,72 +218,6 @@ class TreeView(QTreeView):
         # event.acceptProposedAction()
         # event.accept()
         event.ignore()
-
-        # drPos = self.dropIndicatorPosition()
-        # if drPos == QAbstractItemView.BelowItem and drPos== QAbstractItemView.AboveItem:
-        #     event.ignore()
-        # else:
-        #     event.accept()
-        #
-        #
-        # if event.mimeData().hasFormat('object/x-standart-item'):
-        #     # event.setDropAction(Qt.CopyAction)
-        #     event.setDropAction(Qt.MoveAction)
-        #     # print(self.dropIndicatorPosition())
-        #     event.accept()
-        # else:
-        #     event.ignore()
-
-    #
-    #     # # ---------------------------------------------------------------------
-    #     # def dragLeaveEvent(self, e):
-    #     #     print("asd")
-    #     #     e.ignore()
-    #     #     # return
-    #     #
-    #     #     super(TreeWidget, self).dragLeaveEvent(e)
-    #
-    #     # ---------------------------------------------------------------------
-
-    # #----------------------------------------------------------------------
-    # def dragMoveEvent(self, event):
-    #
-    #     print event.mimeData()
-    #
-    #     # self
-    #     # if opened ise:
-    #     #     event.ignore()
-    #     # else:
-    #     #     event.accept()
-    #     # if event.mimeData().hasUrls:
-    #     #     event.setDropAction(QtCore.Qt.CopyAction)
-    #     #     event.accept()
-    #     # else:
-    #     #     event.ignore()
-
-    # def wheelEvent(self, event):
-    #     # factor = 1.41 ** (event.delta() / 240.0)
-    #     # self.scale(factor, factor)
-    #
-    #     iconSize = self.iconSize()
-    #
-    #     if event.modifiers() & Qt.AltModifier:
-    #         # if event.delta() > 0:
-    #         if event.angleDelta().x() > 0:
-    #
-    #             if not iconSize.width() >= 120:
-    #                 # iconSize = 120
-    #                 iconSize *= 1.1
-    #
-    #             self.setIconSize(iconSize)
-    #         else:
-    #
-    #             if not iconSize.width() <= 16:
-    #                 # iconSize = 16
-    #                 iconSize *= .9
-    #             self.setIconSize(iconSize)
-    #     else:
-    #         super(TreeWidget, self).wheelEvent(event)
 
     # ---------------------------------------------------------------------
     def sayfa_bul_ve_sec(self, sayfa):
@@ -431,8 +274,6 @@ class TreeView(QTreeView):
 
     # ------------------------------------------------------------------------------
     def get_selected_sayfa(self):
-        # TODO: ana kodta selected index kontrollerini kaldir, gerci bu sefer if not none denecek..
-        # bi standartlastiralim bunu.
         if self.selectedIndexes():
             sayfa = self.model().sayfa_indexten(self.selectedIndexes()[0])
             # print(sayfa, "burda")
@@ -461,7 +302,6 @@ class TreeView(QTreeView):
     # ------------------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.MouseButton.MiddleButton:
-            # mayaTBox.myWindow.createScriptTabs(mayaTBox.myWindow.fsModel.fileInfo(mayaTBox.myWindow.treeViewScripts.selectedIndexes()[0]).filePath())
             self.middleClick.emit()
         return QTreeView.mouseReleaseEvent(self, event)
 

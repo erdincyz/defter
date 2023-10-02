@@ -312,6 +312,7 @@ def undoableMovePathPoint(undoStack, description, item, movedPointIndex, eskiPos
     command = UndoableMovePathPoint(description, item, movedPointIndex, eskiPosTuple, yeniPosTuple)
     undoStack.push(command)
 
+
 # ---------------------------------------------------------------------
 def undoableDeletePathPoint(undoStack, description, item, eskiPath, yeniPath):
     command = UndoableDeletePathPoint(description, item, eskiPath, yeniPath)

@@ -1791,7 +1791,6 @@ class UndoableItemSetText(QUndoCommand):
         self.item.scene().parent().act_aramayi_temizle()
         self.item.setText(self.text)
 
-
     # ---------------------------------------------------------------------
     def undo(self):
         self.item.scene().parent().act_aramayi_temizle()

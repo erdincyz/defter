@@ -257,7 +257,6 @@ class DefterAnaPencere(QMainWindow):
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
 
         self.nesneOzellikleriDWScroll = QScrollArea()
-        # self.nesneOzellikleriDWScroll.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         # self.nesneOzellikleriDWScroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         # self.nesneOzellikleriDWScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.nesneOzellikleriDWScroll.setWidgetResizable(True)
@@ -335,7 +334,6 @@ class DefterAnaPencere(QMainWindow):
         # ---------------------------------------------------------------------
 
         self.nesneArkaplanRengiBtn = PushButtonRenk("", 40, 20, self.cScene.aktifArac.arkaPlanRengi, self.nesneGrupW)
-        # self.nesneArkaplanRengiBtn.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.nesneArkaplanRengiBtn.clicked.connect(self.act_set_item_background_color)
 
         renklerDisLay = QHBoxLayout()
@@ -349,7 +347,6 @@ class DefterAnaPencere(QMainWindow):
             btn = self.ver_renk_palet_buton(tip="a", gen=15, yuk=15,
                                             renk=self.nesne_arkaplan_rengi_btn_liste_acilis_renkleri[i],
                                             parent=self.nesneGrupW)
-            # btn.setFocusPolicy(Qt.FocusPolicy.TabFocus)
             renklerSatir1Lay.addWidget(btn)
 
             self.nesne_arkaplan_rengi_btn_liste.append(btn)
@@ -378,7 +375,6 @@ class DefterAnaPencere(QMainWindow):
         #######################################################################
         # ---------------------------------------------------------------------
         self.fontCBox_yazidw = FontComboBox(self.yaziGrupW)
-        # self.fontCBox_yazidw.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         # self.fontCBox_yazidw.activated[str].connect(self.act_set_current_font)
         # self.fontCBox_yazidw.currentFontChanged.connect(self.set_text_family)
         # self.fontCBox_yazidw.currentIndexChanged.connect(self.act_change_font)
@@ -391,7 +387,6 @@ class DefterAnaPencere(QMainWindow):
         self.fontCBox_tbar.currentFontChanged.connect(self.fontCBox_yazidw.setCurrentFont)
 
         self.fontPointSizeFDSBox_yazidw = DoubleSpinBox(self.yaziGrupW)
-        # self.fontPointSizeFDSBox_yazidw.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.fontPointSizeFDSBox_yazidw.setSuffix(" pt")
         self.fontPointSizeFDSBox_yazidw.setValue(self.cScene.aktifArac.yaziBoyutu)
         self.fontPointSizeFDSBox_yazidw.setMaximumWidth(85)
@@ -407,7 +402,6 @@ class DefterAnaPencere(QMainWindow):
         self.fontPointSizeFDSBox_yazidw.setToolTip(self.tr("Text Size"))
 
         self.yaziListeBicimiCBox = QComboBox(self.yaziGrupW)
-        # self.yaziListeBicimiCBox.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.yaziListeBicimiCBox.setMaximumWidth(135)
         self.yaziListeBicimiCBox.addItem(self.tr("Standard"))
         self.yaziListeBicimiCBox.addItem(self.tr("Bullet List (Disc)"))
@@ -424,7 +418,6 @@ class DefterAnaPencere(QMainWindow):
 
         # ---------------------------------------------------------------------
         self.yaziRengiBtn = PushButtonRenk("", 40, 20, self.cScene.aktifArac.yaziRengi, self.yaziGrupW)
-        # self.yaziRengiBtn.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.yaziRengiBtn.clicked.connect(self.act_set_item_text_color)
 
         renklerDisLay = QHBoxLayout()
@@ -436,7 +429,6 @@ class DefterAnaPencere(QMainWindow):
         for i in range(10):
             btn = self.ver_renk_palet_buton(tip="y", gen=15, yuk=15, renk=self.yazi_rengi_btn_liste_acilis_renkleri[i],
                                             parent=self.yaziGrupW)
-            # btn.setFocusPolicy(Qt.FocusPolicy.TabFocus)
             renklerSatir1Lay.addWidget(btn)
 
             self.yazi_rengi_btn_liste.append(btn)
@@ -447,35 +439,30 @@ class DefterAnaPencere(QMainWindow):
         renklerDisLay.addStretch()
 
         self.btnBold = PushButton("", 16, 16, parent=self.yaziGrupW)
-        # self.btnBold.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.btnBold.setIcon(QIcon(':icons/bold.png'))
         self.btnBold.setFlat(True)
         self.btnBold.setCheckable(True)
         self.btnBold.clicked.connect(lambda durum: self.act_bold(durum=durum, from_button=True))
 
         self.btnItalic = PushButton("", 16, 16, parent=self.yaziGrupW)
-        # self.btnItalic.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.btnItalic.setIcon(QIcon(':icons/italic.png'))
         self.btnItalic.setFlat(True)
         self.btnItalic.setCheckable(True)
         self.btnItalic.clicked.connect(lambda durum: self.act_italic(durum=durum, from_button=True))
 
         self.btnUnderline = PushButton("", 16, 16, parent=self.yaziGrupW)
-        # self.btnUnderline.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.btnUnderline.setIcon(QIcon(':icons/underline.png'))
         self.btnUnderline.setFlat(True)
         self.btnUnderline.setCheckable(True)
         self.btnUnderline.clicked.connect(lambda durum: self.act_underline(durum=durum, from_button=True))
 
         self.btnStrikeOut = PushButton("", 16, 16, parent=self.yaziGrupW)
-        # self.btnStrikeOut.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.btnStrikeOut.setIcon(QIcon(':icons/strikeout.png'))
         self.btnStrikeOut.setFlat(True)
         self.btnStrikeOut.setCheckable(True)
         self.btnStrikeOut.clicked.connect(lambda durum: self.act_strikeout(durum=durum, from_button=True))
 
         self.btnOverline = PushButton("", 16, 16, parent=self.yaziGrupW)
-        # self.btnOverline.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.btnOverline.setIcon(QIcon(':icons/overline.png'))
         self.btnOverline.setFlat(True)
         self.btnOverline.setCheckable(True)
@@ -493,30 +480,22 @@ class DefterAnaPencere(QMainWindow):
         grp.buttonClicked.connect(self.act_yazi_hizala_btn)
 
         self.btnYaziHizalaSola = PushButton("", 16, 16, parent=self.yaziGrupW)
-        # self.btnYaziHizalaSola.setFocusPolicy(Qt.FocusPolicy.TabFocus)
-        self.btnYaziHizalaSola.setIcon(
-            QIcon.fromTheme('format-justify-left', QIcon(':icons/format-justify-left.png')))
+        self.btnYaziHizalaSola.setIcon(QIcon(':icons/yazi-hizala-sola.png'))
         self.btnYaziHizalaSola.setFlat(True)
         self.btnYaziHizalaSola.setCheckable(True)
 
         self.btnYaziHizalaOrtala = PushButton("", 16, 16, parent=self.yaziGrupW)
-        # self.btnYaziHizalaOrtala.setFocusPolicy(Qt.FocusPolicy.TabFocus)
-        self.btnYaziHizalaOrtala.setIcon(
-            QIcon.fromTheme('format-justify-center', QIcon(':icons/format-justify-center.png')))
+        self.btnYaziHizalaOrtala.setIcon(QIcon(':icons/yazi-hizala-ortala.png'))
         self.btnYaziHizalaOrtala.setFlat(True)
         self.btnYaziHizalaOrtala.setCheckable(True)
 
         self.btnYaziHizalaSaga = PushButton("", 16, 16, parent=self.yaziGrupW)
-        # self.btnYaziHizalaSaga.setFocusPolicy(Qt.FocusPolicy.TabFocus)
-        self.btnYaziHizalaSaga.setIcon(
-            QIcon.fromTheme('format-justify-right', QIcon(':icons/format-justify-right.png')))
+        self.btnYaziHizalaSaga.setIcon(QIcon(':icons/yazi-hizala-saga.png'))
         self.btnYaziHizalaSaga.setFlat(True)
         self.btnYaziHizalaSaga.setCheckable(True)
 
         self.btnYaziHizalaSigdir = PushButton("", 16, 16, parent=self.yaziGrupW)
-        # self.btnYaziHizalaSigdir.setFocusPolicy(Qt.FocusPolicy.TabFocus)
-        self.btnYaziHizalaSigdir.setIcon(
-            QIcon.fromTheme('format-justify-fill', QIcon(':icons/format-justify-fill.png')))
+        self.btnYaziHizalaSigdir.setIcon(QIcon(':icons/yazi-hizala-sigdir.png'))
         self.btnYaziHizalaSigdir.setFlat(True)
         self.btnYaziHizalaSigdir.setCheckable(True)
 
@@ -669,11 +648,8 @@ class DefterAnaPencere(QMainWindow):
         # ---------------------------------------------------------------------
         self.radioBtnGroup = QButtonGroup(self)
         self.radioArkaplan = QRadioButton(self.tr("Background"), self)
-        # self.radioArkaplan.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.radioYazi = QRadioButton(self.tr("Text"), self)
-        # self.radioYazi.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.radioCizgi = QRadioButton(self.tr("Line && Pen"), self)
-        # self.radioCizgi.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.radioBtnGroup.addButton(self.radioArkaplan)
         self.radioBtnGroup.addButton(self.radioYazi)
         self.radioBtnGroup.addButton(self.radioCizgi)
@@ -693,7 +669,6 @@ class DefterAnaPencere(QMainWindow):
 
         self.renkSecici = RenkSeciciWidget(self.cScene.aktifArac.arkaPlanRengi,
                                            boyut=64, parent=self.nesneOzellikleriDWBaseWidget)
-        # self.renkSecici.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.renkSecici.renkDegisti.connect(self.renk_secicide_renk_degisti)
         self.renkSecici.anaLay.setContentsMargins(0, 0, 0, 0)
         shared.kutulu_arkaplan_olustur(self.nesneArkaplanRengiBtn, 5)
@@ -4903,7 +4878,6 @@ class DefterAnaPencere(QMainWindow):
         self.fontToolBar.setIconSize(QSize(16, 16))
 
         self.fontCBox_tbar = FontComboBox(self.fontToolBar)
-        # self.fontCBox_tbar.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         # self.fontCBox_tbar.activated[str].connect(self.act_set_current_font)
         # self.fontCBox_tbar.currentFontChanged.connect(self.set_text_family)
         # self.fontCBox_tbar.currentIndexChanged.connect(self.act_change_font)
@@ -4911,7 +4885,6 @@ class DefterAnaPencere(QMainWindow):
         self.fontCBox_tbar.valueChangedFromFontComboBoxGuiNotByCode.connect(self.act_set_current_font)
 
         self.fontPointSizeFDSBox_tbar = DoubleSpinBox(self.fontToolBar)
-        # self.fontPointSizeFDSBox_tbar.setFocusPolicy(Qt.FocusPolicy.WheelFocus)
         self.fontPointSizeFDSBox_tbar.setSuffix(" pt")
         self.fontPointSizeFDSBox_tbar.setValue(self.cScene.aktifArac.yaziBoyutu)
         self.fontPointSizeFDSBox_tbar.setMinimum(3)
@@ -5114,7 +5087,6 @@ class DefterAnaPencere(QMainWindow):
             if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 # if self.cScene.activeItem.hasFocus():
                 if self.cScene.activeItem.textCursor().hasSelection():
-                    # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
                     fmt.setFontWeight(QFont.Weight.Bold if self.actionBold.isChecked() else QFont.Weight.Normal)
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
@@ -5138,7 +5110,6 @@ class DefterAnaPencere(QMainWindow):
         if len(self.cScene.selectionQueue) == 1:
             if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.textCursor().hasSelection():
-                    # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
                     fmt.setFontUnderline(self.actionUnderline.isChecked())
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
@@ -5162,7 +5133,6 @@ class DefterAnaPencere(QMainWindow):
         if len(self.cScene.selectionQueue) == 1:
             if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.textCursor().hasSelection():
-                    # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
                     fmt.setFontItalic(self.actionItalic.isChecked())
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
@@ -5186,7 +5156,6 @@ class DefterAnaPencere(QMainWindow):
         if len(self.cScene.selectionQueue) == 1:
             if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.textCursor().hasSelection():
-                    # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
                     fmt.setFontStrikeOut(self.actionStrikeOut.isChecked())
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
@@ -5210,7 +5179,6 @@ class DefterAnaPencere(QMainWindow):
         if len(self.cScene.selectionQueue) == 1:
             if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if self.cScene.activeItem.textCursor().hasSelection():
-                    # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                     fmt = QTextCharFormat()
                     fmt.setFontOverline(self.actionOverline.isChecked())
                     self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
@@ -7359,7 +7327,6 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def renk_sec(self, eskiRenk, baslik, anlikRenkGonderilecekFonksiyon=None):
         renkDialog = QColorDialog(self)
-        # renkDialog.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         renkDialog.setWindowTitle(baslik)
         renkDialog.setOptions(
             QColorDialog.ColorDialogOption.DontUseNativeDialog
@@ -7482,7 +7449,6 @@ class DefterAnaPencere(QMainWindow):
             if len(self.cScene.selectionQueue) == 1:
                 if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                     if self.cScene.activeItem.textCursor().hasSelection():
-                        # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                         fmt = QTextCharFormat()
                         fmt.setForeground(col)
                         self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
@@ -7592,7 +7558,6 @@ class DefterAnaPencere(QMainWindow):
             if len(self.cScene.selectionQueue) == 1:
                 if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                     if self.cScene.activeItem.textCursor().hasSelection():
-                        # text item secili ve focuslanmis iken degisiklikleri text itemin undoredo stacki takip etsin diye
                         fmt = QTextCharFormat()
                         fmt.setBackground(col)
                         self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)
@@ -7987,8 +7952,6 @@ class DefterAnaPencere(QMainWindow):
                 if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                     # if self.cScene.activeItem.hasFocus():
                     if self.cScene.activeItem.textCursor().hasSelection():
-                        # text item secili ve focuslanmis iken degisiklikleri
-                        # text itemin undoredo stacki takip etsin diye
                         fmt = QTextCharFormat()
                         fmt.setFontPointSize(value)
                         self.yazi_nesnesi_iceriginin_karakter_bicimini_degistir(fmt)

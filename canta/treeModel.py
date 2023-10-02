@@ -218,36 +218,6 @@ class DokumanAgacModel(QAbstractItemModel):
 
         # return self.index(row=sayfa.satir(), column=0, parent=sayfa.parent())
 
-    """
-    QModelIndex QStandardItemModel::indexFromItem(const QStandardItem *item) const
-{
-    if (item && item->d_func()->parent) {
-        QPair<int, int> pos = item->d_func()->position();
-        return createIndex(pos.first, pos.second, item->d_func()->parent);
-    }
-    return QModelIndex();
-}
-    """
-
-    # ---------------------------------------------------------------------
-    def parentt(self, index=None):
-        node = self.sayfa_indexten(index)
-        parentNode = node.parent()
-        if parentNode == self.kokSayfa:
-            return QModelIndex()
-        return self.createIndex(parentNode.satir(), 0, parentNode)
-
-    """
-    QModelIndex QStandardItemModel::parent(const QModelIndex &child) const
-{
-    Q_D(const QStandardItemModel);
-    if (!d->indexValid(child))
-        return QModelIndex();
-    QStandardItem *parentItem = static_cast<QStandardItem*>(child.internalPointer());
-    return indexFromItem(parentItem);
-}
-    """
-
     # ---------------------------------------------------------------------
     def parent(self, index=None):
         """bu tamam olmasi lazım"""
@@ -308,119 +278,6 @@ class DokumanAgacModel(QAbstractItemModel):
     # ---------------------------------------------------------------------
     def supportedDragActions(self):
         return Qt.DropAction.MoveAction
-
-    # def flags(self, index):
-    #     defaultFlags = QAbstractItemModel.flags(self, index)
-    #
-    #     if index.isValid():
-    #         return Qt.ItemIsEditable | Qt.ItemIsDragEnabled | \
-    #                Qt.ItemIsDropEnabled | defaultFlags
-    #
-    #     else:
-    #         return Qt.ItemIsDropEnabled | defaultFlags
-
-    # def mimeTypes(self):
-    #     types = ['application/x-ets-qt4-instance']
-    #     return types
-    #
-    # def mimeData(self, Iterable, QModelIndex=None):
-    #
-    #     node = self.sayfa_indexten(QModelIndex[0])
-    #     mimeData = PyMimeData(node)
-    #     return mimeData
-
-    # def dropMimeData(self, mimedata, action, row, column, parentIndex):
-    #     if action == Qt.IgnoreAction:
-    #         return True
-    #
-    #     dragNode = mimedata.instance()
-    #     print(row,column)
-    #     parentNode = self.sayfa_indexten(parentIndex)
-    #
-    #     # make an copy of the node being moved
-    #     newNode = deepcopy(dragNode)
-    #     newNode.setParent(parentNode)
-    #     self.insertRow(len(parentNode) - 1, parentIndex)
-    #     self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"),
-    #               parentIndex, parentIndex)
-    #     return True
-
-    def mimeTypess(self):
-        return ['text/sayfa']
-
-    def mimeDataa(self, indexes, idx=None):
-
-        print(indexes, idx)
-        print(self.sayfa_indexten(indexes[0]).adi)
-
-        mimedata = QMimeData()
-        # mimedata.setData('text/sayfa', b'mimeDasdfsdfsdfsdfta')
-        mimedata.setData('text/sayfa', QByteArray())
-        return mimedata
-
-        # mimedata = QMimeData()
-        # encoded_data = QtCore.QByteArray()
-        # stream = QtCore.QDataStream(encoded_data, QtCore.QIODevice.WriteOnly)
-        # for index in indexes:
-        #     if index.isValid():
-        #         text = self.data(index, 0)
-        # stream << QtCore.QByteArray(text.encode('utf-8'))
-        # mimedata.setData('application/vnd.treeviewdragdrop.list', encoded_data)
-        #
-        #
-        # return mimedata
-
-    # # ---------------------------------------------------------------------
-    # def canDropMimeData(self, data, Qt_DropAction, row, column, QModelIndex):
-    #     print(row,column)
-    #     print(data.formats())
-    #     if not data.hasFormat("text/sayfa"):
-    #         return False
-    #     return True
-
-    def dropMiemeData(self, data, action, row, column, parent):
-
-        if not self.canDropMimeData(data, action, row, column, parent):
-            return True
-
-        print("asdasdsfsadfasdf")
-
-        # print('dropMimeData %s %s %s %s' % (data.data('text/xml').decode("utf-8"), action, row, parent))
-
-        if action == Qt.DropAction.IgnoreAction:
-            return True
-        if not data.hasFormat('text/xml'):
-            return False
-        if column > 0:
-            return False
-
-        num_rows = self.rowCount(QModelIndex())
-        if num_rows <= 0:
-            return False
-
-        if row < 0:
-            if parent.isValid():
-                row = parent.row()
-            else:
-                return False
-
-        # return QAbstractItemModel.dropMimeData(self, data, action, row, column, parent)
-
-    #
-    # def moveItem(self, fromi, toi):
-    #     print("move %d->%d" % (fromi, toi))
-    #
-    #     self.beginMoveRows(QtCore.QModelIndex(), fromi, fromi, QtCore.QModelIndex(), toi)
-    #
-    #     item = self.lst.pop(fromi)
-    #     self.lst.insert(toi, item)
-    #
-    #     self.endMoveRows()
-    #
-    #     print("done")
-
-    # def moveRow(self, QModelIndex, p_int, QModelIndex_1, p_int_1):
-    #     pass
 
     # ---------------------------------------------------------------------
     # def moveRows(self, QModelIndex, p_int, p_int_1, QModelIndex_1, p_int_2):
@@ -658,15 +515,6 @@ class DokumanAgacModel(QAbstractItemModel):
         if not index.isValid():
             return False
 
-        """
-        if (index.isValid() && role == Qt::EditRole) {
-
-        stringList.replace(index.row(), value.toString());
-        emit dataChanged(index, index, {role});
-        return true;
-    }
-    return false;"""
-
         sayfa = self.sayfa_indexten(index)
         # if role == Qt.ItemDataRole.DisplayRole:
         #     sayfa.adi = value
@@ -707,19 +555,9 @@ class DokumanAgacModel(QAbstractItemModel):
             ustSayfa = index.internalPointer()
             ustSayfa.sayfa_ekle(sayfa)
 
-    def insertRowss(self, position, rows=1, index=QModelIndex()):
-        indexSelected = self.index(position, 0)
-        itemSelected = indexSelected.data().toPyObject()
-
-        self.beginInsertRows(QModelIndex(), position, position + rows - 1)
-        for row in range(rows):
-            self.items.insert(position + row, "%s_%s" % (itemSelected, self.added))
-            self.added += 1
-        self.endInsertRows()
-        return True
-
+    # ---------------------------------------------------------------------
     def insertRows(self, position, rows, parent: QModelIndex = None, sayfa=None, *args, **kwargs):
-        print("insert")
+        # print("insert")
         parentSayfa = self.sayfa_indexten(parent)
         self.beginInsertRows(parent, position, position + rows - 1)
 
@@ -729,19 +567,6 @@ class DokumanAgacModel(QAbstractItemModel):
             sonuc = parentSayfa.sayfa_araya_ekle(row, sayfa)
         self.endInsertRows()
         return sonuc
-
-    """
-    bool StringListModel::insertRows(int position, int rows, const QModelIndex &parent)
-{
-    beginInsertRows(QModelIndex(), position, position+rows-1);
-
-    for (int row = 0; row < rows; ++row) {
-        stringList.insert(position, "");
-    }
-
-    endInsertRows();
-    return true;
-}"""
 
     # ---------------------------------------------------------------------
     def sayfa_ekle(self, satir=None, scene=None, view=None, ikon=None, ustSayfa=None):
@@ -867,15 +692,6 @@ class DokumanAgacModel(QAbstractItemModel):
         #     scene.deleteLater()
 
     # ---------------------------------------------------------------------
-    def removeRowss(self, position, rows=1, index=QModelIndex()):
-        print("\n\t\t ...removeRows() Starting position: '%s'" % position, 'with the total rows to be deleted: ', rows)
-        self.beginRemoveRows(QModelIndex(), position, position + rows - 1)
-        self.items = self.items[:position] + self.items[position + rows:]
-        self.endRemoveRows()
-
-        return True
-
-    # ---------------------------------------------------------------------
     def removeRows(self, row, count, parent: QModelIndex = None, *args, **kwargs):
         if row < 0 or row > self.rowCount():
             return False
@@ -885,9 +701,9 @@ class DokumanAgacModel(QAbstractItemModel):
         # sayfa = parentSayfa.ic_sayfa(row)
 
         # parentSayfa.sayfa_sil(sayfa)
-        print(parentSayfa)
-        print(self.kokSayfa)
-        print(parentSayfa == self.kokSayfa, "esitler imisler")
+        # print(parentSayfa)
+        # print(self.kokSayfa)
+        # print(parentSayfa == self.kokSayfa, "esitler imisler")
         sonuc = parentSayfa.sayfa_sil_sira_ile(row)
 
         self.endRemoveRows()
@@ -913,58 +729,3 @@ class DokumanAgacModel(QAbstractItemModel):
     # ---------------------------------------------------------------------
     # diger
     # ---------------------------------------------------------------------
-
-    # def roleNames(self):
-    #     return self._roleNames
-
-# class ListModel(QAbstractItemModel):
-#
-#     def __init__(self):
-#         super().__init__()
-#         self._items = []
-#
-#         meta = klass().metaObject()
-#
-#         self._roleNames = {}
-#         for i in range(0, meta.propertyCount()):
-#             self._roleNames[i] = meta.property(i).name()
-#
-#     def rowCount(self, parent=QModelIndex()):
-#         return len(self._items)
-#
-#     def columnCount(self, parent=QModelIndex()):
-#         return 1
-#
-#     def parent(self, index):
-#         return QModelIndex()
-#
-#     def roleNames(self):
-#         return self._roleNames
-#
-#     def data(self, index, role):
-#         item = self._items[index.row()]
-#         return item.property(self._roleNames[role])
-#
-#     @Slot(int, str, str)
-#     def setProperty(self, index, prop, value):
-#         item = self._items[index]
-#         item.setProperty(prop, value)
-#
-#     def index(self, row, column=0, parent=QModelIndex()):
-#         return self.createIndex(row, column, parent)
-#
-#     def append(self, item):
-#         index = self.rowCount()
-#         self.beginInsertRows(QModelIndex(), index, index)
-#         self._items.append(item)
-#         self.endInsertRows()
-#
-#     def update(self, index, item):
-#         self._items[index] = item
-#         self.dataChanged.emit(self.index(index), self.index(index))
-#
-#     def remove(self, item):
-#         index = self._items.index(item)
-#         self.beginRemoveRows(QModelIndex(), index, index)
-#         self._items.remove(item)
-#         self.endRemoveRows()
