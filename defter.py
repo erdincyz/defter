@@ -4786,7 +4786,7 @@ class DefterAnaPencere(QMainWindow):
         self.ikonDosyaAraci = self.actionEkleDosyaNesnesi.icon().pixmap(16, 16)
 
         self.actionWebBrowserAc = QAction(QIcon(':icons/web-browser.png'), self.tr("Web Browser"), actionGroup)
-        self.actionWebBrowserAc.setShortcut(QKeySequence("W"))
+        # self.actionWebBrowserAc.setShortcut(QKeySequence("W"))
         self.actionWebBrowserAc.triggered.connect(self.act_web_browser_ac)
         # self.actionWebBrowserAc.setCheckable(True)
 
@@ -9611,8 +9611,8 @@ class DefterAnaPencere(QMainWindow):
     def text_item_deselected(self, item):
 
         if item.textCursor().hasSelection():
-            item.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
             item.clear_selection()
+        item.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
 
         self.cScene.selectionQueue.remove(item)
 

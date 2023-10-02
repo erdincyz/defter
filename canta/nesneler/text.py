@@ -7,7 +7,7 @@ __date__ = '3/28/16'
 
 # from math import fabs
 
-from PySide6.QtCore import Qt, Signal, QSizeF, QRectF, QPointF, Slot, QUrl, QRect
+from PySide6.QtCore import Qt, Signal, QSizeF, QRectF, QPointF, Slot, QUrl
 from PySide6.QtGui import QBrush, QPen, QColor, QPainterPath, QFontMetricsF, QTextCursor
 from PySide6.QtWidgets import QGraphicsTextItem, QStyle
 from canta import shared
@@ -564,15 +564,15 @@ class Text(QGraphicsTextItem):
     # ---------------------------------------------------------------------
     def focusOutEvent(self, event):
 
+        self.textItemFocusedOut.emit(self)
+        if self.scene():
+            self.scene().parent()._statusBar.clearMessage()
+
         # self.setTextInteractionFlags(Qt.TextSelectableByMouse)
         # self.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
         # self.clear_selection()
         if self.textCursor().hasSelection():
             return QGraphicsTextItem.focusOutEvent(self, event)
-
-        self.textItemFocusedOut.emit(self)
-        if self.scene():
-            self.scene().parent()._statusBar.clearMessage()
 
         super(Text, self).focusOutEvent(event)
 

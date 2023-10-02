@@ -629,12 +629,14 @@ class Scene(QGraphicsScene):
         # self.addItem(textItem)
         undoRedo.undoableAddItem(self.undoStack, description=self.tr("add text"), scene=self, item=textItem)
         textItem.setFocus()
+        textItem.setSelected(True)
+
 
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
 
-            # drawlnetool kontrolune gerek yok esasen cunku ilktiklamada cizgiyi bitirip sahneye ekliyor.
+            # drawlinetool kontrolune gerek yok esasen cunku ilk tiklamada cizgiyi bitirip sahneye ekliyor.
             # ama coklu cizgi eklenirse hatirlatma olsun diye..
             if not self.aktifArac == self.KalemAraci and not self.aktifArac == self.OkAraci:
                 if not self.itemAt(event.scenePos(), self.views()[0].transform()):
