@@ -5040,12 +5040,12 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def yazi_nesnesi_iceriginin_karakter_bicimini_degistir(self, bicim):
         # bu degisiklikleri yazi nesnesinin documentinin undo redo stacki takip eder.
+        self.cScene.activeItem.isPlainText = False
         cursor = self.cScene.activeItem.textCursor()
         if not cursor.hasSelection():
             cursor.select(QTextCursor.SelectionType.WordUnderCursor)
         cursor.mergeCharFormat(bicim)
         self.cScene.activeItem.setTextCursor(cursor)
-        self.cScene.activeItem.isPlainText = False
         return
 
     # ---------------------------------------------------------------------
@@ -5193,6 +5193,7 @@ class DefterAnaPencere(QMainWindow):
         if len(self.cScene.selectionQueue) == 1:
             if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 # if self.cScene.activeItem.hasFocus():
+                self.cScene.activeItem.isPlainText = False
                 cursor = self.cScene.activeItem.textCursor()
                 if styleIndex:
                     styleDict = {
@@ -5225,7 +5226,6 @@ class DefterAnaPencere(QMainWindow):
                     bfmt = QTextBlockFormat()
                     bfmt.setObjectIndex(-1)
                     cursor.mergeBlockFormat(bfmt)
-                self.cScene.activeItem.isPlainText = False
 
     # ---------------------------------------------------------------------
     @Slot(QAction)
