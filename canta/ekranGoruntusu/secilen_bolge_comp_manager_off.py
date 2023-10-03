@@ -60,7 +60,7 @@ class TamEkranWidget_CM_Off(QLabel):
 
         self.screen = QApplication.primaryScreen()
 
-        self.setAutoFillBackground(True)
+        # self.setAutoFillBackground(True)
 
         # self.setWindowOpacity(0.01)
         # self.setWindowOpacity(0)

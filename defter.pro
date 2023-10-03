@@ -5,5 +5,6 @@ SOURCES	     += canta/tabWidget.py
 SOURCES	     += canta/scene.py
 SOURCES	     += canta/printPreviewDialog.py
 SOURCES	     += canta/yuzenWidget.py
+SOURCES	     += canta/renkSecmeDugmesi.py
 TRANSLATIONS += defter_tr_TR.ts
 CODECFORTR = UTF-8

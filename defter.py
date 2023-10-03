@@ -51,6 +51,7 @@ from canta.nesneOzellikleriYuzenWidget import NesneOzellikleriYuzenWidget
 from canta.pdfyiResmeCevirPenceresi import PdfyiResmeCevirPenceresi
 from canta.printPreviewDialog import PrintPreviewDialog
 from canta.renkSecici import RenkSeciciWidget
+from canta.renkSecmeDugmesi import RenkSecmeDugmesi
 from canta.scene import Scene
 from canta.view import View
 from canta.ekranKutuphane import EkranKutuphane
@@ -659,8 +660,12 @@ class DefterAnaPencere(QMainWindow):
         self.yaziGrupW.hide()
         self.cizgiGrupW.hide()
         self.aracIkonuEtiketi = QLabel(self.nesneOzellikleriDWBaseWidget)
+
+        self.ekrandaRenkSecmeDugmesi = RenkSecmeDugmesi(self)
+        self.ekrandaRenkSecmeDugmesi.renkDegisti.connect(self.ekrandan_renk_secicide_renk_degisti)
         radioLay = QHBoxLayout()
         radioLay.addWidget(self.aracIkonuEtiketi)
+        radioLay.addWidget(self.ekrandaRenkSecmeDugmesi)
         radioLay.addWidget(self.radioArkaplan)
         radioLay.addWidget(self.radioYazi)
         radioLay.addWidget(self.radioCizgi)
@@ -729,6 +734,21 @@ class DefterAnaPencere(QMainWindow):
         elif self.renk_tipi == "c":
             self.cScene.aktifArac.cizgiRengi = renk
             self.act_set_item_line_color(renk, renkSecicidenMi=True)
+
+    # ---------------------------------------------------------------------
+    def ekrandan_renk_secicide_renk_degisti(self, renk, bilgi):
+
+        self.log(bilgi, toStatusBarOnly=True)
+
+        if self.renk_tipi == "a":
+            self.cScene.aktifArac.arkaPlanRengi = renk
+            self.act_set_item_background_color(renk, renkSecicidenMi=False)
+        elif self.renk_tipi == "y":
+            self.cScene.aktifArac.yaziRengi = renk
+            self.act_set_item_text_color(renk, renkSecicidenMi=False)
+        elif self.renk_tipi == "c":
+            self.cScene.aktifArac.cizgiRengi = renk
+            self.act_set_item_line_color(renk, renkSecicidenMi=False)
 
     # ---------------------------------------------------------------------
     def olustur_stillerYW(self):
@@ -4709,6 +4729,7 @@ class DefterAnaPencere(QMainWindow):
         self.nesneOzellikleriYW.arkaPlanRengiDegisti.connect(lambda color: self.act_set_item_background_color(color, renkSecicidenMi=True))
         self.nesneOzellikleriYW.yaziRengiDegisti.connect(lambda color: self.act_set_item_text_color(color, renkSecicidenMi=True))
         self.nesneOzellikleriYW.cizgiRengiDegisti.connect(lambda color: self.act_set_item_line_color(color, renkSecicidenMi=True))
+        # self.nesneOzellikleriYW.ekranRenkSeciciDugmesindenRenkDegisti.connect(self.ekrandan_renk_secicide_renk_degisti)
         self.nesneOzellikleriYW.cizgiKalinligiDegisti.connect(self.act_cizgi_kalinligi_degistir)
         self.nesneOzellikleriYW.cizgiKalinligiDegisti.connect(
             lambda x: self.cizgiKalinligiDSliderWithDSBox_tbar.setValue(x * 10))

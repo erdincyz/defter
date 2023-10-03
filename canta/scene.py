@@ -631,7 +631,6 @@ class Scene(QGraphicsScene):
         textItem.setFocus()
         textItem.setSelected(True)
 
-
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
