@@ -43,13 +43,12 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
 
         self.ekleWidget(self.renkSecici)
         self.addStretchToLayout()
-
         self.olustur_cizgi_kalinligi_slider()
-
+        self.addStretchToLayout()
         self.radioArkaplan.setChecked(True)
 
-        self.setMinimumWidth(250)
-        self.setMinimumHeight(175)
+        self.setMinimumWidth(280)
+        self.setMinimumHeight(165)
 
     # ---------------------------------------------------------------------
     def olustur_radio(self):
@@ -76,7 +75,7 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
 
         radioLay.addSpacing(5)
         radioLay.addWidget(self.aracIkonuEtiketi)
-        radioLay.addSpacing(5)
+        radioLay.addSpacing(3)
         radioLay.addWidget(self.ekrandaRenkSecmeDugmesi)
         radioLay.addSpacing(5)
         radioLay.addWidget(self.radioArkaplan)

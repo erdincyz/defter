@@ -4,177 +4,177 @@
 <context>
     <name>DefterAnaPencere</name>
     <message>
-        <location filename="defter.py" line="3450"/>
+        <location filename="defter.py" line="3449"/>
         <source>The file has been modified!</source>
         <translation>Dosya değişikliğe uğramış !</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3451"/>
+        <location filename="defter.py" line="3450"/>
         <source>Do you want to save your changes?</source>
         <translation>Değişikliklerinizi kaydetmek istiyor musunuz?</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4034"/>
+        <location filename="defter.py" line="4033"/>
         <source>Tools</source>
         <translation>Araçlar</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4048"/>
+        <location filename="defter.py" line="4047"/>
         <source>Help</source>
         <translation>Yardım</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4049"/>
+        <location filename="defter.py" line="4048"/>
         <source>About Defter</source>
         <translation>Defter Hakkında</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4053"/>
+        <location filename="defter.py" line="4052"/>
         <source>About Qt</source>
         <translation>Qt Hakkında</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4779"/>
+        <location filename="defter.py" line="4778"/>
         <source>Select</source>
         <translation>Seç</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4785"/>
+        <location filename="defter.py" line="4784"/>
         <source>Add Text</source>
         <translation>Yazı Ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4791"/>
+        <location filename="defter.py" line="4790"/>
         <source>Add Rectangle</source>
         <translation>Dikdörtgen Ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4797"/>
+        <location filename="defter.py" line="4796"/>
         <source>Add Ellipse</source>
         <translation>Yuvarlak Ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4823"/>
+        <location filename="defter.py" line="4822"/>
         <source>Add Image</source>
         <translation>Resim Ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4830"/>
+        <location filename="defter.py" line="4829"/>
         <source>Add Video</source>
         <translation>Video Ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3866"/>
+        <location filename="defter.py" line="3865"/>
         <source>Color</source>
         <translation>Renk</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5052"/>
+        <location filename="defter.py" line="5051"/>
         <source>Item&apos;s Background Color</source>
         <translation>Nesne arkaplan rengi</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7494"/>
+        <location filename="defter.py" line="7493"/>
         <source>Text Color</source>
         <translation>Yazı Rengi</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7552"/>
+        <location filename="defter.py" line="7551"/>
         <source>Line Color</source>
         <translation>Çizgi Rengi</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5375"/>
+        <location filename="defter.py" line="5374"/>
         <source>Mirror X</source>
         <translation>Yatayda aynala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5379"/>
+        <location filename="defter.py" line="5378"/>
         <source>Mirror Y</source>
         <translation>Dikeyde aynala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5383"/>
+        <location filename="defter.py" line="5382"/>
         <source>Align left edges</source>
         <translation>Sol kenarları hizala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5388"/>
+        <location filename="defter.py" line="5387"/>
         <source>Align right edges</source>
         <translation>Sağ kenarları hizala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5393"/>
+        <location filename="defter.py" line="5392"/>
         <source>Align top edges</source>
         <translation>Üst kenarları hizala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5398"/>
+        <location filename="defter.py" line="5397"/>
         <source>Align bottom edges</source>
         <translation>Alt kenarları hizala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5404"/>
+        <location filename="defter.py" line="5403"/>
         <source>Align centers vertically</source>
         <translation>Merkezleri dikey olarak hizala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5409"/>
+        <location filename="defter.py" line="5408"/>
         <source>Align centers horizontally</source>
         <translation>Merkezleri yatay olarak hizala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5483"/>
+        <location filename="defter.py" line="5482"/>
         <source>If checked on, Defter will stay on top of other windows.</source>
         <translation>Eğer seçilir ise Defter programı penceresi her zaman en üst pencere olacak.</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5896"/>
+        <location filename="defter.py" line="5895"/>
         <source>No active image item!</source>
         <translation>Resim nesnesi aktif nesne değil!</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5906"/>
+        <location filename="defter.py" line="5905"/>
         <source>Open Image File...</source>
         <translation>Resim dosyası seç...</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5945"/>
+        <location filename="defter.py" line="5944"/>
         <source>Open Image Files...</source>
         <translation>Resim dosyalarını seç...</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6024"/>
+        <location filename="defter.py" line="6023"/>
         <source>Open Video File...</source>
         <translation>Video dosyası seç...</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6047"/>
+        <location filename="defter.py" line="6046"/>
         <source>Open Video Files...</source>
         <translation>Video dosyalarını seç...</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6213"/>
+        <location filename="defter.py" line="6212"/>
         <source>Delete</source>
         <translation>Sil</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6235"/>
+        <location filename="defter.py" line="6234"/>
         <source>_remove</source>
         <translation>_sil</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8149"/>
+        <location filename="defter.py" line="8148"/>
         <source>Create a new style preset</source>
         <translation>Yeni bir stil oluştur</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8188"/>
+        <location filename="defter.py" line="8187"/>
         <source>Preset name:</source>
         <translation>Stil adı:</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8737"/>
+        <location filename="defter.py" line="8736"/>
         <source>---------------------------------------
 Please install &quot;xdg-open&quot; from your package manager. 
 More info at :
@@ -191,337 +191,337 @@ http://portland.freedesktop.org/xdg-utils-1.0/xdg-open.html
 ---------------------------------------</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3579"/>
+        <location filename="defter.py" line="3578"/>
         <source>File</source>
         <translation>Dosya</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3581"/>
+        <location filename="defter.py" line="3580"/>
         <source>New File</source>
         <translation>Yeni</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3585"/>
+        <location filename="defter.py" line="3584"/>
         <source>Open File</source>
         <translation>Aç</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3593"/>
+        <location filename="defter.py" line="3592"/>
         <source>Recent Files</source>
         <translation>Önceki dosyalar</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3602"/>
+        <location filename="defter.py" line="3601"/>
         <source>Reopen Last Closed Tab</source>
         <translation>Son kapatilan sekmeyi yeniden aç</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3610"/>
+        <location filename="defter.py" line="3609"/>
         <source>Save File</source>
         <translation>Kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3616"/>
+        <location filename="defter.py" line="3615"/>
         <source>Save as File</source>
         <translation>Farklı kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9795"/>
+        <location filename="defter.py" line="9794"/>
         <source>Export Document as HTML</source>
         <translation>Belgeyi HTML olarak kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3646"/>
+        <location filename="defter.py" line="3645"/>
         <source>Set Background Image</source>
         <translation>Arkaplan resmini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3652"/>
+        <location filename="defter.py" line="3651"/>
         <source>Clear Background Image</source>
         <translation>Arkaplan resmini temizle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4458"/>
+        <location filename="defter.py" line="4457"/>
         <source>Change Background Color</source>
         <translation>Arkaplan rengini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3669"/>
+        <location filename="defter.py" line="3668"/>
         <source>Import Image(s)</source>
         <translation>Resim(ler) ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3674"/>
+        <location filename="defter.py" line="3673"/>
         <source>Import Video(s)</source>
         <translation>Video(lar) ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3687"/>
+        <location filename="defter.py" line="3686"/>
         <source>E&amp;xit</source>
         <translation>&amp;Çıkış</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3691"/>
+        <location filename="defter.py" line="3690"/>
         <source>Quit</source>
         <translation>Programı kapat</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3717"/>
+        <location filename="defter.py" line="3716"/>
         <source>Undo</source>
         <translation>Geri al</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3728"/>
+        <location filename="defter.py" line="3727"/>
         <source>Redo</source>
         <translation>Yinele</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3739"/>
+        <location filename="defter.py" line="3738"/>
         <source>Cut</source>
         <translation>Kes</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3744"/>
+        <location filename="defter.py" line="3743"/>
         <source>Copy</source>
         <translation>Kopyala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3749"/>
+        <location filename="defter.py" line="3748"/>
         <source>Paste</source>
         <translation>Yapıştır</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3754"/>
+        <location filename="defter.py" line="3753"/>
         <source>Paste as Plain Text</source>
         <translation>Düz yazı olarak yapıştır</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3763"/>
+        <location filename="defter.py" line="3762"/>
         <source>Group</source>
         <translation>Grupla</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3768"/>
+        <location filename="defter.py" line="3767"/>
         <source>Ungroup</source>
         <translation>Grubu dağıt</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3773"/>
+        <location filename="defter.py" line="3772"/>
         <source>Parent</source>
         <translation>Nesneyi bağla</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3778"/>
+        <location filename="defter.py" line="3777"/>
         <source>Unparent</source>
         <translation>Nesneyi çöz</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3783"/>
+        <location filename="defter.py" line="3782"/>
         <source>Bring to &amp;Front</source>
         <translation>Üste &amp;taşı</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3786"/>
+        <location filename="defter.py" line="3785"/>
         <source>Bring item to front</source>
         <translation>Nesneyi en üste taşır</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3789"/>
+        <location filename="defter.py" line="3788"/>
         <source>Send to &amp;Back</source>
         <translation>Alta t&amp;aşı</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3792"/>
+        <location filename="defter.py" line="3791"/>
         <source>Send item to back</source>
         <translation>Nesneyi en alta taşır</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8225"/>
+        <location filename="defter.py" line="8224"/>
         <source>&amp;Delete</source>
         <translation>&amp;Sil</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3798"/>
+        <location filename="defter.py" line="3797"/>
         <source>Delete item</source>
         <translation>Nesneyi sil</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3802"/>
+        <location filename="defter.py" line="3801"/>
         <source>&amp;Select All</source>
         <translation>&amp;Hepsini seç</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3805"/>
+        <location filename="defter.py" line="3804"/>
         <source>Select All</source>
         <translation>Sahnedeki tüm nesneleri seçer</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3830"/>
+        <location filename="defter.py" line="3829"/>
         <source>View</source>
         <translation>Görünüm</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3833"/>
+        <location filename="defter.py" line="3832"/>
         <source>Toolbars</source>
         <translation>Araç çubukları</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3847"/>
+        <location filename="defter.py" line="3846"/>
         <source>Properties</source>
         <translation>Özellikler</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3873"/>
+        <location filename="defter.py" line="3872"/>
         <source>Mirror - Align - Distribute</source>
         <translation>Aynala - Hizala -Dağıt</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3854"/>
+        <location filename="defter.py" line="3853"/>
         <source>Font</source>
         <translation>Yazı tipi</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3880"/>
+        <location filename="defter.py" line="3879"/>
         <source>Utilities</source>
         <translation>Çeşitli</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4372"/>
+        <location filename="defter.py" line="4371"/>
         <source>Zoom</source>
         <translation>Yaklaş - Uzaklaş</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4485"/>
+        <location filename="defter.py" line="4484"/>
         <source>Zoom in</source>
         <translation>Yaklaş</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4490"/>
+        <location filename="defter.py" line="4489"/>
         <source>Zoom out</source>
         <translation>Uzaklaş</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4496"/>
+        <location filename="defter.py" line="4495"/>
         <source>Zoom to fit</source>
         <translation>Ekrana sığdır</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3962"/>
+        <location filename="defter.py" line="3961"/>
         <source>Zoom to selection</source>
         <translation>Seçili olanı ekrana sığdır</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4502"/>
+        <location filename="defter.py" line="4501"/>
         <source>Reset zoom</source>
         <translation>Sıfırla</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3983"/>
+        <location filename="defter.py" line="3982"/>
         <source>Clean Mode</source>
         <translation>Sade görünüm</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3988"/>
+        <location filename="defter.py" line="3987"/>
         <source>Status Bar</source>
         <translation>Durum çubuğu</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3992"/>
+        <location filename="defter.py" line="3991"/>
         <source>Toggles status bar visibility.</source>
         <translation>Durum çubuğunu gösterir/gizler.</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4076"/>
+        <location filename="defter.py" line="4075"/>
         <source>Pin</source>
         <translation>Sabitle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4081"/>
+        <location filename="defter.py" line="4080"/>
         <source>Unpin</source>
         <translation>Sabitleme</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4147"/>
+        <location filename="defter.py" line="4146"/>
         <source>Embed image(s) to document</source>
         <translation>Resim(leri) belgeye göm(dahil et)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4152"/>
+        <location filename="defter.py" line="4151"/>
         <source>Export image(s)</source>
         <translation>Resim(ler)i dışarıya da kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4156"/>
+        <location filename="defter.py" line="4155"/>
         <source>Show image info</source>
         <translation>Resim bilgilerini göster</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4159"/>
+        <location filename="defter.py" line="4158"/>
         <source>Crop Image</source>
         <translation>Resmi kırp</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4170"/>
+        <location filename="defter.py" line="4169"/>
         <source>Embed video(s) to document</source>
         <translation>Video(ları) belgeye göm(dahil et)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4175"/>
+        <location filename="defter.py" line="4174"/>
         <source>Export video(s)</source>
         <translation>Vidyo(lar)ı dışarıya da kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4179"/>
+        <location filename="defter.py" line="4178"/>
         <source>Show video info</source>
         <translation>Video bilgisi göster</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4122"/>
+        <location filename="defter.py" line="4121"/>
         <source>Show HTML source</source>
         <translation>HTML olarak goster</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4127"/>
+        <location filename="defter.py" line="4126"/>
         <source>Localize HTML</source>
         <translation>HTML yi dosyada çalışır hale getir.(localize)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4523"/>
+        <location filename="defter.py" line="4522"/>
         <source>Show in file manager</source>
         <translation>Dosya yöneticisinde göster</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4136"/>
+        <location filename="defter.py" line="4135"/>
         <source>Show as web page</source>
         <translation>Web sayfası olarak goster</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4092"/>
+        <location filename="defter.py" line="4091"/>
         <source>Add selected item&apos;s style as a preset</source>
         <translation>Seçili nesnenin stilini stillere ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4351"/>
+        <location filename="defter.py" line="4350"/>
         <source>Group Menu</source>
         <translation>Gruplama Menüsü</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4874"/>
+        <location filename="defter.py" line="4873"/>
         <source>Width</source>
         <translation>Genişlik</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4883"/>
+        <location filename="defter.py" line="4882"/>
         <source>Height</source>
         <translation>Yükseklik</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4892"/>
+        <location filename="defter.py" line="4891"/>
         <source>Rotation</source>
         <translation>Döndürme</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4949"/>
+        <location filename="defter.py" line="4948"/>
         <source>Text Size</source>
         <translation>Yazı boyutu</translation>
     </message>
@@ -576,7 +576,7 @@ http://portland.freedesktop.org/xdg-utils-1.0/xdg-open.html
         <translation>Kare</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4920"/>
+        <location filename="defter.py" line="4919"/>
         <source>Line Width</source>
         <translation>Çizgi Genişliği</translation>
     </message>
@@ -586,7 +586,7 @@ http://portland.freedesktop.org/xdg-utils-1.0/xdg-open.html
         <translation>Sıfırla</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3916"/>
+        <location filename="defter.py" line="3915"/>
         <source>Style Presets</source>
         <translation>Stiller</translation>
     </message>
@@ -641,7 +641,7 @@ http://portland.freedesktop.org/xdg-utils-1.0/xdg-open.html
         <translation>Kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3903"/>
+        <location filename="defter.py" line="3902"/>
         <source>Pages</source>
         <translation>Sayfalar</translation>
     </message>
@@ -651,12 +651,12 @@ http://portland.freedesktop.org/xdg-utils-1.0/xdg-open.html
         <translation>sayfa adı değiştirildi</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4068"/>
+        <location filename="defter.py" line="4067"/>
         <source>Redo {}</source>
         <translation>Yinele {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4069"/>
+        <location filename="defter.py" line="4068"/>
         <source>Undo {}</source>
         <translation>Geri Al {}</translation>
     </message>
@@ -668,21 +668,21 @@ http://portland.freedesktop.org/xdg-utils-1.0/xdg-open.html
 {1:s}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8376"/>
+        <location filename="defter.py" line="8375"/>
         <source>Could not open file  --   &quot;{0:s}&quot;
 {1:s}</source>
         <translation>Dosya açılamadı  --   &quot;{0:s}&quot;
 {1:s}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8391"/>
+        <location filename="defter.py" line="8390"/>
         <source>Could not open file  --   &quot;{0:s}&quot;
  Unrecognized file type!</source>
         <translation>Dosya açılamadı  --   &quot;{0:s}&quot;
  Tanınmayan dosya tipi!</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6099"/>
+        <location filename="defter.py" line="6098"/>
         <source>Open File...</source>
         <translation>Dosya Aç...</translation>
     </message>
@@ -692,7 +692,7 @@ http://portland.freedesktop.org/xdg-utils-1.0/xdg-open.html
         <translation>def Dosyaları (*.def);;Tüm Dosyalar(*)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8386"/>
+        <location filename="defter.py" line="8385"/>
         <source>{0:s} : Unrecognized file type!</source>
         <translation>{0:s} : Tanınmayan dosya tipi!</translation>
     </message>
@@ -707,12 +707,12 @@ http://portland.freedesktop.org/xdg-utils-1.0/xdg-open.html
         <translation>Dosya kaydedilemedi &quot;{}&quot; : &quot;{}&quot;</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8331"/>
+        <location filename="defter.py" line="8330"/>
         <source>Could not save file as &quot;{0:s}&quot; : &quot;{1:s}&quot;</source>
         <translation>Dosya kaydedilemedi &quot;{0:s}&quot; : &quot;{1:s}&quot;</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8351"/>
+        <location filename="defter.py" line="8350"/>
         <source>Could not save file as &quot;{0:s}&quot; : &quot;{1:s}&quot; </source>
         <translation>Dosya kaydedilemedi &quot;{0:s}&quot; : &quot;{1:s}&quot; </translation>
     </message>
@@ -722,609 +722,609 @@ http://portland.freedesktop.org/xdg-utils-1.0/xdg-open.html
         <translation>{0:s} başarı ile kaydedildi!</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3426"/>
+        <location filename="defter.py" line="3425"/>
         <source>Save as</source>
         <translation>Farklı kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3425"/>
+        <location filename="defter.py" line="3424"/>
         <source>*.def files (*.def);;All Files (*)</source>
         <translation>*.def Dosyaları (*.def);;Tüm Dosyalar (*)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3448"/>
+        <location filename="defter.py" line="3447"/>
         <source>Defter: Save file?</source>
         <translation>Defter: Dosyayı kaydet?</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3453"/>
+        <location filename="defter.py" line="3452"/>
         <source>&amp;Save</source>
         <translation>&amp;Kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3454"/>
+        <location filename="defter.py" line="3453"/>
         <source>&amp;Discard</source>
         <translation>&amp;Hayır</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8226"/>
+        <location filename="defter.py" line="8225"/>
         <source>&amp;Cancel</source>
         <translation>&amp;İptal</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3478"/>
+        <location filename="defter.py" line="3477"/>
         <source>There are unsaved files!</source>
         <translation>Kaydedilmemiş dosyalar mevcut!</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3479"/>
+        <location filename="defter.py" line="3478"/>
         <source>Your changes will be lost if you don&apos;t save them.</source>
         <translation>Eğer kaydetmezseniz yaptığınız değişiklikler kaybolacak.</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3481"/>
+        <location filename="defter.py" line="3480"/>
         <source>Close &amp;without saving</source>
         <translation>&amp;Kaydetmeden kapat</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3553"/>
+        <location filename="defter.py" line="3552"/>
         <source>Reset Zoom</source>
         <translation>Yaklaşmayı sıfırlar</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3715"/>
+        <location filename="defter.py" line="3714"/>
         <source>Edit</source>
         <translation>Düzenle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5963"/>
+        <location filename="defter.py" line="5962"/>
         <source>Add {} image(s)</source>
         <translation>{} resim ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6066"/>
+        <location filename="defter.py" line="6065"/>
         <source>Add {} video(s)</source>
         <translation>{} video ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6649"/>
+        <location filename="defter.py" line="6648"/>
         <source>_paste</source>
         <translation>_yapıştır</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6672"/>
+        <location filename="defter.py" line="6671"/>
         <source>paste</source>
         <translation>yapıştır</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6734"/>
+        <location filename="defter.py" line="6733"/>
         <source>Please select at least 1 item! And click anywhere in the scene to set the mirror axis.</source>
         <translation>Lütfen en az 1 adet nesne seçiniz! Sonra da sahnede herhangi bir yere tıklayıp aynalama eksenini belirleyiniz.</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6756"/>
+        <location filename="defter.py" line="6755"/>
         <source>mirror x</source>
         <translation>yatay aynala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6808"/>
+        <location filename="defter.py" line="6807"/>
         <source>mirror y</source>
         <translation>dikey aynala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7120"/>
+        <location filename="defter.py" line="7119"/>
         <source>Please select at least 2 (non-parented) items!</source>
         <translation>Lütfen en az 2 adet bağlanmamış nesne seçiniz!</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7122"/>
+        <location filename="defter.py" line="7121"/>
         <source>Please select at least 2 items!</source>
         <translation>Lütfen en az 2 nesne seçiniz!</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6856"/>
+        <location filename="defter.py" line="6855"/>
         <source>align left edges</source>
         <translation>sol kenarları hizala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6879"/>
+        <location filename="defter.py" line="6878"/>
         <source>align right edges</source>
         <translation>sağ kenarları hizala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6902"/>
+        <location filename="defter.py" line="6901"/>
         <source>align top edges</source>
         <translation>üst kenarları hizala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6925"/>
+        <location filename="defter.py" line="6924"/>
         <source>align bottom edges</source>
         <translation>alt kenarları hizala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6948"/>
+        <location filename="defter.py" line="6947"/>
         <source>align centers horizontally</source>
         <translation>merkezleri yatay olarak hizala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6971"/>
+        <location filename="defter.py" line="6970"/>
         <source>align centers vertically</source>
         <translation>merkezleri dikey olarak hizala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7034"/>
+        <location filename="defter.py" line="7033"/>
         <source>Please select at least 3 (non-parented) items!</source>
         <translation>Lütfen en az 3 adet bağlanmamış nesne seçiniz!</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7036"/>
+        <location filename="defter.py" line="7035"/>
         <source>Please select at least 3 items!</source>
         <translation>Lütfen en az 3 adet nesne seçiniz!</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7015"/>
+        <location filename="defter.py" line="7014"/>
         <source>equalize horizontal gaps</source>
         <translation>yatay boşlukları eşitle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7050"/>
+        <location filename="defter.py" line="7049"/>
         <source>equalize vertical gaps</source>
         <translation>dikey boşlukları eşitle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7075"/>
+        <location filename="defter.py" line="7074"/>
         <source>distribute vertically</source>
         <translation>dikey olarak dağıt</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7101"/>
+        <location filename="defter.py" line="7100"/>
         <source>distribute horizontally</source>
         <translation>yatay olarak dağıt</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7170"/>
+        <location filename="defter.py" line="7169"/>
         <source>parent</source>
         <translation>bağla</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7239"/>
+        <location filename="defter.py" line="7238"/>
         <source>_unparent</source>
         <translation>bağı çöz</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7196"/>
+        <location filename="defter.py" line="7195"/>
         <source>_parent</source>
         <translation>_bağla</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7201"/>
+        <location filename="defter.py" line="7200"/>
         <source>Parented</source>
         <translation>Nesneler bağlandı</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7226"/>
+        <location filename="defter.py" line="7225"/>
         <source>unparent</source>
         <translation>bağı çöz</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7241"/>
+        <location filename="defter.py" line="7240"/>
         <source>Unparented</source>
         <translation>Nesnelerin bağı çözüldü</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7252"/>
+        <location filename="defter.py" line="7251"/>
         <source>group</source>
         <translation>grupla</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7254"/>
+        <location filename="defter.py" line="7253"/>
         <source>add single item to group</source>
         <translation>gruba nesne ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7258"/>
+        <location filename="defter.py" line="7257"/>
         <source>Grouped</source>
         <translation>Gruplandı</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7326"/>
+        <location filename="defter.py" line="7325"/>
         <source>ungroup</source>
         <translation>grup dağıtıldı</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7338"/>
+        <location filename="defter.py" line="7337"/>
         <source>Ungrouped</source>
         <translation>Grup dağıtıldı</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7352"/>
+        <location filename="defter.py" line="7351"/>
         <source>Select Background Image ...</source>
         <translation>Arkaplan Resmi Seç ...</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8645"/>
+        <location filename="defter.py" line="8644"/>
         <source>change scene&apos;s background color</source>
         <translation>sahnenin arkaplan rengini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7513"/>
+        <location filename="defter.py" line="7512"/>
         <source>change items&apos; text color</source>
         <translation>nesnenin yazi rengini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7516"/>
+        <location filename="defter.py" line="7515"/>
         <source>change item&apos;s text color</source>
         <translation>nesnenin yazi rengini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7561"/>
+        <location filename="defter.py" line="7560"/>
         <source>change items&apos; line color</source>
         <translation>nesnenin çizgi rengini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7564"/>
+        <location filename="defter.py" line="7563"/>
         <source>change item&apos;s line color</source>
         <translation>nesnenin çizgi rengini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8638"/>
+        <location filename="defter.py" line="8637"/>
         <source>Background Color</source>
         <translation>Arkaplan Rengi</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7622"/>
+        <location filename="defter.py" line="7621"/>
         <source>change items&apos; background color</source>
         <translation>nesnenin arkaplan rengini degistir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7625"/>
+        <location filename="defter.py" line="7624"/>
         <source>change item&apos;s background color</source>
         <translation>nesnenin arkaplan rengini degistir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7800"/>
+        <location filename="defter.py" line="7799"/>
         <source>change items&apos; line style</source>
         <translation>nesnenin çizgi rengini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7884"/>
+        <location filename="defter.py" line="7883"/>
         <source>change item&apos;s line style</source>
         <translation>nesnenin çizgi rengini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7817"/>
+        <location filename="defter.py" line="7816"/>
         <source>change items&apos; line join style</source>
         <translation>nesnenin çizgi birleşim tipini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7886"/>
+        <location filename="defter.py" line="7885"/>
         <source>change item&apos;s line join style</source>
         <translation>nesnenin çizgi birleşim tipini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7833"/>
+        <location filename="defter.py" line="7832"/>
         <source>change items&apos; line cap style</source>
         <translation>nesnenin çizgi uç tipini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7888"/>
+        <location filename="defter.py" line="7887"/>
         <source>change item&apos;s line cap style</source>
         <translation>nesnenin çizgi uç tipini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7868"/>
+        <location filename="defter.py" line="7867"/>
         <source>change items&apos; line width</source>
         <translation>nesnenin çizgi genişliğini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7890"/>
+        <location filename="defter.py" line="7889"/>
         <source>change item&apos;s line width</source>
         <translation>nesnenin çizgi genişliğini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7882"/>
+        <location filename="defter.py" line="7881"/>
         <source>reset items&apos; line properties</source>
         <translation>nesnenin çizgi özelliklerini sıfırla</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7919"/>
+        <location filename="defter.py" line="7918"/>
         <source>change width</source>
         <translation>genişliği değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7960"/>
+        <location filename="defter.py" line="7959"/>
         <source>change height</source>
         <translation>yüksekliği değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7992"/>
+        <location filename="defter.py" line="7991"/>
         <source>change font</source>
         <translation>yazıtipini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8021"/>
+        <location filename="defter.py" line="8020"/>
         <source>change text size</source>
         <translation>yazı boyutunu değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8042"/>
+        <location filename="defter.py" line="8041"/>
         <source>rotate</source>
         <translation>döndür</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8193"/>
+        <location filename="defter.py" line="8192"/>
         <source>style</source>
         <translation>stil</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8261"/>
+        <location filename="defter.py" line="8260"/>
         <source>apply style preset to the selected item(s)</source>
         <translation>stili secili nesnelere uygula</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8267"/>
+        <location filename="defter.py" line="8266"/>
         <source>apply style preset to the selected group</source>
         <translation>stili secili gruplara uygula</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8270"/>
+        <location filename="defter.py" line="8269"/>
         <source>_apply style preset to the group</source>
         <translation>_stili gruba uygula</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8281"/>
+        <location filename="defter.py" line="8280"/>
         <source>_apply style preset to the selected item</source>
         <translation>_stili secili nesneye uygula</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8294"/>
+        <location filename="defter.py" line="8293"/>
         <source>apply style preset</source>
         <translation>stili uygula</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8312"/>
+        <location filename="defter.py" line="8311"/>
         <source>Save style presets</source>
         <translation>Stilleri kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8311"/>
+        <location filename="defter.py" line="8310"/>
         <source>*.defstyles files (*.defstyles)</source>
         <translation>*.defstyles dosyalari (*.defstyles)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8364"/>
+        <location filename="defter.py" line="8363"/>
         <source>Load style presets...</source>
         <translation>Stilleri yükle...</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8363"/>
+        <location filename="defter.py" line="8362"/>
         <source>*.defstyles Files (*.defstyles)</source>
         <translation>*.defstyles dosyaları (*.defstyles)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8521"/>
+        <location filename="defter.py" line="8520"/>
         <source>bring to front</source>
         <translation>üste taşı</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8547"/>
+        <location filename="defter.py" line="8546"/>
         <source>send to back</source>
         <translation>alta taşı</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8582"/>
+        <location filename="defter.py" line="8581"/>
         <source>pin</source>
         <translation>sabitle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8593"/>
+        <location filename="defter.py" line="8592"/>
         <source>unpin</source>
         <translation>sabitleme</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8608"/>
+        <location filename="defter.py" line="8607"/>
         <source>No active item!</source>
         <translation>Aktif nesne yok!</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8615"/>
+        <location filename="defter.py" line="8614"/>
         <source>Defter: HTML source</source>
         <translation>Defter: HTML kaynağı</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8732"/>
+        <location filename="defter.py" line="8731"/>
         <source>Please install &quot;xdg-open&quot; from your package manager.</source>
         <translation>Lütfen paket yöneticiniz ile &quot;xdg-open&quot; yükleyiniz.</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8744"/>
+        <location filename="defter.py" line="8743"/>
         <source>Could not load image: Could not find the direct link to the image or image type is unsupported.: {}</source>
         <translation>Resim yüklenemedi: Resme direkt bulunamadı veya resim tipi desteklenmiyor.: {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8820"/>
+        <location filename="defter.py" line="8819"/>
         <source>{} active threads</source>
         <translation>{} aktif iş parçacığı</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8823"/>
+        <location filename="defter.py" line="8822"/>
         <source>All images are succesfully downloaded!</source>
         <translation>Bütün resimler başarı ile indirildi!</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8833"/>
+        <location filename="defter.py" line="8832"/>
         <source>Cleaning Threads Please Wait...</source>
         <translation>İş parçacıkları temizleniyor lütfen bekleyiniz...</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8957"/>
+        <location filename="defter.py" line="8956"/>
         <source>Defter: Show As Web Page</source>
         <translation>Defter: Web Sayfası Olarak Göster</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9004"/>
+        <location filename="defter.py" line="9003"/>
         <source>convert to web item</source>
         <translation>web nesnesine dönüştür</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9028"/>
+        <location filename="defter.py" line="9027"/>
         <source>Defter: Image info</source>
         <translation>Defter: Resim Bilgileri</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9039"/>
+        <location filename="defter.py" line="9038"/>
         <source>None: Cropped or pasted image</source>
         <translation>Yok: Kırpılmış veya yapıştırılmış resim</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9447"/>
+        <location filename="defter.py" line="9446"/>
         <source> Original Source Path: {}</source>
         <translation> İlk kaynak adresi: {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9448"/>
+        <location filename="defter.py" line="9447"/>
         <source>
  Current Path: {}</source>
         <translation>
  Şimdiki Adresi: {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9449"/>
+        <location filename="defter.py" line="9448"/>
         <source>
  isEmbeded: {}</source>
         <translation>
  dosyaya gömülü mü: {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9184"/>
+        <location filename="defter.py" line="9183"/>
         <source>
  Original Width: {}</source>
         <translation>
  Orjinal Genişlik: {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9185"/>
+        <location filename="defter.py" line="9184"/>
         <source>
  Original Height: {}</source>
         <translation>
  Orjinal Yükseklik: {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9187"/>
+        <location filename="defter.py" line="9186"/>
         <source>
  Current Width: {}</source>
         <translation>
  Şimdiki Genişlik: {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9188"/>
+        <location filename="defter.py" line="9187"/>
         <source>
  Current Height: {}</source>
         <translation>
  Şimdiki Yükseklik: {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9078"/>
+        <location filename="defter.py" line="9077"/>
         <source>_embed image</source>
         <translation>_resmi_dosyaya_dahil_et_(göm)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9072"/>
+        <location filename="defter.py" line="9071"/>
         <source>Could not embeded! Image&apos;s original source path does not exist! : {}</source>
         <translation>Dokümana dahil edilemedi. (Gömülemedi)! Resim ilk adresinde bulunamadı! : {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9076"/>
+        <location filename="defter.py" line="9075"/>
         <source>Embed image(s)</source>
         <translation>Resimleri dokümana dahil et. (Göm)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9091"/>
+        <location filename="defter.py" line="9090"/>
         <source>Embed image</source>
         <translation>Resmi dokümana dahil et (göm)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9092"/>
+        <location filename="defter.py" line="9091"/>
         <source>Image embeded.</source>
         <translation>Resim dokümana dahil edildi.(gömüldü).</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9085"/>
+        <location filename="defter.py" line="9084"/>
         <source>Image(s) embeded.</source>
         <translation>Resim(ler) dokümana dahil edildi. (gömüldü).</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9095"/>
+        <location filename="defter.py" line="9094"/>
         <source>Could not embeded! Image&apos;s original source path does not exist! {}</source>
         <translation>Dokümana dahil edilemedi. (Gömülemedi)! Resim ilk adresinde bulunamadı! {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9145"/>
+        <location filename="defter.py" line="9144"/>
         <source>Save image(s) as</source>
         <translation>Resim(ler)i farklı kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9161"/>
+        <location filename="defter.py" line="9160"/>
         <source>{} image(s) exported.</source>
         <translation>{} adet resim dışarıya da kaydedildi.</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9169"/>
+        <location filename="defter.py" line="9168"/>
         <source>Defter: Video info</source>
         <translation>Defter: Video bilgisi</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9217"/>
+        <location filename="defter.py" line="9216"/>
         <source>Embed video(s)</source>
         <translation>video(ları) dokümana dahil et(göm)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9232"/>
+        <location filename="defter.py" line="9231"/>
         <source>_embed video</source>
         <translation>_videoyu dokümana dahil et (göm)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9213"/>
+        <location filename="defter.py" line="9212"/>
         <source>Could not embeded! Video&apos;s original source path does not exist! : {}</source>
         <translation>Dokümana dahil edilemedi. (Gömülemedi)! Video ilk adresinde bulunamadı! : {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9223"/>
+        <location filename="defter.py" line="9222"/>
         <source>Embed video</source>
         <translation>Videoyu dokümana dahil et(göm)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9233"/>
+        <location filename="defter.py" line="9232"/>
         <source>Video embeded.</source>
         <translation>Video dokümana dahil edildi (gömüldü).</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9236"/>
+        <location filename="defter.py" line="9235"/>
         <source>Could not embeded! Video&apos;s original source path does not exist! {}</source>
         <translation>Dokümana dahil edilemedi. (Gömülemedi)! Video ilk adresinde bulunamadı! {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9291"/>
+        <location filename="defter.py" line="9290"/>
         <source>Save video(s) as</source>
         <translation>Video(ları) farklı kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9308"/>
+        <location filename="defter.py" line="9307"/>
         <source>{} Video(s) exported.</source>
         <translation>{} adet video disa aktarildi.</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9711"/>
+        <location filename="defter.py" line="9710"/>
         <source>Defter: Log</source>
         <translation>Defter:Bildirimler</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9748"/>
+        <location filename="defter.py" line="9747"/>
         <source>!! Warning : </source>
         <translation>!! Uyarı : </translation>
     </message>
     <message>
-        <location filename="defter.py" line="9750"/>
+        <location filename="defter.py" line="9749"/>
         <source>!! Error : </source>
         <translation>!! Hata : </translation>
     </message>
@@ -1358,7 +1358,7 @@ File could not be parsed!</source>
 Dosya okunup anlamlandırılamadı!</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3589"/>
+        <location filename="defter.py" line="3588"/>
         <source>Import def file(s)</source>
         <translation>Def dosya(ları) ekle</translation>
     </message>
@@ -1368,12 +1368,12 @@ Dosya okunup anlamlandırılamadı!</translation>
         <translation>def Dosyaları (*.def)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9409"/>
+        <location filename="defter.py" line="9408"/>
         <source>*{} files (*{});;All Files (*)</source>
         <translation>*{} Dosyaları (*{});;Tüm Dosyalar (*)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3922"/>
+        <location filename="defter.py" line="3921"/>
         <source>Library</source>
         <translation>Kütüphane</translation>
     </message>
@@ -1383,7 +1383,7 @@ Dosya okunup anlamlandırılamadı!</translation>
         <translation>Defter: Kullanılmayan gömülü dosyalar silinsin mi?</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8223"/>
+        <location filename="defter.py" line="8222"/>
         <source>This is undoable!</source>
         <translation>Bu işlem geri alınamaz bir işlemdir!</translation>
     </message>
@@ -1403,137 +1403,137 @@ Dosya okunup anlamlandırılamadı!</translation>
         <translation>Bu geri alınamaz bir işlemdir!. Kullanılan dosyalar silinmeyecektir!</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3683"/>
+        <location filename="defter.py" line="3682"/>
         <source>Import File(s)</source>
         <translation>Dosya(lar) Ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4074"/>
+        <location filename="defter.py" line="4073"/>
         <source>Item Menu</source>
         <translation>Nesne Menusu</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4186"/>
+        <location filename="defter.py" line="4185"/>
         <source>Embed file(s) to document</source>
         <translation>Dosya(ları) belgeye dahil et. (Göm)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4191"/>
+        <location filename="defter.py" line="4190"/>
         <source>Export file(s)</source>
         <translation>Dosya(ları) dışarıya da kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4195"/>
+        <location filename="defter.py" line="4194"/>
         <source>Show file info</source>
         <translation>Dosya bilgilerini göster</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4514"/>
+        <location filename="defter.py" line="4513"/>
         <source>Library Item Menu</source>
         <translation>Kütüphane Nesnesi Menusu</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4440"/>
+        <location filename="defter.py" line="4439"/>
         <source>All Html images</source>
         <translation>Tüm Html resimleri</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4448"/>
+        <location filename="defter.py" line="4447"/>
         <source>Delete unused embeded - document</source>
         <translation>Kullanılmayan dahili resimleri sil - belge</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4803"/>
+        <location filename="defter.py" line="4802"/>
         <source>Draw Line</source>
         <translation>Çizgi çiz</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4836"/>
+        <location filename="defter.py" line="4835"/>
         <source>Add File</source>
         <translation>Dosya ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6016"/>
+        <location filename="defter.py" line="6015"/>
         <source>add image</source>
         <translation>resim ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9372"/>
+        <location filename="defter.py" line="9371"/>
         <source>All Files (*)</source>
         <translation>Tüm Dosyalar (*)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6091"/>
+        <location filename="defter.py" line="6090"/>
         <source>add video</source>
         <translation>video ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6122"/>
+        <location filename="defter.py" line="6121"/>
         <source>Open Files...</source>
         <translation>Eklenecek Dosyaları Seç...</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6141"/>
+        <location filename="defter.py" line="6140"/>
         <source>Add {} file(s)</source>
         <translation>{} tane dosya ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9226"/>
+        <location filename="defter.py" line="9225"/>
         <source>Video(s) embeded.</source>
         <translation>Video(lar) dokümana dahil edildi(gömüldü).</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9338"/>
+        <location filename="defter.py" line="9337"/>
         <source>Embed file(s)</source>
         <translation>Dosya(ları) dokümana dahil et (göm)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9353"/>
+        <location filename="defter.py" line="9352"/>
         <source>_embed file</source>
         <translation>_dosyayi dokümana dahil et (göm)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9334"/>
+        <location filename="defter.py" line="9333"/>
         <source>Could not embeded! File&apos;s original source path does not exist! : {}</source>
         <translation>Dahil edilemedi(Gömülemedi)! Dosya ilk kaynak adresinde bulunamıyor! : {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9344"/>
+        <location filename="defter.py" line="9343"/>
         <source>Embed file</source>
         <translation>Dosyayı dokümana dahil et.(göm)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9347"/>
+        <location filename="defter.py" line="9346"/>
         <source>File(s) embeded.</source>
         <translation>Dosya(lar) dokümana dahil edildi.(Gömüldü).</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9354"/>
+        <location filename="defter.py" line="9353"/>
         <source>File embeded.</source>
         <translation>Dosya dokümana dahil edildi. (Gömüldü).</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9357"/>
+        <location filename="defter.py" line="9356"/>
         <source>Could not embeded! File&apos;s original source path does not exist! {}</source>
         <translation>Dahil edilemedi(Gömülemedi)! Dosya ilk kaynak adresinde bulunamıyor! {}</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9411"/>
+        <location filename="defter.py" line="9410"/>
         <source>Save file(s) as</source>
         <translation>Farklı isimde kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9428"/>
+        <location filename="defter.py" line="9427"/>
         <source>{} File(s) exported.</source>
         <translation>{} adet dosya dışarı aktarıldı.</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9437"/>
+        <location filename="defter.py" line="9436"/>
         <source>Defter: File info</source>
         <translation>Defter: Dosya bilgisi</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9452"/>
+        <location filename="defter.py" line="9451"/>
         <source>
  Size: {} Mb</source>
         <translation>
@@ -1585,12 +1585,12 @@ Dosya okunup anlamlandırılamadı!</translation>
         <translation>Roma büyük rakkamlı sıralı liste</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3909"/>
+        <location filename="defter.py" line="3908"/>
         <source>Item Properties</source>
         <translation>Nesne Özellikleri</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7429"/>
+        <location filename="defter.py" line="7428"/>
         <source>Left click to set line color, Right click to modify color.</source>
         <translation>Çizgi rengini değiştirmek için farenin sol tuşu ile tıklayın, Kutunun rengini değiştirmek için sağ tıklayın.</translation>
     </message>
@@ -1610,322 +1610,322 @@ Dosya okunup anlamlandırılamadı!</translation>
         <translation>Seçili sayfayı sil</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3632"/>
+        <location filename="defter.py" line="3631"/>
         <source>Print &amp;&amp; Export as PDF</source>
         <translation>Yazdır &amp;&amp; PDF Olarak Kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3637"/>
+        <location filename="defter.py" line="3636"/>
         <source>Export Page as Image</source>
         <translation>Sayfayı Resim Olarak Kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3678"/>
+        <location filename="defter.py" line="3677"/>
         <source>~Import SVG(s)</source>
         <translation>~SVG Ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3860"/>
+        <location filename="defter.py" line="3859"/>
         <source>Line</source>
         <translation>Çizgi</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4132"/>
+        <location filename="defter.py" line="4131"/>
         <source>Resize to fit in view</source>
         <translation>Ekrana sığdır</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4376"/>
+        <location filename="defter.py" line="4375"/>
         <source>Both linked and embeded - document</source>
         <translation>Harici ve dahili - belge</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4379"/>
+        <location filename="defter.py" line="4378"/>
         <source>List both linked and embeded images in the document</source>
         <translation>Belgedeki harici ve dahili resimleri listele</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4385"/>
+        <location filename="defter.py" line="4384"/>
         <source>Both linked and embeded - page</source>
         <translation>Harici ve dahili - sayfa</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4388"/>
+        <location filename="defter.py" line="4387"/>
         <source>List both linked and embeded images in the page</source>
         <translation>Sayfadaki harici ve dahili resimleri listele</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4394"/>
+        <location filename="defter.py" line="4393"/>
         <source>Linked - document</source>
         <translation>Harici - belge</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4396"/>
+        <location filename="defter.py" line="4395"/>
         <source>List linked images in the document</source>
         <translation>Belgedeki harici resimleri listele</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4402"/>
+        <location filename="defter.py" line="4401"/>
         <source>Linked - page</source>
         <translation>Harici - sayfa</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4404"/>
+        <location filename="defter.py" line="4403"/>
         <source>List linked images in the page</source>
         <translation>Sayfadaki harici resimleri listele</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4410"/>
+        <location filename="defter.py" line="4409"/>
         <source>Embeded - document</source>
         <translation>Dahili -belge</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4412"/>
+        <location filename="defter.py" line="4411"/>
         <source>List embeded images in the document</source>
         <translation>Belgedeki dahili resimleri listele</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4417"/>
+        <location filename="defter.py" line="4416"/>
         <source>Embeded - page</source>
         <translation>Gömülü - sayfa</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4419"/>
+        <location filename="defter.py" line="4418"/>
         <source>List embeded images in the page</source>
         <translation>Sayfadaki gömülü resimleri listele</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4424"/>
+        <location filename="defter.py" line="4423"/>
         <source>Unused embeded - document</source>
         <translation>Kullanılmayan gömülü - belge</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4426"/>
+        <location filename="defter.py" line="4425"/>
         <source>List unused embeded images in the document</source>
         <translation>Belgede kullanılmayan dahili resimleri listele</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4432"/>
+        <location filename="defter.py" line="4431"/>
         <source>Unused embeded - page</source>
         <translation>Kullanılmayan dahili - sayfa</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4434"/>
+        <location filename="defter.py" line="4433"/>
         <source>List unused embeded images in the page</source>
         <translation>Sayfadaki kullanılmayan dahili resimleri listele</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4443"/>
+        <location filename="defter.py" line="4442"/>
         <source>List all images downloaded with HTML localization</source>
         <translation>HTML yerelleştirme ile indirilmiş belgedeki tüm resimleri listele</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4450"/>
+        <location filename="defter.py" line="4449"/>
         <source>Delete unused embeded images in the document</source>
         <translation>Belgede kullanılmayan tüm dahili resimleri sil</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4774"/>
+        <location filename="defter.py" line="4773"/>
         <source>Tools Tool Bar</source>
         <translation>Araçlar Araç Çubuğu</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4809"/>
+        <location filename="defter.py" line="4808"/>
         <source>Draw Path</source>
         <translation>Kalemle Çiz</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4865"/>
+        <location filename="defter.py" line="4864"/>
         <source>Item Properties Tool Bar</source>
         <translation>Nesne Özellikleri Araç Çubuğu</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4905"/>
+        <location filename="defter.py" line="4904"/>
         <source>Line &amp;&amp; Pen Properties Tool Bar</source>
         <translation>Çizgi &amp;&amp; Kalem Özellikleri Araç Çubuğu</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4931"/>
+        <location filename="defter.py" line="4930"/>
         <source>Font Tool Bar</source>
         <translation>Yazıtipi Araç Çubuğu</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4952"/>
+        <location filename="defter.py" line="4951"/>
         <source>Bold</source>
         <translation>Kalın</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4962"/>
+        <location filename="defter.py" line="4961"/>
         <source>Italic</source>
         <translation>Eğik</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4969"/>
+        <location filename="defter.py" line="4968"/>
         <source>Underline</source>
         <translation>Altı çizili</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4976"/>
+        <location filename="defter.py" line="4975"/>
         <source>Strike Out</source>
         <translation>Üstü çizili</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4984"/>
+        <location filename="defter.py" line="4983"/>
         <source>Overline</source>
         <translation>Üzeri çizili</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4995"/>
+        <location filename="defter.py" line="4994"/>
         <source>Align Left</source>
         <translation>Sola Yasla</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4998"/>
+        <location filename="defter.py" line="4997"/>
         <source>Centered</source>
         <translation>Ortala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5001"/>
+        <location filename="defter.py" line="5000"/>
         <source>Align Right</source>
         <translation>Sağa Yasla</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5004"/>
+        <location filename="defter.py" line="5003"/>
         <source>Justify</source>
         <translation>Sığdır</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5049"/>
+        <location filename="defter.py" line="5048"/>
         <source>Color Tool Bar</source>
         <translation>Renk Araç Çubuğu</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5149"/>
+        <location filename="defter.py" line="5148"/>
         <source>bold</source>
         <translation>kalın</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5172"/>
+        <location filename="defter.py" line="5171"/>
         <source>underline</source>
         <translation>altı çizili</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5195"/>
+        <location filename="defter.py" line="5194"/>
         <source>italic</source>
         <translation>eğik</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5218"/>
+        <location filename="defter.py" line="5217"/>
         <source>strikeout</source>
         <translation>üstü çizili</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5241"/>
+        <location filename="defter.py" line="5240"/>
         <source>overline</source>
         <translation>üzeri çizili</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5313"/>
+        <location filename="defter.py" line="5312"/>
         <source>align</source>
         <translation>hizala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5316"/>
+        <location filename="defter.py" line="5315"/>
         <source>align left</source>
         <translation>sola yasla</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5320"/>
+        <location filename="defter.py" line="5319"/>
         <source>align center</source>
         <translation>ortala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5324"/>
+        <location filename="defter.py" line="5323"/>
         <source>align right</source>
         <translation>sağa yasla</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5328"/>
+        <location filename="defter.py" line="5327"/>
         <source>align justify</source>
         <translation>sığdır</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5372"/>
+        <location filename="defter.py" line="5371"/>
         <source>Align Tool Bar</source>
         <translation>Hizala Araç Çubuğu</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5470"/>
+        <location filename="defter.py" line="5469"/>
         <source>Utilities Tool Bar</source>
         <translation>Yardımcı Araçlar Araç Çubuğu</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5479"/>
+        <location filename="defter.py" line="5478"/>
         <source>Always on Top</source>
         <translation>Her zaman en üstte</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5679"/>
+        <location filename="defter.py" line="5678"/>
         <source>Warning: Could not locate the file!</source>
         <translation>Uyarı: Dosya bulunamadı !</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7927"/>
+        <location filename="defter.py" line="7926"/>
         <source>change length</source>
         <translation>cizgi uzunluğu değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8220"/>
+        <location filename="defter.py" line="8219"/>
         <source>Defter: Delete style preset?</source>
         <translation>Defter: Stili sil?</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8222"/>
+        <location filename="defter.py" line="8221"/>
         <source>Do you want to delete selected file preset(s)?</source>
         <translation>Seçili stil(ler)i silmek istiyormusunuz?</translation>
     </message>
     <message>
-        <location filename="defter.py" line="10554"/>
+        <location filename="defter.py" line="10553"/>
         <source>Save Image as</source>
         <translation>Resmi farklı kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="10575"/>
+        <location filename="defter.py" line="10574"/>
         <source>Page succesfully exported as image. {}</source>
         <translation>Sayfa başarı ile resim olarak kaydedildi</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3895"/>
+        <location filename="defter.py" line="3894"/>
         <source>Panels</source>
         <translation>Paneller</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3998"/>
+        <location filename="defter.py" line="3997"/>
         <source>Menu bar</source>
         <translation>Menu çubuğu</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4002"/>
+        <location filename="defter.py" line="4001"/>
         <source>Toggles menu bar visibility.</source>
         <translation>Menu çubuğunu gizler veya gösterir.</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4085"/>
+        <location filename="defter.py" line="4084"/>
         <source>~Edit Command</source>
         <translation>~Komutu düzenle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4141"/>
+        <location filename="defter.py" line="4140"/>
         <source>~Convert to web item (Experimental &amp;&amp; Slow)</source>
         <translation>~Web nesnesine dönüştür. (Deneysel Özellik &amp;&amp; Yavaş)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4529"/>
+        <location filename="defter.py" line="4528"/>
         <source>~Show in scene</source>
         <translation>~Sahnede göster</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3929"/>
+        <location filename="defter.py" line="3928"/>
         <source>Draw Print Borders</source>
         <translation>Sayfa Baskı Sınırlarını Çiz</translation>
     </message>
@@ -1970,22 +1970,22 @@ Dosya okunup anlamlandırılamadı!</translation>
         <translation>Yatay</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3836"/>
+        <location filename="defter.py" line="3835"/>
         <source>Show All</source>
         <translation>Hepsini Göster</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3898"/>
+        <location filename="defter.py" line="3897"/>
         <source>Show all</source>
         <translation>Hepsini Göster</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4117"/>
+        <location filename="defter.py" line="4116"/>
         <source>Convert selected item(s) to plain text</source>
         <translation>Seçili nesne(ler)i  düz metne çevir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9019"/>
+        <location filename="defter.py" line="9018"/>
         <source>convert to plain text</source>
         <translation>düz metne çevir</translation>
     </message>
@@ -1995,62 +1995,62 @@ Dosya okunup anlamlandırılamadı!</translation>
         <translation>Baskı Sayfa Sınırı Rengi</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8871"/>
+        <location filename="defter.py" line="8870"/>
         <source>Web Browser</source>
         <translation>İnternet Tarayıcısı</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5491"/>
+        <location filename="defter.py" line="5490"/>
         <source>ScreenShot</source>
         <translation>Ekran Görüntüsü</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5496"/>
+        <location filename="defter.py" line="5495"/>
         <source>Selected Area (Comp On)</source>
         <translation>Seçilen bölge (Kompozitor Açık)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5500"/>
+        <location filename="defter.py" line="5499"/>
         <source>Selected Area (Comp Off)</source>
         <translation>Seçilen bölge (Kompozitor Kapalı)</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5504"/>
+        <location filename="defter.py" line="5503"/>
         <source>Fullscreen</source>
         <translation>Tam ekran</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9793"/>
+        <location filename="defter.py" line="9792"/>
         <source>Export Page as HTML</source>
         <translation>Sayfayı HTML olarak kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3658"/>
+        <location filename="defter.py" line="3657"/>
         <source>Embed Background Image</source>
         <translation>Arkaplan resmini belgeye kopyala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7359"/>
+        <location filename="defter.py" line="7358"/>
         <source>change scene&apos;s background image</source>
         <translation>sahne arkaplan resmini değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7368"/>
+        <location filename="defter.py" line="7367"/>
         <source>clear scene&apos;s background image</source>
         <translation>sahne arkaplan resmini kaldır</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7376"/>
+        <location filename="defter.py" line="7375"/>
         <source>embed scene&apos;s background image</source>
         <translation>sahne arkaplan resmini belgeye kopyala</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7379"/>
+        <location filename="defter.py" line="7378"/>
         <source>Scene&apos;s background image is embeded.</source>
         <translation>Sahne arkaplan resmi belgeye kopyalandı.</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9800"/>
+        <location filename="defter.py" line="9799"/>
         <source>Copy all the linked end embeded files with the HTML file</source>
         <translation>Tüm harici ve dahili dosyaları HTML ile birlikte bir yere topla (kopyala)</translation>
     </message>
@@ -2095,142 +2095,142 @@ Dosya okunup anlamlandırılamadı!</translation>
         <translation>Seçili sayfayı silmek istiyor musunuz?</translation>
     </message>
     <message>
-        <location filename="defter.py" line="3642"/>
+        <location filename="defter.py" line="3641"/>
         <source>Print &amp;&amp; Export Selected Text Item Content as PDF</source>
         <translation>Seçili nesnedeki yazıyı yazdır ya da PDF olarak kaydet</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4006"/>
+        <location filename="defter.py" line="4005"/>
         <source>Search</source>
         <translation>Ara</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4098"/>
+        <location filename="defter.py" line="4097"/>
         <source>Apply selected item&apos;s style to the active tool</source>
         <translation>Seçili nesnenin stilini aktif araca uygula</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4105"/>
+        <location filename="defter.py" line="4104"/>
         <source>Set selected item&apos;s style as tool default</source>
         <translation>Seçili nesnenin stilini kendi aracına uygula</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4164"/>
+        <location filename="defter.py" line="4163"/>
         <source>Image to original size</source>
         <translation>Resmi orjinal boyutuna döndür</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4182"/>
+        <location filename="defter.py" line="4181"/>
         <source>Video to image(s)</source>
         <translation>Videoyu resimlere çevir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4198"/>
+        <location filename="defter.py" line="4197"/>
         <source>PDF to image(s)</source>
         <translation>PDFyi resimlere çevir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4223"/>
+        <location filename="defter.py" line="4222"/>
         <source>Text Item Menu</source>
         <translation>Yazi Nesnesi Menüsü</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4258"/>
+        <location filename="defter.py" line="4257"/>
         <source>Image Item Menu</source>
         <translation>Resim Nesnesi Menüsü</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4290"/>
+        <location filename="defter.py" line="4289"/>
         <source>Video Item Menu</source>
         <translation>Video Nesnesi Menüsü</translation>
     </message>
     <message>
-        <location filename="defter.py" line="4320"/>
+        <location filename="defter.py" line="4319"/>
         <source>File Item Menu</source>
         <translation>Dosya Nesnesi Menüsü</translation>
     </message>
     <message>
-        <location filename="defter.py" line="6201"/>
+        <location filename="defter.py" line="6200"/>
         <source>add file</source>
         <translation>dosya ekle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8422"/>
+        <location filename="defter.py" line="8421"/>
         <source>Presets loaded succesfully.</source>
         <translation>Stiller başarı ile yüklendi.</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9491"/>
+        <location filename="defter.py" line="9490"/>
         <source>Video to image</source>
         <translation>Videoyu resme çevir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="9559"/>
+        <location filename="defter.py" line="9558"/>
         <source>PDF to image</source>
         <translation>PDFyi resme çevir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="10826"/>
+        <location filename="defter.py" line="10825"/>
         <source>Match Case</source>
         <translation>Büyük Küçük Harfe Duyarlı</translation>
     </message>
     <message>
-        <location filename="defter.py" line="10831"/>
+        <location filename="defter.py" line="10830"/>
         <source>Words</source>
         <translation>Kelimeler</translation>
     </message>
     <message>
-        <location filename="defter.py" line="10951"/>
+        <location filename="defter.py" line="10950"/>
         <source>0 results</source>
         <translation>0 sonuç</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5414"/>
+        <location filename="defter.py" line="5413"/>
         <source>Make horizontal gaps between items equal</source>
         <translation>Yatayda boşlukları eşitle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5420"/>
+        <location filename="defter.py" line="5419"/>
         <source>Make vertical gaps between items equal</source>
         <translation>Dikeyde boşlukları eşitle</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5426"/>
+        <location filename="defter.py" line="5425"/>
         <source>Distribute items vertically</source>
         <translation>Nesneleri dikeyde dağıt</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5432"/>
+        <location filename="defter.py" line="5431"/>
         <source>Distribute items horizontally</source>
         <translation>Nesneleri yatayda dağıt</translation>
     </message>
     <message>
-        <location filename="defter.py" line="5437"/>
+        <location filename="defter.py" line="5436"/>
         <source>Distribute items</source>
         <translation>Nesneleri dağıt</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7136"/>
+        <location filename="defter.py" line="7135"/>
         <source>distribute</source>
         <translation>nesneleri dağıt</translation>
     </message>
     <message>
-        <location filename="defter.py" line="7345"/>
+        <location filename="defter.py" line="7344"/>
         <source>&quot;Defter&quot; is developed by Erdinc Yilmaz. Copyright (C) 2023 </source>
         <translation>&quot;Defter&quot; Erdinç Yılmaz tarafından geliştirilmektedir. Copyright (C) 2023 </translation>
     </message>
     <message>
-        <location filename="defter.py" line="5542"/>
+        <location filename="defter.py" line="5541"/>
         <source>Rename</source>
         <translation>Yeniden Adlandır</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8187"/>
+        <location filename="defter.py" line="8186"/>
         <source>Rename style preset</source>
         <translation>Stil adı değiştir</translation>
     </message>
     <message>
-        <location filename="defter.py" line="8207"/>
+        <location filename="defter.py" line="8206"/>
         <source>rename style preset</source>
         <translation>stil adı değiştir</translation>
     </message>
@@ -2246,6 +2246,24 @@ Dosya okunup anlamlandırılamadı!</translation>
         <location filename="canta/treeModel.py" line="575"/>
         <source>Untitled</source>
         <translation>İsimsiz</translation>
+    </message>
+</context>
+<context>
+    <name>NesneOzellikleriYuzenWidget</name>
+    <message>
+        <location filename="canta/nesneOzellikleriYuzenWidget.py" line="64"/>
+        <source>Background</source>
+        <translation>Arkaplan</translation>
+    </message>
+    <message>
+        <location filename="canta/nesneOzellikleriYuzenWidget.py" line="66"/>
+        <source>Text</source>
+        <translation>Yazı</translation>
+    </message>
+    <message>
+        <location filename="canta/nesneOzellikleriYuzenWidget.py" line="68"/>
+        <source>Line &amp;&amp; Pen</source>
+        <translation>Çizgi &amp;&amp; Kalem</translation>
     </message>
 </context>
 <context>
