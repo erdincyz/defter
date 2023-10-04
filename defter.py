@@ -83,7 +83,6 @@ from canta.treeView import TreeView
 from canta.treeSayfa import Sayfa
 from canta.pushButton import PushButton, PushButtonRenk
 from canta.yuzenWidget import YuzenWidget
-from canta.tercumeYuzenWidget import TercumeYuzenWidget
 from canta.with_signals_updates_blocked import (signals_blocked_and_updates_disabled as signals_updates_blocked,
                                                 signals_blocked)
 
