@@ -9,7 +9,7 @@ from PySide6.QtCore import Signal
 from PySide6.QtGui import QColor, Qt
 from PySide6.QtWidgets import QHBoxLayout, QButtonGroup, QRadioButton, QLabel
 from canta.renkSecici import RenkSeciciWidget
-# from canta.renkSecmeDugmesi import RenkSecmeDugmesi
+from canta.renkSecmeDugmesi import RenkSecmeDugmesi
 from canta.sliderDoubleWithDoubleSpinBox import SliderDoubleWithDoubleSpinBox
 from canta.yuzenWidget import YuzenWidget
 
@@ -19,7 +19,7 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
     arkaPlanRengiDegisti = Signal(QColor)
     yaziRengiDegisti = Signal(QColor)
     cizgiRengiDegisti = Signal(QColor)
-    # ekranRenkSeciciDugmesindenRenkDegisti = Signal(QColor, str)
+    ekranRenkSeciciDugmesindenRenkDegisti = Signal(QColor, str)
     cizgiKalinligiDegisti = Signal(float)
 
     # ---------------------------------------------------------------------
@@ -56,8 +56,8 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
 
         self.aracIkonuEtiketi = QLabel(self)
 
-        # self.ekrandaRenkSecmeDugmesi = RenkSecmeDugmesi(self)
-        # self.ekrandaRenkSecmeDugmesi.renkDegisti.connect(self.ekranRenkSeciciDugmesindenRenkDegisti.emit)
+        self.ekrandaRenkSecmeDugmesi = RenkSecmeDugmesi(self)
+        self.ekrandaRenkSecmeDugmesi.renkDegisti.connect(self.ekranRenkSeciciDugmesindenRenkDegisti.emit)
 
         self.radioBtnGroup = QButtonGroup(self)
 
@@ -76,8 +76,8 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
 
         radioLay.addSpacing(5)
         radioLay.addWidget(self.aracIkonuEtiketi)
-        # radioLay.addSpacing(5)
-        # radioLay.addWidget(self.ekrandaRenkSecmeDugmesi)
+        radioLay.addSpacing(5)
+        radioLay.addWidget(self.ekrandaRenkSecmeDugmesi)
         radioLay.addSpacing(5)
         radioLay.addWidget(self.radioArkaplan)
         radioLay.addSpacing(5)

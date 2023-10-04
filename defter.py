@@ -26,7 +26,6 @@ from PySide6.QtGui import (QCursor, QKeySequence, QIcon, QPixmap, QColor, QPen, 
                            QImageReader, QImage, QPixmapCache, QTextCharFormat, QTextCursor, QPalette, QTextListFormat,
                            QTextBlockFormat, QPageSize, QPageLayout, QAction, QActionGroup, QUndoGroup,
                            QShortcut)
-from PySide6.QtWebEngineCore import QWebEngineSettings  # , QWebEngineProfile, QWebEnginePage
 
 from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QApplication,
                                QFileDialog, QToolBar, QMenuBar, QMenu, QColorDialog, QMessageBox,
@@ -39,11 +38,12 @@ from PySide6.QtCore import (Qt, QRectF, QSettings, QPoint, Slot, QSizeF, QSize, 
                             QIODevice, QDataStream, QMimeData, QByteArray, QPointF, qCompress, qUncompress, QLocale,
                             QThread, QUrl, QLineF, QObject, QRect, QTimer, QDir)
 
+from PySide6.QtWebEngineCore import QWebEngineSettings  # , QWebEngineProfile, QWebEnginePage
 from PySide6.QtWebEngineWidgets import QWebEngineView
 
 from PySide6.QtPdf import QPdfDocument, QPdfPageRenderer
-
 from PySide6.QtPrintSupport import QPrinter, QPrinterInfo
+
 from canta import shared
 from canta.dockWidget import DockWidget
 from canta.lutfenBekleyin import LutfenBekleyin
@@ -74,7 +74,6 @@ from canta.nesneler.group import Group
 from canta.nesneler.dosya import DosyaNesnesi
 from canta.comboBox import ComboBox
 from canta.fontComboBox import FontComboBox
-# from canta.ozelliklerAcilirMenu import OzelliklerAcilirMenu
 from canta.nesneler.web import Web
 # from canta.syntaxHighlighter import HtmlHighlighter
 from canta.listWidgetItem import ListWidgetItem, ListWidgetItemDelegate
@@ -84,14 +83,16 @@ from canta.treeView import TreeView
 from canta.treeSayfa import Sayfa
 from canta.pushButton import PushButton, PushButtonRenk
 from canta.yuzenWidget import YuzenWidget
+from canta.tercumeYuzenWidget import TercumeYuzenWidget
 from canta.with_signals_updates_blocked import (signals_blocked_and_updates_disabled as signals_updates_blocked,
                                                 signals_blocked)
-import canta.icons_rc
 
 from canta import undoRedoFonksiyolar as undoRedo
 
 from canta.ekranGoruntusu.secilen_bolge_comp_manager_on import TamEkranWidget_CM_On
 from canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_CM_Off
+
+import canta.icons_rc
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -139,7 +140,7 @@ class DefterAnaPencere(QMainWindow):
         # TODO: options=QFileDialog.DontUseNativeDialog
         # TODO: su anda JPEG, PNG gibi buyuk harfli dosyalari bir gtk bugindan dolayi gormuyor,
         # TODO: ya native dialog kullanmayacagiz, ya bunlari ekleyecegiz listeye, ya da AllFiles ekleyecegiz..
-        # TODO: ya da gtk theme kullaniliyorsa nativedegil veya hangi cozum kullanildi ise yoksa native ac gibi..
+        # TODO: ya da gtk theme kullaniliyorsa nativ edegil veya hangi cozum kullanildi ise yoksa native ac gibi..
         # TODO: şimdilik All Files ekliyoruz.
         self.supportedImageFormats = self.tr("Image Files ")
         for imgFormat in self.supportedImageFormatList:
@@ -2182,7 +2183,7 @@ class DefterAnaPencere(QMainWindow):
         scene.selectionChanged.connect(self.on_scene_selection_changed)
 
         # TODO: burayi bir debug etmeli bi kac defa alt atirlardan buraya atliyor.
-        # setActiveStack i grubun en aştina mi alsak
+        # setActiveStack i grubun en altina mi alsak
 
         with signals_blocked(self.undoGroup):
             self.undoGroup.addStack(scene.undoStack)
@@ -3385,12 +3386,11 @@ class DefterAnaPencere(QMainWindow):
                            cModel=self.cModel,
                            varsa_ayni_adresteki_dosya_silinsin_mi=varsa_ayni_adresteki_dosya_silinsin_mi,
                            isSaveAs=False)
-            self.move_or_append_left_in_recent_files_queue(path)
+        self.move_or_append_left_in_recent_files_queue(path)
 
     # ---------------------------------------------------------------------
     @Slot()
     def act_save_as_def_file(self):
-        varsa_ayni_adresteki_dosya_silinsin_mi = False
         path, varsa_ayni_adresteki_dosya_silinsin_mi = self._get_def_file_save_path()
         if path:
             self.save_file(zipDosyaTamAdres=path,
@@ -4729,7 +4729,7 @@ class DefterAnaPencere(QMainWindow):
         self.nesneOzellikleriYW.arkaPlanRengiDegisti.connect(lambda color: self.act_set_item_background_color(color, renkSecicidenMi=True))
         self.nesneOzellikleriYW.yaziRengiDegisti.connect(lambda color: self.act_set_item_text_color(color, renkSecicidenMi=True))
         self.nesneOzellikleriYW.cizgiRengiDegisti.connect(lambda color: self.act_set_item_line_color(color, renkSecicidenMi=True))
-        # self.nesneOzellikleriYW.ekranRenkSeciciDugmesindenRenkDegisti.connect(self.ekrandan_renk_secicide_renk_degisti)
+        self.nesneOzellikleriYW.ekranRenkSeciciDugmesindenRenkDegisti.connect(self.ekrandan_renk_secicide_renk_degisti)
         self.nesneOzellikleriYW.cizgiKalinligiDegisti.connect(self.act_cizgi_kalinligi_degistir)
         self.nesneOzellikleriYW.cizgiKalinligiDegisti.connect(
             lambda x: self.cizgiKalinligiDSliderWithDSBox_tbar.setValue(x * 10))

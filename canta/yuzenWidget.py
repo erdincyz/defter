@@ -132,9 +132,10 @@ class YuzenWidget(QWidget):
     # ---------------------------------------------------------------------
     def mouseMoveEvent(self, event) -> None:
         if event.buttons() & Qt.MouseButton.LeftButton:
-            fark = event.pos() - self.mPos
-            yeniPos = self.pos() + fark
-            self.move(yeniPos)
+            if self.solClick:
+                fark = event.pos() - self.mPos
+                yeniPos = self.pos() + fark
+                self.move(yeniPos)
 
         super(YuzenWidget, self).mousePressEvent(event)
 
