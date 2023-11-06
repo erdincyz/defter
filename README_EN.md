@@ -1,7 +1,6 @@
-### [TÜRKÇE](https://github.com/erdincyz/defter)
-
 ![GIF](https://raw.githubusercontent.com/erdincyz/gorseller/master/_defter/defter.gif)
 
+### [TÜRKÇE](https://github.com/erdincyz/defter)
 
 ### Welcome
 **Defter** (means Notebook) is an open source software that is (hopefully) still being developed as time permits and as needed.
@@ -19,9 +18,9 @@ It can bu used for;
 
 _This software is not an alternative to pen and paper. It is perhaps most useful for quickly gathering data from digital environments._
 
-It is licensed under GPLv3.
+It is licensed under **GPLv3**.
 
-Contains many Bugs and incomplete features. It is recommended that you do not use it for important work, (without trying it thoroughly.)
+Contains many **Bugs** and **incomplete features**. It is recommended that you do not use it for important work, (without trying it thoroughly.)
 
 You can follow the known bugs and features that are intended to be added (although not up-to-date at the moment) from the [Issues](https://github.com/erdincyz/defter/issues) section on this page.
 
