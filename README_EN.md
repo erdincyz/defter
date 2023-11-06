@@ -43,4 +43,38 @@ cd defter
 python3 defter.py
 ```
 
+### File Structure:
+These are zip files with the extension changed to "def" and a compression ratio of 1. Zip files are used like containers. You can open them like a zip file and access other files archived in it. Additionally, each time a file is saved, an html file for each page in the document is also saved in def. You can also access your document by extracting the def file in a folder and opening the html files in it in the web browser.
+
+### Tips:
+
+#### To save files faster:
+
+If 7z or zip is installed on your system and can be accessed directly from the command line, Defter can save files faster. Because the archive update feature supported by 7z or zip is not supported by the zipfile module that comes with Python. (Archive update feature: It writes only the added or changed files back to the disk. It saves all files from being written to the disk again.)
+
+#### To take screenshots more easily:
+
+You can take screenshots with Defter, but if there is another software for this purpose on your system, it is recommended that you use it. For example, in Linux, you can assign the following command to a system-wide shortcut and use it for taking screenshots to clipboard.
+
+The following command takes screenshot and copies it to the clipboard.
+
+#### For Linux:
+
+(If Scrot and xclip software are not installed on your system, you must first install them with your package manager.)
+```
+scrot -s -q 100 '/tmp/foo.jpg' -e 'xclip -selection clipboard -t image/jpg -i $f'
+```
+#### For Windows:
+You can use this shortcut.
+```
+Win + Shift + S
+```
+#### For OS X:
+You can use this shortcut.
+```
+Command + Shift + 4
+```
+
+Defter supports pasting from the clipboard. You can copy the screenshot to the clipboard and paste it into the Defter using the methods above or any other method you prefer.
+
 Thanks.
