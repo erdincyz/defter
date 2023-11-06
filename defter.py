@@ -1873,15 +1873,15 @@ class DefterAnaPencere(QMainWindow):
             self.sayfalarYWTreeView.setIconSize(self.cModel.treeViewIkonBoyutu)
 
             self.sayfalarYW.restoreGeometry(self.settings.value("sayfalarYWGeo"))
-            self.sayfalarYW.yukleme_bilgisi(self.settings.value("sayfalarYWYonDurum"))
+            self.sayfalarYW.yukleme_bilgisi(self.settings.value("sayfalarYWYonDurum"), "00110")
             self.kutuphaneYW.restoreGeometry(self.settings.value("kutuphaneYWGeo"))
-            self.kutuphaneYW.yukleme_bilgisi(self.settings.value("kutuphaneYWYonDurum"))
+            self.kutuphaneYW.yukleme_bilgisi(self.settings.value("kutuphaneYWYonDurum"), "00111")
             self.nesneOzellikleriYW2.restoreGeometry(self.settings.value("nesneOzellikleriYW2Geo"))
-            self.nesneOzellikleriYW2.yukleme_bilgisi(self.settings.value("nesneOzellikleriYW2YonDurum"))
+            self.nesneOzellikleriYW2.yukleme_bilgisi(self.settings.value("nesneOzellikleriYW2YonDurum"), "00100")
             self.stillerYW2.restoreGeometry(self.settings.value("stillerYW2Geo"))
-            self.stillerYW2.yukleme_bilgisi(self.settings.value("stillerYW2YonDurum"))
+            self.stillerYW2.yukleme_bilgisi(self.settings.value("stillerYW2YonDurum"), "00101")
             self.baskiSiniriCizimAyarlariYW.restoreGeometry(self.settings.value("baskiSiniriCizimAyarlariYWGeo"))
-            self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi(self.settings.value("baskiSiniriCizimAyarlariYWYonDurum"))
+            self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi(self.settings.value("baskiSiniriCizimAyarlariYWYonDurum"), "00102")
 
         else:  # ilk acilis
             self.sayfalarYW.yukleme_bilgisi("00110")
