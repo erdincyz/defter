@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-# .
+
+# print("بِسْــــــــــــــــــــــمِ اﷲِارَّحْمَنِ ارَّحِيم")
+
+# الحمد لله
 
 __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
@@ -28,7 +31,7 @@ from PySide6.QtGui import (QCursor, QKeySequence, QIcon, QPixmap, QColor, QPen, 
                            QShortcut)
 
 from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QApplication,
-                               QFileDialog, QToolBar, QMenuBar, QMenu, QColorDialog, QMessageBox,
+                               QFileDialog, QMenuBar, QMenu, QColorDialog, QMessageBox,
                                QStatusBar, QSizePolicy, QLabel, QPushButton, QScrollArea,
                                QDialog, QTextEdit, QInputDialog, QListWidget, QListWidgetItem,
                                QLineEdit, QToolButton, QComboBox, QButtonGroup, QGroupBox, QRadioButton,
@@ -47,7 +50,7 @@ from PySide6.QtPrintSupport import QPrinter, QPrinterInfo
 from canta import shared
 from canta.dockWidget import DockWidget
 from canta.lutfenBekleyin import LutfenBekleyin
-from canta.nesneOzellikleriYuzenWidget import NesneOzellikleriYuzenWidget
+from canta.yw.nesneOzellikleriYW import NesneOzellikleriYW
 from canta.pdfyiResmeCevirPenceresi import PdfyiResmeCevirPenceresi
 from canta.printPreviewDialog import PrintPreviewDialog
 from canta.renkSecici import RenkSeciciWidget
@@ -58,6 +61,7 @@ from canta.ekranKutuphane import EkranKutuphane
 from canta.sahneKutuphane import SahneKutuphane
 from canta.tabWidget import TabWidget
 from canta.tabBar import TabBar
+from canta.toolBar import ToolBar
 from canta.spinBoxlar import SpinBox, SpinBoxForRotation, DoubleSpinBox
 from canta.sliderDoubleWithDoubleSpinBox import SliderDoubleWithDoubleSpinBox
 from canta.lineEdit import AraLineEdit
@@ -82,7 +86,9 @@ from canta.htmlParsers import ImgSrcParser
 from canta.treeView import TreeView
 from canta.treeSayfa import Sayfa
 from canta.pushButton import PushButton, PushButtonRenk
-from canta.yuzenWidget import YuzenWidget
+from canta.yw.yuzenWidget import YuzenWidget
+from canta.yanBolme.yanBolme import YanBolme
+from canta.yw.tercumeYW import TercumeYW
 from canta.with_signals_updates_blocked import (signals_blocked_and_updates_disabled as signals_updates_blocked,
                                                 signals_blocked)
 
@@ -91,11 +97,9 @@ from canta import undoRedoFonksiyolar as undoRedo
 from canta.ekranGoruntusu.secilen_bolge_comp_manager_on import TamEkranWidget_CM_On
 from canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_CM_Off
 
-import canta.icons_rc
-
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "(v0.91)"
+VERSION = "(v0.95)"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -116,6 +120,8 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def __init__(self, parent=None):
         super(DefterAnaPencere, self).__init__(parent)
+
+        self.renk_degistir()
 
         self.setWindowTitle("Defter")
         # self.ekran_cozunurluk = QApplication.primaryScreen().availableGeometry()
@@ -178,9 +184,11 @@ class DefterAnaPencere(QMainWindow):
 
         self.olustur_ayarlar()
         self.oku_kullanici_ayarlari()
-        self.olustur_sayfalarDW()
+        self.olustur_merkezW()
+        self.olustur_sol_yan_bolum()
+        self.olustur_sayfalarYW()
         self.olustur_tab_widget()
-        self.olustur_kutuphaneDW()
+        self.olustur_kutuphaneYW()
         self.olustur_arama_cubugu()
 
         self.olustur_tools_toolbar()
@@ -190,18 +198,20 @@ class DefterAnaPencere(QMainWindow):
         self.olustur_renk_toolbar()
         self.olustur_nesne_hizalama_arac_cubugu()
         self.olustur_menu_bar()
-        self.olustur_utilities_toolbar()
         self.olustur_status_bar()
         self.olustur_nesne_sag_menuler()
-        self.olustur_dummy_widget_for_actions()
 
         self.ekle_hotkeys()
 
-        self.olustur_nesne_ozellikleriDW()
+        self.olustur_nesne_ozellikleriYW2()
         self.olustur_nesne_ozellikleriYW()
-        self.olustur_stillerDW()
+        self.olustur_stillerYW2()
         self.olustur_stillerYW()
-        self.olustur_sahneye_baski_siniri_cizim_ayarlari()
+        self.olustur_tercumeYW()
+        self.olustur_baskiSiniriYW()
+        self.olustur_yw_menu()
+        self.olustur_utilities_toolbar()
+        self.olustur_dummy_widget_for_actions()
         self.arsivleme_programi_adres_belirle()
 
         self.act_switch_to_selection_tool()
@@ -242,50 +252,108 @@ class DefterAnaPencere(QMainWindow):
     #         print(item.text()," --> ",item.shortcut().toString())
 
     # ---------------------------------------------------------------------
+    def renk_degistir(self):
+
+        # self.renkYazi = QColor(255, 255, 255)
+        # self.renkArkaplan = QColor(221, 231, 242)
+        self.renkArkaplan = QColor(238, 238, 238)
+        # self.renkArkaplan = QColor(245, 245, 245)
+
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setAutoFillBackground(True)
+
+        p = self.palette()
+        # p.setColor(self.foregroundRole(), self.renkYazi)
+        p.setColor(self.backgroundRole(), self.renkArkaplan)
+        self.setPalette(p)
+
+    # ---------------------------------------------------------------------
     def setCursor(self, cursor, gecici_mi=False):
         if not gecici_mi:
             self.imlec_arac = cursor
         super(DefterAnaPencere, self).setCursor(cursor)
 
     # ---------------------------------------------------------------------
-    def olustur_nesne_ozellikleriDW(self):
+    def olustur_merkezW(self):
+        self.centralW = QWidget(self)
+        self.centralW.setContentsMargins(0, 0, 0, 0)
+        self.setCentralWidget(self.centralW)
+        self.anaLay = QHBoxLayout(self.centralW)
+        # self.anaLay.setContentsMargins(0,5,0,0)
+        self.anaLay.setContentsMargins(0, 0, 0, 0)
+        # self.anaLay.setSpacing(0)
+        # self.centralW.setLayout(self.anaLay)
 
-        self.nesneOzellikleriDW = DockWidget(self.tr("Item && Tool Properties"), self)
-        self.nesneOzellikleriDW.setObjectName("nesneOzellikleriDW")
-        # self.nesneOzellikleriDW.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
-        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.nesneOzellikleriDW)
+        self.solLay = QHBoxLayout()
+        self.solLay.setContentsMargins(0, 0, 0, 0)
+        self.solLay.setSizeConstraint(self.solLay.SizeConstraint.SetFixedSize)
+        self.solLay.setSpacing(0)
+        self.ortaLay = QVBoxLayout()
+        self.ortaLay.setContentsMargins(0, 0, 0, 0)
+        self.sagLay = QVBoxLayout()
+        self.sagLay.setContentsMargins(0, 0, 0, 0)
+        #
+        self.anaLay.addLayout(self.solLay)
+        self.anaLay.addLayout(self.ortaLay)
+        self.anaLay.addLayout(self.sagLay)
 
-        # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
+    # ---------------------------------------------------------------------
+    def olustur_sol_yan_bolum(self):
 
-        self.nesneOzellikleriDWScroll = QScrollArea()
-        # self.nesneOzellikleriDWScroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        # self.nesneOzellikleriDWScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.nesneOzellikleriDWScroll.setWidgetResizable(True)
-        # self.nesneOzellikleriDWScroll.setBackgroundRole(QPalette.Dark)
-        self.nesneOzellikleriDW.setWidget(self.nesneOzellikleriDWScroll)
-        # scrollLayout = QVBoxLayout(self.nesneOzellikleriDWScroll)
+        self.solYanBolme = YanBolme(solSag="sol", parent=self)
+        self.solLay.addWidget(self.solYanBolme)
 
-        self.nesneOzellikleriDWBaseWidget = QWidget(self.nesneOzellikleriDWScroll)
-        # self.nesneOzellikleriDW.setWidget(self.nesneOzellikleriDWBaseWidget)
-        anaLay = QVBoxLayout(self.nesneOzellikleriDWBaseWidget)
+        self.sagYanBolme = YanBolme(solSag="sag", parent=self)
+        self.sagLay.addWidget(self.sagYanBolme)
+
+    # ---------------------------------------------------------------------
+    def yw_cubuga_tasi(self, yw, yuklenirken_mi):
+        if yw.sol_cubukta_mi:
+            self.solYanBolme.yw_cubuga_tasi_veya_kapat(yw, yuklenirken_mi)
+        else:
+            self.sagYanBolme.yw_cubuga_tasi_veya_kapat(yw, yuklenirken_mi)
+
+    # ---------------------------------------------------------------------
+    def olustur_nesne_ozellikleriYW2(self):
+
+        scroll = QScrollArea()
+        # scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        # scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setWidgetResizable(True)
+        # scroll.setBackgroundRole(QPalette.Dark)
+        # scrollLayout = QVBoxLayout(scroll)
+        # self.nesneOzellikleriYW2.setWidget(scroll)
+
+        self.nesneOzellikleriYW2 = YuzenWidget(parent=self.centralW)
+        self.nesneOzellikleriYW2.yazBaslik(self.tr("Item && Tool Properties"))
+        # self.nesneOzellikleriYW2.setMinimumWidth(315)
+        # self.nesneOzellikleriYW2.setMinimumHeight(190)
+        self.nesneOzellikleriYW2.icerikW.setMinimumSize(315, 400)
+        self.nesneOzellikleriYW2.ekleWidget(scroll)
+        self.nesneOzellikleriYW2.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
+        # self.nesneOzellikleriYW2.hide()
+
+        temelW = QWidget(scroll)
+        # self.nesneOzellikleriYW2.setWidget(temelW)
+        anaLay = QVBoxLayout(temelW)
         # anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
         # anaLay.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
         anaLay.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
         # anaLay.setSizeConstraint(QVBoxLayout.SetMaximumSize)
         # anaLay.setContentsMargins(0,0,0,0)
-        # self.nesneOzellikleriDW.setContentsMargins(0, 0, 0, 0)
-        # self.nesneOzellikleriDWBaseWidget.setContentsMargins(0,0,0,0)
-        # scrollLayout.addWidget(self.nesneOzellikleriDWBaseWidget)
-        self.nesneOzellikleriDWScroll.setWidget(self.nesneOzellikleriDWBaseWidget)
-        # self.nesneOzellikleriDWScroll.setLayout(layout)
+        # self.nesneOzellikleriYW2.setContentsMargins(0, 0, 0, 0)
+        # temelW.setContentsMargins(0,0,0,0)
+        # scrollLayout.addWidget(temelW)
+        scroll.setWidget(temelW)
+        # scroll.setLayout(layout)
 
-        self.nesneGrupW = QWidget(self.nesneOzellikleriDWBaseWidget)
+        self.nesneGrupW = QWidget(temelW)
         nesneLay = QVBoxLayout(self.nesneGrupW)
         nesneLay.setContentsMargins(0, 0, 0, 0)
-        self.yaziGrupW = QWidget(self.nesneOzellikleriDWBaseWidget)
+        self.yaziGrupW = QWidget(temelW)
         yaziLay = QVBoxLayout(self.yaziGrupW)
         yaziLay.setContentsMargins(0, 0, 0, 0)
-        self.cizgiGrupW = QWidget(self.nesneOzellikleriDWBaseWidget)
+        self.cizgiGrupW = QWidget(temelW)
         cizgiLay = QVBoxLayout(self.cizgiGrupW)
         cizgiLay.setContentsMargins(0, 0, 0, 0)
 
@@ -428,7 +496,8 @@ class DefterAnaPencere(QMainWindow):
         self.yazi_rengi_btn_liste = []
 
         for i in range(10):
-            btn = self.ver_renk_palet_buton(tip="y", gen=15, yuk=15, renk=self.yazi_rengi_btn_liste_acilis_renkleri[i],
+            btn = self.ver_renk_palet_buton(tip="y", gen=15, yuk=15,
+                                            renk=self.yazi_rengi_btn_liste_acilis_renkleri[i],
                                             parent=self.yaziGrupW)
             renklerSatir1Lay.addWidget(btn)
 
@@ -439,31 +508,31 @@ class DefterAnaPencere(QMainWindow):
         renklerDisLay.addLayout(renklerSatirlarLay)
         renklerDisLay.addStretch()
 
-        self.btnBold = PushButton("", 16, 16, parent=self.yaziGrupW)
+        self.btnBold = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
         self.btnBold.setIcon(QIcon(':icons/bold.png'))
         self.btnBold.setFlat(True)
         self.btnBold.setCheckable(True)
         self.btnBold.clicked.connect(lambda durum: self.act_bold(durum=durum, from_button=True))
 
-        self.btnItalic = PushButton("", 16, 16, parent=self.yaziGrupW)
+        self.btnItalic = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
         self.btnItalic.setIcon(QIcon(':icons/italic.png'))
         self.btnItalic.setFlat(True)
         self.btnItalic.setCheckable(True)
         self.btnItalic.clicked.connect(lambda durum: self.act_italic(durum=durum, from_button=True))
 
-        self.btnUnderline = PushButton("", 16, 16, parent=self.yaziGrupW)
+        self.btnUnderline = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
         self.btnUnderline.setIcon(QIcon(':icons/underline.png'))
         self.btnUnderline.setFlat(True)
         self.btnUnderline.setCheckable(True)
         self.btnUnderline.clicked.connect(lambda durum: self.act_underline(durum=durum, from_button=True))
 
-        self.btnStrikeOut = PushButton("", 16, 16, parent=self.yaziGrupW)
+        self.btnStrikeOut = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
         self.btnStrikeOut.setIcon(QIcon(':icons/strikeout.png'))
         self.btnStrikeOut.setFlat(True)
         self.btnStrikeOut.setCheckable(True)
         self.btnStrikeOut.clicked.connect(lambda durum: self.act_strikeout(durum=durum, from_button=True))
 
-        self.btnOverline = PushButton("", 16, 16, parent=self.yaziGrupW)
+        self.btnOverline = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
         self.btnOverline.setIcon(QIcon(':icons/overline.png'))
         self.btnOverline.setFlat(True)
         self.btnOverline.setCheckable(True)
@@ -480,22 +549,22 @@ class DefterAnaPencere(QMainWindow):
         grp = QButtonGroup(self.yaziGrupW)
         grp.buttonClicked.connect(self.act_yazi_hizala_btn)
 
-        self.btnYaziHizalaSola = PushButton("", 16, 16, parent=self.yaziGrupW)
+        self.btnYaziHizalaSola = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
         self.btnYaziHizalaSola.setIcon(QIcon(':icons/yazi-hizala-sola.png'))
         self.btnYaziHizalaSola.setFlat(True)
         self.btnYaziHizalaSola.setCheckable(True)
 
-        self.btnYaziHizalaOrtala = PushButton("", 16, 16, parent=self.yaziGrupW)
+        self.btnYaziHizalaOrtala = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
         self.btnYaziHizalaOrtala.setIcon(QIcon(':icons/yazi-hizala-ortala.png'))
         self.btnYaziHizalaOrtala.setFlat(True)
         self.btnYaziHizalaOrtala.setCheckable(True)
 
-        self.btnYaziHizalaSaga = PushButton("", 16, 16, parent=self.yaziGrupW)
+        self.btnYaziHizalaSaga = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
         self.btnYaziHizalaSaga.setIcon(QIcon(':icons/yazi-hizala-saga.png'))
         self.btnYaziHizalaSaga.setFlat(True)
         self.btnYaziHizalaSaga.setCheckable(True)
 
-        self.btnYaziHizalaSigdir = PushButton("", 16, 16, parent=self.yaziGrupW)
+        self.btnYaziHizalaSigdir = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
         self.btnYaziHizalaSigdir.setIcon(QIcon(':icons/yazi-hizala-sigdir.png'))
         self.btnYaziHizalaSigdir.setFlat(True)
         self.btnYaziHizalaSigdir.setCheckable(True)
@@ -659,7 +728,7 @@ class DefterAnaPencere(QMainWindow):
         self.nesneGrupW.show()
         self.yaziGrupW.hide()
         self.cizgiGrupW.hide()
-        self.aracIkonuEtiketi = QLabel(self.nesneOzellikleriDWBaseWidget)
+        self.aracIkonuEtiketi = QLabel(temelW)
 
         self.ekrandaRenkSecmeDugmesi = RenkSecmeDugmesi(self)
         self.ekrandaRenkSecmeDugmesi.renkDegisti.connect(self.ekrandan_renk_secicide_renk_degisti)
@@ -669,11 +738,12 @@ class DefterAnaPencere(QMainWindow):
         radioLay.addWidget(self.radioArkaplan)
         radioLay.addWidget(self.radioYazi)
         radioLay.addWidget(self.radioCizgi)
+        radioLay.addStretch()
 
         self.radioBtnGroup.buttonClicked.connect(self.act_radio_secim_degisti)
 
         self.renkSecici = RenkSeciciWidget(self.cScene.aktifArac.arkaPlanRengi,
-                                           boyut=64, parent=self.nesneOzellikleriDWBaseWidget)
+                                           boyut=64, parent=temelW)
         self.renkSecici.renkDegisti.connect(self.renk_secicide_renk_degisti)
         self.renkSecici.anaLay.setContentsMargins(0, 0, 0, 0)
         shared.kutulu_arkaplan_olustur(self.nesneArkaplanRengiBtn, 5)
@@ -753,12 +823,13 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def olustur_stillerYW(self):
 
-        self.stillerYuzenWidget = YuzenWidget(self)
-        self.stillerYuzenWidget.hide()
-        self.stillerYuzenWidget.yazBaslik(self.tr("Style Presets"))
+        self.stillerYW = YuzenWidget(kapatilabilir_mi=True, parent=self.centralW)
+        self.stillerYW.yazBaslik(self.tr("Style Presets"))
+        self.stillerYW.icerikW.setMinimumSize(150, 150)
+        self.stillerYW.hide()
 
-        self.stillerYLW = QListWidget(self.stillerYuzenWidget)
-        self.stillerYLW.setMinimumWidth(100)
+        self.stillerYLW = QListWidget(self.stillerYW)
+        self.stillerYLW.setMinimumWidth(150)
         self.stillerYLW.setMinimumHeight(100)
         # self.stillerYLW.setMaximumHeight(500)
         # self.stillerYLW.resize(250, 100)
@@ -771,43 +842,48 @@ class DefterAnaPencere(QMainWindow):
         delegate = ListWidgetItemDelegate(self.stillerYLW)
         self.stillerYLW.setItemDelegate(delegate)
 
-        self.stillerYuzenWidget.ekleWidget(self.stillerYLW)
+        self.stillerYW.ekleWidget(self.stillerYLW)
 
     # ---------------------------------------------------------------------
-    def olustur_stillerDW(self):
-        self.stillerDW = DockWidget(self.tr("Style Presets"), self)
-        self.stillerDW.setObjectName("stillerDockWidget")
-        # self.stillerDW.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
-        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.stillerDW)
+    def olustur_stillerYW2(self):
 
-        # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
+
+        self.stillerYW2 = YuzenWidget(parent=self.centralW)
+        self.stillerYW2.yazBaslik(self.tr("Style Presets"))
+        self.stillerYW2.icerikW.setMinimumSize(200, 200)
+        self.stillerYW2.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
+        # self.stillerYW2.hide()
+
 
         scroll = QScrollArea()
         # scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         # scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll.setWidgetResizable(True)
         # scroll.setBackgroundRole(QPalette.Dark)
-        self.stillerDW.setWidget(scroll)
         # scrollLayout = QVBoxLayout(scroll)
 
-        self.stillerDWBaseWidget = QWidget(scroll)
-        # self.stillerDW.setWidget(self.stillerDWBaseWidget)
-        anaLay = QVBoxLayout(self.stillerDWBaseWidget)
+        temelW = QWidget(parent=self.stillerYW2)
+        scroll.setWidget(temelW)
+        # self.stillerYW2.ekleWidget(temelW)
+        self.stillerYW2.ekleWidget(scroll)
+
+
+        temelW.setContentsMargins(0, 0, 0, 0)
+        anaLay = QVBoxLayout(temelW)
         # anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
         # anaLay.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
         anaLay.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
         # anaLay.setSizeConstraint(QVBoxLayout.SetMaximumSize)
-        # anaLay.setContentsMargins(0,0,0,0)
-        # self.stillerDW.setContentsMargins(0, 0, 0, 0)
-        # self.stillerDWBaseWidget.setContentsMargins(0,0,0,0)
-        # scrollLayout.addWidget(self.stillerDWBaseWidget)
-        scroll.setWidget(self.stillerDWBaseWidget)
-        # scroll.setLayout(layout)
+        anaLay.setContentsMargins(1, 3, 1, 1)
+        anaLay.setSpacing(3)
 
-        self.stillerLW = QListWidget(self.stillerDWBaseWidget)
+        self.stillerLW = QListWidget(temelW)
 
         delegate = ListWidgetItemDelegate(self.stillerLW)
         self.stillerLW.setItemDelegate(delegate)
+        # self.stillerLW.setMinimumWidth(190)
+        # self.stillerLW.setMinimumHeight(250)
+        # self.stillerLW.setMinimumSize(190, 250)
         # self.stillerLW.setItemDelegateForRow()
         # self.stillerLW.setLineWidth(100)
         # self.stillerLW.setViewMode(self.stillerLW.IconMode)
@@ -819,26 +895,29 @@ class DefterAnaPencere(QMainWindow):
         self.stillerLW.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.stillerLW.customContextMenuRequested.connect(self.act_stiller_sag_menu_goster)
 
-        anaLay.addWidget(self.stillerLW)
-
         btnLayout = QHBoxLayout()
+        btnLayout.setContentsMargins(0, 0, 0, 0)
 
-        stilEkleBtn = QPushButton(self.tr("Add"), self.stillerDWBaseWidget)
-        stilEkleBtn.setMinimumWidth(50)
+        btnRenk = QColor(200, 200, 200)
+
+        stilEkleBtn = PushButton(self.tr("+"), yukseklik=16, renkArkaplan=btnRenk, parent=temelW)
+        stilEkleBtn.setMinimumWidth(20)
+        stilEkleBtn.setToolTip(self.tr("Add style"))
         stilEkleBtn.clicked.connect(self.act_stil_ekle)
 
-        self.stilYenidenAdlandirBtn = QPushButton(self.tr("Rename"), self.stillerDWBaseWidget)
-        self.stilYenidenAdlandirBtn.setMinimumWidth(75)
+        self.stilYenidenAdlandirBtn = PushButton(self.tr('" "'), yukseklik=16, renkArkaplan=btnRenk, parent=temelW)
+        self.stilYenidenAdlandirBtn.setMinimumWidth(20)
+        self.stilYenidenAdlandirBtn.setToolTip(self.tr("Rename style"))
         self.stilYenidenAdlandirBtn.clicked.connect(self.act_stil_yeniden_adlandir)
         self.stilYenidenAdlandirBtn.setDisabled(True)
 
-        self.stilSilBtn = QPushButton(self.tr("Delete"), self.stillerDWBaseWidget)
-        self.stilSilBtn.setMinimumWidth(75)
+        self.stilSilBtn = PushButton(self.tr("-"), yukseklik=16, renkArkaplan=btnRenk, parent=temelW)
+        self.stilSilBtn.setMinimumWidth(20)
+        self.stilSilBtn.setToolTip(self.tr("Remove style"))
         self.stilSilBtn.clicked.connect(self.act_stil_sil)
         self.stilSilBtn.setDisabled(True)
-        
-        stillerMenuBtn = QPushButton("☰", self.stillerDWBaseWidget)
-        stillerMenuBtn.setFixedWidth(30)
+
+        stillerMenuBtn = PushButton("☰", genislik=30, yukseklik=16, parent=temelW)
 
         stillerBtnMenu = QMenu(self.tr("Presets"), stillerMenuBtn)
         stillerBtnMenu.aboutToShow.connect(self.on_stiller_btn_menu_about_to_show)
@@ -881,52 +960,51 @@ class DefterAnaPencere(QMainWindow):
         btnLayout.addWidget(stilEkleBtn)
         btnLayout.addWidget(self.stilYenidenAdlandirBtn)
         btnLayout.addWidget(self.stilSilBtn)
+        btnLayout.addStretch()
         btnLayout.addWidget(stillerMenuBtn)
+        anaLay.addWidget(self.stillerLW)
         anaLay.addLayout(btnLayout)
 
     # ---------------------------------------------------------------------
-    def olustur_sahneye_baski_siniri_cizim_ayarlari(self):
-        self.baskiSiniriCizimAyarlariDW = DockWidget(self.tr("Draw Print Borders"), self)
-        self.baskiSiniriCizimAyarlariDW.setObjectName("baskiSiniriCizimAyarlariDockWidget")
-        self.baskiSiniriCizimAyarlariDW.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
-        self.baskiSiniriCizimAyarlariDW.setVisible(False)
-        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.baskiSiniriCizimAyarlariDW)
+    def olustur_baskiSiniriYW(self):
 
-        # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
+        self.baskiSiniriCizimAyarlariYW = YuzenWidget(parent=self.centralW)
+        self.baskiSiniriCizimAyarlariYW.yazBaslik(self.tr("Print Borders"))
+        # self.baskiSiniriCizimAyarlariYW.hide()
+        # self.baskiSiniriCizimAyarlariYW.setMinimumWidth(190)
+        # self.baskiSiniriCizimAyarlariYW.setMinimumHeight(315)
+        self.baskiSiniriCizimAyarlariYW.icerikW.setMinimumSize(190, 315)
+        self.baskiSiniriCizimAyarlariYW.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
+        # self.baskiSiniriCizimAyarlariYW.baslikWidget.setMaximumWidth(190)
+        # self.baskiSiniriCizimAyarlariYW.adjustSize()
 
-        scroll = QScrollArea()
-        # scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        # scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll.setWidgetResizable(True)
-        # scroll.setBackgroundRole(QPalette.Dark)
-        self.baskiSiniriCizimAyarlariDW.setWidget(scroll)
-        # scrollLayout = QVBoxLayout(scroll)
+        temelW = QWidget(self.baskiSiniriCizimAyarlariYW)
+        self.baskiSiniriCizimAyarlariYW.ekleWidget(temelW)
 
-        self.baskiSiniriCizimAyarlariDWBW = QWidget(scroll)
-        # self.baskiSiniriCizimAyarlariDW.setWidget(self.baskiSiniriCizimAyarlariDWBW)
-        anaLay = QVBoxLayout(self.baskiSiniriCizimAyarlariDWBW)
+        anaLay = QVBoxLayout(temelW)
         # anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
         # anaLay.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
         anaLay.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
         # anaLay.setSizeConstraint(QVBoxLayout.SetMaximumSize)
-        # anaLay.setContentsMargins(10,15,0,0)
-        # self.baskiSiniriCizimAyarlariDW.setContentsMargins(0, 0, 0, 0)
-        # self.baskiSiniriCizimAyarlariDWBW.setContentsMargins(0,0,0,0)
-        # scrollLayout.addWidget(self.baskiSiniriCizimAyarlariDWBW)
-        scroll.setWidget(self.baskiSiniriCizimAyarlariDWBW)
+        # anaLay.setContentsMargins(0,0,0,0)
+        # self.baskiSiniriCizimAyarlariYW.setContentsMargins(0, 0, 0, 0)
+        # temelW.setContentsMargins(0,0,0,0)
+        # scrollLayout.addWidget(temelW)
+        # scroll.setWidget(temelW)
         # scroll.setLayout(layout)
 
-        self.baskiSinirGBox = QGroupBox(self.baskiSiniriCizimAyarlariDWBW)
+        self.baskiSinirGBox = QGroupBox(temelW)
+        # self.baskiSinirGBox.setContentsMargins(0, 0, 0, 0)
         self.baskiSinirGBox.setFlat(True)
         self.baskiSinirGBox.setCheckable(True)
         self.baskiSinirGBox.setChecked(False)
         self.baskiSinirGBox.setTitle(self.tr("Draw print borders"))
         self.baskiSinirGBox.clicked.connect(self.act_yazici_sayfa_kenar_cizdir)
-        self.baskiSinirGBoxLay = QVBoxLayout(self.baskiSinirGBox)
+        layBaskiSiniriGBox = QVBoxLayout(self.baskiSinirGBox)
 
-        renkLbl = QLabel(self.tr("Color"), self.baskiSiniriCizimAyarlariDWBW)
+        renkLbl = QLabel(self.tr("Color"), temelW)
         self.baskiCerceveRengiBtn = PushButtonRenk("", 36, 16, self.baskiCerceveRengi,
-                                                   self.baskiSiniriCizimAyarlariDWBW)
+                                                   temelW)
         self.baskiCerceveRengiBtn.clicked.connect(self.act_baski_cerceve_rengi_kur)
 
         renkLay = QHBoxLayout()
@@ -934,7 +1012,7 @@ class DefterAnaPencere(QMainWindow):
         renkLay.addWidget(self.baskiCerceveRengiBtn)
         renkLay.addStretch(1)
 
-        self.baskiBirimCBox = QComboBox(self.baskiSiniriCizimAyarlariDWBW)
+        self.baskiBirimCBox = QComboBox(temelW)
 
         self.baskiBirimCBox.setFixedWidth(135)
 
@@ -945,7 +1023,7 @@ class DefterAnaPencere(QMainWindow):
                                       "Didot",
                                       "Cicero"])
 
-        self.baskiKagitBoyutuCBox = QComboBox(self.baskiSiniriCizimAyarlariDWBW)
+        self.baskiKagitBoyutuCBox = QComboBox(temelW)
         # self.baskiKagitBoyutuCBox.setFixedWidth(135)
         self.baskiKagitBoyutuCBox.setMaximumWidth(135)
         printerInfo = QPrinterInfo(self.printer)
@@ -957,14 +1035,14 @@ class DefterAnaPencere(QMainWindow):
                 desteklenenSayfaBoyutlari.append(psize)
                 self.baskiKagitBoyutuCBox.addItem(psize.name())
 
-        widthLbl = QLabel(self.tr("Width"), self.baskiSiniriCizimAyarlariDWBW)
+        widthLbl = QLabel(self.tr("Width"), temelW)
         widthLbl.setFixedWidth(50)
-        heightLbl = QLabel(self.tr("Height"), self.baskiSiniriCizimAyarlariDWBW)
+        heightLbl = QLabel(self.tr("Height"), temelW)
         heightLbl.setFixedWidth(50)
-        self.kagitGenislikLE = QLineEdit(self.baskiSiniriCizimAyarlariDWBW)
+        self.kagitGenislikLE = QLineEdit(temelW)
         self.kagitGenislikLE.setMaximumWidth(75)
         self.kagitGenislikLE.setEnabled(False)
-        self.kagitYukseklikLE = QLineEdit(self.baskiSiniriCizimAyarlariDWBW)
+        self.kagitYukseklikLE = QLineEdit(temelW)
         self.kagitYukseklikLE.setMaximumWidth(75)
         self.kagitYukseklikLE.setEnabled(False)
 
@@ -994,13 +1072,13 @@ class DefterAnaPencere(QMainWindow):
 
         fitRadioBtnGrp.buttonClicked.connect(self.act_yazici_sayfa_kenar_cizdir)
 
-        kagitYonBtnGrp = QButtonGroup(self.baskiSiniriCizimAyarlariDWBW)
+        kagitYonBtnGrp = QButtonGroup(temelW)
 
-        self.radioBaskiDikey = QRadioButton(self.tr("Portrait"), self.baskiSiniriCizimAyarlariDWBW)
+        self.radioBaskiDikey = QRadioButton(self.tr("Portrait"), temelW)
         self.radioBaskiDikey.setIcon(QIcon(':icons/dikey-sayfa.png'))
         self.radioBaskiDikey.setChecked(True)
 
-        self.radioBaskiYatay = QRadioButton(self.tr("Landscape"), self.baskiSiniriCizimAyarlariDWBW)
+        self.radioBaskiYatay = QRadioButton(self.tr("Landscape"), temelW)
         self.radioBaskiYatay.setIcon(QIcon(':icons/yatay-sayfa.png'))
 
         kagitYonBtnGrp.buttonClicked.connect(self.act_yazici_kagit_yonu_degisti)
@@ -1008,17 +1086,18 @@ class DefterAnaPencere(QMainWindow):
         kagitYonBtnGrp.addButton(self.radioBaskiDikey)
         kagitYonBtnGrp.addButton(self.radioBaskiYatay)
 
-        self.baskiSinirGBoxLay.addLayout(renkLay)
-        self.baskiSinirGBoxLay.addWidget(self.baskiBirimCBox)
-        self.baskiSinirGBoxLay.addWidget(self.baskiKagitBoyutuCBox)
-        self.baskiSinirGBoxLay.addLayout(boyutGenLay)
-        self.baskiSinirGBoxLay.addLayout(boyutYukLay)
-        self.baskiSinirGBoxLay.addSpacing(10)
-        self.baskiSinirGBoxLay.addWidget(self.radioBaskiDikey)
-        self.baskiSinirGBoxLay.addWidget(self.radioBaskiYatay)
-        self.baskiSinirGBoxLay.addSpacing(10)
-        self.baskiSinirGBoxLay.addWidget(self.radioSayfaSigdir)
-        self.baskiSinirGBoxLay.addWidget(self.radioGenislikSigdir)
+        layBaskiSiniriGBox.addLayout(renkLay)
+        layBaskiSiniriGBox.addWidget(self.baskiBirimCBox)
+        layBaskiSiniriGBox.addWidget(self.baskiKagitBoyutuCBox)
+        layBaskiSiniriGBox.addLayout(boyutGenLay)
+        layBaskiSiniriGBox.addLayout(boyutYukLay)
+        layBaskiSiniriGBox.addSpacing(10)
+        layBaskiSiniriGBox.addWidget(self.radioBaskiDikey)
+        layBaskiSiniriGBox.addWidget(self.radioBaskiYatay)
+        layBaskiSiniriGBox.addSpacing(10)
+        layBaskiSiniriGBox.addWidget(self.radioSayfaSigdir)
+        layBaskiSiniriGBox.addWidget(self.radioGenislikSigdir)
+        layBaskiSiniriGBox.addStretch()
 
         anaLay.addWidget(self.baskiSinirGBox)
 
@@ -1121,55 +1200,50 @@ class DefterAnaPencere(QMainWindow):
         self.act_yazici_sayfa_kenar_cizdir()
 
     # ---------------------------------------------------------------------
-    def olustur_sayfalarDW(self):
-        self.sayfalarDW = DockWidget(self.tr("Pages"), self)
-        self.sayfalarDW.setObjectName("sayfalarDockWidget")
-        # self.sayfalarDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.sayfalarDW)
+    def olustur_sayfalarYW(self):
 
-        # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
+        self.sayfalarYW = YuzenWidget(parent=self.centralW)
+        self.sayfalarYW.yazBaslik(self.tr("Pages"))
+        self.sayfalarYW.icerikW.setMinimumSize(190, 315)
+        self.sayfalarYW.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
+        # self.sayfalarYW.move(100, 100)
+        # self.sayfalarYW.show()
 
-        base = QWidget(self.sayfalarDW)
-        base.setContentsMargins(0, 0, 0, 0)
-        self.sayfalarDW.setWidget(base)
-        layBase = QVBoxLayout(base)
+        # ---------------------------------------------------------------------
+        # self.sayfalarBtn = DikeyDugme(self.tr("Pages"), self, yon="yukari")
+        # self.sayfalarBtn.setMaximumWidth(16)
+        # self.hareketliYanBolmeSol.ekle_dugme_ve_icerik(self.sayfalarBtn, self.sayfalarYW)
+        # ---------------------------------------------------------------------
+
+        sayfalarTemelW = QWidget(self.sayfalarYW)
+        # sayfalarTemelW.raise_()
+        # sayfalarTemelW.move(16,130)
+        # sayfalarTemelW.setFixedHeight(350)
+        sayfalarTemelW.setContentsMargins(0, 0, 0, 0)
+
+        self.sayfalarYW.ekleWidget(sayfalarTemelW)
+
+        anaLay = QVBoxLayout(sayfalarTemelW)
+        anaLay.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
+
         layButonlar = QHBoxLayout()
-        layBase.addLayout(layButonlar)
+        # anaLay.addWidget(baslikWidget)
+        anaLay.addLayout(layButonlar)
 
-        # scroll = QScrollArea()
-        # # scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        # # scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        # scroll.setWidgetResizable(True)
-        # # scroll.setBackgroundRole(QPalette.Dark)
-        # self.sayfalarDW.setWidget(scroll)
-        # # scrollLayout = QVBoxLayout(scroll)
-        # sayfalarBaseWidget = QWidget(scroll)
-        # layoutV = QVBoxLayout(sayfalarBaseWidget)
-        #
-        # layoutV.addLayout(layoutH)
-        # # TODO: bu layout sistemi tam olmadı
+        self.sayfalarYWTreeView = TreeView(sayfalarTemelW)
+        anaLay.addWidget(self.sayfalarYWTreeView)
 
-        self.sayfalarDWTreeView = TreeView(base)
-        # self.sayfalarDWTreeModel = TreeModel(self.sayfalarDWTreeView)
-        # self.sayfalarDWTreeView.setModel(self.sayfalarDWTreeModel)
+        # self.sayfalarYWTreeView.doubleClicked.connect(self.tw_edit_item)
+        # self.sayfalarYWTreeView.itemDoubleClicked.connect(self.tw_edit_item)
+        # self.sayfalarYWTreeModel.nesneDegistirilmekUzere.connect(self.tv_nesne_degistirilmek_uzere)
+        # self.sayfalarYWTreeModel.nesneDegisti.connect(self.tv_nesne_degisti)
+        # self.sayfalarYWTreeView.itemSelectionChanged.connect(self.tw_item_selection_changed)
+        # self.sayfalarYWTreeView.itemPressed.connect(self.tw_item_clicked)
+        # self.sayfalarYWTreeView.nesneAktiveEdildi.connect(self.tv_sayfa_degistir)
+        self.sayfalarYWTreeView.secimDegisti.connect(self.tv_sayfa_degistir)
+        # self.sayfalarYWTreeView.itemClicked.connect(self.tv_sayfa_degistir)
 
-        # for column in range(self.sayfalarDWTreeModel.columnCount()):
-        #     self.sayfalarDWTreeView.resizeColumnToContents(column)
-
-        # self.sayfalarDWTreeView.model().dataChanged.connect(self.tw_model_data_changed)
-        layBase.addWidget(self.sayfalarDWTreeView)
-
-        # self.sayfalarDWTreeView.doubleClicked.connect(self.tw_edit_item)
-        # self.sayfalarDWTreeView.itemDoubleClicked.connect(self.tw_edit_item)
-        # self.sayfalarDWTreeModel.nesneDegistirilmekUzere.connect(self.tv_nesne_degistirilmek_uzere)
-        # self.sayfalarDWTreeModel.nesneDegisti.connect(self.tv_nesne_degisti)
-        # self.sayfalarDWTreeView.itemSelectionChanged.connect(self.tw_item_selection_changed)
-        # self.sayfalarDWTreeView.itemPressed.connect(self.tw_item_clicked)
-        # self.sayfalarDWTreeView.nesneAktiveEdildi.connect(self.tv_sayfa_degistir)
-        self.sayfalarDWTreeView.secimDegisti.connect(self.tv_sayfa_degistir)
-        # self.sayfalarDWTreeView.itemClicked.connect(self.tv_sayfa_degistir)
-
-        self.twsayfa_ekle_btn = QPushButton(base)
+        self.twsayfa_ekle_btn = QPushButton(sayfalarTemelW)
         self.twsayfa_ekle_btn.setIcon(QIcon(":icons/yesil-yeni-sayfa.png"))
         self.twsayfa_ekle_btn.setToolTip(self.tr("Add new page"))
         self.twsayfa_ekle_btn.setFlat(True)
@@ -1179,7 +1253,7 @@ class DefterAnaPencere(QMainWindow):
         self.twsayfa_ekle_btn.clicked.connect(self.tw_sayfa_ekle)
         layButonlar.addWidget(self.twsayfa_ekle_btn)
 
-        self.tw_alt_sayfa_ekle_btn = QPushButton(base)
+        self.tw_alt_sayfa_ekle_btn = QPushButton(sayfalarTemelW)
         self.tw_alt_sayfa_ekle_btn.setIcon(QIcon(":icons/ic-sayfa-yesil.png"))
         self.tw_alt_sayfa_ekle_btn.setToolTip(self.tr("Add new inner page"))
         self.tw_alt_sayfa_ekle_btn.setFlat(True)
@@ -1189,7 +1263,7 @@ class DefterAnaPencere(QMainWindow):
         self.tw_alt_sayfa_ekle_btn.clicked.connect(self.tw_alt_sayfa_ekle)
         layButonlar.addWidget(self.tw_alt_sayfa_ekle_btn)
 
-        self.tw_sayfa_sil_btn = QPushButton(base)
+        self.tw_sayfa_sil_btn = QPushButton(sayfalarTemelW)
         self.tw_sayfa_sil_btn.setIcon(QIcon(":icons/sil-sayfa.png"))
         self.tw_sayfa_sil_btn.setToolTip(self.tr("Delete selected page"))
         self.tw_sayfa_sil_btn.setEnabled(False)
@@ -1201,20 +1275,32 @@ class DefterAnaPencere(QMainWindow):
         layButonlar.addWidget(self.tw_sayfa_sil_btn)
 
     # ---------------------------------------------------------------------
-    def olustur_kutuphaneDW(self):
-        self.kutuphaneDW = DockWidget(self.tr("Library"), self)
-        self.kutuphaneDW.setObjectName("kutuphaneDockWidget")
-        # self.kutuphaneDW.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea | Qt.BottomDockWidgetArea)
-        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.kutuphaneDW)
+    def olustur_kutuphaneYW(self):
 
-        # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
+        self.kutuphaneYW = YuzenWidget(parent=self.centralW)
+        self.kutuphaneYW.yazBaslik(self.tr("Library"))
+        self.kutuphaneYW.icerikW.setMinimumSize(200, 200)
+        self.kutuphaneYW.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
+        # self.kutuphaneYW.hide()
 
-        base = QWidget(self.kutuphaneDW)
-        base.setContentsMargins(0, 0, 0, 0)
-        self.kutuphaneDW.setWidget(base)
-        layBase = QVBoxLayout(base)
+        # ---------------------------------------------------------------------
+        # self.kutuphaneBtn = DikeyDugme(self.tr("Library"), self, yon="yukari")
+        # self.kutuphaneBtn.setMaximumWidth(16)
+        # self.hareketliYanBolmeSol.ekle_dugme_ve_icerik(self.kutuphaneBtn, self.kutuphaneYW)
+        # ---------------------------------------------------------------------
+
+        # baslikWidget = Baslik(baslik, parent=self)
+
+        temelW = QWidget(self.kutuphaneYW)
+        temelW.setContentsMargins(0, 0, 0, 0)
+
+        self.kutuphaneYW.ekleWidget(temelW)
+
+        anaLay = QVBoxLayout(temelW)
+        anaLay.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
         layButonlar = QHBoxLayout()
-        layBase.addLayout(layButonlar)
+        # anaLay.addWidget(baslikWidget)
+        anaLay.addLayout(layButonlar)
 
         #######################################################################
         #######################################################################
@@ -1232,7 +1318,7 @@ class DefterAnaPencere(QMainWindow):
         # # self.cSahneKutuphane = sahne
         # self.cEkranKutuphane = ekran
         # # view.setViewport(QGLWidget())
-        # layBase.addWidget(ekran)
+        # anaLay.addWidget(ekran)
 
         #######################################################################
         #######################################################################
@@ -1248,7 +1334,7 @@ class DefterAnaPencere(QMainWindow):
         self.sahneKutuphane = sahne
         self.ekranKutuphane = ekran
         # view.setViewport(QGLWidget())
-        layBase.addWidget(ekran)
+        anaLay.addWidget(ekran)
 
     # ---------------------------------------------------------------------
     def act_kut_belgedeki_gomulu_dosyalari_goster(self):
@@ -1355,7 +1441,7 @@ class DefterAnaPencere(QMainWindow):
         # aslında gereksiz, cunku ancak sayfayi column 1'e atarken, bi degisiklik oluyor diger columnlarda
         # yoksa hep column 0 da degisiklik var, ilk bakışta... dusunulebilir.
         # if column == 0:
-        # idx = self.sayfalarDWTreeView.indexFromItem(item, column).row()
+        # idx = self.sayfalarYWTreeView.indexFromItem(item, column).row()
         # self.cModel.sayfalar[idx].adi = item.text(column)
         # sayfa.adi = item.text(column)
         # sayfa_adi = item.data(Qt.DisplayRole)
@@ -1367,10 +1453,10 @@ class DefterAnaPencere(QMainWindow):
         # # bu column == 0 ile test edildigi icin sadece sahne adi degistirilince cagriliyor.
         # if sayfa.scene.isModified():
         #     if not sayfa.adi[0] == "★":
-        #         self.sayfalarDWTreeView.blockSignals(True)
+        #         self.sayfalarYWTreeView.blockSignals(True)
         #         yildizli_sayfa_adi = "★ {}".format(sayfa.adi)
         #         sayfa.adi = yildizli_sayfa_adi
-        #         self.sayfalarDWTreeView.blockSignals(False)
+        #         self.sayfalarYWTreeView.blockSignals(False)
         #     # item.setForeground(0, Qt.blue)
 
     # # ---------------------------------------------------------------------
@@ -1394,8 +1480,8 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def ekle_sil_butonlari_guncelle(self):
 
-        # secilenSayfa = self.sayfalarDWTreeView.get_selected_sayfa()
-        secilenSayfa = self.sayfalarDWTreeView.get_current_sayfa()
+        # secilenSayfa = self.sayfalarYWTreeView.get_selected_sayfa()
+        secilenSayfa = self.sayfalarYWTreeView.get_current_sayfa()
         # self.tw_sayfa_sil_btn.setEnabled(True)
         if secilenSayfa.ic_sayfa_var_mi():
             self.tw_sayfa_sil_btn.setEnabled(False)
@@ -1415,15 +1501,15 @@ class DefterAnaPencere(QMainWindow):
 
         """
             # sayfa ekleyip cikarinca cagiriyoruz,
-            # sayfalarDWTreeView.selectionChanged kullanmiyoruz cunku arada birden fazla defa emit ediliyor
+            # sayfalarYWTreeView.selectionChanged kullanmiyoruz cunku arada birden fazla defa emit ediliyor
             tw_sayfa_ekle()
             tw_alt_sayfa_ekle()
             tw_sayfa_sil()
 
-            # klavye ile de sayfalarDWTreeView.itemActivated() ile cagiriyoruz..
+            # klavye ile de sayfalarYWTreeView.itemActivated() ile cagiriyoruz..
 
             # selectionChanged alternatifi olarak
-            sayfalarDWTreeView.mousePressEvent() cagiriyoruz.
+            sayfalarYWTreeView.mousePressEvent() cagiriyoruz.
 
         """
 
@@ -1447,7 +1533,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.cScene.setFocus()
 
-        # sayfa_idx = self.sayfalarDWTreeView.indexFromItem(item, 0).row()
+        # sayfa_idx = self.sayfalarYWTreeView.indexFromItem(item, 0).row()
         # self.cModel.enSonAktifSayfa = sayfa_idx
         self.cModel.enSonAktifSayfa = sayfa
 
@@ -1470,16 +1556,16 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def tw_sayfa_ekle(self, parentItem=None):
 
-        with signals_updates_blocked(self.sayfalarDWTreeView):
+        with signals_updates_blocked(self.sayfalarYWTreeView):
             scene, view = self.create_scene(self.cModel.tempDirPath)
-            # parentItem = self.sayfalarDWTreeView.get_selected_sayfanin_parent_sayfasi()
+            # parentItem = self.sayfalarYWTreeView.get_selected_sayfanin_parent_sayfasi()
             if not parentItem:
-                parentItem = self.sayfalarDWTreeView.get_selected_sayfanin_parent_sayfasi()
-                # parentItem = self.sayfalarDWTreeView.get_current_sayfa()
+                parentItem = self.sayfalarYWTreeView.get_selected_sayfanin_parent_sayfasi()
+                # parentItem = self.sayfalarYWTreeView.get_current_sayfa()
                 # if not parentItem:
                 #     self.log(self.tr("Please select a page."))
                 #     return
-            # satir = self.sayfalarDWTreeView.get_selected_sayfa().satir()
+            # satir = self.sayfalarYWTreeView.get_selected_sayfa().satir()
             satir = parentItem.satirSayisi() - 1
             sayfa = self.cModel.sayfa_ekle(satir=satir,
                                            scene=scene,
@@ -1488,13 +1574,13 @@ class DefterAnaPencere(QMainWindow):
                                            ikon=self.tw_get_page_as_icon()
                                            )
 
-            # self.sayfalarDWTreeView.clearSelection()
+            # self.sayfalarYWTreeView.clearSelection()
             # root.setSelected(True)
-            self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(sayfa)
-            # self.sayfalarDWTreeView.scrollTo(self.cModel.index_sayfadan(sayfa),
-            #                                  self.sayfalarDWTreeView.EnsureVisible)  # PositionAtCenter
+            self.sayfalarYWTreeView.sayfayi_sec_ve_current_index_yap(sayfa)
+            # self.sayfalarYWTreeView.scrollTo(self.cModel.index_sayfadan(sayfa),
+            #                                  self.sayfalarYWTreeView.EnsureVisible)  # PositionAtCenter
 
-            # self.sayfalarDWTreeView.sec()
+            # self.sayfalarYWTreeView.sec()
             # item.setSelected(True)
 
         # tv_sayfa_degistir burda yeni dokuman yani tab ekleme ile ilgili
@@ -1510,32 +1596,32 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def tw_alt_sayfa_ekle(self, parentItem=None):
 
-        with signals_updates_blocked(self.sayfalarDWTreeView):
+        with signals_updates_blocked(self.sayfalarYWTreeView):
             if not parentItem:  # arayuzden altsayfa ekliyoruz, yoksa dosya yuklenirken parentItem geliyor zaten
-                parentItem = self.sayfalarDWTreeView.get_current_sayfa()
+                parentItem = self.sayfalarYWTreeView.get_current_sayfa()
                 if not parentItem:
                     self.log(self.tr("Please select a page."))
                     return
 
-            # with signals_updates_blocked(self.sayfalarDWTreeView):
+            # with signals_updates_blocked(self.sayfalarYWTreeView):
 
             scene, view = self.create_scene(self.cModel.tempDirPath)
             # self.cScene = scene
             # self.cView = view
 
-            # parentItem = self.sayfalarDWTreeView.get_current_sayfa()
-            # parentItem = self.sayfalarDWTreeView.get_selected_sayfa()
-            # satir = self.sayfalarDWTreeView.get_selected_sayfa().satir()
+            # parentItem = self.sayfalarYWTreeView.get_current_sayfa()
+            # parentItem = self.sayfalarYWTreeView.get_selected_sayfa()
+            # satir = self.sayfalarYWTreeView.get_selected_sayfa().satir()
             sayfa = self.cModel.sayfa_ekle(scene=scene,
                                            view=view,
                                            ustSayfa=parentItem,
                                            ikon=self.tw_get_page_as_icon())
 
-            # self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(sayfa.parent())
-            self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(sayfa)
+            # self.sayfalarYWTreeView.sayfayi_sec_ve_current_index_yap(sayfa.parent())
+            self.sayfalarYWTreeView.sayfayi_sec_ve_current_index_yap(sayfa)
 
-        self.sayfalarDWTreeView.sayfayi_expand_et(parentItem)
-        # self.sayfalarDWTreeView.sayfayi_expand_et(sayfa.parent())
+        self.sayfalarYWTreeView.sayfayi_expand_et(parentItem)
+        # self.sayfalarYWTreeView.sayfayi_expand_et(sayfa.parent())
         self.tv_sayfa_degistir(sayfa)
 
         self.ekle_sil_butonlari_guncelle()
@@ -1548,7 +1634,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def tw_sayfa_sil(self):
 
-        sayfa = self.sayfalarDWTreeView.get_current_sayfa()
+        sayfa = self.sayfalarYWTreeView.get_current_sayfa()
 
         if sayfa == self.cModel.kokSayfa:  # hep bir sayfa donuyor yoksa kokSayfa donuyor, kok sayfa da gorunmez ya
             self.log(self.tr("Please select a page."))
@@ -1568,13 +1654,12 @@ class DefterAnaPencere(QMainWindow):
 
         msgBox.exec()
         if msgBox.clickedButton() == deleteButton:
-
             # TODO: ara_eski_nesne silinmeden once burda cagiriyoruz, sayfa degisince de
             # bir daha cagrilacak ama simdilik boyle
             self.act_aramayi_temizle()
 
             # klavye ile secilip aktif edilmeden silinebilir sayfa, o yuzden selectedItems[0]
-            # idx = self.sayfalarDWTreeView.selectedIndexes()[0]
+            # idx = self.sayfalarYWTreeView.selectedIndexes()[0]
             # with signals_updates_blocked(self.tabWidget):
             scene = sayfa.scene
             view = sayfa.view
@@ -1582,9 +1667,9 @@ class DefterAnaPencere(QMainWindow):
             self.cModel.satir_sil(sayfa)
             self.cModel.enSonAktifSayfa = None
 
-            # self.tv_sayfa_degistir(self.sayfalarDWTreeView.currentItem())
-            # self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(parentSayfa)
-            self.tv_sayfa_degistir(self.sayfalarDWTreeView.get_current_sayfa())
+            # self.tv_sayfa_degistir(self.sayfalarYWTreeView.currentItem())
+            # self.sayfalarYWTreeView.sayfayi_sec_ve_current_index_yap(parentSayfa)
+            self.tv_sayfa_degistir(self.sayfalarYWTreeView.get_current_sayfa())
 
             # silinen satirin(sayfanin scene ve viewi temizleniyor)
             scene.undoStack.clear()
@@ -1672,10 +1757,10 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def tw_sayfa_guncelle(self):
         # SelectedIndexes[0] yerine curentIndex() ten item donduren metodlari kullanmak bir tik daha iyi olabilir.
-        # self.sayfalarDWTreeView.get_selected_sayfa().ikon = QIcon(self.tw_get_page_as_pixmap(self.cView))
-        self.sayfalarDWTreeView.get_current_sayfa().ikon = self.tw_get_page_as_icon()
-        idx = self.sayfalarDWTreeView.currentIndex()
-        self.sayfalarDWTreeView.dataChanged(idx, idx)
+        # self.sayfalarYWTreeView.get_selected_sayfa().ikon = QIcon(self.tw_get_page_as_pixmap(self.cView))
+        self.sayfalarYWTreeView.get_current_sayfa().ikon = self.tw_get_page_as_icon()
+        idx = self.sayfalarYWTreeView.currentIndex()
+        self.sayfalarYWTreeView.dataChanged(idx, idx)
         # TODO: burda thumbnailleri preview olarak kaydetsek mi tmp klasore,
         # tab degisitrince isler karmasiklasiyor
 
@@ -1690,7 +1775,7 @@ class DefterAnaPencere(QMainWindow):
         # pixmap = view.grab()
         pixmap = self.cView.grab(self.cView.viewport().rect())
         # pixmap = pixmap.scaled(128,128,Qt.KeepAspectRatioByExpanding, Qt.FastTransformation)
-        # pixmap = pixmap.scaledToWidth(self.sayfalarDWTreeView.width(), Qt.FastTransformation)
+        # pixmap = pixmap.scaledToWidth(self.sayfalarYWTreeView.width(), Qt.FastTransformation)
         pixmap = pixmap.scaledToWidth(128, Qt.TransformationMode.FastTransformation)
         return QIcon(pixmap)
 
@@ -1785,8 +1870,25 @@ class DefterAnaPencere(QMainWindow):
                 self.actionAlwaysOnTopToggle.setChecked(int(self.settings.value("alwaysOnTop", False)))
             self.ekranKutuphane.setBackgroundBrush(self.settings.value("kutuphaneArkaPlanRengi", QColor(Qt.GlobalColor.lightGray)))
             self.cModel.treeViewIkonBoyutu = self.settings.value("treeViewIkonBoyutu", QSize(48, 48))
-            self.sayfalarDWTreeView.setIconSize(self.cModel.treeViewIkonBoyutu)
+            self.sayfalarYWTreeView.setIconSize(self.cModel.treeViewIkonBoyutu)
 
+            self.sayfalarYW.restoreGeometry(self.settings.value("sayfalarYWGeo"))
+            self.sayfalarYW.yukleme_bilgisi(self.settings.value("sayfalarYWYonDurum"))
+            self.kutuphaneYW.restoreGeometry(self.settings.value("kutuphaneYWGeo"))
+            self.kutuphaneYW.yukleme_bilgisi(self.settings.value("kutuphaneYWYonDurum"))
+            self.nesneOzellikleriYW2.restoreGeometry(self.settings.value("nesneOzellikleriYW2Geo"))
+            self.nesneOzellikleriYW2.yukleme_bilgisi(self.settings.value("nesneOzellikleriYW2YonDurum"))
+            self.stillerYW2.restoreGeometry(self.settings.value("stillerYW2Geo"))
+            self.stillerYW2.yukleme_bilgisi(self.settings.value("stillerYW2YonDurum"))
+            self.baskiSiniriCizimAyarlariYW.restoreGeometry(self.settings.value("baskiSiniriCizimAyarlariYWGeo"))
+            self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi(self.settings.value("baskiSiniriCizimAyarlariYWYonDurum"))
+
+        else:  # ilk acilis
+            self.sayfalarYW.yukleme_bilgisi("00110")
+            self.kutuphaneYW.yukleme_bilgisi("00111")
+            self.nesneOzellikleriYW2.yukleme_bilgisi("00100")
+            self.stillerYW2.yukleme_bilgisi("00101")
+            self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi("00102")
         self.settings.endGroup()
 
         self.settings.beginGroup("StylePresets")
@@ -1811,6 +1913,17 @@ class DefterAnaPencere(QMainWindow):
         self.settings.setValue("alwaysOnTop", shared.unicode_to_bool(self.actionAlwaysOnTopToggle.isChecked()))
         self.settings.setValue("kutuphaneArkaPlanRengi", self.ekranKutuphane.backgroundBrush().color())
         self.settings.setValue("treeViewIkonBoyutu", self.cModel.treeViewIkonBoyutu)
+
+        self.settings.setValue("sayfalarYWGeo", self.sayfalarYW.saveGeometry())
+        self.settings.setValue("sayfalarYWYonDurum", self.sayfalarYW.kaydetme_bilgisi())
+        self.settings.setValue("nesneOzellikleriYW2Geo", self.nesneOzellikleriYW2.saveGeometry())
+        self.settings.setValue("nesneOzellikleriYW2YonDurum", self.nesneOzellikleriYW2.kaydetme_bilgisi())
+        self.settings.setValue("baskiSiniriCizimAyarlariYWGeo", self.baskiSiniriCizimAyarlariYW.saveGeometry())
+        self.settings.setValue("baskiSiniriCizimAyarlariYWYonDurum", self.baskiSiniriCizimAyarlariYW.kaydetme_bilgisi())
+        self.settings.setValue("kutuphaneYWGeo", self.kutuphaneYW.saveGeometry())
+        self.settings.setValue("kutuphaneYWYonDurum", self.kutuphaneYW.kaydetme_bilgisi())
+        self.settings.setValue("stillerYW2Geo", self.stillerYW2.saveGeometry())
+        self.settings.setValue("stillerYW2YonDurum", self.stillerYW2.kaydetme_bilgisi())
 
         self.settings.endGroup()
 
@@ -2060,16 +2173,12 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def olustur_tab_widget(self):
 
-        baseTabWidget = QWidget(self)
-        self.setCentralWidget(baseTabWidget)
-        layout = QVBoxLayout(baseTabWidget)
-        baseTabWidget.setLayout(layout)
-
-        self.tabWidget = TabWidget(baseTabWidget)
-        # self.tabWidget = TabWidget(self)
-        # self.setCentralWidget(self.tabWidget)
+        self.tabWidget = TabWidget(self.centralW)
         self.tabWidget.setDocumentMode(True)
-        layout.addWidget(self.tabWidget)
+        # yuzenWidgetlarin ustune cikmasin, aslinda sadece sayfalarYW uzerine cikiyor
+        # sayfalar bundan once olusturuluyor cunku
+        self.tabWidget.lower()
+        self.ortaLay.addWidget(self.tabWidget)
 
         self.tabBar = TabBar(self.tabWidget)
         # TODO:
@@ -2116,11 +2225,11 @@ class DefterAnaPencere(QMainWindow):
         # dokuman.sayfa_ekle(scene, view, parent=None)
         self.cModel = self.tabWidget.model_ekle(tempDirPath)
 
-        # self.sayfalarDWTreeView.setUpdatesEnabled(False)
+        # self.sayfalarYWTreeView.setUpdatesEnabled(False)
         self.cModel.nesneDegisti.connect(self.tv_nesne_degisti)
 
-        with signals_updates_blocked(self.sayfalarDWTreeView):
-            self.sayfalarDWTreeView.setModel(self.cModel)
+        with signals_updates_blocked(self.sayfalarYWTreeView):
+            self.sayfalarYWTreeView.setModel(self.cModel)
 
         #  bunu burda olusturmak lazım, sayfa = self.tw_sayfa_ekle() kullanmadan
         # sayfa eklede yaparsak tab ekleyemiyoruz, degistiri cagırıyor falan
@@ -2138,11 +2247,11 @@ class DefterAnaPencere(QMainWindow):
         self.tabWidget.tab_olustur(view, self.cModel.fileName, sayfa.adi)
 
         # bu sayfa degistiri cagircak o da ilk widgeti ekeleycek.
-        with signals_blocked(self.sayfalarDWTreeView):
-            self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(sayfa)
+        with signals_blocked(self.sayfalarYWTreeView):
+            self.sayfalarYWTreeView.sayfayi_sec_ve_current_index_yap(sayfa)
 
         # print(self.tabWidget.currentIndex(), "iindexx")
-        # self.sayfalarDWTreeView.setUpdatesEnabled(True)
+        # self.sayfalarYWTreeView.setUpdatesEnabled(True)
 
         # self.cModel.nesneDegisti.connect(self.tv_nesne_degisti)
 
@@ -2243,8 +2352,8 @@ class DefterAnaPencere(QMainWindow):
     # yani : kaydedince_butun_yildizlari_sil, Yalnız, sahnede undo yapinca o sahne değişikliksiz
     # hale gelince durumunu unutmamak lazım
     def star_modified_scenes(self, temiz_mi):
-        # self.sayfalarDWTreeView.blockSignals(True)
-        sayfa = self.sayfalarDWTreeView.get_current_sayfa()
+        # self.sayfalarYWTreeView.blockSignals(True)
+        sayfa = self.sayfalarYWTreeView.get_current_sayfa()
         itemText = sayfa.adi
 
         if temiz_mi:
@@ -2259,8 +2368,8 @@ class DefterAnaPencere(QMainWindow):
         # TODO: bunu baska yere tasisak mi
         # mesela sayfa propertylerine, her degisiklik icin gerek var mi ki.
         # bir de currentindex diyoruz.. degisir mi..
-        idx = self.sayfalarDWTreeView.currentIndex()
-        self.sayfalarDWTreeView.dataChanged(idx, idx)
+        idx = self.sayfalarYWTreeView.currentIndex()
+        self.sayfalarYWTreeView.dataChanged(idx, idx)
 
         # if self.cScene.isModified():
         #     text = ("★ %s" % item.text(0))
@@ -2272,14 +2381,14 @@ class DefterAnaPencere(QMainWindow):
         #         item.setText(0, itemText[2:])
         #         item.setForeground(0, Qt.black)
 
-        # self.sayfalarDWTreeView.blockSignals(False)
+        # self.sayfalarYWTreeView.blockSignals(False)
         self.pencere_ve_tab_yazilarini_guncelle()
 
     # ---------------------------------------------------------------------
     def pencere_ve_tab_yazilarini_guncelle(self):
         # TODO: ilk acilista 2 defa cagriliyor ard arda.
         idx = self.tabWidget.currentIndex()
-        yazi = "{} - {}".format(self.cModel.fileName, self.sayfalarDWTreeView.get_current_sayfa().adi.replace("★ ", ""))
+        yazi = "{} - {}".format(self.cModel.fileName, self.sayfalarYWTreeView.get_current_sayfa().adi.replace("★ ", ""))
 
         self.setWindowTitle(f"Defter {VERSION}  -  {yazi}")
 
@@ -2308,15 +2417,15 @@ class DefterAnaPencere(QMainWindow):
             self.tabWidget.cModel = self.tabWidget.modeller[idx]
             # self.cModel = self.tabWidget.cModel
 
-            with signals_blocked(self.sayfalarDWTreeView):
-                self.sayfalarDWTreeView.setModel(self.cModel)
+            with signals_blocked(self.sayfalarYWTreeView):
+                self.sayfalarYWTreeView.setModel(self.cModel)
 
-                self.sayfalarDWTreeView.setIconSize(self.cModel.treeViewIkonBoyutu)
+                self.sayfalarYWTreeView.setIconSize(self.cModel.treeViewIkonBoyutu)
 
                 if self.cModel.enSonAktifSayfa:
-                    # self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(self.cModel.enSonAktifSayfa)
-                    self.sayfalarDWTreeView.sayfayi_current_index_yap(self.cModel.enSonAktifSayfa)
-                    self.sayfalarDWTreeView.sayfayi_expand_et(self.cModel.enSonAktifSayfa.parent())
+                    # self.sayfalarYWTreeView.sayfayi_sec_ve_current_index_yap(self.cModel.enSonAktifSayfa)
+                    self.sayfalarYWTreeView.sayfayi_current_index_yap(self.cModel.enSonAktifSayfa)
+                    self.sayfalarYWTreeView.sayfayi_expand_et(self.cModel.enSonAktifSayfa.parent())
 
             self.cView = self.tabWidget.currentWidget()
             self.cScene = self.cView.scene()
@@ -2473,17 +2582,17 @@ class DefterAnaPencere(QMainWindow):
                 # bunlar da anasayfalar oldugundan, en top level itemi seciyoruz ve de top levele donmus oluyoruz
                 # cunku tw_sayfa_ekle secili itemin seviyesine ekliyor yeni itemlari.
                 # sinyalleri simdilik blocklamaya gerek yok selectionChanged signali kullanmiyoruz cunku.
-                # self.sayfalarDWTreeView.blockSignals(True)
+                # self.sayfalarYWTreeView.blockSignals(True)
 
-                # self.sayfalarDWTreeView.setCurrentItem(self.sayfalarDWTreeView.topLevelItem(0))
+                # self.sayfalarYWTreeView.setCurrentItem(self.sayfalarYWTreeView.topLevelItem(0))
 
-                # self.sayfalarDWTreeView.blockSignals(False)
+                # self.sayfalarYWTreeView.blockSignals(False)
                 self._dict_to_scene(sceneDict, parent=self.cModel.kokSayfa, altSayfaSeklindeEkle=False)
                 # TODO : bu alltakine bak
                 self.cScene.unite_with_scene_rect(sceneDict["sceneRect"])
 
-            self.sayfalarDWTreeView.sayfayi_expand_et(self.cModel.enSonAktifSayfa)
-            # self.sayfalarDWTreeView.sayfayi_expand_et(sayfa.parent())
+            self.sayfalarYWTreeView.sayfayi_expand_et(self.cModel.enSonAktifSayfa)
+            # self.sayfalarYWTreeView.sayfayi_expand_et(sayfa.parent())
             # self.tv_sayfa_degistir(sayfa)
 
             self.ekle_sil_butonlari_guncelle()
@@ -2991,10 +3100,10 @@ class DefterAnaPencere(QMainWindow):
 
         sayfa.adi = sceneDict["sayfaAdi"]
         sayfa._kim = sceneDict.get("sayfaKim", None)
-        self.sayfalarDWTreeView.get_current_sayfa().adi = sceneDict["sayfaAdi"]
-        self.sayfalarDWTreeView.get_current_sayfa()._kim = sceneDict.get("sayfaKim", None)
+        self.sayfalarYWTreeView.get_current_sayfa().adi = sceneDict["sayfaAdi"]
+        self.sayfalarYWTreeView.get_current_sayfa()._kim = sceneDict.get("sayfaKim", None)
 
-        # self.tv_sayfa_degistir(self.sayfalarDWTreeView.currentItem(), 0)
+        # self.tv_sayfa_degistir(self.sayfalarYWTreeView.currentItem(), 0)
 
         self.cScene.sonZDeger = sceneDict.get("sonZDeger", 0)
         self.cScene.setSceneRect(sceneDict["sceneRect"])
@@ -3063,8 +3172,8 @@ class DefterAnaPencere(QMainWindow):
         # create_tab kullaniyorduk onceden simdi daha basit bir versiyonunu direkt yazdik.
         self.cModel = self.tabWidget.model_ekle(tempDirPath)
         self.cModel.nesneDegisti.connect(self.tv_nesne_degisti)
-        with signals_blocked(self.sayfalarDWTreeView):
-            self.sayfalarDWTreeView.setModel(self.cModel)
+        with signals_blocked(self.sayfalarYWTreeView):
+            self.sayfalarYWTreeView.setModel(self.cModel)
 
         # scene, view = self.create_scene(self.cModel.tempDirPath)
         tempWidgetViewYerine = QWidget()
@@ -3080,7 +3189,7 @@ class DefterAnaPencere(QMainWindow):
         self.cModel.embededFileCounter = dokumanDict.get("embededFileCounter", 0)
 
         self.cModel.treeViewIkonBoyutu = dokumanDict.get("treeViewIkonBoyutu", QSize(48, 48))
-        self.sayfalarDWTreeView.setIconSize(self.cModel.treeViewIkonBoyutu)
+        self.sayfalarYWTreeView.setIconSize(self.cModel.treeViewIkonBoyutu)
 
         # self.ekranKutuphane.setBackgroundBrush(dokumanDict["kutuphaneBackgroundBrush"])
         self.ekranKutuphane.setBackgroundBrush(dokumanDict.get("kutuphaneBackgroundBrush", Qt.GlobalColor.lightGray))
@@ -3104,16 +3213,16 @@ class DefterAnaPencere(QMainWindow):
             # bunlar da anasayfalar oldugundan, en top level itemi seciyoruz ve de top levele donmus oluyoruz
             # cunku tw_sayfa_ekle secili itemin seviyesine ekliyor yeni itemlari.
             # sinyalleri simdilik blocklamaya gerek yok selectionChanged signali kullanmiyoruz cunku.
-            # self.sayfalarDWTreeView.blockSignals(True)
-            # self.sayfalarDWTreeView.setCurrentItem(self.sayfalarDWTreeView.topLevelItem(0))
-            # self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(self.sayfalarDWTreeView.model().satirdaki_sayfa(0))
-            # self.sayfalarDWTreeView.blockSignals(False)
+            # self.sayfalarYWTreeView.blockSignals(True)
+            # self.sayfalarYWTreeView.setCurrentItem(self.sayfalarYWTreeView.topLevelItem(0))
+            # self.sayfalarYWTreeView.sayfayi_sec_ve_current_index_yap(self.sayfalarYWTreeView.model().satirdaki_sayfa(0))
+            # self.sayfalarYWTreeView.blockSignals(False)
             self._dict_to_scene(sceneDict, parent=self.cModel.kokSayfa, altSayfaSeklindeEkle=False)
 
         sayfa_kim = dokumanDict.get("enSonAktifSayfaKim", None)
         sayfa = self.cModel.kimlikten_sayfa(sayfa_kim)
         if sayfa:
-            self.sayfalarDWTreeView.sayfayi_sec_ve_current_index_yap(sayfa)
+            self.sayfalarYWTreeView.sayfayi_sec_ve_current_index_yap(sayfa)
             self.pencere_ve_tab_yazilarini_guncelle()
 
         tempWidgetViewYerine.deleteLater()
@@ -3484,10 +3593,10 @@ class DefterAnaPencere(QMainWindow):
                                          lambda throw_away=0: self.close_selected_tab(self.tabWidget.currentIndex()))
         hot_close_active_tab.setContext(Qt.ShortcutContext.ApplicationShortcut)
 
-        # hot_tercume_YW_goster_gizle = QShortcut(QKeySequence("Alt+0"),
-        #                                                          self,
-        #                                                          self.tercumeYW_goster_gizle)
-        # hot_tercume_YW_goster_gizle.setContext(Qt.ShortcutContext.ApplicationShortcut)
+        hot_tercume_YW_goster_gizle = QShortcut(QKeySequence("Alt+0"),
+                                                self,
+                                                self.tercumeYW_goster_gizle)
+        hot_tercume_YW_goster_gizle.setContext(Qt.ShortcutContext.ApplicationShortcut)
 
     # ---------------------------------------------------------------------
     def olustur_status_bar(self):
@@ -3548,6 +3657,55 @@ class DefterAnaPencere(QMainWindow):
         self._statusBar.addPermanentWidget(btn)
         # self._statusBar.addAction(QAction("deneme"))
         # self._statusBar.addPermanentWidget(QPushButton("deneme"))
+
+
+    # ---------------------------------------------------------------------
+    def olustur_yw_menu(self):
+        yuzenWidgetsMenu = QMenu(self.tr("Panels"), self.viewMenu)
+        yuzenWidgetsMenu.aboutToShow.connect(self.on_yuzen_widgets_menu_about_to_show)
+
+        self.actionTumPanelleriGoster = QAction(QIcon(':icons/hepsini-goster.png'), self.tr('Show all'),
+                                                yuzenWidgetsMenu)
+        self.actionTumPanelleriGoster.setShortcut(QKeySequence("Ctrl+Alt+0"))
+        self.actionTumPanelleriGoster.triggered.connect(self.act_tum_panelleri_goster)
+
+        self.actionToggleSayfalarYW = QAction(QIcon(':icons/properties.png'), self.tr('Pages'), yuzenWidgetsMenu)
+        self.actionToggleSayfalarYW.setShortcut(QKeySequence("Ctrl+Alt+1"))
+        self.actionToggleSayfalarYW.setCheckable(True)
+        self.actionToggleSayfalarYW.triggered.connect(self.sayfalarYW.kucult_buyult)
+
+        self.actionToggleNesneOzellikleriYW = QAction(QIcon(':icons/properties.png'), self.tr('Item Properties'),
+                                                      yuzenWidgetsMenu)
+        self.actionToggleNesneOzellikleriYW.setShortcut(QKeySequence("Ctrl+Alt+2"))
+        self.actionToggleNesneOzellikleriYW.setCheckable(True)
+        self.actionToggleNesneOzellikleriYW.triggered.connect(self.nesneOzellikleriYW2.kucult_buyult)
+
+        self.actionToggleStillerYW = QAction(QIcon(':icons/properties.png'), self.tr('Style Presets'), yuzenWidgetsMenu)
+        self.actionToggleStillerYW.setShortcut(QKeySequence("Ctrl+Alt+3"))
+        self.actionToggleStillerYW.setCheckable(True)
+        self.actionToggleStillerYW.triggered.connect(self.stillerYW2.kucult_buyult)
+
+        self.actionToggleKutuphaneYW = QAction(QIcon(':icons/properties.png'), self.tr('Library'), yuzenWidgetsMenu)
+        self.actionToggleKutuphaneYW.setShortcut(QKeySequence("Ctrl+Alt+4"))
+        self.actionToggleKutuphaneYW.setCheckable(True)
+        self.actionToggleKutuphaneYW.triggered.connect(self.kutuphaneYW.kucult_buyult)
+
+        self.actionToggleBaskiSiniriCizimAyarlariYW = QAction(QIcon(':icons/properties.png'),
+                                                              self.tr('Draw Print Borders'), yuzenWidgetsMenu)
+        self.actionToggleBaskiSiniriCizimAyarlariYW.setShortcut(QKeySequence("Ctrl+Alt+5"))
+        self.actionToggleBaskiSiniriCizimAyarlariYW.setCheckable(True)
+        self.actionToggleBaskiSiniriCizimAyarlariYW.triggered.connect(self.baskiSiniriCizimAyarlariYW.kucult_buyult)
+
+        yuzenWidgetsMenu.addActions((self.actionTumPanelleriGoster,
+                                     self.actionToggleSayfalarYW,
+                                     self.actionToggleKutuphaneYW,
+                                     self.actionToggleStillerYW,
+                                     self.actionToggleNesneOzellikleriYW,
+                                     self.actionToggleBaskiSiniriCizimAyarlariYW))
+
+        # self.viewMenu.insertMenu(beforAction, menu)
+        self.viewMenu.addSeparator(),
+        self.viewMenu.addMenu(yuzenWidgetsMenu),
 
     # ---------------------------------------------------------------------
     def olustur_menu_bar(self):
@@ -3850,8 +4008,8 @@ class DefterAnaPencere(QMainWindow):
             lambda: self.renkAracCubugu.setVisible(not self.renkAracCubugu.isVisible()))
 
         self.actionToggleHizalaAracCubugu = QAction(QIcon(':icons/align-top-edges.png'),
-                                                self.tr('Mirror - Align - Distribute'),
-                                                toolBarsMenu)
+                                                    self.tr('Mirror - Align - Distribute'),
+                                                    toolBarsMenu)
         self.actionToggleHizalaAracCubugu.setShortcut(QKeySequence("Ctrl+6"))
         self.actionToggleHizalaAracCubugu.setCheckable(True)
         self.actionToggleHizalaAracCubugu.triggered.connect(
@@ -3872,52 +4030,7 @@ class DefterAnaPencere(QMainWindow):
                                  self.actionToggleHizalaAracCubugu,
                                  self.actionToggleUtilitiesToolbar))
 
-        dockWidgetsMenu = QMenu(self.tr("Panels"), self.viewMenu)
-        dockWidgetsMenu.aboutToShow.connect(self.on_dock_widgets_menu_about_to_show)
 
-        self.actionTumPanelleriGoster = QAction(QIcon(':icons/hepsini-goster.png'), self.tr('Show all'),
-                                                dockWidgetsMenu)
-        self.actionTumPanelleriGoster.setShortcut(QKeySequence("Ctrl+Alt+0"))
-        self.actionTumPanelleriGoster.triggered.connect(self.act_tum_panelleri_goster)
-
-        self.actionToggleSayfalarDW = QAction(QIcon(':icons/properties.png'), self.tr('Pages'), dockWidgetsMenu)
-        self.actionToggleSayfalarDW.setShortcut(QKeySequence("Ctrl+Alt+1"))
-        self.actionToggleSayfalarDW.setCheckable(True)
-        self.actionToggleSayfalarDW.triggered.connect(
-            lambda: self.sayfalarDW.setVisible(not self.sayfalarDW.isVisible()))
-
-        self.actionToggleNesneOzellikleriDW = QAction(QIcon(':icons/properties.png'), self.tr('Item Properties'),
-                                                      dockWidgetsMenu)
-        self.actionToggleNesneOzellikleriDW.setShortcut(QKeySequence("Ctrl+Alt+2"))
-        self.actionToggleNesneOzellikleriDW.setCheckable(True)
-        self.actionToggleNesneOzellikleriDW.triggered.connect(
-            lambda: self.nesneOzellikleriDW.setVisible(not self.nesneOzellikleriDW.isVisible()))
-
-        self.actionToggleStillerDW = QAction(QIcon(':icons/properties.png'), self.tr('Style Presets'), dockWidgetsMenu)
-        self.actionToggleStillerDW.setShortcut(QKeySequence("Ctrl+Alt+3"))
-        self.actionToggleStillerDW.setCheckable(True)
-        self.actionToggleStillerDW.triggered.connect(
-            lambda: self.stillerDW.setVisible(not self.stillerDW.isVisible()))
-
-        self.actionToggleKutuphaneDW = QAction(QIcon(':icons/properties.png'), self.tr('Library'), dockWidgetsMenu)
-        self.actionToggleKutuphaneDW.setShortcut(QKeySequence("Ctrl+Alt+4"))
-        self.actionToggleKutuphaneDW.setCheckable(True)
-        self.actionToggleKutuphaneDW.triggered.connect(
-            lambda: self.kutuphaneDW.setVisible(not self.kutuphaneDW.isVisible()))
-
-        self.actionToggleBaskiSiniriCizimAyarlariDW = QAction(QIcon(':icons/properties.png'),
-                                                              self.tr('Draw Print Borders'), dockWidgetsMenu)
-        self.actionToggleBaskiSiniriCizimAyarlariDW.setShortcut(QKeySequence("Ctrl+Alt+5"))
-        self.actionToggleBaskiSiniriCizimAyarlariDW.setCheckable(True)
-        self.actionToggleBaskiSiniriCizimAyarlariDW.triggered.connect(
-            lambda: self.baskiSiniriCizimAyarlariDW.setVisible(not self.baskiSiniriCizimAyarlariDW.isVisible()))
-
-        dockWidgetsMenu.addActions((self.actionTumPanelleriGoster,
-                                    self.actionToggleSayfalarDW,
-                                    self.actionToggleKutuphaneDW,
-                                    self.actionToggleStillerDW,
-                                    self.actionToggleNesneOzellikleriDW,
-                                    self.actionToggleBaskiSiniriCizimAyarlariDW))
 
         self.zoomMenu = QMenu(self.tr("Zoom"), self.viewMenu)
         self.zoomMenu.setIcon(QIcon(":/icons/zoom.png"))
@@ -3982,20 +4095,18 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleMenuBar.setToolTip(self.tr("Toggles menu bar visibility."))
         self.actionToggleMenuBar.triggered.connect(
             lambda: self.mBar.setVisible(not self.mBar.isVisible()))
-        
+
         self.actionAra = QAction(self.tr("Search"), self.viewMenu)
         self.actionAra.setIcon(QIcon.fromTheme('system-search', QIcon(':icons/ara.png')))
         self.actionAra.setShortcut("Ctrl+F")
         # self.actionAra.setShortcutContext(Qt.ApplicationShortcut)
         self.actionAra.triggered.connect(self.act_arama_cubugu_ac_kapa)
         self.actionAra.setCheckable(True)
-        # self.actionAra.setChecked(self.araBaseWidget.isVisible())
+        # self.actionAra.setChecked(self.araTemelW.isVisible())
 
         self.viewMenu.addActions((self.viewMenu.addMenu(self.zoomMenu),
                                   self.viewMenu.addSeparator(),
                                   self.viewMenu.addMenu(toolBarsMenu),
-                                  self.viewMenu.addSeparator(),
-                                  self.viewMenu.addMenu(dockWidgetsMenu),
                                   self.viewMenu.addSeparator(),
                                   self.actionToggleStatusBar,
                                   self.actionToggleMenuBar,
@@ -4589,13 +4700,13 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionToggleRenkAracCubugu,
                                           self.actionTogglecizgiOzellikleriToolBar,
                                           self.actionToggleUtilitiesToolbar,
-                                          # dockWidgetsMenu actions
+                                          # yuzenWidgetsMenu actions
                                           self.actionTumPanelleriGoster,
-                                          self.actionToggleSayfalarDW,
-                                          self.actionToggleNesneOzellikleriDW,
-                                          self.actionToggleStillerDW,
-                                          self.actionToggleKutuphaneDW,
-                                          self.actionToggleBaskiSiniriCizimAyarlariDW,
+                                          self.actionToggleSayfalarYW,
+                                          self.actionToggleNesneOzellikleriYW,
+                                          self.actionToggleStillerYW,
+                                          self.actionToggleKutuphaneYW,
+                                          self.actionToggleBaskiSiniriCizimAyarlariYW,
                                           # view menu actions
                                           self.actionToggleStatusBar,
                                           self.actionToggleMenuBar,
@@ -4674,26 +4785,26 @@ class DefterAnaPencere(QMainWindow):
     def stil_uygulaYW_goster_gizle(self):
 
         # if not self.stillerYLW.isVisible():
-        if not self.stillerYuzenWidget.isVisible():
-            self.stillerYuzenWidget.move(self.cView.mapFromGlobal(QCursor.pos()))
+        if not self.stillerYW.isVisible():
+            self.stillerYW.move(self.cView.mapFromGlobal(QCursor.pos()))
             # self.stillerYLW.resize(250, self.stillerYLW.count() * 21)
-            # self.stillerYuzenWidget.adjustSize()
-            self.stillerYuzenWidget.setVisible(True)
+            # self.stillerYW.adjustSize()
+            self.stillerYW.setVisible(True)
         else:
-            self.stillerYuzenWidget.setVisible(False)
+            self.stillerYW.setVisible(False)
 
     # # ---------------------------------------------------------------------
     # def stil_uygulaYW_goster_gizle2(self):
     #
     #     # if not self.stillerYLW.isVisible():
-    #     if not self.stillerDW.isVisible():
-    #         self.stillerDW.setFloating(True)
-    #         self.stillerDW.move(self.cView.mapFromGlobal(QCursor.pos()))
+    #     if not self.stillerYW2.isVisible():
+    #         self.stillerYW2.setFloating(True)
+    #         self.stillerYW2.move(self.cView.mapFromGlobal(QCursor.pos()))
     #         # self.stillerYLW.resize(250, self.stillerYLW.count() * 21)
-    #         # self.stillerYuzenWidget.adjustSize()
-    #         self.stillerDW.setVisible(True)
+    #         # self.stillerYW.adjustSize()
+    #         self.stillerYW2.setVisible(True)
     #     else:
-    #         self.stillerDW.setVisible(False)
+    #         self.stillerYW2.setVisible(False)
 
     # ---------------------------------------------------------------------
     def tercumeYW_goster_gizle(self):
@@ -4701,7 +4812,7 @@ class DefterAnaPencere(QMainWindow):
         if not self.tercumeYW.isVisible():
             self.tercumeYW.move(self.cView.mapFromGlobal(QCursor.pos()))
             # self.stillerYLW.resize(250, self.stillerYLW.count() * 21)
-            # self.stillerYuzenWidget.adjustSize()
+            # self.stillerYW.adjustSize()
             self.tercumeYW.setVisible(True)
         else:
             self.tercumeYW.setVisible(False)
@@ -4720,10 +4831,10 @@ class DefterAnaPencere(QMainWindow):
 
         # self.arkaPlanRengi vs iptal edilince, nesneye bile tiklasak, secim aracina geciyor, sahneye tiklasa yine ayni
         # kalemde iken de kalem secili zaten
-        self.nesneOzellikleriYW = NesneOzellikleriYuzenWidget(self.cScene.aktifArac.arkaPlanRengi,  # secim toolu
-                                                              self.cScene.aktifArac.yaziRengi,
-                                                              self.cScene.aktifArac.cizgiRengi,
-                                                              self.cScene.aktifArac.cizgiKalinligi, self)
+        self.nesneOzellikleriYW = NesneOzellikleriYW(self.cScene.aktifArac.arkaPlanRengi,  # secim toolu
+                                                     self.cScene.aktifArac.yaziRengi,
+                                                     self.cScene.aktifArac.cizgiRengi,
+                                                     self.cScene.aktifArac.cizgiKalinligi, self)
         self.nesneOzellikleriYW.hide()
         self.nesneOzellikleriYW.arkaPlanRengiDegisti.connect(lambda color: self.act_set_item_background_color(color, renkSecicidenMi=True))
         self.nesneOzellikleriYW.yaziRengiDegisti.connect(lambda color: self.act_set_item_text_color(color, renkSecicidenMi=True))
@@ -4734,8 +4845,22 @@ class DefterAnaPencere(QMainWindow):
             lambda x: self.cizgiKalinligiDSliderWithDSBox_tbar.setValue(x * 10))
 
     # ---------------------------------------------------------------------
+    def olustur_tercumeYW(self):
+
+        # self.arkaPlanRengi vs iptal edilince, nesneye bile tiklasak, secim aracina geciyor, sahneye tiklasa yine ayni
+        # kalemde iken de kalem secili zaten
+        self.tercumeYW = TercumeYW(self)
+        self.tercumeYW.hide()
+        # self.tercumeYW.arkaPlanRengiDegisti.connect(self.act_set_item_background_color)
+        # self.tercumeYW.yaziRengiDegisti.connect(self.act_set_item_text_color)
+        # self.tercumeYW.cizgiRengiDegisti.connect(self.act_set_item_line_color)
+        # self.tercumeYW.cizgiKalinligiDegisti.connect(self.act_cizgi_kalinligi_degistir)
+        # self.tercumeYW.cizgiKalinligiDegisti.connect(
+        #     lambda x: self.cizgiKalinligiDSliderWithDSBox_tbar.setValue(x * 10))
+
+    # ---------------------------------------------------------------------
     def olustur_tools_toolbar(self):
-        self.toolsToolBar = QToolBar(self)
+        self.toolsToolBar = ToolBar(self)
         self.toolsToolBar.setObjectName("toolsToolBar")
         self.toolsToolBar.setWindowTitle(self.tr("Tools Tool Bar"))
         self.toolsToolBar.setIconSize(QSize(16, 16))
@@ -4826,7 +4951,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def olustur_properties_toolbar(self):
-        self.propertiesToolBar = QToolBar(self)
+        self.propertiesToolBar = ToolBar(self)
         self.propertiesToolBar.setObjectName("propertiesToolBar")
         self.propertiesToolBar.setWindowTitle(self.tr("Item Properties Tool Bar"))
         self.propertiesToolBar.setIconSize(QSize(16, 16))
@@ -4866,7 +4991,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def olustur_cizgi_ozellikleri_toolbar(self):
-        self.cizgiOzellikleriToolBar = QToolBar(self)
+        self.cizgiOzellikleriToolBar = ToolBar(self)
         self.cizgiOzellikleriToolBar.setObjectName("cizgiOZellikleriToolBar")
         self.cizgiOzellikleriToolBar.setWindowTitle(self.tr("Line && Pen Properties Tool Bar"))
         self.cizgiOzellikleriToolBar.setIconSize(QSize(16, 16))
@@ -4892,7 +5017,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def olustur_font_toolbar(self):
-        self.fontToolBar = QToolBar(self.tr("Font Tool Bar"), self)
+        self.fontToolBar = ToolBar(self.tr("Font Tool Bar"), self)
         self.fontToolBar.setObjectName("fontToolBar")
         self.fontToolBar.setWindowTitle(self.tr("Font Tool Bar"))
         self.fontToolBar.setIconSize(QSize(16, 16))
@@ -5010,7 +5135,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def olustur_renk_toolbar(self):
 
-        self.renkAracCubugu = QToolBar(self.tr("Color Tool Bar"), self)
+        self.renkAracCubugu = ToolBar(self.tr("Color Tool Bar"), self)
         self.renkAracCubugu.setObjectName("renkAracCubugu")
         self.renkAracCubugu.setWindowTitle(self.tr("Color Tool Bar"))
         self.renkAracCubugu.setIconSize(QSize(16, 16))
@@ -5333,7 +5458,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def olustur_nesne_hizalama_arac_cubugu(self):
-        self.hizalaAracCubugu = QToolBar(self)
+        self.hizalaAracCubugu = ToolBar(self)
         self.hizalaAracCubugu.setObjectName("hizalaAracCubugu")
         self.hizalaAracCubugu.setWindowTitle(self.tr("Align Tool Bar"))
         self.hizalaAracCubugu.setIconSize(QSize(16, 16))
@@ -5431,7 +5556,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def olustur_utilities_toolbar(self):
-        self.utilitiesToolBar = QToolBar(self)
+        self.utilitiesToolBar = ToolBar(self)
         self.utilitiesToolBar.setObjectName("utilitiesToolBar")
         self.utilitiesToolBar.setWindowTitle(self.tr("Utilities Tool Bar"))
         self.utilitiesToolBar.setIconSize(QSize(16, 16))
@@ -5477,7 +5602,7 @@ class DefterAnaPencere(QMainWindow):
         self.utilitiesToolBar.addWidget(spacerWidget)
         # self.utilitiesToolBar.addWidget(self.actionAlwaysOnTopToggle)
         self.utilitiesToolBar.addWidget(ekranGoruntusuMenuPB)
-        self.utilitiesToolBar.addAction(self.actionToggleBaskiSiniriCizimAyarlariDW)
+        self.utilitiesToolBar.addAction(self.actionToggleBaskiSiniriCizimAyarlariYW)
         self.utilitiesToolBar.addAction(self.actionAlwaysOnTopToggle)
 
         self.addToolBar(self.utilitiesToolBar)
@@ -5505,8 +5630,8 @@ class DefterAnaPencere(QMainWindow):
     def act_stillerYW_sag_menu_goster(self, pos):
         globalPos = self.stillerYLW.mapToGlobal(pos)
         menu = QMenu()
-        yeniden_adlandir = menu.addAction(self.tr("Rename"), lambda :self.act_stil_yeniden_adlandir(yw=True))
-        sil = menu.addAction(self.tr("Delete"), lambda :self.act_stil_sil(yw=True))
+        yeniden_adlandir = menu.addAction(self.tr("Rename"), lambda: self.act_stil_yeniden_adlandir(yw=True))
+        sil = menu.addAction(self.tr("Delete"), lambda: self.act_stil_sil(yw=True))
         menu.exec(globalPos)
 
     # ---------------------------------------------------------------------
@@ -5514,7 +5639,7 @@ class DefterAnaPencere(QMainWindow):
     def on_view_menu_about_to_show(self):
         self.actionToggleStatusBar.setChecked(self._statusBar.isVisible())
         self.actionToggleMenuBar.setChecked(self.mBar.isVisible())
-        self.actionAra.setChecked(self.araBaseWidget.isVisible())
+        self.actionAra.setChecked(self.araTemelW.isVisible())
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -5539,20 +5664,20 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def on_dock_widgets_menu_about_to_show(self):
-        self.actionToggleSayfalarDW.setChecked(self.sayfalarDW.isVisible())
-        self.actionToggleNesneOzellikleriDW.setChecked(self.nesneOzellikleriDW.isVisible())
-        self.actionToggleStillerDW.setChecked(self.stillerDW.isVisible())
-        self.actionToggleKutuphaneDW.setChecked(self.kutuphaneDW.isVisible())
-        self.actionToggleBaskiSiniriCizimAyarlariDW.setChecked(self.baskiSiniriCizimAyarlariDW.isVisible())
+    def on_yuzen_widgets_menu_about_to_show(self):
+        self.actionToggleSayfalarYW.setChecked(not self.sayfalarYW.kucuk_mu)
+        self.actionToggleNesneOzellikleriYW.setChecked(not self.nesneOzellikleriYW2.kucuk_mu)
+        self.actionToggleStillerYW.setChecked(not self.stillerYW2.kucuk_mu)
+        self.actionToggleKutuphaneYW.setChecked(not self.kutuphaneYW.kucuk_mu)
+        self.actionToggleBaskiSiniriCizimAyarlariYW.setChecked(not self.baskiSiniriCizimAyarlariYW.kucuk_mu)
 
     # ---------------------------------------------------------------------
     def act_tum_panelleri_goster(self):
-        self.sayfalarDW.setVisible(True)
-        self.kutuphaneDW.setVisible(True)
-        self.nesneOzellikleriDW.setVisible(True)
-        self.stillerDW.setVisible(True)
-        self.baskiSiniriCizimAyarlariDW.setVisible(True)
+        self.sayfalarYW.buyult()
+        self.kutuphaneYW.buyult()
+        self.nesneOzellikleriYW2.buyult()
+        self.stillerYW2.buyult()
+        self.baskiSiniriCizimAyarlariYW.buyult()
 
     # ---------------------------------------------------------------------
     # @Slot() # this is called directly from base's overriden contextMenuEvent
@@ -8197,7 +8322,6 @@ class DefterAnaPencere(QMainWindow):
         msgBox.exec()
         if msgBox.clickedButton() == deleteButton:
 
-
             if yw:
                 for item in self.stillerYLW.selectedItems():
                     row = self.stillerYLW.row(item)
@@ -8526,11 +8650,11 @@ class DefterAnaPencere(QMainWindow):
             self.utilitiesToolBar.hide()
             self._statusBar.hide()
             self.mBar.hide()
-            self.nesneOzellikleriDW.hide()
-            self.stillerDW.hide()
-            self.baskiSiniriCizimAyarlariDW.hide()
-            self.sayfalarDW.hide()
-            self.kutuphaneDW.hide()
+            self.nesneOzellikleriYW2.hide()
+            self.stillerYW2.hide()
+            self.baskiSiniriCizimAyarlariYW.hide()
+            self.sayfalarYW.hide()
+            self.kutuphaneYW.hide()
         else:
             self.mBar.show()
             self._statusBar.show()
@@ -8841,10 +8965,10 @@ class DefterAnaPencere(QMainWindow):
 
         # -- her ada nın cevresine bir onu kaplayici ve margini ayarlanabilir bir cember veya kutu
 
-        base = QWidget(self.webBrowserDW)
-        base.setContentsMargins(0, 0, 0, 0)
-        self.webBrowserDW.setWidget(base)
-        # layBase = QVBoxLayout(base)
+        temelW = QWidget(self.webBrowserDW)
+        temelW.setContentsMargins(0, 0, 0, 0)
+        self.webBrowserDW.setWidget(temelW)
+        # anaLay = QVBoxLayout(temelW)
 
         scroll = QScrollArea()
         # scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
@@ -10514,7 +10638,7 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def act_export_page_as_image(self):
-        # sayfa = self.sayfalarDWTreeView.get_current_sayfa()
+        # sayfa = self.sayfalarYWTreeView.get_current_sayfa()
         # baseName = sayfa.adi
         fn = QFileDialog.getSaveFileName(self,
                                          self.tr('Save Image as'),
@@ -10758,16 +10882,16 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def olustur_arama_cubugu(self):
 
-        self.araBaseWidget = QWidget(self)
-        self.araBaseWidget.setObjectName("araBaseWidget")
-        self.araBaseWidget.hide()
-        self.araBaseWidget.setMinimumHeight(35)
-        araLay = QHBoxLayout(self.araBaseWidget)
+        self.araTemelW = QWidget(self)
+        self.araTemelW.setObjectName("araTemelW")
+        self.araTemelW.hide()
+        self.araTemelW.setMinimumHeight(35)
+        araLay = QHBoxLayout(self.araTemelW)
         # araLay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
-        # self.araBaseWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        # self.araTemelW.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.araLineEdit = AraLineEdit(self.araBaseWidget)
+        self.araLineEdit = AraLineEdit(self.araTemelW)
         # self.araLineEdit.setMinimumWidth(250)
         self.araLineEdit.returnVeyaEnterBasildi.connect(lambda: self.act_ara(geriyeDogru=False))
         self.araLineEdit.shiftEnterVeyaReturnBasildi.connect(lambda: self.act_ara(geriyeDogru=True))
@@ -10777,11 +10901,11 @@ class DefterAnaPencere(QMainWindow):
 
         araLay.addWidget(self.araLineEdit)
 
-        self.araGeriBtn = QPushButton("<", self.araBaseWidget)
+        self.araGeriBtn = QPushButton("<", self.araTemelW)
         self.araGeriBtn.setMaximumWidth(23)
         self.araGeriBtn.setFixedHeight(23)
         self.araGeriBtn.clicked.connect(lambda: self.act_ara(geriyeDogru=True))
-        self.araIleriBtn = QPushButton(">", self.araBaseWidget)
+        self.araIleriBtn = QPushButton(">", self.araTemelW)
         self.araIleriBtn.setMaximumWidth(23)
         self.araIleriBtn.setFixedHeight(23)
         self.araIleriBtn.clicked.connect(lambda: self.act_ara(geriyeDogru=False))
@@ -10789,15 +10913,15 @@ class DefterAnaPencere(QMainWindow):
         araLay.addWidget(self.araGeriBtn)
         araLay.addWidget(self.araIleriBtn)
 
-        self.buyukKucukHarfDuyarliCBox = QCheckBox(self.tr("Match Case"), self.araBaseWidget)
+        self.buyukKucukHarfDuyarliCBox = QCheckBox(self.tr("Match Case"), self.araTemelW)
         self.buyukKucukHarfDuyarliCBox.setFixedHeight(23)
         self.buyukKucukHarfDuyarliCBox.stateChanged.connect(lambda: self.act_aramayi_temizle(yeniden_ara=True))
-        # self.regexCBox = QCheckBox(self.tr("Regex"), self.araBaseWidget)
+        # self.regexCBox = QCheckBox(self.tr("Regex"), self.araTemelW)
         # self.regexCBox.stateChanged.connect(lambda: self.act_aramayi_temizle(yeniden_ara=True))
-        self.kelimeAraCBox = QCheckBox(self.tr("Words"), self.araBaseWidget)
+        self.kelimeAraCBox = QCheckBox(self.tr("Words"), self.araTemelW)
         self.kelimeAraCBox.setFixedHeight(23)
         self.kelimeAraCBox.stateChanged.connect(lambda: self.act_aramayi_temizle(yeniden_ara=True))
-        # self.isaretleCBox = QCheckBox(self.tr("Mark"), self.araBaseWidget)
+        # self.isaretleCBox = QCheckBox(self.tr("Mark"), self.araTemelW)
         # self.isaretleCBox.stateChanged.connect(self.act_ara_isaretle_ac_kapa)
         # araLay.addWidget(self.regexCBox)
         # araLay.addWidget(self.isaretleCBox)
@@ -10807,7 +10931,7 @@ class DefterAnaPencere(QMainWindow):
         self.ara_ilk_arama_mi = True
         self.ara_eski_nesne = None
 
-        self.tabWidget.parent().layout().addWidget(self.araBaseWidget)
+        self.ortaLay.addWidget(self.araTemelW)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -10818,23 +10942,23 @@ class DefterAnaPencere(QMainWindow):
             if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 cursor = self.cScene.activeItem.textCursor()
 
-        if self.araBaseWidget.isVisible():
+        if self.araTemelW.isVisible():
             if cursor:
                 if cursor.hasSelection():
                     if cursor.selectedText() == self.araLineEdit.text():
-                        self.araBaseWidget.hide()
+                        self.araTemelW.hide()
                         self._statusBar.clearMessage()
                     else:
                         self.araLineEdit.setText(cursor.selectedText())
                         self.araLineEdit.setFocus()
                 else:
-                    self.araBaseWidget.hide()
+                    self.araTemelW.hide()
                     self._statusBar.clearMessage()
             else:
-                self.araBaseWidget.hide()
+                self.araTemelW.hide()
                 self._statusBar.clearMessage()
         else:
-            self.araBaseWidget.show()
+            self.araTemelW.show()
             self.araLineEdit.setFocus()
             if cursor:
                 if cursor.hasSelection():
@@ -10855,7 +10979,7 @@ class DefterAnaPencere(QMainWindow):
     def act_aramayi_temizle(self, yeniden_ara=False):
         # TODO: bu undoRedoSiniflarda 6 yerde var
         # print("temizlendi")
-        if self.araBaseWidget.isVisible():
+        if self.araTemelW.isVisible():
             self.ara_ilk_arama_mi = True
             self.ara_bulunan_nesneler = []
             self.ara_bulunan_nesneler_sira = 0
@@ -10891,11 +11015,11 @@ class DefterAnaPencere(QMainWindow):
             nesne.setSelected(True)
         nesne.ensureVisible()
 
-        self.log(f"{sira+1} / {len(self.ara_bulunan_nesneler)}")
+        self.log(f"{sira + 1} / {len(self.ara_bulunan_nesneler)}")
 
     # ---------------------------------------------------------------------
     def act_ara(self, geriyeDogru=False):
-        
+
         if self.ara_ilk_arama_mi:
             self.ara_bulunan_nesneler = self.act_ara_hepsini_bul()
             self.ara_ilk_arama_mi = False
@@ -10912,7 +11036,7 @@ class DefterAnaPencere(QMainWindow):
                     self.ara_bulunan_nesneler_sira = 0
 
             self.arama_sonucu_isaretle(self.ara_bulunan_nesneler_sira)
-        
+
         else:
             self.log(self.tr("0 results"))
 

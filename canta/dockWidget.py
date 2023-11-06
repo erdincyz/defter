@@ -20,9 +20,11 @@ class DockWidget(QDockWidget):
         self.renkYazi = QColor(255, 255, 255)
         self.renkArkaplan = QColor(153, 170, 187)
 
+        self.setContentsMargins(0,0,0,0)
+
         self.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetMovable |
                          QDockWidget.DockWidgetFeature.DockWidgetClosable |
-                         # QDockWidget.DockWidgetVerticalTitleBar|
+                         # QDockWidget.DockWidgetFeature.DockWidgetVerticalTitleBar|
                          QDockWidget.DockWidgetFeature.DockWidgetFloatable
                          )
 
@@ -30,7 +32,7 @@ class DockWidget(QDockWidget):
 
         # baslik
         baslikWidget = QWidget(self)
-        baslikWidget.setFixedHeight(23)
+        baslikWidget.setFixedHeight(20)
         baslikWidget.setContentsMargins(0, 0, 0, 0)
         baslikWidget.setAutoFillBackground(True)
 

@@ -11,11 +11,11 @@ from PySide6.QtWidgets import QHBoxLayout, QButtonGroup, QRadioButton, QLabel
 from canta.renkSecici import RenkSeciciWidget
 from canta.renkSecmeDugmesi import RenkSecmeDugmesi
 from canta.sliderDoubleWithDoubleSpinBox import SliderDoubleWithDoubleSpinBox
-from canta.yuzenWidget import YuzenWidget
+from canta.yw.yuzenWidget import YuzenWidget
 
 
 #######################################################################
-class NesneOzellikleriYuzenWidget(YuzenWidget):
+class NesneOzellikleriYW(YuzenWidget):
     arkaPlanRengiDegisti = Signal(QColor)
     yaziRengiDegisti = Signal(QColor)
     cizgiRengiDegisti = Signal(QColor)
@@ -24,7 +24,7 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
 
     # ---------------------------------------------------------------------
     def __init__(self, arkaPlanRengi, yaziRengi, cizgiRengi, cizgiKalinligi, parent=None):
-        super(NesneOzellikleriYuzenWidget, self).__init__(parent)
+        super(NesneOzellikleriYW, self).__init__(kapatilabilir_mi=True, parent=parent)
 
         self.arkaPlanRengi = arkaPlanRengi.toHsv()
         self.yaziRengi = yaziRengi.toHsv()
@@ -47,8 +47,11 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
         self.addStretchToLayout()
         self.radioArkaplan.setChecked(True)
 
-        self.setMinimumWidth(280)
-        self.setMinimumHeight(165)
+        self.setMinimumWidth(100)
+        self.setMinimumHeight(20)
+        # self.setMinimumSize(280, 165)
+        self.icerikW.setMinimumSize(280, 165)
+        self.adjustSize()
 
     # ---------------------------------------------------------------------
     def olustur_radio(self):
@@ -84,8 +87,8 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
         radioLay.addSpacing(5)
         radioLay.addWidget(self.radioCizgi)
 
-        self.anaLay.addSpacing(5)
-        self.anaLay.addLayout(radioLay)
+        self.icerikLay.addSpacing(5)
+        self.icerikLay.addLayout(radioLay)
 
         self.radioBtnGroup.buttonToggled.connect(self.act_radio_secim_degisti)
 
@@ -105,7 +108,7 @@ class NesneOzellikleriYuzenWidget(YuzenWidget):
         # layH.addWidget(self.cizgiKalinligiDSlider)
         # self.anaLay.addLayout(layH)
 
-        self.anaLay.addWidget(self.cizgiKalinligiDSlider)
+        self.ekleWidget(self.cizgiKalinligiDSlider)
 
     # ---------------------------------------------------------------------
     def act_radio_secim_degisti(self, btn):

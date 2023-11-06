@@ -68,12 +68,12 @@ class RenkSecmeDugmesi(QPushButton):
 
         super(RenkSecmeDugmesi, self).mouseReleaseEvent(event)
 
-    # ---------------------------------------------------------------------
-    def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key.Key_Escape:
-            # self.esc_key_pressed.emit()
-            self.renkDegisti.emit(self.eski_renk)
-        super(RenkSecmeDugmesi, self).keyPressEvent(event)
-        self.close()
-        self.deleteLater()
+    # # ---------------------------------------------------------------------
+    # def keyPressEvent(self, event):
+    #
+    #     if event.key() == Qt.Key.Key_Escape:
+    #         # self.esc_key_pressed.emit()
+    #         self.renkDegisti.emit(self.eski_renk)
+    #     super(RenkSecmeDugmesi, self).keyPressEvent(event)
+    #     self.close()
+    #     self.deleteLater()

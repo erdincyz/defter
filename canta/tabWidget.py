@@ -22,6 +22,8 @@ class TabWidget(QTabWidget):
         self.modeller = []
         self.cModel = None
 
+        self.setContentsMargins(0, 0, 0, 0)
+
     # # ---------------------------------------------------------------------
     # def mousePressEvent(self, a0):
     #     super(TabWidget, self).mousePressEvent(a0)

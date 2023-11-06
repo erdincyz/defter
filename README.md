@@ -42,4 +42,29 @@ komutu ile programı çalıştırabilirsiniz.
 
 ### [YARDIM SAYFALARI](https://github.com/erdincyz/defter/wiki)
 
+### Dosya Yapısı:
+Uzantısı "def" olarak değiştirilmiş sıkıştırma oranı 1 olan zip dosyalarıdır. 
+Zip dosyaları konteynır gibi kullanılmaktadır.
+Dosyaları bir zip dosyası gibi açıp içindeki gömülü diger dosyalara erişebilirsiniz.
+Ayrıca her dosya kaydedildiğinde, belgedeki her sayfa icin bir html dosyası da def icine kaydedilir.
+def dosyasını bir klasore açıp içindeki html dosyalarını web gezgininideacarakda belgenize erişebilirsiniz.
+İlla defter ihityaç yok.
+
+### İpuçları
+Kağıt kalemin yerini hiç bir şey tutmuyor. Daha sonra kağıt kalemle geviş getirebilirsiniz. Hızlıca otlamak için bu.
+
+sisteminizde 7z veya zip yuklu ise ve komut satırından direkt erişilebilir ise dosyalrı daha hızlı kaydedebilir.
+Çünkü, python ile gelen zipfile modulu arsiv guncelleme ozelligi desteklememekte, 7z veya zip desteklemekte. 
+Yani sadece eklenen veya degisen dosyları tekrar diske yazmak gerekiyor.
+
+
+Defter ile ekran goruntusu alabilirsiniz, ama sisteminize bu işin yazılmış bir porgram varsa
+onu kullanmanız önerilir. Mesela linuxta aşagıdaki komutu kullanabilirsiniz. bunu bir global kısyola atayıp.
+Defter panodan yapıştırmayı destekler. Aşağıdaki komut ekran goruntusunu panoya kopyalar.
+
+windows icin ayrıca var. 
+os x için zaten var.
+
+scrot -s -q 100 '/tmp/foo.jpg' -e 'xclip -selection clipboard -t image/jpg -i $f'
+
 ### Teşekkürler.

@@ -26,6 +26,7 @@ from canta.nesneler.path import PathItem
 from canta.nesneler.mirrorLine import MirrorLine
 from canta.threadWorkers import DownloadWorker
 from canta import undoRedoFonksiyolar as undoRedo, shared
+from canta.yw.yuzenWidget import YuzenWidget
 
 
 ########################################################################
@@ -137,7 +138,10 @@ class Scene(QGraphicsScene):
     def arac_ozellikleri_yukle(self, aracOzellikleriSozluk):
         if aracOzellikleriSozluk:
             for arac in self.araclar:
-                arac.yaz_ozellikler(aracOzellikleriSozluk[arac.tip])
+                try:
+                    arac.yaz_ozellikler(aracOzellikleriSozluk[arac.tip])
+                except Exception as e:
+                    pass
 
     # ---------------------------------------------------------------------
     def nesne_ozellikleri_guncelle(self):
@@ -1217,6 +1221,9 @@ class Scene(QGraphicsScene):
 
         # print(event.mimeData().formats())
         # print(event.mimeData().urls())
+
+        if type(event.source()) == YuzenWidget:
+            event.source().parent().parent().yw_yuzdur(event.source())
 
         if event.mimeData().hasUrls():
 

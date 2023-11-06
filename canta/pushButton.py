@@ -15,11 +15,26 @@ from canta.shared import kutulu_arkaplan_olustur
 class PushButton(QPushButton):
 
     # ---------------------------------------------------------------------
-    def __init__(self, yazi, genislik, yukseklik, parent=None):
+    def __init__(self, yazi, genislik=None, yukseklik=None, renkArkaplan=None, renkYazi=None, parent=None):
         super(PushButton, self).__init__(yazi, parent)
 
-        self.setFixedWidth(genislik)
-        self.setFixedHeight(yukseklik)
+        self.setFlat(True)
+
+        if genislik:
+            self.setFixedWidth(genislik)
+        if yukseklik:
+            self.setFixedHeight(yukseklik)
+
+        if renkArkaplan or renkYazi:
+            self.setAutoFillBackground(True)
+
+            p = self.palette()
+            if renkYazi:
+                p.setColor(self.foregroundRole(), renkYazi)
+            if renkArkaplan:
+                p.setColor(self.backgroundRole(), renkArkaplan)
+            self.setPalette(p)
+
 
 
 #######################################################################
