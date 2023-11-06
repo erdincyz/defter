@@ -4,7 +4,7 @@
 
 
 ### Welcome
-**Defter**(means Notebook) is an open source software that is (hopefully) still being developed as time permits and as needed.
+**Defter** (means Notebook) is an open source software that is (hopefully) still being developed as time permits and as needed.
 
 It can bu used for;
 * To quickly take notes by double-clicking anywhere on the page
@@ -17,7 +17,7 @@ It can bu used for;
 
 * You can export the scene as a PDF or HTML file.
 
-This software is not an alternative to pen and paper. It is perhaps most useful for quickly gathering data from digital environments.
+_This software is not an alternative to pen and paper. It is perhaps most useful for quickly gathering data from digital environments._
 
 * It is licensed under GPLv3.
 
