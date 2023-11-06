@@ -17,6 +17,8 @@ It can bu used for;
 
 * You can export the scene as a PDF or HTML file.
 
+This software is not an alternative to pen and paper. It is perhaps most useful for quickly gathering data from digital environments.
+
 * It is licensed under GPLv3.
 
 * Contains many Bugs and incomplete features. It is recommended that you do not use it for important work, (without trying it thoroughly.)
