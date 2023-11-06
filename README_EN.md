@@ -77,4 +77,4 @@ Command + Shift + 4
 
 Defter supports pasting from the clipboard. You can copy the screenshot to the clipboard and paste it into the Defter using the methods above or any other method you prefer.
 
-Thanks.
+### Thanks.
