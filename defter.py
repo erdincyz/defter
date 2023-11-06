@@ -102,7 +102,6 @@ DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
 DEFSTYLES_FILE_VERSION = 1
 
-
 # def get_cursor_pos(item):
 #     # Get mouse position relative to this item
 #     cursor_pos = item.scene().parent().mapFromGlobal(QCursor.pos())
