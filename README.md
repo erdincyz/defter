@@ -66,17 +66,21 @@ Mesela linuxta aşagıdaki komutu sistem çapında bir kısayola atayıp kullana
 
 Aşağıdaki komut ekran goruntusunu panoya kopyalar. 
 
-Linux için:
+#### Linux için:
 
 (Scrot ve xclip yazılımları sisteminizde yüklü değilse öncelikle paket yöneticiniz ile bunları kurmanız gerekiyor.)
 ```
 scrot -s -q 100 '/tmp/foo.jpg' -e 'xclip -selection clipboard -t image/jpg -i $f'
 ```
-Windows için: 
+#### Windows için: 
+
+Aşağıdaki kısayolu kullanabilirsiniz.
 ```
 Win + Shift + S
 ```
-OS X için:
+#### OS X için:
+
+Aşağıdaki kısayolu kullanabilirsiniz.
 ```
 Command + Shift + 4
 ```
