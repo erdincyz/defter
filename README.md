@@ -15,7 +15,7 @@
 * Mesela sahneye taşıyacağınız, **veya** izlemekte olduğunuz bir videodan ekran görüntüsü alıp, sahneye yapıştıracağınız o resmin üzerine çift tıklayınca, resmin tıkladığınız noktasında bir metin kutusu oluşur. Böylece resmin üzerine de dilediğiniz kadar not alabilirsiniz. 
 * Sahneyi veya tüm belgeyi PDF veya HTML dosyası olarak kaydedebilirsiniz.
 
-Kağıt kalemin yerini hiç bir şey tutmuyor. Bu yazılım kağıt kaleme alternatif değildir. Dijital ortamlardan verileri hızlıca bir araya toparlayabilmek için faydalıdır belki en fazla.
+_Kağıt kalemin yerini hiç bir şey tutmuyor. Bu yazılım kağıt kaleme alternatif değildir. Dijital ortamlardan verileri hızlıca bir araya toparlayabilmek için faydalıdır belki en fazla._
 
 **GPLv3** lisanslıdır.
 
