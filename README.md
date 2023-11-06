@@ -1,7 +1,6 @@
-### [ENGLISH](https://github.com/erdincyz/defter/blob/main/README_EN.md)
-
 ![GIF](https://raw.githubusercontent.com/erdincyz/gorseller/master/_defter/defter.gif)
 
+### [ENGLISH](https://github.com/erdincyz/defter/blob/main/README_EN.md)
 
 ### Hoşgeldiniz
 İnşallah, **Defter** vakit buldukça ve ihtiyaç duyuldukça halen geliştirilmekte olan açık kaynak bir yazılımdır. 
