@@ -27,7 +27,7 @@ from PySide6.QtGui import (QCursor, QKeySequence, QIcon, QPixmap, QColor, QPen, 
                            QTextBlockFormat, QPageSize, QPageLayout, QAction, QActionGroup, QUndoGroup,
                            QShortcut)
 
-from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QApplication,
+from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QStackedLayout, QApplication,
                                QFileDialog, QMenuBar, QMenu, QColorDialog, QMessageBox,
                                QStatusBar, QSizePolicy, QLabel, QPushButton, QScrollArea,
                                QDialog, QTextEdit, QInputDialog, QListWidget, QListWidgetItem,
@@ -312,36 +312,22 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def olustur_nesne_ozellikleriYW2(self):
 
-        scroll = QScrollArea()
-        # scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        # scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll.setWidgetResizable(True)
-        # scroll.setBackgroundRole(QPalette.Dark)
-        # scrollLayout = QVBoxLayout(scroll)
-        # self.nesneOzellikleriYW2.setWidget(scroll)
-
         self.nesneOzellikleriYW2 = YuzenWidget(parent=self.centralW)
         self.nesneOzellikleriYW2.yazBaslik(self.tr("Item && Tool Properties"))
         # self.nesneOzellikleriYW2.setMinimumWidth(315)
         # self.nesneOzellikleriYW2.setMinimumHeight(190)
-        self.nesneOzellikleriYW2.icerikW.setMinimumSize(315, 400)
-        self.nesneOzellikleriYW2.ekleWidget(scroll)
+        self.nesneOzellikleriYW2.setMinimumSize(310, 215)
+        # self.nesneOzellikleriYW2.icerikScroll.setMinimumSize(315, 250)
         self.nesneOzellikleriYW2.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
         # self.nesneOzellikleriYW2.hide()
 
-        temelW = QWidget(scroll)
-        # self.nesneOzellikleriYW2.setWidget(temelW)
+        temelW = QWidget(self.nesneOzellikleriYW2)
+        # temelW.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        self.nesneOzellikleriYW2.ekleWidget(temelW)
         anaLay = QVBoxLayout(temelW)
         # anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
-        # anaLay.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
-        anaLay.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
+        # anaLay.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
         # anaLay.setSizeConstraint(QVBoxLayout.SetMaximumSize)
-        # anaLay.setContentsMargins(0,0,0,0)
-        # self.nesneOzellikleriYW2.setContentsMargins(0, 0, 0, 0)
-        # temelW.setContentsMargins(0,0,0,0)
-        # scrollLayout.addWidget(temelW)
-        scroll.setWidget(temelW)
-        # scroll.setLayout(layout)
 
         self.nesneGrupW = QWidget(temelW)
         nesneLay = QVBoxLayout(self.nesneGrupW)
@@ -748,12 +734,15 @@ class DefterAnaPencere(QMainWindow):
 
         anaLay.addLayout(radioLay)
         anaLay.addWidget(self.renkSecici)
-        anaLay.addWidget(self.nesneGrupW)
-        anaLay.addWidget(self.yaziGrupW)
-        anaLay.addWidget(self.cizgiGrupW)
+        self.stackedLay = QStackedLayout()
+        anaLay.addLayout(self.stackedLay)
+        self.stackedLay.addWidget(self.nesneGrupW)
+        self.stackedLay.addWidget(self.yaziGrupW)
+        self.stackedLay.addWidget(self.cizgiGrupW)
 
     # ---------------------------------------------------------------------
     def act_radio_secim_degisti(self, btn):
+
         if btn == self.radioArkaplan:
             if self.cScene.activeItem:
                 renk = self.cScene.activeItem.arkaPlanRengi
@@ -761,9 +750,7 @@ class DefterAnaPencere(QMainWindow):
                 renk = self.cScene.aktifArac.arkaPlanRengi
             self.renk_tipi = "a"
 
-            self.nesneGrupW.show()
-            self.yaziGrupW.hide()
-            self.cizgiGrupW.hide()
+            self.stackedLay.setCurrentWidget(self.nesneGrupW)
 
         elif btn == self.radioYazi:
             if self.cScene.activeItem:
@@ -772,9 +759,7 @@ class DefterAnaPencere(QMainWindow):
                 renk = self.cScene.aktifArac.yaziRengi
             self.renk_tipi = "y"
 
-            self.nesneGrupW.hide()
-            self.yaziGrupW.show()
-            self.cizgiGrupW.hide()
+            self.stackedLay.setCurrentWidget(self.yaziGrupW)
 
         elif btn == self.radioCizgi:
             if self.cScene.activeItem:
@@ -783,9 +768,7 @@ class DefterAnaPencere(QMainWindow):
                 renk = self.cScene.aktifArac.cizgiRengi
             self.renk_tipi = "c"
 
-            self.nesneGrupW.hide()
-            self.yaziGrupW.hide()
-            self.cizgiGrupW.show()
+            self.stackedLay.setCurrentWidget(self.cizgiGrupW)
 
         self.renkSecici.disardan_renk_gir(renk)
 
@@ -821,7 +804,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.stillerYW = YuzenWidget(kapatilabilir_mi=True, parent=self.centralW)
         self.stillerYW.yazBaslik(self.tr("Style Presets"))
-        self.stillerYW.icerikW.setMinimumSize(150, 150)
+        self.stillerYW.setMinimumSize(150, 150)
         self.stillerYW.hide()
 
         self.stillerYLW = QListWidget(self.stillerYW)
@@ -843,26 +826,14 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def olustur_stillerYW2(self):
 
-
         self.stillerYW2 = YuzenWidget(parent=self.centralW)
         self.stillerYW2.yazBaslik(self.tr("Style Presets"))
-        self.stillerYW2.icerikW.setMinimumSize(200, 200)
+        self.stillerYW2.setMinimumSize(200, 100)
         self.stillerYW2.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
         # self.stillerYW2.hide()
 
-
-        scroll = QScrollArea()
-        # scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        # scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll.setWidgetResizable(True)
-        # scroll.setBackgroundRole(QPalette.Dark)
-        # scrollLayout = QVBoxLayout(scroll)
-
         temelW = QWidget(parent=self.stillerYW2)
-        scroll.setWidget(temelW)
-        # self.stillerYW2.ekleWidget(temelW)
-        self.stillerYW2.ekleWidget(scroll)
-
+        self.stillerYW2.ekleWidget(temelW)
 
         temelW.setContentsMargins(0, 0, 0, 0)
         anaLay = QVBoxLayout(temelW)
@@ -874,6 +845,8 @@ class DefterAnaPencere(QMainWindow):
         anaLay.setSpacing(3)
 
         self.stillerLW = QListWidget(temelW)
+        self.stillerLW.setMinimumWidth(150)
+        self.stillerLW.setMinimumHeight(100)
 
         delegate = ListWidgetItemDelegate(self.stillerLW)
         self.stillerLW.setItemDelegate(delegate)
@@ -969,7 +942,7 @@ class DefterAnaPencere(QMainWindow):
         # self.baskiSiniriCizimAyarlariYW.hide()
         # self.baskiSiniriCizimAyarlariYW.setMinimumWidth(190)
         # self.baskiSiniriCizimAyarlariYW.setMinimumHeight(315)
-        self.baskiSiniriCizimAyarlariYW.icerikW.setMinimumSize(190, 315)
+        self.baskiSiniriCizimAyarlariYW.setMinimumSize(182, 250)
         self.baskiSiniriCizimAyarlariYW.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
         # self.baskiSiniriCizimAyarlariYW.baslikWidget.setMaximumWidth(190)
         # self.baskiSiniriCizimAyarlariYW.adjustSize()
@@ -991,6 +964,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.baskiSinirGBox = QGroupBox(temelW)
         # self.baskiSinirGBox.setContentsMargins(0, 0, 0, 0)
+        self.baskiSinirGBox.setMinimumSize(180, 280)
         self.baskiSinirGBox.setFlat(True)
         self.baskiSinirGBox.setCheckable(True)
         self.baskiSinirGBox.setChecked(False)
@@ -1200,7 +1174,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.sayfalarYW = YuzenWidget(parent=self.centralW)
         self.sayfalarYW.yazBaslik(self.tr("Pages"))
-        self.sayfalarYW.icerikW.setMinimumSize(190, 315)
+        self.sayfalarYW.setMinimumSize(190, 315)
         self.sayfalarYW.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
         # self.sayfalarYW.move(100, 100)
         # self.sayfalarYW.show()
@@ -1227,6 +1201,7 @@ class DefterAnaPencere(QMainWindow):
         anaLay.addLayout(layButonlar)
 
         self.sayfalarYWTreeView = TreeView(sayfalarTemelW)
+        self.sayfalarYWTreeView.setMinimumSize(150, 200)
         anaLay.addWidget(self.sayfalarYWTreeView)
 
         # self.sayfalarYWTreeView.doubleClicked.connect(self.tw_edit_item)
@@ -1275,7 +1250,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.kutuphaneYW = YuzenWidget(parent=self.centralW)
         self.kutuphaneYW.yazBaslik(self.tr("Library"))
-        self.kutuphaneYW.icerikW.setMinimumSize(200, 200)
+        self.kutuphaneYW.setMinimumSize(200, 200)
         self.kutuphaneYW.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
         # self.kutuphaneYW.hide()
 

@@ -7,7 +7,7 @@ __author__ = 'Erdinç Yılmaz'
 
 from PySide6.QtCore import Qt, QPoint, QSize, Signal, QMimeData
 from PySide6.QtGui import QColor, QDrag, QPixmap
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QSizePolicy, QScrollArea
 
 from canta.yanBolme.dikeyEtiket import DikeyEtiket
 
@@ -24,6 +24,8 @@ class YuzenWidget(QWidget):
         self.parkPos = QPoint(0, 100)
         self.eskiAcikPos = QPoint(0, 100)
         self.eskiYuzenPos = QPoint(0, 0)
+        self.eskiSize = self.size()
+        self.setMinimumSize(100, 100)
 
         self.kucuk_mu = False
         self.dikey_mi = False
@@ -56,7 +58,6 @@ class YuzenWidget(QWidget):
         self.sagClick = False
         self.solClick = False
 
-        self.setMinimumSize(190, 20)
         self.baslikWidget = QWidget(self)
         # self.baslikWidget.setFixedHeight(20)
         self.baslikWidget.setContentsMargins(0, 0, 0, 0)
@@ -96,7 +97,7 @@ class YuzenWidget(QWidget):
         if self.kapatilabilir_mi:
             yazi = "x"
         else:
-            yazi = "~"
+            yazi = "#"
         self.btnKenaraAlVeyaKapat = QPushButton(yazi, self.baslikWidget)
         self.btnKenaraAlVeyaKapat.setFixedWidth(20)
         self.btnKenaraAlVeyaKapat.setFlat(True)
@@ -109,8 +110,8 @@ class YuzenWidget(QWidget):
         self.btnKenaraAlVeyaKapat.setPalette(p)
 
         self.anaLay = QVBoxLayout(self)
-        self.anaLay.setContentsMargins(1, 0, 1, 1)
-        self.anaLay.setSpacing(1)
+        self.anaLay.setContentsMargins(0, 0, 0, 0)
+        self.anaLay.setSpacing(0)
         # self.anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
 
         self.layBaslik = QHBoxLayout()
@@ -131,15 +132,50 @@ class YuzenWidget(QWidget):
 
         self.anaLay.addWidget(self.baslikWidget)
 
-        self.icerikW = QWidget(self)
-        self.icerikW.setContentsMargins(0, 0, 0, 0)
-        self.icerikW.setMinimumHeight(100)
-        self.icerikLay = QVBoxLayout(self.icerikW)
-        self.icerikLay.setContentsMargins(0, 0, 0, 0)
-        self.anaLay.addWidget(self.icerikW)
+        self.icerikScroll = QScrollArea()
+        self.icerikScroll.setContentsMargins(0, 0, 0, 0)
+        # icerikScroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        # icerikScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.icerikScroll.setWidgetResizable(True)
+        # scroll.setLayout(self.anaLay)
+        self.anaLay.addWidget(self.icerikScroll)
 
-        self.icerikToplamMinWidth = 0
-        self.icerikToplamMinHeight = 0
+        # self.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+
+    # ---------------------------------------------------------------------
+    def yazBaslik(self, yazi):
+        self.baslikEtiket.setText(yazi)
+
+    # ---------------------------------------------------------------------
+    def ekleWidget(self, widget):
+        # self.resize(widget.size())
+
+        # gripper = QSizeGrip(widget)
+        # l = QHBoxLayout(widget)
+        #
+        # l.setContentsMargins(0, 0, 0, 0)
+        # l.addWidget(gripper, 0, Qt.AlignRight | Qt.AlignBottom)
+
+        self.icerikScroll.setWidget(widget)
+        # self.anaLay.addWidget(widget)
+
+        # self.adjustSize()
+
+    # # ---------------------------------------------------------------------
+    # def sizeHint(self):
+    #     # return self.baslikWidget.size() + self.icerikScroll.size()
+    #
+    #     if self.kucuk_mu:
+    #         return self.baslikWidget.size()
+    #     if self.dikey_mi:
+    #         return self.icerikScroll.size() + QSize(20, 0)
+    #     else:
+    #         return self.icerikScroll.size() + QSize(0, 20)
+
+    # # ---------------------------------------------------------------------
+    # def resizeEvent(self, event):
+    #
+    #     super(YuzenWidget, self).resizeEvent(event)
 
     # ---------------------------------------------------------------------
     def kaydetme_bilgisi(self):
@@ -194,7 +230,6 @@ class YuzenWidget(QWidget):
 
     # ---------------------------------------------------------------------
     def cubuga_tasindi_yuklenirken(self, solSag):
-        self.min_width = self.minimumWidth()
         self.eskiYuzenPos = self.pos()
         self.eskiSize = self.size()
 
@@ -210,7 +245,6 @@ class YuzenWidget(QWidget):
     # ---------------------------------------------------------------------
     def cubuga_tasindi(self, solSag):
 
-        self.min_width = self.minimumWidth()
         self.eskiYuzenPos = self.pos()
         self.eskiSize = self.size()
         self.dikey_mi = self.baslikEtiket.dikey
@@ -240,10 +274,8 @@ class YuzenWidget(QWidget):
 
         if self.dikey_mi:
             self.dikey_dondur()
-        else:
-            self.yatay_dondur()
+
         self.cubukta_mi = False
-        self.setMinimumWidth(self.min_width)
         self.move(self.eskiYuzenPos)
         self.resize(self.eskiSize)
         # self.adjustSize()
@@ -263,7 +295,7 @@ class YuzenWidget(QWidget):
 
     # ---------------------------------------------------------------------
     def dondur(self, dikey_dondur):
-        # self.icerikW.setVisible(not self.icerikW.isVisible())
+        # self.icerikScroll.setVisible(not self.icerikScroll.isVisible())
 
         if dikey_dondur:
             self.dikey_dondur()
@@ -272,6 +304,7 @@ class YuzenWidget(QWidget):
 
     # ---------------------------------------------------------------------
     def dikey_dondur(self):
+        self.setMinimumSize(20, self.minimumSize().height())
         self.dikey_mi = True
         self.baslikEtiket.dikey = True
         self.baslikEtiket.setFixedSize(16777215, 16777215)
@@ -284,10 +317,12 @@ class YuzenWidget(QWidget):
         self.baslikWidget.update()
         self.layBaslik.setDirection(QVBoxLayout.Direction.TopToBottom)
         self.anaLay.setDirection(QVBoxLayout.Direction.LeftToRight)
+
         self.adjustSize()
 
     # ---------------------------------------------------------------------
     def yatay_dondur(self):
+        self.setMinimumSize(self.minimumSize().width(), 20)
         self.dikey_mi = False
         self.baslikEtiket.dikey = False
         self.baslikEtiket.setFixedSize(16777215, 16777215)
@@ -301,24 +336,14 @@ class YuzenWidget(QWidget):
         self.baslikWidget.update()
         self.layBaslik.setDirection(QVBoxLayout.Direction.LeftToRight)
         self.anaLay.setDirection(QVBoxLayout.Direction.TopToBottom)
-        self.adjustSize()
 
-    # ---------------------------------------------------------------------
-    def kenara_al(self):
-        if self.kucuk_mu:
-            self.kucuk_mu = False
-            self.btnKenaraAlVeyaKapat.show()
-            self.move(self.eskiAcikPos)
-            self.icerikW.show()
-            self.btnKucult.setText("<")
-            self.adjustSize()
-            return
+        self.adjustSize()
 
     # ---------------------------------------------------------------------
     def kucult(self):
         # if self.baslikEtiket.dikey:
         #     if self.anaLay.direction() == QVBoxLayout.Direction.RightToLeft:
-        #         self.move(self.pos() + QPoint(self.icerikW.rect().width(), 0))
+        #         self.move(self.pos() + QPoint(self.icerikScroll.rect().width(), 0))
 
         self.kucuk_mu = True
         if self.cubukta_mi:
@@ -327,18 +352,19 @@ class YuzenWidget(QWidget):
             # if not self.dikey_mi:
             #     self.dikey_dondur()
         else:
+            self.eskiSize = self.size()
             if self.dikey_mi:
                 self.setMinimumWidth(20)
             else:
                 self.setMinimumHeight(20)
-            self.icerikW.hide()
+            self.icerikScroll.hide()
             self.btnKucult.setText(">")
             self.adjustSize()
 
     # ---------------------------------------------------------------------
     def buyult(self):
         # if self.dikey_mi:
-        #     if (self.pos().x() + self.icerikW.rect().width()) < self.parent().rect().width():
+        #     if (self.pos().x() + self.icerikScroll.rect().width()) < self.parent().rect().width():
         #         self.anaLay.setDirection(QVBoxLayout.Direction.RightToLeft)
         #     else:
         #         self.anaLay.setDirection(QVBoxLayout.Direction.LeftToRight)
@@ -347,7 +373,7 @@ class YuzenWidget(QWidget):
         #         self.move(self.pos() + self.mapToParent(self.rect().topLeft()))
         #
         # else:
-        #     if self.pos().y() + self.icerikW.rect().height() < self.parent().rect().height():
+        #     if self.pos().y() + self.icerikScroll.rect().height() < self.parent().rect().height():
         #         self.anaLay.setDirection(QVBoxLayout.Direction.TopToBottom)
         #     else:
         #         self.anaLay.setDirection(QVBoxLayout.Direction.BottomToTop)
@@ -357,59 +383,18 @@ class YuzenWidget(QWidget):
             self.show()
             self.dugme.renk_degistir(acik_mi=True)
         else:
-            self.setMinimumSize(190, 20)
-            self.icerikW.show()
+            self.icerikScroll.show()
             self.btnKucult.setText("<")
-            self.adjustSize()
+            self.resize(self.eskiSize)
+            # self.adjustSize()
 
     # ---------------------------------------------------------------------
     def kucult_buyult(self):
-        # self.icerikW.setVisible(not self.icerikW.isVisible())
 
         if self.kucuk_mu:
             self.buyult()
         else:
             self.kucult()
-
-    # ---------------------------------------------------------------------
-    def yazBaslik(self, yazi):
-        self.baslikEtiket.setText(yazi)
-
-    # ---------------------------------------------------------------------
-    def ekleWidget(self, widget):
-        # self.resize(widget.size())
-
-        # gripper = QSizeGrip(widget)
-        # l = QHBoxLayout(widget)
-        #
-        # l.setContentsMargins(0, 0, 0, 0)
-        # l.addWidget(gripper, 0, Qt.AlignRight | Qt.AlignBottom)
-
-        self.icerikToplamMinWidth += widget.minimumWidth()
-        self.icerikToplamMinHeight += widget.minimumHeight()
-        # self.anaLay.addWidget(widget)
-        self.icerikLay.addWidget(widget)
-        # self.baslikEtiket.setMinimumWidth(self.icerikToplamMinWidth - self.kapatBtn.maximumWidth())
-        self.adjustSize()
-
-    # ---------------------------------------------------------------------
-    def addStretchToLayout(self):
-        self.icerikLay.addStretch()
-
-    # ---------------------------------------------------------------------
-    def sizeHint(self):
-        # return self.baslikWidget.size() + self.icerikW.size()
-
-        if self.kucuk_mu:
-            return self.baslikWidget.size()
-        if self.dikey_mi:
-            return self.icerikW.size() + QSize(20, 0)
-        else:
-            return self.icerikW.size() + QSize(0, 20)
-
-            # def resizeEvent(self, event):
-
-    #     super(YuzenWidget, self).resizeEvent(event)
 
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
@@ -436,7 +421,7 @@ class YuzenWidget(QWidget):
                 self.solClick = True
                 self.setCursor(Qt.CursorShape.ClosedHandCursor)
 
-            if event.button() == Qt.MouseButton.RightButton and self.icerikW.isVisible():
+            if event.button() == Qt.MouseButton.RightButton and self.icerikScroll.isVisible():
                 self.sagDragx = event.x()
                 self.sagDragy = event.y()
                 self.enSagX = self.width()
@@ -477,9 +462,9 @@ class YuzenWidget(QWidget):
                     self.move(yeniPos)
 
             if self.sagClick:
-                genislik = max(self.icerikToplamMinWidth,
+                genislik = max(self.icerikScroll.minimumWidth(),
                                self.enSagX + event.x() - self.sagDragx)
-                yukseklik = max(self.icerikToplamMinHeight,
+                yukseklik = max(self.icerikScroll.minimumHeight(),
                                 self.enAltY + event.y() - self.sagDragy)
                 self.resize(genislik, yukseklik)
 
@@ -491,7 +476,6 @@ class YuzenWidget(QWidget):
                 #     # self.baslikEtiket.resize(genislik, self.baslikEtiket.size().height())
 
                 # self.eskiSize = QSize(genislik, yukseklik)
-
 
         else:
             if event.buttons() == Qt.MouseButton.LeftButton:

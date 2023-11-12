@@ -7,7 +7,7 @@ __author__ = 'Erdinç Yılmaz'
 
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QColor, Qt
-from PySide6.QtWidgets import QHBoxLayout, QButtonGroup, QRadioButton, QLabel
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QButtonGroup, QRadioButton, QLabel
 from canta.renkSecici import RenkSeciciWidget
 from canta.renkSecmeDugmesi import RenkSecmeDugmesi
 from canta.sliderDoubleWithDoubleSpinBox import SliderDoubleWithDoubleSpinBox
@@ -35,27 +35,6 @@ class NesneOzellikleriYW(YuzenWidget):
         # ilk acilista arkaplan rengi geliyor, sonra da kapatilinca gizlendigi icin devamlilik var.
         self.renk = self.arkaPlanRengi
 
-        self.olustur_radio()
-
-        self.renkSecici = RenkSeciciWidget(self.renk, boyut=64, parent=self)
-        self.renkSecici.setFocusPolicy(Qt.FocusPolicy.TabFocus)
-        self.renkSecici.renkDegisti.connect(self.renkGuncelle)
-
-        self.ekleWidget(self.renkSecici)
-        self.addStretchToLayout()
-        self.olustur_cizgi_kalinligi_slider()
-        self.addStretchToLayout()
-        self.radioArkaplan.setChecked(True)
-
-        self.setMinimumWidth(100)
-        self.setMinimumHeight(20)
-        # self.setMinimumSize(280, 165)
-        self.icerikW.setMinimumSize(280, 165)
-        self.adjustSize()
-
-    # ---------------------------------------------------------------------
-    def olustur_radio(self):
-
         self.aracIkonuEtiketi = QLabel(self)
 
         self.ekrandaRenkSecmeDugmesi = RenkSecmeDugmesi(self)
@@ -79,21 +58,18 @@ class NesneOzellikleriYW(YuzenWidget):
         radioLay.addSpacing(5)
         radioLay.addWidget(self.aracIkonuEtiketi)
         radioLay.addSpacing(3)
-        radioLay.addWidget(self.ekrandaRenkSecmeDugmesi)
+        radioLay.addWidget(self.ekrandaRenkSecmeDugmesi, 1)
         radioLay.addSpacing(5)
-        radioLay.addWidget(self.radioArkaplan)
+        radioLay.addWidget(self.radioArkaplan, 2)
         radioLay.addSpacing(5)
-        radioLay.addWidget(self.radioYazi)
+        radioLay.addWidget(self.radioYazi, 2)
         radioLay.addSpacing(5)
-        radioLay.addWidget(self.radioCizgi)
+        radioLay.addWidget(self.radioCizgi, 2)
 
-        self.icerikLay.addSpacing(5)
-        self.icerikLay.addLayout(radioLay)
-
+        self.radioArkaplan.setChecked(True)
+        self.renk_tipi = "a"
         self.radioBtnGroup.buttonToggled.connect(self.act_radio_secim_degisti)
 
-    # ---------------------------------------------------------------------
-    def olustur_cizgi_kalinligi_slider(self):
         self.cizgiKalinligiDSlider = SliderDoubleWithDoubleSpinBox(parent=self)
         # self.cizgiKalinligiDSlider.setMaximumWidth(150)
         self.cizgiKalinligiDSlider.setMinimum(0)
@@ -102,13 +78,26 @@ class NesneOzellikleriYW(YuzenWidget):
         self.cizgiKalinligiDSlider.setValue(self.cizgiKalinligi * 10)
         self.cizgiKalinligiDSlider.degerDegisti.connect(lambda x: self.cizgiKalinligiDegisti.emit(x))
 
-        # etiket = QLabel(self.tr("Line&&Pen"), self)
-        # layH = QHBoxLayout()
-        # layH.addWidget(etiket)
-        # layH.addWidget(self.cizgiKalinligiDSlider)
-        # self.anaLay.addLayout(layH)
+        self.renkSecici = RenkSeciciWidget(self.renk, boyut=64, parent=self)
+        self.renkSecici.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+        self.renkSecici.renkDegisti.connect(self.renkGuncelle)
 
-        self.ekleWidget(self.cizgiKalinligiDSlider)
+        temelW = QWidget(self)
+        anaLay = QVBoxLayout(temelW)
+
+        anaLay.addLayout(radioLay)
+        anaLay.addWidget(self.renkSecici)
+        anaLay.addSpacing(5)
+        anaLay.addWidget(self.cizgiKalinligiDSlider)
+        anaLay.addStretch()
+
+        self.setMinimumWidth(100)
+        self.setMinimumHeight(20)
+        # self.setMinimumSize(280, 165)
+        temelW.setMinimumSize(280, 165)
+        self.adjustSize()
+
+        self.ekleWidget(temelW)
 
     # ---------------------------------------------------------------------
     def act_radio_secim_degisti(self, btn):

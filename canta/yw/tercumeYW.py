@@ -5,16 +5,12 @@ __project_name__ = 'Defter'
 __date__ = '16/11/22'
 __author__ = 'Erdinç Yılmaz'
 
-from PySide6.QtWidgets import QHBoxLayout, QLineEdit, QPushButton, QTextEdit
+from PySide6.QtWidgets import QHBoxLayout, QLineEdit, QPushButton, QTextEdit, QWidget, QVBoxLayout
 from canta.yw.yuzenWidget import YuzenWidget
 
 
 #######################################################################
 class TercumeYW(YuzenWidget):
-    # arkaPlanRengiDegisti = Signal(QColor)
-    # yaziRengiDegisti = Signal(QColor)
-    # cizgiRengiDegisti = Signal(QColor)
-    # cizgiKalinligiDegisti = Signal(float)
 
     # ---------------------------------------------------------------------
     def __init__(self, parent=None):
@@ -27,20 +23,22 @@ class TercumeYW(YuzenWidget):
         self.tercumeEngBtn = QPushButton(self.tr("Eng"), self)
         self.tercumeEngBtn.clicked.connect(self.yap_eng_tercume)
 
-        self.ekleWidget(self.okuBtn)
-        self.ekleWidget(self.girisYaziLE)
         layTercumeBtn = QHBoxLayout()
         layTercumeBtn.addWidget(self.tercumeTrBtn)
         layTercumeBtn.addWidget(self.tercumeEngBtn)
-        self.anaLay.addLayout(layTercumeBtn)
-        # self.olustur_radio()
 
         self.sonucTE = QTextEdit(self)
         self.ekleWidget(self.sonucTE)
 
-        self.addStretchToLayout()
+        temelW = QWidget(self)
+        anaLay = QVBoxLayout(temelW)
+        anaLay.addWidget(self.okuBtn)
+        anaLay.addWidget(self.girisYaziLE)
+        anaLay.addLayout(layTercumeBtn)
+        anaLay.addWidget(self.sonucTE)
+        anaLay.addStretch()
 
-        # self.olustur_cizgi_kalinligi_slider()
+        self.ekleWidget(temelW)
 
         self.setMinimumWidth(250)
         self.setMinimumHeight(170)
