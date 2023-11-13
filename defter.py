@@ -166,6 +166,10 @@ class DefterAnaPencere(QMainWindow):
 
         self.itemSize = QSizeF(25, 25)
 
+        font = self.font()
+        font.setPointSizeF(font.pointSizeF() - 1)
+        self.setFont(font)
+
         self.yazi_hizasi = Qt.AlignmentFlag.AlignLeft
 
         self.printer = None
@@ -1740,10 +1744,11 @@ class DefterAnaPencere(QMainWindow):
         """bunu ozellikle thread yapmadık, sayfalar ilk olusturulurken bu kullanılıyor"""
 
         # pixmap = self.cView.grab(self.cView.get_visible_rect().toRect())
-        # pixmap = view.grab(view.childrenRect())
         # pixmap = view.grab(view.contentsRect())
         # pixmap = view.grab(self.tabWidget.currentWidget().contentsRect())
         # pixmap = view.grab()
+        # pixmap = self.cView.grab(self.cScene.sceneRect().toRect())
+        # su ana kadar bu alttaki kullanildi !!
         pixmap = self.cView.grab(self.cView.viewport().rect())
         # pixmap = pixmap.scaled(128,128,Qt.KeepAspectRatioByExpanding, Qt.FastTransformation)
         # pixmap = pixmap.scaledToWidth(self.sayfalarYWTreeView.width(), Qt.FastTransformation)

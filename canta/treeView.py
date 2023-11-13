@@ -111,19 +111,19 @@ class TreeView(QTreeView):
         if action == actionListe:
             size = QSize(20, 20)
             self.setIconSize(size)
-            self.model().treeViewIconSize = size
+            self.model().treeViewIkonBoyutu = size
         elif action == actionResimKucuk:
             size = QSize(48, 48)
             self.setIconSize(size)
-            self.model().treeViewIconSize = size
+            self.model().treeViewIkonBoyutu = size
         elif action == actionResimOrta:
             size = QSize(128, 128)
             self.setIconSize(size)
-            self.model().treeViewIconSize = size
+            self.model().treeViewIkonBoyutu = size
         elif action == actionResimBuyuk:
             size = QSize(256, 256)
             self.setIconSize(size)
-            self.model().treeViewIconSize = size
+            self.model().treeViewIkonBoyutu = size
 
     # ---------------------------------------------------------------------
     def mousePressEvent(self, e):

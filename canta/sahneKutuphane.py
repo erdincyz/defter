@@ -47,11 +47,18 @@ class SahneKutuphane(QGraphicsScene):
         self.aktif_sahne = aktif_sahne
         self.tempDirPath = tempDirPath
 
+        self.sonZDeger = 0
+
         self.belge_olceginde_islem_yap = False
 
         self.suruklenmekte_olan_nesne = None
 
         self.desteklenen_tipler = [shared.IMAGE_ITEM_TYPE, shared.VIDEO_ITEM_TYPE, shared.DOSYA_ITEM_TYPE]
+
+    # ---------------------------------------------------------------------
+    def zDeger_arttir(self, nesne):
+        self.sonZDeger += 1
+        nesne.setZValue(self.sonZDeger)
 
     # ---------------------------------------------------------------------
     def dragEnterEvent(self, e):
@@ -230,6 +237,8 @@ class SahneKutuphane(QGraphicsScene):
     # ---------------------------------------------------------------------
     def _dosyalari_goster(self, kume, isEmbeded, pozisyonSifirla=True):
 
+        self.sonZDeger = 0
+
         if pozisyonSifirla:
             pos = QPoint(5, 5)
             self.enSonElemanPos = pos
@@ -240,6 +249,7 @@ class SahneKutuphane(QGraphicsScene):
             kutuphane_nesnesi = KutuphaneNesnesi(pos=pos, tip=eleman.tip,
                                                  dosya_adresi=eleman.adres,
                                                  isEmbeded=isEmbeded)
+            self.zDeger_arttir(kutuphane_nesnesi)
             self.addItem(kutuphane_nesnesi)
             pos.setX(pos.x() + 50)
             if sayac % 5 == 0:

@@ -399,8 +399,8 @@ class YuzenWidget(QWidget):
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
 
-        self.kenara_al_veya_kapat()
-        # self.kucult_buyult()
+        # self.kenara_al_veya_kapat()
+        self.kucult_buyult()
 
         # if self.cubukta_mi:
         #     self.kenara_al_veya_kapat()
@@ -485,6 +485,9 @@ class YuzenWidget(QWidget):
 
                 pixmap = QPixmap(self.size())
                 self.render(pixmap)
+                # drag.setHotSpot(QPoint(pixmap.width()/2, pixmap.height()))
+                drag.setHotSpot(event.pos() - self.rect().topLeft())
+                # drag.setHotSpot(self.mPos)
                 drag.setPixmap(pixmap)
 
                 drag.exec(Qt.DropAction.MoveAction)
