@@ -35,6 +35,25 @@ class PushButton(QPushButton):
                 p.setColor(self.backgroundRole(), renkArkaplan)
             self.setPalette(p)
 
+        else:
+            stil = """
+            QPushButton{
+                background-color: #eee;
+                border: 0;
+                padding: 3px;
+                border-radius: 3px;
+            }
+            QPushButton:hover{
+                background-color: #def;
+            }
+            QPushButton:pressed{
+                background-color: #cde;
+            }
+            QPushButton:checked{
+                background-color: #ced5e1;
+            }
+                """
+            self.setStyleSheet(stil)
 
 
 #######################################################################

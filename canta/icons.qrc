@@ -20,11 +20,18 @@
         <file>icons/distribute.png</file>
         <file>icons/distribute-horizontally.png</file>
         <file>icons/distribute-vertically.png</file>
-        <file>icons/line_dash_dot_dot.png</file>
-        <file>icons/line_dash_dot.png</file>
-        <file>icons/line_dashed.png</file>
-        <file>icons/line_dotted.png</file>
-        <file>icons/line_solid.png</file>
+        <file>icons/cizgi-yok.png</file>
+        <file>icons/cizgi-duz.png</file>
+        <file>icons/cizgi-noktali.png</file>
+        <file>icons/cizgi-cizgili.png</file>
+        <file>icons/cizgi-cizgi-nokta.png</file>
+        <file>icons/cizgi-cizgi-2nokta.png</file>
+        <file>icons/cizgi-birlesim-sivri.png</file>
+        <file>icons/cizgi-birlesim-yuvarlak.png</file>
+        <file>icons/cizgi-birlesim-kirpik.png</file>
+        <file>icons/cizgi-ucu-duz.png</file>
+        <file>icons/cizgi-ucu-kare.png</file>
+        <file>icons/cizgi-ucu-yuvarlak.png</file>
         <file>icons/t.png</file>
         <file>icons/align-bottom-edges.png</file>
         <file>icons/align-centers-horizontally.png</file>

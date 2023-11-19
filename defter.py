@@ -457,7 +457,7 @@ class DefterAnaPencere(QMainWindow):
         self.fontPointSizeFDSBox_yazidw.setToolTip(self.tr("Text Size"))
 
         self.yaziListeBicimiCBox = QComboBox(self.yaziGrupW)
-        self.yaziListeBicimiCBox.setMaximumWidth(135)
+        self.yaziListeBicimiCBox.setMaximumWidth(75)
         self.yaziListeBicimiCBox.addItem(self.tr("Standard"))
         self.yaziListeBicimiCBox.addItem(self.tr("Bullet List (Disc)"))
         self.yaziListeBicimiCBox.addItem(self.tr("Bullet List (Circle)"))
@@ -571,81 +571,151 @@ class DefterAnaPencere(QMainWindow):
         btnBicimlerLay.addLayout(btnKaratkerBicimleriLay)
         btnBicimlerLay.addSpacing(10)
         btnBicimlerLay.addLayout(btnHizalaLay)
+        btnBicimlerLay.addWidget(self.yaziListeBicimiCBox)
         btnBicimlerLay.addStretch(1)
 
         lay = QHBoxLayout()
         lay.addWidget(self.fontPointSizeFDSBox_yazidw)
-        lay.addWidget(self.yaziListeBicimiCBox)
+        lay.addWidget(self.fontCBox_yazidw)
         lay.addStretch()
 
         yaziLay.addSpacing(5)
         yaziLay.addLayout(renklerDisLay)
         yaziLay.addSpacing(10)
-        yaziLay.addLayout(btnBicimlerLay)
-        yaziLay.addSpacing(5)
-        yaziLay.addWidget(self.fontCBox_yazidw)
-        yaziLay.addSpacing(5)
         yaziLay.addLayout(lay)
+        yaziLay.addSpacing(5)
+        yaziLay.addLayout(btnBicimlerLay)
         yaziLay.addStretch()
         #######################################################################
         #######################################################################
+
+        self.grpBtnCizgiTipi = QButtonGroup(self.yaziGrupW)
+        self.grpBtnCizgiTipi.buttonClicked.connect(lambda x: self.act_cizgi_tipi_degistir(x.cizgiTipi))
+
+        self.btnCizgiTipiYok = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
+        self.btnCizgiTipiYok.setIcon(QIcon(':icons/cizgi-yok.png'))
+        self.btnCizgiTipiYok.cizgiTipi = Qt.PenStyle.NoPen
+        self.btnCizgiTipiYok.setFlat(True)
+        self.btnCizgiTipiYok.setCheckable(True)
+        self.btnCizgiTipiYok.setChecked(True)
+
+        self.btnCizgiTipiDuz = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
+        self.btnCizgiTipiDuz.setIcon(QIcon(':icons/cizgi-duz.png'))
+        self.btnCizgiTipiDuz.cizgiTipi = Qt.PenStyle.SolidLine
+        self.btnCizgiTipiDuz.setFlat(True)
+        self.btnCizgiTipiDuz.setCheckable(True)
+
+        self.btnCizgiTipiNoktali = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
+        self.btnCizgiTipiNoktali.setIcon(QIcon(':icons/cizgi-noktali.png'))
+        self.btnCizgiTipiNoktali.cizgiTipi = Qt.PenStyle.DotLine
+        self.btnCizgiTipiNoktali.setFlat(True)
+        self.btnCizgiTipiNoktali.setCheckable(True)
+
+        self.btnCizgiTipiCizgili = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
+        self.btnCizgiTipiCizgili.setIcon(QIcon(':icons/cizgi-cizgili.png'))
+        self.btnCizgiTipiCizgili.cizgiTipi = Qt.PenStyle.DashLine
+        self.btnCizgiTipiCizgili.setFlat(True)
+        self.btnCizgiTipiCizgili.setCheckable(True)
+
+        self.btnCizgiTipiCizgiNokta = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
+        self.btnCizgiTipiCizgiNokta.setIcon(QIcon(':icons/cizgi-cizgi-nokta.png'))
+        self.btnCizgiTipiCizgiNokta.cizgiTipi = Qt.PenStyle.DashDotLine
+        self.btnCizgiTipiCizgiNokta.setFlat(True)
+        self.btnCizgiTipiCizgiNokta.setCheckable(True)
+
+        self.btnCizgiTipiCizgi2Nokta = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
+        self.btnCizgiTipiCizgi2Nokta.setIcon(QIcon(':icons/cizgi-cizgi-2nokta.png'))
+        self.btnCizgiTipiCizgi2Nokta.cizgiTipi = Qt.PenStyle.DashDotDotLine
+        self.btnCizgiTipiCizgi2Nokta.setFlat(True)
+        self.btnCizgiTipiCizgi2Nokta.setCheckable(True)
+
+        self.grpBtnCizgiTipi.addButton(self.btnCizgiTipiYok)
+        self.grpBtnCizgiTipi.addButton(self.btnCizgiTipiDuz)
+        self.grpBtnCizgiTipi.addButton(self.btnCizgiTipiNoktali)
+        self.grpBtnCizgiTipi.addButton(self.btnCizgiTipiCizgili)
+        self.grpBtnCizgiTipi.addButton(self.btnCizgiTipiCizgiNokta)
+        self.grpBtnCizgiTipi.addButton(self.btnCizgiTipiCizgi2Nokta)
 
         # ---------------------------------------------------------------------
         # def olustur_cizgi_ozellikleriDW(self):
         # ---------------------------------------------------------------------
         # ---- cizgi tipi -----------------------------------------------------------------
-        cizgiTipiLabel = QLabel(self.tr("Line Type"), self.cizgiGrupW)
-        cizgiTipiLabel.setFixedWidth(67)
-        self.cizgiTipiCBox = ComboBox(self.cizgiGrupW)
-        self.cizgiTipiCBox.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.cizgiTipiCBox.setIconSize(QSize(100, 15))
-        self.cizgiTipiCBox.addItem(self.tr("      No Line"), userData=Qt.PenStyle.NoPen)
-        self.cizgiTipiCBox.addItem(QIcon(':icons/line_solid.png'), "", userData=Qt.PenStyle.SolidLine)
-        self.cizgiTipiCBox.addItem(QIcon(':icons/line_dotted.png'), "", userData=Qt.PenStyle.DotLine)
-        self.cizgiTipiCBox.addItem(QIcon(':icons/line_dashed.png'), "", userData=Qt.PenStyle.DashLine)
-        self.cizgiTipiCBox.addItem(QIcon(':icons/line_dash_dot.png'), "", userData=Qt.PenStyle.DashDotLine)
-        self.cizgiTipiCBox.addItem(QIcon(':icons/line_dash_dot_dot.png'), "", userData=Qt.PenStyle.DashDotDotLine)
-        self.cizgiTipiCBox.setCurrentIndex(1)
-        # self.cizgiTipiCBox.activated.connect(self.act_cizgi_tipi_degistir)
-        self.cizgiTipiCBox.currentIndexChangedFromComboBoxGuiNotBySetCurrentIndex[int].connect(
-            lambda x: self.act_cizgi_tipi_degistir(self.cizgiTipiCBox.itemData(x, Qt.ItemDataRole.UserRole)))
 
         cizgiTipiLayout = QHBoxLayout()
-        cizgiTipiLayout.addWidget(cizgiTipiLabel)
-        cizgiTipiLayout.addWidget(self.cizgiTipiCBox)
+        cizgiTipiLayout.setSpacing(3)
+        cizgiTipiLayout.addWidget(self.btnCizgiTipiYok)
+        cizgiTipiLayout.addWidget(self.btnCizgiTipiDuz)
+        cizgiTipiLayout.addWidget(self.btnCizgiTipiNoktali)
+        cizgiTipiLayout.addWidget(self.btnCizgiTipiCizgili)
+        cizgiTipiLayout.addWidget(self.btnCizgiTipiCizgiNokta)
+        cizgiTipiLayout.addWidget(self.btnCizgiTipiCizgi2Nokta)
+        cizgiTipiLayout.addStretch()
 
         # ---- cizgi birlesim tipi -----------------------------------------------------------------
-        cizgiBirlesimTipiLabel = QLabel(self.tr("Join Style"), self.cizgiGrupW)
-        cizgiBirlesimTipiLabel.setFixedWidth(67)
-        self.cizgiBirlesimTipiCBox = ComboBox(self.cizgiGrupW)
-        self.cizgiBirlesimTipiCBox.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.cizgiBirlesimTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Round"),
-                                           userData=Qt.PenJoinStyle.RoundJoin)  # Yuvarlak
-        self.cizgiBirlesimTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Miter"),
-                                           userData=Qt.PenJoinStyle.MiterJoin)  # Sivri
-        self.cizgiBirlesimTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Bevel"),
-                                           userData=Qt.PenJoinStyle.BevelJoin)  # Kırpık
-        self.cizgiBirlesimTipiCBox.currentIndexChangedFromComboBoxGuiNotBySetCurrentIndex[int].connect(
-            lambda x: self.act_cizgi_birlesim_tipi_degistir(self.cizgiBirlesimTipiCBox.itemData(x, Qt.ItemDataRole.UserRole)))
+        self.grpBtnCizgiBirlesimTipi = QButtonGroup(self.yaziGrupW)
+        self.grpBtnCizgiBirlesimTipi.buttonClicked.connect(lambda x: self.act_cizgi_birlesim_tipi_degistir(x.cizgiBirlesimTipi))
+
+        self.btnCizgiBirlesimTipiSivri = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
+        self.btnCizgiBirlesimTipiSivri.setIcon(QIcon(':icons/cizgi-birlesim-sivri.png'))
+        self.btnCizgiBirlesimTipiSivri.cizgiBirlesimTipi = Qt.PenJoinStyle.MiterJoin
+        self.btnCizgiBirlesimTipiSivri.setFlat(True)
+        self.btnCizgiBirlesimTipiSivri.setCheckable(True)
+        self.btnCizgiBirlesimTipiSivri.setChecked(True)
+
+        self.btnCizgiBirlesimTipiYuvarlak = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
+        self.btnCizgiBirlesimTipiYuvarlak.setIcon(QIcon(':icons/cizgi-birlesim-yuvarlak.png'))
+        self.btnCizgiBirlesimTipiYuvarlak.cizgiBirlesimTipi = Qt.PenJoinStyle.RoundJoin
+        self.btnCizgiBirlesimTipiYuvarlak.setFlat(True)
+        self.btnCizgiBirlesimTipiYuvarlak.setCheckable(True)
+
+        self.btnCizgiBirlesimTipiKirpik = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
+        self.btnCizgiBirlesimTipiKirpik.setIcon(QIcon(':icons/cizgi-birlesim-kirpik.png'))
+        self.btnCizgiBirlesimTipiKirpik.cizgiBirlesimTipi = Qt.PenJoinStyle.BevelJoin
+        self.btnCizgiBirlesimTipiKirpik.setFlat(True)
+        self.btnCizgiBirlesimTipiKirpik.setCheckable(True)
+
+        self.grpBtnCizgiBirlesimTipi.addButton(self.btnCizgiBirlesimTipiSivri)
+        self.grpBtnCizgiBirlesimTipi.addButton(self.btnCizgiBirlesimTipiYuvarlak)
+        self.grpBtnCizgiBirlesimTipi.addButton(self.btnCizgiBirlesimTipiKirpik)
 
         cizgiBirlesimTipiLayout = QHBoxLayout()
-        cizgiBirlesimTipiLayout.addWidget(cizgiBirlesimTipiLabel)
-        cizgiBirlesimTipiLayout.addWidget(self.cizgiBirlesimTipiCBox)
+        cizgiBirlesimTipiLayout.addWidget(self.btnCizgiBirlesimTipiSivri)
+        cizgiBirlesimTipiLayout.addWidget(self.btnCizgiBirlesimTipiYuvarlak)
+        cizgiBirlesimTipiLayout.addWidget(self.btnCizgiBirlesimTipiKirpik)
+        cizgiBirlesimTipiLayout.addStretch()
 
         # ---- cizgi ucu tipi -----------------------------------------------------------------
-        cizgiUcuTipiLabel = QLabel(self.tr("Cap Style"), self.cizgiGrupW)
-        cizgiUcuTipiLabel.setFixedWidth(67)
-        self.cizgiUcuTipiCBox = ComboBox(self.cizgiGrupW)
-        self.cizgiUcuTipiCBox.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.cizgiUcuTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Flat"), userData=Qt.PenCapStyle.FlatCap)
-        self.cizgiUcuTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Square"), userData=Qt.PenCapStyle.SquareCap)
-        self.cizgiUcuTipiCBox.addItem(QIcon(':icons/line_solid.png'), self.tr("Round"), userData=Qt.PenCapStyle.RoundCap)
-        self.cizgiUcuTipiCBox.currentIndexChangedFromComboBoxGuiNotBySetCurrentIndex[int].connect(
-            lambda x: self.act_cizgi_ucu_tipi_degistir(self.cizgiUcuTipiCBox.itemData(x, Qt.ItemDataRole.UserRole)))
+        self.grpBtnCizgiUcuTipi = QButtonGroup(self.yaziGrupW)
+        self.grpBtnCizgiUcuTipi.buttonClicked.connect(lambda x: self.act_cizgi_ucu_tipi_degistir(x.cizgiUcuTipi))
+
+        self.btnCizgiUcuTipiDuz = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
+        self.btnCizgiUcuTipiDuz.setIcon(QIcon(':icons/cizgi-ucu-duz.png'))
+        self.btnCizgiUcuTipiDuz.cizgiUcuTipi = Qt.PenCapStyle.FlatCap
+        self.btnCizgiUcuTipiDuz.setFlat(True)
+        self.btnCizgiUcuTipiDuz.setCheckable(True)
+        self.btnCizgiUcuTipiDuz.setChecked(True)
+
+        self.btnCizgiUcuTipiKare = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
+        self.btnCizgiUcuTipiKare.setIcon(QIcon(':icons/cizgi-ucu-kare.png'))
+        self.btnCizgiUcuTipiKare.cizgiUcuTipi = Qt.PenCapStyle.SquareCap
+        self.btnCizgiUcuTipiKare.setFlat(True)
+        self.btnCizgiUcuTipiKare.setCheckable(True)
+
+        self.btnCizgiUcuTipiYuvarlak = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
+        self.btnCizgiUcuTipiYuvarlak.setIcon(QIcon(':icons/cizgi-ucu-yuvarlak.png'))
+        self.btnCizgiUcuTipiYuvarlak.cizgiUcuTipi = Qt.PenCapStyle.RoundCap
+        self.btnCizgiUcuTipiYuvarlak.setFlat(True)
+        self.btnCizgiUcuTipiYuvarlak.setCheckable(True)
+
+        self.grpBtnCizgiUcuTipi.addButton(self.btnCizgiUcuTipiDuz)
+        self.grpBtnCizgiUcuTipi.addButton(self.btnCizgiUcuTipiKare)
+        self.grpBtnCizgiUcuTipi.addButton(self.btnCizgiUcuTipiYuvarlak)
 
         cizgiUcuTipiLayout = QHBoxLayout()
-        cizgiUcuTipiLayout.addWidget(cizgiUcuTipiLabel)
-        cizgiUcuTipiLayout.addWidget(self.cizgiUcuTipiCBox)
+        cizgiUcuTipiLayout.addWidget(self.btnCizgiUcuTipiDuz)
+        cizgiUcuTipiLayout.addWidget(self.btnCizgiUcuTipiKare)
+        cizgiUcuTipiLayout.addWidget(self.btnCizgiUcuTipiYuvarlak)
+        cizgiUcuTipiLayout.addStretch()
 
         # ---- cizgi kalinligi -----------------------------------------------------------------
         self.cizgiKalinligiDSliderWithDSBox = SliderDoubleWithDoubleSpinBox(yerlesim=Qt.Orientation.Horizontal,
@@ -665,7 +735,7 @@ class DefterAnaPencere(QMainWindow):
         self.cizgiKalinligiDSliderWithDSBox_tbar.degerDegisti.connect(
             lambda x: self.cizgiKalinligiDSliderWithDSBox.setValue(x * 10))
 
-        cizgiOzellikleriniSifirlaBtn = QPushButton(self.tr("Reset"), self.cizgiGrupW)
+        cizgiOzellikleriniSifirlaBtn = PushButton("0", genislik=16, yukseklik=16, parent=self.cizgiGrupW)
         cizgiOzellikleriniSifirlaBtn.clicked.connect(self.act_cizgi_ozelliklerini_sifirla)
 
         self.cizgiRengiBtn = PushButtonRenk("", 40, 20, self.cScene.aktifArac.cizgiRengi, self.cizgiGrupW)
@@ -689,14 +759,18 @@ class DefterAnaPencere(QMainWindow):
         renklerDisLay.addLayout(renklerSatirlarLay)
         renklerDisLay.addStretch()
 
+        altBtnLay = QHBoxLayout()
+        altBtnLay.addWidget(cizgiOzellikleriniSifirlaBtn)
+        altBtnLay.addLayout(cizgiTipiLayout)
+        altBtnLay.addLayout(cizgiBirlesimTipiLayout)
+        altBtnLay.addLayout(cizgiUcuTipiLayout)
+
         cizgiLay.addSpacing(5)
         cizgiLay.addLayout(renklerDisLay)
         cizgiLay.addSpacing(5)
         cizgiLay.addWidget(self.cizgiKalinligiDSliderWithDSBox)
-        cizgiLay.addLayout(cizgiTipiLayout)
-        cizgiLay.addLayout(cizgiBirlesimTipiLayout)
-        cizgiLay.addLayout(cizgiUcuTipiLayout)
-        cizgiLay.addWidget(cizgiOzellikleriniSifirlaBtn)
+        cizgiLay.addLayout(altBtnLay)
+
         cizgiLay.addStretch()
         # anaLay.addStretch()
 
@@ -7868,8 +7942,6 @@ class DefterAnaPencere(QMainWindow):
     # @Slot(Qt.PenStyle)
     def act_cizgi_tipi_degistir(self, penStyle_int):
 
-        # activated kullanirsak
-        # lineStyle = Qt.PenStyle(self.cizgiTipiCBox.itemData(self.cizgiTipiCBox.currentIndex(), Qt.UserRole))
         lineStyle = Qt.PenStyle(penStyle_int)
 
         if self.cScene.selectionQueue:
@@ -7968,9 +8040,9 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.undoStack.endMacro()
 
         else:
-            self.cizgiTipiCBox.setCurrentIndex(1)
-            self.cizgiBirlesimTipiCBox.setCurrentIndex(0)
-            self.cizgiUcuTipiCBox.setCurrentIndex(0)
+            self.btnCizgiTipiDuz.setChecked(True)
+            self.btnCizgiBirlesimTipiSivri.setChecked(True)
+            self.btnCizgiUcuTipiDuz.setChecked(True)
             self.change_line_widthF(0)
 
             self.cScene.aktifArac.kalem = QPen(self.cScene.aktifArac.cizgiRengi,
@@ -8162,9 +8234,21 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def change_line_style_options(self, pen):
-        self.cizgiTipiCBox.setCurrentIndex(self.cizgiTipiCBox.findData(pen.style(), Qt.ItemDataRole.UserRole))
-        self.cizgiBirlesimTipiCBox.setCurrentIndex(self.cizgiBirlesimTipiCBox.findData(pen.joinStyle(), Qt.ItemDataRole.UserRole))
-        self.cizgiUcuTipiCBox.setCurrentIndex(self.cizgiUcuTipiCBox.findData(pen.capStyle(), Qt.ItemDataRole.UserRole))
+        for btn in self.grpBtnCizgiTipi.buttons():
+            if btn.cizgiTipi == pen.style():
+                btn.setChecked(True)
+                break
+
+        for btn in self.grpBtnCizgiBirlesimTipi.buttons():
+            if btn.cizgiBirlesimTipi == pen.joinStyle():
+                btn.setChecked(True)
+                break
+
+        for btn in self.grpBtnCizgiUcuTipi.buttons():
+            if btn.cizgiUcuTipi == pen.capStyle():
+                btn.setChecked(True)
+                break
+
         self.change_line_widthF(pen.widthF())
         # self.cizgiKalinligiSlider.setValue(pen.width())
 
@@ -9662,8 +9746,7 @@ class DefterAnaPencere(QMainWindow):
         self.change_transform_box_values(item)
         self.yazi_hizalama_degisti()
         self.karakter_bicimi_degisti()
-        if self.cizgiTipiCBox.isVisible():
-            self.change_line_style_options(item._pen)
+        self.change_line_style_options(item._pen)
         item.update_resize_handles()
 
     # ---------------------------------------------------------------------
@@ -9684,8 +9767,7 @@ class DefterAnaPencere(QMainWindow):
         # self.itemRotationSBox_tbar.setValue(item.angle())
         # rotation change_transform_box_values icinde de var.
         self.change_transform_box_values(item)
-        if self.cizgiTipiCBox.isVisible():
-            self.change_line_style_options(item._pen)
+        self.change_line_style_options(item._pen)
 
     # ---------------------------------------------------------------------
     def path_item_selected(self, item):
@@ -9706,8 +9788,7 @@ class DefterAnaPencere(QMainWindow):
         self.itemRotationSBox_nesnedw.setValue(item.rotation())
         self.yazi_hizalama_degisti()
         self.karakter_bicimi_degisti()
-        if self.cizgiTipiCBox.isVisible():
-            self.change_line_style_options(item._pen)
+        self.change_line_style_options(item._pen)
 
     # ---------------------------------------------------------------------
     # @Slot(QGraphicsTextItem)
@@ -9733,8 +9814,7 @@ class DefterAnaPencere(QMainWindow):
         self.itemRotationSBox_nesnedw.setValue(item.rotation())
         self.yazi_hizalama_degisti()
         self.karakter_bicimi_degisti()
-        if self.cizgiTipiCBox.isVisible():
-            self.change_line_style_options(item._pen)
+        self.change_line_style_options(item._pen)
         item.update_resize_handles()
 
     # ---------------------------------------------------------------------
@@ -9755,8 +9835,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.itemRotationSBox_tbar.setValue(group.rotation())
         self.itemRotationSBox_nesnedw.setValue(group.rotation())
-        if self.cizgiTipiCBox.isVisible():
-            self.change_line_style_options(group._pen)
+        self.change_line_style_options(group._pen)
 
     # ---------------------------------------------------------------------
     def group_item_deselected(self, group):
