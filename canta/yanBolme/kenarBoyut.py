@@ -73,7 +73,7 @@ class KenarBoyutSol(QFrame):
             # self.splitterW.setFixedWidth(width)
 
             for i in range(self.splitterW.count()):
-                self.splitterW.widget(i).setMinimumWidth(width)
+                self.splitterW.widget(i).setMinimumWidthVeEskiMinimumSize(width)
 
     # # ---------------------------------------------------------------------
     # def genislikleri_esitle(self):
@@ -141,4 +141,4 @@ class KenarBoyutSag(KenarBoyutSol):
             # self.splitterW.setFixedWidth(width)
 
             for i in range(self.splitterW.count()):
-                self.splitterW.widget(i).setMinimumWidth(width)
+                self.splitterW.widget(i).setMinimumWidthVeEskiMinimumSize(width)

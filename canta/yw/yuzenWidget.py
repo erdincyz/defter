@@ -209,11 +209,10 @@ class YuzenWidget(QWidget):
             self.buyult()
 
     # ---------------------------------------------------------------------
-    def setMinimumSize(self, *args):
-        if not type(args) is QSize:
-            args = QSize(*args)
-        self.eskiMinimumSize = args
-        super(YuzenWidget, self).setMinimumSize(args)
+    def setMinimumWidthVeEskiMinimumSize(self, width):
+        # metod override ozellikle yapilmadi
+        self.setMinimumWidth(width)
+        self.eskiMinimumSize = self.minimumSize()
 
     # ---------------------------------------------------------------------
     def moveEvent(self, event):
@@ -363,6 +362,10 @@ class YuzenWidget(QWidget):
             self.eskiSize = self.size()
             self.icerikScroll.hide()
             self.btnKucult.setText(">")
+            if self.dikey_mi:
+                self.setMinimumWidth(20)
+            else:
+                self.setMinimumHeight(20)
             self.adjustSize()
 
     # ---------------------------------------------------------------------
