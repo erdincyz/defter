@@ -100,37 +100,37 @@ class KutuphaneNesnesi(QGraphicsItem):
             self.pixmap = QPixmap(self.filePathForDraw).scaledToWidth(45, Qt.TransformationMode.FastTransformation)
 
 
-#     # ---------------------------------------------------------------------
-#     def _pixmap_olustur_eski(self):
-#
-#
-#         # # self.pixmap = pixmap
-#         # self.pixmap = QPixmap()
-#         # if not QPixmapCache.find(self.filePathForDraw, self.pixmap):
-#         #     self.pixmap = QPixmap(self.filePathForDraw)
-#         #     QPixmapCache.insert(self.filePathForDraw, self.pixmap)
-#         #
-#         # # self.pixmap = QPixmap(self.filePathForDraw)
-#
-#         # self.pixmap = pixmap
-#         # self.pixmap = QPixmap()
-#         # print(QPixmapCache.cacheLimit())
-#         # self.pixmap = QPixmapCache.find(self.filePathForDraw, self.pixmap)
-#         self.pixmap = QPixmapCache.find(self.filePathForDraw)
-#         if not self.pixmap:
-#             # print("asdasd")
-#             # viewRectSize = self.scene().views()[0].get_visible_rect().size().toSize()
-#             # self.pixMap = QPixmap(self.filePathForDraw).scaled(viewRectSize / 1.5, Qt.KeepAspectRatio)
-#             if self.tip == shared.VIDEO_ITEM_TYPE or self.tip == shared.DOSYA_ITEM_TYPE:
-#                 iconProvider = QFileIconProvider()
-#                 self.ikon = iconProvider.icon(QFileInfo(dosya_adresi))
-#                 # self.pixmap = self.ikon.pixmap(self._rect.toRect().size())
-#                 self.pixmap = self.ikon.pixmap(QSize(45, 45))
-#             else:
-#                 self.pixmap = QPixmap(self.filePathForDraw).scaledToWidth(45, Qt.TransformationMode.FastTransformation)
-#             QPixmapCache.insert(self.filePathForDraw, self.pixmap)
-#         else:
-#             self.pixmap = self.pixmap.scaledToWidth(45, Qt.TransformationMode.FastTransformation)
+    # # ---------------------------------------------------------------------
+    # def _pixmap_olustur_eski(self):
+    #
+    #
+    #     # # self.pixmap = pixmap
+    #     # self.pixmap = QPixmap()
+    #     # if not QPixmapCache.find(self.filePathForDraw, self.pixmap):
+    #     #     self.pixmap = QPixmap(self.filePathForDraw)
+    #     #     QPixmapCache.insert(self.filePathForDraw, self.pixmap)
+    #     #
+    #     # # self.pixmap = QPixmap(self.filePathForDraw)
+    #
+    #     # self.pixmap = pixmap
+    #     # self.pixmap = QPixmap()
+    #     # print(QPixmapCache.cacheLimit())
+    #     # self.pixmap = QPixmapCache.find(self.filePathForDraw, self.pixmap)
+    #     self.pixmap = QPixmapCache.find(self.filePathForDraw)
+    #     if not self.pixmap:
+    #         # print("asdasd")
+    #         # viewRectSize = self.scene().views()[0].get_visible_rect().size().toSize()
+    #         # self.pixMap = QPixmap(self.filePathForDraw).scaled(viewRectSize / 1.5, Qt.KeepAspectRatio)
+    #         if self.tip == shared.VIDEO_ITEM_TYPE or self.tip == shared.DOSYA_ITEM_TYPE:
+    #             iconProvider = QFileIconProvider()
+    #             self.ikon = iconProvider.icon(QFileInfo(dosya_adresi))
+    #             # self.pixmap = self.ikon.pixmap(self._rect.toRect().size())
+    #             self.pixmap = self.ikon.pixmap(QSize(45, 45))
+    #         else:
+    #             self.pixmap = QPixmap(self.filePathForDraw).scaledToWidth(45, Qt.TransformationMode.FastTransformation)
+    #         QPixmapCache.insert(self.filePathForDraw, self.pixmap)
+    #     else:
+    #         self.pixmap = self.pixmap.scaledToWidth(45, Qt.TransformationMode.FastTransformation)
 
     # ---------------------------------------------------------------------
     def _onizleme_pixmap_olustur(self):

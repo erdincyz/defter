@@ -33,9 +33,6 @@ class Eleman:
 
 ########################################################################
 class SahneKutuphane(QGraphicsScene):
-    # clean_changed = Signal(bool)
-    # itemMoved = Signal(QGraphicsItem, QPointF)
-    # textItemSelected = Signal(QGraphicsTextItem)
 
     # ---------------------------------------------------------------------
     def __init__(self, aktif_sahne, sayfalar, tempDirPath, parent=None):
@@ -234,6 +231,8 @@ class SahneKutuphane(QGraphicsScene):
                 pos.setY(pos.y() + 50)
             sayac += 1
 
+        self.setSceneRect(0, 0, 250, pos.y())
+
     # ---------------------------------------------------------------------
     def _dosyalari_goster(self, kume, isEmbeded, pozisyonSifirla=True):
 
@@ -258,6 +257,10 @@ class SahneKutuphane(QGraphicsScene):
             sayac += 1
 
         self.enSonElemanPos = pos
+
+        # self.setSceneRect(self.itemsBoundingRect())
+        # self.views()[0].zoomToFit()
+        self.setSceneRect(0, 0, 250, pos.y())
 
     # ---------------------------------------------------------------------
     def belgedeki_linkli_ve_gomulu_dosyalari_goster(self):
@@ -305,6 +308,8 @@ class SahneKutuphane(QGraphicsScene):
                 pos.setY(pos.y() + 50)
             sayac += 1
 
+        self.setSceneRect(0, 0, 250, pos.y())
+
     # ---------------------------------------------------------------------
     def belgede_kullanilmayan_gomulu_dosyalari_goster(self):
         self.belge_olceginde_islem_yap = True
@@ -327,6 +332,8 @@ class SahneKutuphane(QGraphicsScene):
                 pos.setX(5)
                 pos.setY(pos.y() + 50)
             sayac += 1
+
+        self.setSceneRect(0, 0, 250, pos.y())
 
     # ---------------------------------------------------------------------
     def kullanilmayanlari_isaretle(self):
@@ -407,3 +414,5 @@ class SahneKutuphane(QGraphicsScene):
                 pos.setX(5)
                 pos.setY(pos.y() + 50)
             sayac += 1
+
+        self.setSceneRect(0, 0, 250, pos.y())

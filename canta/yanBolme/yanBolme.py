@@ -122,7 +122,8 @@ class YanBolme(QFrame):
             yw.sira = self.icerikSplitter.count()
             self.icerikSplitter.addWidget(yw)
             yw.resize(yw.eskiSize)
-        self.kenarBoyutWidget.genislikleri_esitle()
+
+        # self.kenarBoyutWidget.genislikleri_esitle()
 
         dugme.renk_degistir(acik_mi=not yw.kucuk_mu)
 

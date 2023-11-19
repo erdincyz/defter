@@ -7,7 +7,7 @@ __author__ = 'Erdinç Yılmaz'
 
 from PySide6.QtCore import Qt, QPoint, QSize, Signal, QMimeData
 from PySide6.QtGui import QColor, QDrag, QPixmap
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QSizePolicy, QScrollArea
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QScrollArea
 
 from canta.yanBolme.dikeyEtiket import DikeyEtiket
 
@@ -26,6 +26,7 @@ class YuzenWidget(QWidget):
         self.eskiYuzenPos = QPoint(0, 0)
         self.eskiSize = self.size()
         self.setMinimumSize(100, 100)
+        self.eskiMinimumSize = self.minimumSize()
 
         self.kucuk_mu = False
         self.dikey_mi = False
@@ -208,6 +209,13 @@ class YuzenWidget(QWidget):
             self.buyult()
 
     # ---------------------------------------------------------------------
+    def setMinimumSize(self, *args):
+        if not type(args) is QSize:
+            args = QSize(*args)
+        self.eskiMinimumSize = args
+        super(YuzenWidget, self).setMinimumSize(args)
+
+    # ---------------------------------------------------------------------
     def moveEvent(self, event):
         if self.kucuk_mu:
             # self.parkPos = event.oldPos()
@@ -278,7 +286,7 @@ class YuzenWidget(QWidget):
         self.cubukta_mi = False
         self.move(self.eskiYuzenPos)
         self.resize(self.eskiSize)
-        # self.adjustSize()
+        self.adjustSize()
 
     # ---------------------------------------------------------------------
     def kenara_al_veya_kapat(self):
@@ -304,7 +312,7 @@ class YuzenWidget(QWidget):
 
     # ---------------------------------------------------------------------
     def dikey_dondur(self):
-        self.setMinimumSize(20, self.minimumSize().height())
+        self.setMinimumWidth(20)
         self.dikey_mi = True
         self.baslikEtiket.dikey = True
         self.baslikEtiket.setFixedSize(16777215, 16777215)
@@ -322,7 +330,7 @@ class YuzenWidget(QWidget):
 
     # ---------------------------------------------------------------------
     def yatay_dondur(self):
-        self.setMinimumSize(self.minimumSize().width(), 20)
+        self.setMinimumHeight(20)
         self.dikey_mi = False
         self.baslikEtiket.dikey = False
         self.baslikEtiket.setFixedSize(16777215, 16777215)
@@ -353,10 +361,6 @@ class YuzenWidget(QWidget):
             #     self.dikey_dondur()
         else:
             self.eskiSize = self.size()
-            if self.dikey_mi:
-                self.setMinimumWidth(20)
-            else:
-                self.setMinimumHeight(20)
             self.icerikScroll.hide()
             self.btnKucult.setText(">")
             self.adjustSize()
@@ -379,6 +383,7 @@ class YuzenWidget(QWidget):
         #         self.anaLay.setDirection(QVBoxLayout.Direction.BottomToTop)
 
         self.kucuk_mu = False
+        self.setMinimumSize(self.eskiMinimumSize)
         if self.cubukta_mi:
             self.show()
             self.dugme.renk_degistir(acik_mi=True)
@@ -386,7 +391,7 @@ class YuzenWidget(QWidget):
             self.icerikScroll.show()
             self.btnKucult.setText("<")
             self.resize(self.eskiSize)
-            # self.adjustSize()
+            self.adjustSize()
 
     # ---------------------------------------------------------------------
     def kucult_buyult(self):
@@ -487,7 +492,6 @@ class YuzenWidget(QWidget):
                 self.render(pixmap)
                 # drag.setHotSpot(QPoint(pixmap.width()/2, pixmap.height()))
                 drag.setHotSpot(event.pos() - self.rect().topLeft())
-                # drag.setHotSpot(self.mPos)
                 drag.setPixmap(pixmap)
 
                 drag.exec(Qt.DropAction.MoveAction)

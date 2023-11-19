@@ -34,7 +34,7 @@ class EkranKutuphane(QGraphicsView):
 
         # self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
 
-        self.pan = False
+        self.panStartPos = None
 
         # self.background = QPixmap('/pictures/rig.jpg')
         # self.backgroundImage = None
@@ -52,15 +52,15 @@ class EkranKutuphane(QGraphicsView):
     # def scrollContentsBy(self, p_int, p_int_1):
     #     pass
 
-    # ---------------------------------------------------------------------
-    def resizeEvent(self, QResizeEvent):
-
-        # self.scene().setSceneRect(self.get_visible_rect())
-        # self.scene().setSceneRect(self.get_visible_rect())
-        vrect = self.viewport().rect()
-        self.scene().setSceneRect(QRectF(0, 0, vrect.width(), vrect.height()))
-
-        super(EkranKutuphane, self).resizeEvent(QResizeEvent)
+    # # ---------------------------------------------------------------------
+    # def resizeEvent(self, QResizeEvent):
+    #
+    #     # self.scene().setSceneRect(self.get_visible_rect())
+    #     # self.scene().setSceneRect(self.get_visible_rect())
+    #     vrect = self.viewport().rect()
+    #     self.scene().setSceneRect(QRectF(0, 0, vrect.width(), vrect.height()))
+    #
+    #     super(EkranKutuphane, self).resizeEvent(QResizeEvent)
 
     # ---------------------------------------------------------------------
     def contextMenuEvent(self, event):
@@ -164,11 +164,10 @@ class EkranKutuphane(QGraphicsView):
         if event.button() == Qt.MouseButton.MiddleButton:
             # if not self.scene().selectedItems():
             # if not self.itemAt(event.pos()):
-            self.pan = True
-            self.panStartX = event.x()
-            self.panStartY = event.y()
+            self.panStartPos = event.pos()
             self.setCursor(Qt.CursorShape.ClosedHandCursor)
             event.accept()
+            return
 
         super(EkranKutuphane, self).mousePressEvent(event)
         # return QGraphicsView.mousePressEvent(self, event)
@@ -178,8 +177,9 @@ class EkranKutuphane(QGraphicsView):
 
         if event.button() == Qt.MouseButton.MiddleButton:
             self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
-            self.pan = False
+            self.panStartPos = None
             self.setCursor(Qt.CursorShape.ArrowCursor)
+            self.setSceneRect(self.sceneRect().united(self.scene().itemsBoundingRect()))
             event.accept()
 
         super(EkranKutuphane, self).mouseReleaseEvent(event)
@@ -187,12 +187,24 @@ class EkranKutuphane(QGraphicsView):
     # ---------------------------------------------------------------------
     def mouseMoveEvent(self, event):
 
-        if self.pan:
+        if self.panStartPos:
+            # normal gezinme , sahne boyutlarini degistirmez. scroll bar sonlari sinirdir.
+            # alt kisim eklenince, islevi biraz degisti, bu olmazsa sadece alt kisim varsa ve sahnede scrollbar varsa
+            # sahnede gezinirken scrollbarlar bitene kadar sahne sabit kaliyor sonra gezinme basliyor.
             self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
-            self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - (event.x() - self.panStartX))
-            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - (event.y() - self.panStartY))
-            self.panStartX = event.x()
-            self.panStartY = event.y()
+            self.horizontalScrollBar().setValue(
+                self.horizontalScrollBar().value() - (event.x() - self.panStartPos.x()))
+            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - (event.y() - self.panStartPos.y()))
+
+            # bu sonradan eklendi ve de bununla beraber,
+            # mouse release eklendi- > self.setSceneRect(self.sceneRect().united(self.scene().itemsBoundingRect()))
+            transform = self.transform()
+            deltaX = (self.panStartPos.x() - event.x()) / transform.m11()
+            deltaY = (self.panStartPos.y() - event.y()) / transform.m22()
+            self.setSceneRect(self.sceneRect().translated(deltaX, deltaY))
+
+            self.panStartPos = event.pos()
+
             event.accept()
 
         super(EkranKutuphane, self).mouseMoveEvent(event)
@@ -214,6 +226,14 @@ class EkranKutuphane(QGraphicsView):
         else:
             super(EkranKutuphane, self).wheelEvent(event)
         # superi cagirmayalim cunku scrool bar move ediyor normalde wheel
+
+    # ---------------------------------------------------------------------
+    def setDragModeRubberBandDrag(self):
+        self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
+
+    # ---------------------------------------------------------------------
+    def setDragModeNoDrag(self):
+        self.setDragMode(QGraphicsView.DragMode.NoDrag)
 
     # ---------------------------------------------------------------------
     @Slot()

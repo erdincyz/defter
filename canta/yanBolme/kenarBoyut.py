@@ -75,11 +75,11 @@ class KenarBoyutSol(QFrame):
             for i in range(self.splitterW.count()):
                 self.splitterW.widget(i).setMinimumWidth(width)
 
-    # ---------------------------------------------------------------------
-    def genislikleri_esitle(self):
-        if self.splitterW.count() > 1:
-            for i in range(self.splitterW.count()):
-                self.splitterW.widget(i).setMinimumWidth(self.splitterW.width())
+    # # ---------------------------------------------------------------------
+    # def genislikleri_esitle(self):
+    #     if self.splitterW.count() > 1:
+    #         for i in range(self.splitterW.count()):
+    #             self.splitterW.widget(i).setMinimumWidth(self.splitterW.width())
 
     # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
