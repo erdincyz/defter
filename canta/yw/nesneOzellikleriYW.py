@@ -93,6 +93,7 @@ class NesneOzellikleriYW(YuzenWidget):
 
         self.setMinimumWidth(100)
         self.setMinimumHeight(20)
+        self.setMinimumSize(300, 190)
         # self.setMinimumSize(280, 165)
         temelW.setMinimumSize(280, 165)
         self.adjustSize()
