@@ -77,6 +77,7 @@ class NesneOzellikleriYW(YuzenWidget):
         self.cizgiKalinligiDSlider.setSingleStep(0.1)
         self.cizgiKalinligiDSlider.setValue(self.cizgiKalinligi * 10)
         self.cizgiKalinligiDSlider.degerDegisti.connect(lambda x: self.cizgiKalinligiDegisti.emit(x))
+        self.cizgiKalinligiDSlider.hide()
 
         self.renkSecici = RenkSeciciWidget(self.renk, boyut=64, parent=self)
         self.renkSecici.setFocusPolicy(Qt.FocusPolicy.TabFocus)

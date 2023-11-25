@@ -878,6 +878,21 @@ class DefterAnaPencere(QMainWindow):
             self.act_set_item_line_color(renk, renkSecicidenMi=False)
 
     # ---------------------------------------------------------------------
+    def ekrandan_renk_secicide_renk_degisti_ywden(self, renk, bilgi):
+
+        self.log(bilgi, toStatusBarOnly=True)
+
+        if self.nesneOzellikleriYW.renk_tipi == "a":
+            self.cScene.aktifArac.arkaPlanRengi = renk
+            self.act_set_item_background_color(renk, renkSecicidenMi=False)
+        elif self.nesneOzellikleriYW.renk_tipi == "y":
+            self.cScene.aktifArac.yaziRengi = renk
+            self.act_set_item_text_color(renk, renkSecicidenMi=False)
+        elif self.nesneOzellikleriYW.renk_tipi == "c":
+            self.cScene.aktifArac.cizgiRengi = renk
+            self.act_set_item_line_color(renk, renkSecicidenMi=False)
+
+    # ---------------------------------------------------------------------
     def olustur_stillerYW(self):
 
         self.stillerYW = YuzenWidget(kapatilabilir_mi=True, parent=self.centralW)
@@ -4899,7 +4914,7 @@ class DefterAnaPencere(QMainWindow):
         self.nesneOzellikleriYW.arkaPlanRengiDegisti.connect(lambda color: self.act_set_item_background_color(color, renkSecicidenMi=True))
         self.nesneOzellikleriYW.yaziRengiDegisti.connect(lambda color: self.act_set_item_text_color(color, renkSecicidenMi=True))
         self.nesneOzellikleriYW.cizgiRengiDegisti.connect(lambda color: self.act_set_item_line_color(color, renkSecicidenMi=True))
-        self.nesneOzellikleriYW.ekranRenkSeciciDugmesindenRenkDegisti.connect(self.ekrandan_renk_secicide_renk_degisti)
+        self.nesneOzellikleriYW.ekranRenkSeciciDugmesindenRenkDegisti.connect(self.ekrandan_renk_secicide_renk_degisti_ywden)
         self.nesneOzellikleriYW.cizgiKalinligiDegisti.connect(self.act_cizgi_kalinligi_degistir)
         self.nesneOzellikleriYW.cizgiKalinligiDegisti.connect(
             lambda x: self.cizgiKalinligiDSliderWithDSBox_tbar.setValue(x * 10))
