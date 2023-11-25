@@ -8618,7 +8618,7 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def act_secili_nesne_stilini_secili_araca_uygula(self):
 
-        self.cScene.aktifArac.font = self.cScene.activeItem.font()
+        self.cScene.aktifArac.yaziTipi = QFont(self.cScene.activeItem.font())
         self.cScene.aktifArac.kalem = QPen(self.cScene.activeItem._pen)
         self.cScene.aktifArac.arkaPlanRengi = self.cScene.activeItem.arkaPlanRengi
         self.cScene.aktifArac.yaziRengi = self.cScene.activeItem.yaziRengi
@@ -8648,7 +8648,7 @@ class DefterAnaPencere(QMainWindow):
         else:
             arac = self.cScene.SecimAraci
 
-        arac.font = self.cScene.activeItem.font()
+        arac.yaziTipi = QFont(self.cScene.activeItem.font())
         arac.kalem = QPen(self.cScene.activeItem._pen)
         arac.arkaPlanRengi = self.cScene.activeItem.arkaPlanRengi
         arac.yaziRengi = self.cScene.activeItem.yaziRengi
