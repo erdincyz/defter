@@ -6174,7 +6174,7 @@ class DefterAnaPencere(QMainWindow):
                      self.cScene.aktifArac.yaziRengi,
                      self.cScene.aktifArac.arkaPlanRengi,
                      self.cScene.aktifArac.kalem,
-                     self.font(),
+                     self.cScene.aktifArac.yaziTipi,
                      isEmbeded=isEmbeded)
         self.increase_zvalue(item)
         # self.addItem(item)
@@ -6359,7 +6359,7 @@ class DefterAnaPencere(QMainWindow):
                              self.cScene.aktifArac.yaziRengi,
                              self.cScene.aktifArac.arkaPlanRengi,
                              self.cScene.aktifArac.kalem,
-                             self.font(),
+                             self.cScene.aktifArac.yaziTipi,
                              pixmap=None)
         self.increase_zvalue(nesne)
         # self.addItem(item)

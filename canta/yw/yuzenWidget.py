@@ -5,8 +5,8 @@ __project_name__ = 'Defter'
 __date__ = '26/1/22'
 __author__ = 'Erdinç Yılmaz'
 
-from PySide6.QtCore import Qt, QPoint, QSize, Signal, QMimeData
-from PySide6.QtGui import QColor, QDrag, QPixmap
+from PySide6.QtCore import Qt, QPoint, Signal, QMimeData
+from PySide6.QtGui import QColor, QDrag, QPixmap, QPainter, QPen
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QScrollArea
 
 from canta.yanBolme.dikeyEtiket import DikeyEtiket
@@ -407,8 +407,8 @@ class YuzenWidget(QWidget):
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
 
-        # self.kenara_al_veya_kapat()
-        self.kucult_buyult()
+        self.kenara_al_veya_kapat()
+        # self.kucult_buyult()
 
         # if self.cubukta_mi:
         #     self.kenara_al_veya_kapat()
@@ -493,6 +493,13 @@ class YuzenWidget(QWidget):
 
                 pixmap = QPixmap(self.size())
                 self.render(pixmap)
+                painter = QPainter(pixmap)
+                painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Screen)
+                # painter.setOpacity(50)
+                # painter.fillRect(pixmap.rect(), QColor(200, 210, 255))
+                painter.setPen(QPen(QColor(0, 191, 255), 5, Qt.PenStyle.DotLine))
+                painter.drawRect(pixmap.rect())
+                painter.end()
                 # drag.setHotSpot(QPoint(pixmap.width()/2, pixmap.height()))
                 drag.setHotSpot(event.pos() - self.rect().topLeft())
                 drag.setPixmap(pixmap)
@@ -506,3 +513,6 @@ class YuzenWidget(QWidget):
             self.sagClick = False
             self.solClick = False
             self.setCursor(Qt.CursorShape.ArrowCursor)
+
+        # manhattan length yapmak lazım
+        # self.kucult_buyult()
