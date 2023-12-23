@@ -148,6 +148,11 @@ class YuzenWidget(QWidget):
         self.baslikEtiket.setText(yazi)
 
     # ---------------------------------------------------------------------
+    def restoreGeometry(self, geo):
+        super(YuzenWidget, self).restoreGeometry(geo)
+        self.eskiSize = self.size()
+
+    # ---------------------------------------------------------------------
     def ekleWidget(self, widget):
         # self.resize(widget.size())
 
@@ -200,9 +205,11 @@ class YuzenWidget(QWidget):
             # okunup ywler burda guncellenince, dugmeye tiklanmis gibi eski yerlerine yerlestiriyoruz
             self.kenaraAlVeyaKapatTiklandi.emit(self, True)
         else:
-            self.dondur(dikey_dondur=dikey_mi)
+            # self.dondur(dikey_dondur=dikey_mi)
+            if dikey_mi:
+                self.dikey_dondur()
 
-        # degiskene biilgi girildi ama daha kucultulup buyutulmedigi icin terslemiyoruz degiskeni
+        # degiskene bilgi girildi ama daha kucultulup buyutulmedigi icin terslemiyoruz degiskeni
         if self.kucuk_mu:
             self.kucult()
         else:
@@ -407,8 +414,8 @@ class YuzenWidget(QWidget):
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
 
-        self.kenara_al_veya_kapat()
-        # self.kucult_buyult()
+        # self.kenara_al_veya_kapat()
+        self.kucult_buyult()
 
         # if self.cubukta_mi:
         #     self.kenara_al_veya_kapat()

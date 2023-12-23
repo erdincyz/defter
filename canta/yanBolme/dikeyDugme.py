@@ -59,6 +59,7 @@ class DikeyDugme(QPushButton):
             QPushButton{
                 color:#fff;
                 background-color: #99aabb;
+                background-color: #aabcee;
                 border: 0;
                 padding: 3px;
                 border-radius: 3px;
@@ -81,6 +82,7 @@ class DikeyDugme(QPushButton):
             QPushButton{
                 color:#5b5b5b;
                 background-color: #bcbcbc;
+                background-color: #aaa;
                 border: 0;
                 padding: 3px;
                 border-radius: 3px;

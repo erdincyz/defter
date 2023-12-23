@@ -420,7 +420,6 @@ class Scene(QGraphicsScene):
 
         if self.aktifArac == self.KalemAraci:
             if self.pathItem:
-
                 if self.pathItem.path().elementCount() > 1:
                     if self.pathItem.path().elementCount() == 2:
                         kapat = False

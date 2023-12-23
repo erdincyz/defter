@@ -53,7 +53,7 @@ class YanBolme(QFrame):
 
         self.dugmeLay = QVBoxLayout()
         self.dugmeLay.setContentsMargins(0, 0, 0, 0)
-        self.dugmeLay.setSpacing(4)
+        self.dugmeLay.setSpacing(24)
 
         icerikLay = QHBoxLayout()
         icerikLay.setContentsMargins(0, 0, 0, 0)
@@ -105,8 +105,12 @@ class YanBolme(QFrame):
     # ---------------------------------------------------------------------
     def dugme_ve_yw_ekle(self, yazi, yw, yuklenirken_mi):
 
-        dugme = DikeyDugme(yazi, self, "yukari")
-        dugme.setMaximumWidth(15)
+        # dugme = DikeyDugme(yazi, self, "yukari")
+        dugme = DikeyDugme("", self, "yukari")
+        # dugme.setToolTip(yazi)
+        dugme.setStatusTip(yazi)
+        dugme.setMaximumWidth(4)
+        # dugme.setMaximumHeight(100)
         dugme.clicked.connect(self.ac_kapa)
         # dugme.btnYuzdur.clicked.connect(lambda: self.yw_yuzdur(dugme.yw))
         dugme.yw = yw

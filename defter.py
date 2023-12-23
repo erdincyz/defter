@@ -73,7 +73,6 @@ from canta.nesneler.text import Text
 from canta.nesneler.video import VideoItem
 from canta.nesneler.group import Group
 from canta.nesneler.dosya import DosyaNesnesi
-from canta.comboBox import ComboBox
 from canta.fontComboBox import FontComboBox
 from canta.nesneler.web import Web
 # from canta.syntaxHighlighter import HtmlHighlighter
@@ -281,7 +280,7 @@ class DefterAnaPencere(QMainWindow):
         self.anaLay = QHBoxLayout(self.centralW)
         # self.anaLay.setContentsMargins(0,5,0,0)
         self.anaLay.setContentsMargins(0, 0, 0, 0)
-        # self.anaLay.setSpacing(0)
+        self.anaLay.setSpacing(0)
         # self.centralW.setLayout(self.anaLay)
 
         self.solLay = QHBoxLayout()

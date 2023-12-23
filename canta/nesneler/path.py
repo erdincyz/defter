@@ -679,27 +679,28 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def basitlestir(self):
-        liste = []
-        # ilk noktayi basitlestirilmis cizgiye dahil ediyoruz
-        liste.append([self.lastPath.elementAt(1).x, self.lastPath.elementAt(1).y])
-        self.arama_kutusu = QRectF(0, 0, self.cizgi_basitlestirme_miktari, self.cizgi_basitlestirme_miktari)
-        self.arama_kutusu.moveCenter(QPointF(liste[0][0], liste[0][1]))
-        try:
-            for i in range(self.lastPath.elementCount()):
-                if self.arama_kutusu.contains(self.lastPath.elementAt(i).x, self.lastPath.elementAt(i).y):
-                    continue
-                else:
-                    liste.append([self.lastPath.elementAt(i).x, self.lastPath.elementAt(i).y])
-                    self.arama_kutusu.moveCenter(QPointF(liste[-1][0], liste[-1][1]))
+        if self.lastPath.elementCount() > 3:
+            liste = []
+            # ilk noktayi basitlestirilmis cizgiye dahil ediyoruz
+            liste.append([self.lastPath.elementAt(1).x, self.lastPath.elementAt(1).y])
+            self.arama_kutusu = QRectF(0, 0, self.cizgi_basitlestirme_miktari, self.cizgi_basitlestirme_miktari)
+            self.arama_kutusu.moveCenter(QPointF(liste[0][0], liste[0][1]))
+            try:
+                for i in range(self.lastPath.elementCount()):
+                    if self.arama_kutusu.contains(self.lastPath.elementAt(i).x, self.lastPath.elementAt(i).y):
+                        continue
+                    else:
+                        liste.append([self.lastPath.elementAt(i).x, self.lastPath.elementAt(i).y])
+                        self.arama_kutusu.moveCenter(QPointF(liste[-1][0], liste[-1][1]))
 
-            # son noktayi basitlestirilmis cizgiye dahil ediyoruz
-            liste.append([self.lastPath.elementAt(self.lastPath.elementCount() - 1).x,
-                          self.lastPath.elementAt(self.lastPath.elementCount() - 1).y])
-        #
-        except Exception as e:
-            print(e)
-        # print(self.lastPath.elementCount(), len(liste))
-        self.fromList(liste, self.isPathClosed)
+                # son noktayi basitlestirilmis cizgiye dahil ediyoruz
+                liste.append([self.lastPath.elementAt(self.lastPath.elementCount() - 1).x,
+                            self.lastPath.elementAt(self.lastPath.elementCount() - 1).y])
+            #
+            except Exception as e:
+                print(e)
+            # print(self.lastPath.elementCount(), len(liste))
+            self.fromList(liste, self.isPathClosed)
 
     # # ---------------------------------------------------------------------
     # def pathi_pixmap_yap(self):
