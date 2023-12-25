@@ -410,18 +410,19 @@ class YuzenWidget(QWidget):
             self.dugme.renk_degistir(acik_mi=True)
         else:
             self.icerikScroll.show()
+            self.resize(self.eskiSize)
+            self.adjustSize()
             # yuzuyor olsa da hangi cubukta dugmesi var
             if self.sol_cubukta_mi:
                 self.btnKucult.setText("<")
             else:
                 if self.dikey_mi:
                     self.btnKucult.setText(">")
-                    self.move(self.pos() - QPoint(2 * self.width(), 0))
+                    self.move(self.pos() - QPoint(self.icerikScroll.width(), 0))
                 else:
                     self.btnKucult.setText("<")
             # self.btnKucult.setText("<")
-            self.resize(self.eskiSize)
-            self.adjustSize()
+
 
     # ---------------------------------------------------------------------
     def kucult_buyult(self):
