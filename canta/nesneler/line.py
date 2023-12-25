@@ -1162,7 +1162,10 @@ class LineItem(QGraphicsItem):
             # aci = math.atan2(-self._line.dy(), self._line.dx())
             # aci = aci * 180 / math.pi
             # painter.rotate(- aci)
-            painter.rotate(- self._line.angle())
+            if  90 < self._line.angle() < 270:
+                painter.rotate(- self._line.angle() - 180)
+            else:
+                painter.rotate(- self._line.angle())
             painter.translate(-self._line.center())
             # painter.drawText(self.boundingRect(), Qt.AlignCenter | Qt.AlignVCenter, self._text)
             # painter.drawText(self.boundingRect(), self._text, self.painterTextOption)
