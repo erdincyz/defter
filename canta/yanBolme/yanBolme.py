@@ -193,7 +193,8 @@ class YanBolme(QFrame):
             birak = False
             for n in range(dugmeAdet):
                 w = self.dugmeLay.itemAt(n).widget()
-                birak = pos.y() < w.y() + w.size().height() // 2
+                # birak = pos.y() < w.y() + w.size().height() // 2
+                birak = pos.y() < w.y() + w.size().height()
 
                 if birak:
                     if self.solSag == "sol":
@@ -201,8 +202,8 @@ class YanBolme(QFrame):
                     else:
                         yw.saga_yasla()
 
-                    self.dugmeLay.insertWidget(n - 1, dugme)
-                    self.icerikSplitter.insertWidget(n - 1, yw)
+                    self.dugmeLay.insertWidget(n, dugme)
+                    self.icerikSplitter.insertWidget(n, yw)
                     # self.dugmeTasindi.emit(dugme)
                     break
 

@@ -89,8 +89,16 @@ class KenarBoyutSol(QFrame):
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
         super(KenarBoyutSol, self).mouseDoubleClickEvent(event)
+        buyult = True
         for i in range(self.splitterW.count()):
-            self.splitterW.widget(i).kucult()
+            if not self.splitterW.widget(i).kucuk_mu:
+                self.splitterW.widget(i).kucult()
+                buyult = False
+        if buyult:
+            for i in range(self.splitterW.count()):
+                if self.splitterW.widget(i).kucuk_mu:
+                    self.splitterW.widget(i).buyult()
+
             # self.splitterW.widget(i).setVisible(not self.splitterW.widget(i).isVisible())
 
     # # ---------------------------------------------------------------------

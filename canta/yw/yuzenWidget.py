@@ -330,8 +330,10 @@ class YuzenWidget(QWidget):
         self.baslikWidget.setFixedWidth(20)
         self.baslikWidget.update()
         self.layBaslik.setDirection(QVBoxLayout.Direction.TopToBottom)
-        self.anaLay.setDirection(QVBoxLayout.Direction.LeftToRight)
-
+        if self.sol_cubukta_mi:
+            self.anaLay.setDirection(QVBoxLayout.Direction.LeftToRight)
+        else:
+            self.anaLay.setDirection(QVBoxLayout.Direction.RightToLeft)
         self.adjustSize()
 
     # ---------------------------------------------------------------------
@@ -368,7 +370,16 @@ class YuzenWidget(QWidget):
         else:
             self.eskiSize = self.size()
             self.icerikScroll.hide()
-            self.btnKucult.setText(">")
+            # yuzuyor olsa da hangi cubukta dugmesi var
+            if self.sol_cubukta_mi:
+                self.btnKucult.setText(">")
+            else:
+                if self.dikey_mi:
+                    self.btnKucult.setText("<")
+                    self.move(self.pos() + QPoint(self.width() - 20, 0))
+                else:
+                    self.btnKucult.setText(">")
+
             if self.dikey_mi:
                 self.setMinimumWidth(20)
             else:
@@ -399,7 +410,16 @@ class YuzenWidget(QWidget):
             self.dugme.renk_degistir(acik_mi=True)
         else:
             self.icerikScroll.show()
-            self.btnKucult.setText("<")
+            # yuzuyor olsa da hangi cubukta dugmesi var
+            if self.sol_cubukta_mi:
+                self.btnKucult.setText("<")
+            else:
+                if self.dikey_mi:
+                    self.btnKucult.setText(">")
+                    self.move(self.pos() - QPoint(2 * self.width(), 0))
+                else:
+                    self.btnKucult.setText("<")
+            # self.btnKucult.setText("<")
             self.resize(self.eskiSize)
             self.adjustSize()
 
