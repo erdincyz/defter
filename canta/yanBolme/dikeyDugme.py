@@ -7,8 +7,8 @@ __author__ = 'E. Y.'
 
 import sys
 
-from PySide6.QtCore import QCoreApplication, QSize, Qt, QMimeData
-from PySide6.QtGui import QDrag, QPixmap, QColor
+from PySide6.QtCore import QCoreApplication, QSize
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QPushButton, QStylePainter, QStyle, QStyleOptionButton, QFrame, QHBoxLayout, QApplication, QSizePolicy
 
 

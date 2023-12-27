@@ -58,6 +58,7 @@ class YuzenWidget(QWidget):
         self.mPos = QPoint()
         self.sagClick = False
         self.solClick = False
+        self.solClickKucultBuyult = False
 
         self.baslikWidget = QWidget(self)
         # self.baslikWidget.setFixedHeight(20)
@@ -211,9 +212,9 @@ class YuzenWidget(QWidget):
 
         # degiskene bilgi girildi ama daha kucultulup buyutulmedigi icin terslemiyoruz degiskeni
         if self.kucuk_mu:
-            self.kucult()
+            self.kucult(ilk_acilis_mi=True)
         else:
-            self.buyult()
+            self.buyult(ilk_acilis_mi=True)
 
     # ---------------------------------------------------------------------
     def setMinimumWidthVeEskiMinimumSize(self, width):
@@ -335,6 +336,7 @@ class YuzenWidget(QWidget):
         else:
             self.anaLay.setDirection(QVBoxLayout.Direction.RightToLeft)
         self.adjustSize()
+        # self.resize(self.size().transposed())
 
     # ---------------------------------------------------------------------
     def yatay_dondur(self):
@@ -354,9 +356,10 @@ class YuzenWidget(QWidget):
         self.anaLay.setDirection(QVBoxLayout.Direction.TopToBottom)
 
         self.adjustSize()
+        # self.resize(self.size().transposed())
 
     # ---------------------------------------------------------------------
-    def kucult(self):
+    def kucult(self, ilk_acilis_mi=False):
         # if self.baslikEtiket.dikey:
         #     if self.anaLay.direction() == QVBoxLayout.Direction.RightToLeft:
         #         self.move(self.pos() + QPoint(self.icerikScroll.rect().width(), 0))
@@ -376,7 +379,8 @@ class YuzenWidget(QWidget):
             else:
                 if self.dikey_mi:
                     self.btnKucult.setText("<")
-                    self.move(self.pos() + QPoint(self.width() - 20, 0))
+                    if not ilk_acilis_mi:
+                        self.move(self.pos() + QPoint(self.width() - 20, 0))
                 else:
                     self.btnKucult.setText(">")
 
@@ -385,9 +389,10 @@ class YuzenWidget(QWidget):
             else:
                 self.setMinimumHeight(20)
             self.adjustSize()
+            # self.resize(self.baslikWidget.size())
 
     # ---------------------------------------------------------------------
-    def buyult(self):
+    def buyult(self, ilk_acilis_mi=False):
         # if self.dikey_mi:
         #     if (self.pos().x() + self.icerikScroll.rect().width()) < self.parent().rect().width():
         #         self.anaLay.setDirection(QVBoxLayout.Direction.RightToLeft)
@@ -418,7 +423,8 @@ class YuzenWidget(QWidget):
             else:
                 if self.dikey_mi:
                     self.btnKucult.setText(">")
-                    self.move(self.pos() - QPoint(self.icerikScroll.width(), 0))
+                    if not ilk_acilis_mi:
+                        self.move(self.pos() - QPoint(self.icerikScroll.width(), 0))
                 else:
                     self.btnKucult.setText("<")
             # self.btnKucult.setText("<")
@@ -449,6 +455,10 @@ class YuzenWidget(QWidget):
 
         super(YuzenWidget, self).mousePressEvent(event)
 
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.solClickKucultBuyult = True
+            self.mGPos = event.globalPosition()
+
         if not self.cubukta_mi:
             self.raise_()
 
@@ -469,18 +479,17 @@ class YuzenWidget(QWidget):
     def mouseMoveEvent(self, event):
         super(YuzenWidget, self).mousePressEvent(event)
         if not self.cubukta_mi:
-
             if event.buttons() & Qt.MouseButton.LeftButton:
                 if self.solClick:
                     fark = event.pos() - self.mPos
                     yeniPos = self.pos() + fark
                     pr = self.parent().rect()
-                    if yeniPos.x() < 0:
-                        yeniPos.setX(0)
+                    if yeniPos.x() < 10:
+                        yeniPos.setX(10)
                         # self.dikey_dondur()
                         # self.anaLay.setDirection(QVBoxLayout.Direction.LeftToRight)
-                    elif yeniPos.x() + self.width() > pr.right():
-                        yeniPos.setX(pr.right() - self.width())
+                    elif yeniPos.x() + self.width() > pr.right() - 9:
+                        yeniPos.setX(pr.right() - self.width() - 9)
                         # self.dikey_dondur()
                         # self.anaLay.setDirection(QVBoxLayout.Direction.RightToLeft)
 
@@ -536,11 +545,18 @@ class YuzenWidget(QWidget):
 
     # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
+        if self.solClickKucultBuyult:
+            hareket = event.globalPosition().toPoint() - self.mGPos.toPoint()
+            if hareket.manhattanLength() < 3:
+                self.kucult_buyult()
+                # event.ignore()
+                # return
+            self.solClickKucultBuyult = False
+
         super(YuzenWidget, self).mouseReleaseEvent(event)
+
         if not self.cubukta_mi:
             self.sagClick = False
             self.solClick = False
             self.setCursor(Qt.CursorShape.ArrowCursor)
 
-        # manhattan length yapmak lazım
-        # self.kucult_buyult()
