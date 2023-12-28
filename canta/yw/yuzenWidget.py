@@ -11,6 +11,32 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QS
 
 from canta.yanBolme.dikeyEtiket import DikeyEtiket
 
+#######################################################################
+class BaslikWidget(QWidget):
+    sol_tiklandi = Signal()
+
+    # ---------------------------------------------------------------------
+    def __init__(self, kapatilabilir_mi=False, parent=None):
+        super(BaslikWidget, self).__init__(parent)
+
+    # ---------------------------------------------------------------------
+    def mousePressEvent(self, event):
+        super(BaslikWidget, self).mousePressEvent(event)
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.solClickKucultBuyult = True
+            self.mGPos = event.globalPosition()
+
+    # ---------------------------------------------------------------------
+    def mouseReleaseEvent(self, event):
+        super(BaslikWidget, self).mouseReleaseEvent(event)
+        if self.solClickKucultBuyult:
+            hareket = event.globalPosition().toPoint() - self.mGPos.toPoint()
+            if hareket.manhattanLength() < 3:
+                self.sol_tiklandi.emit()
+                # event.ignore()
+                # return
+            self.solClickKucultBuyult = False
+
 
 #######################################################################
 class YuzenWidget(QWidget):
@@ -60,7 +86,8 @@ class YuzenWidget(QWidget):
         self.solClick = False
         self.solClickKucultBuyult = False
 
-        self.baslikWidget = QWidget(self)
+        self.baslikWidget = BaslikWidget(self)
+        self.baslikWidget.sol_tiklandi.connect(self.kucult_buyult)
         # self.baslikWidget.setFixedHeight(20)
         self.baslikWidget.setContentsMargins(0, 0, 0, 0)
         self.baslikWidget.setAutoFillBackground(True)
@@ -438,26 +465,22 @@ class YuzenWidget(QWidget):
         else:
             self.kucult()
 
-    # ---------------------------------------------------------------------
-    def mouseDoubleClickEvent(self, event):
-
-        # self.kenara_al_veya_kapat()
-        self.kucult_buyult()
-
-        # if self.cubukta_mi:
-        #     self.kenara_al_veya_kapat()
-        # else:
-        #     self.kucult_buyult()
-        super(YuzenWidget, self).mouseDoubleClickEvent(event)
+    # # ---------------------------------------------------------------------
+    # def mouseDoubleClickEvent(self, event):
+    #
+    #     self.kenara_al_veya_kapat()
+    #     # self.kucult_buyult()
+    #
+    #     # if self.cubukta_mi:
+    #     #     self.kenara_al_veya_kapat()
+    #     # else:
+    #     #     self.kucult_buyult()
+    #     super(YuzenWidget, self).mouseDoubleClickEvent(event)
 
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):
 
         super(YuzenWidget, self).mousePressEvent(event)
-
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.solClickKucultBuyult = True
-            self.mGPos = event.globalPosition()
 
         if not self.cubukta_mi:
             self.raise_()
@@ -545,14 +568,6 @@ class YuzenWidget(QWidget):
 
     # ---------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
-        if self.solClickKucultBuyult:
-            hareket = event.globalPosition().toPoint() - self.mGPos.toPoint()
-            if hareket.manhattanLength() < 3:
-                self.kucult_buyult()
-                # event.ignore()
-                # return
-            self.solClickKucultBuyult = False
-
         super(YuzenWidget, self).mouseReleaseEvent(event)
 
         if not self.cubukta_mi:
