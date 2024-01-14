@@ -140,6 +140,8 @@ class BaseItem(QGraphicsItem):
                     ok.temp_prepend(QPointF(scx - dxdy_nokta[0], scy - dxdy_nokta[1]))
                 elif dxdy_nokta[2] == 2:
                     ok.temp_append(QPointF(scx - dxdy_nokta[0], scy - dxdy_nokta[1]))
+                if ok._text:
+                    ok.update_painter_text_rect()
 
     # ---------------------------------------------------------------------
     def get_properties_for_save_binary(self):

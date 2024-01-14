@@ -1287,6 +1287,8 @@ class DefterAnaPencere(QMainWindow):
 
         anaLay = QVBoxLayout(sayfalarTemelW)
         anaLay.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
+        anaLay.setContentsMargins(3, 5, 3, 3)
+        anaLay.setSpacing(5)
 
         layButonlar = QHBoxLayout()
         # anaLay.addWidget(baslikWidget)
@@ -1318,7 +1320,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.tw_alt_sayfa_ekle_btn = QPushButton(sayfalarTemelW)
         self.tw_alt_sayfa_ekle_btn.setIcon(QIcon(":icons/ic-sayfa-yesil.png"))
-        self.tw_alt_sayfa_ekle_btn.setToolTip(self.tr("Add new inner page"))
+        self.tw_alt_sayfa_ekle_btn.setToolTip(self.tr("Add new subpage"))
         self.tw_alt_sayfa_ekle_btn.setFlat(True)
         self.tw_alt_sayfa_ekle_btn.setFixedWidth(30)
         self.tw_alt_sayfa_ekle_btn.setFixedHeight(20)
@@ -2462,9 +2464,11 @@ class DefterAnaPencere(QMainWindow):
     def pencere_ve_tab_yazilarini_guncelle(self):
         # TODO: ilk acilista 2 defa cagriliyor ard arda.
         idx = self.tabWidget.currentIndex()
-        yazi = "{} - {}".format(self.cModel.fileName, self.sayfalarYWTreeView.get_current_sayfa().adi.replace("★ ", ""))
+        sayfa_adi = self.sayfalarYWTreeView.get_current_sayfa().adi.replace("★ ", "")
+        yazi = "{} - {}".format(self.cModel.fileName, sayfa_adi)
 
         self.setWindowTitle(f"Defter {VERSION}  -  {yazi}")
+        self.sayfalarYW.yazBaslik(f"{self.tr('Pages')} - {sayfa_adi}")
 
         self.tabBar.setTabText(idx, yazi)  #
         # ---------------------------------------------------------------------
