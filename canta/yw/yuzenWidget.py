@@ -295,6 +295,8 @@ class YuzenWidget(QWidget):
         if self.dikey_mi:
             self.yuzerken_dikey_miydi = True
             self.yatay_dondur()
+        else:
+            self.yuzerken_dikey_miydi = False
 
         if solSag == "sol":
             self.sola_yasla()
