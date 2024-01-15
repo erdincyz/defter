@@ -56,6 +56,7 @@ class YuzenWidget(QWidget):
 
         self.kucuk_mu = False
         self.dikey_mi = False
+        self.yuzerken_dikey_miydi = False
         # ilk acilista True olmasi
         self.cubukta_mi = False
         self.sol_cubukta_mi = True
@@ -292,6 +293,7 @@ class YuzenWidget(QWidget):
         self.dikey_mi = self.baslikEtiket.dikey
 
         if self.dikey_mi:
+            self.yuzerken_dikey_miydi = True
             self.yatay_dondur()
 
         if solSag == "sol":
@@ -314,7 +316,7 @@ class YuzenWidget(QWidget):
         # # self.btnKucult.show()
         # self.btnKenaraAlVeyaKapat.show()
 
-        if self.dikey_mi:
+        if self.yuzerken_dikey_miydi:
             self.dikey_dondur()
 
         self.cubukta_mi = False

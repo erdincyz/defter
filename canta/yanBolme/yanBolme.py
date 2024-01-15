@@ -47,6 +47,12 @@ class YanBolme(QFrame):
 
         self.solSag = solSag
 
+        self.setAutoFillBackground(True)
+
+        p = self.palette()
+        self.renkArkaplan = p.color(self.backgroundRole())
+        self.renkArkaplanSurukleBirakBelirt = QColor(185, 255, 220)
+
         anaLay = QHBoxLayout(self)
         anaLay.setContentsMargins(0, 0, 0, 0)
         anaLay.setSpacing(0)
@@ -173,9 +179,35 @@ class YanBolme(QFrame):
         else:
             yw.buyult()
 
+
+    # ---------------------------------------------------------------------
+    def renk_degistir(self, renkArkaplan=None):
+
+        p = self.palette()
+        # p.setColor(self.foregroundRole(), self.renkYazi)
+        # ozellikle boyle yapildi, anlik widgeti baska renge boyayabiliyoruz
+        # renk yoksa yine eski rengine don anlamında
+        if renkArkaplan:
+            p.setColor(self.backgroundRole(), renkArkaplan)
+            self.kenarBoyutWidget.renk_degistir(renkArkaplan)
+        else:
+            # orjinal rengine don
+            p.setColor(self.backgroundRole(), self.renkArkaplan)
+            self.kenarBoyutWidget.renk_degistir()
+        self.setPalette(p)
+
+
+
     # ---------------------------------------------------------------------
     def dragEnterEvent(self, e):
         e.accept()
+        self.renk_degistir(self.renkArkaplanSurukleBirakBelirt)
+
+
+    # ---------------------------------------------------------------------
+    def dragLeaveEvent(self, e):
+        e.accept()
+        self.renk_degistir()
 
     # ---------------------------------------------------------------------
     def dropEvent(self, e):
@@ -208,6 +240,7 @@ class YanBolme(QFrame):
                     break
 
         e.accept()
+        self.renk_degistir()
 
     # # ---------------------------------------------------------------------
     # def dropEventDugmeIcin(self, e):

@@ -20,7 +20,8 @@ class KenarBoyutSol(QFrame):
 
         # renkBordo = QColor(200, 150, 160)
 
-        self.renkYazi = QColor(255, 255, 255)
+        # self.renkYazi = QColor(255, 255, 255)
+        self.setAutoFillBackground(True)
         self.renkArkaplan = renk
         self.renk_degistir()
 
@@ -44,13 +45,16 @@ class KenarBoyutSol(QFrame):
         self.show()
 
     # ---------------------------------------------------------------------
-    def renk_degistir(self):
-
-        self.setAutoFillBackground(True)
+    def renk_degistir(self, renkArkaplan=None):
 
         p = self.palette()
-        p.setColor(self.foregroundRole(), self.renkYazi)
-        p.setColor(self.backgroundRole(), self.renkArkaplan)
+        # p.setColor(self.foregroundRole(), self.renkYazi)
+        # ozellikle boyle yapildi, anlik widgeti baska renge boyayabiliyoruz
+        # renk yoksa yine eski rengine don anlamında
+        if renkArkaplan:
+            p.setColor(self.backgroundRole(), renkArkaplan)
+        else:
+            p.setColor(self.backgroundRole(), self.renkArkaplan)
         self.setPalette(p)
 
     # ---------------------------------------------------------------------
