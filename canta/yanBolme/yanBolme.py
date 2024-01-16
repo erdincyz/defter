@@ -59,7 +59,7 @@ class YanBolme(QFrame):
 
         self.dugmeLay = QVBoxLayout()
         self.dugmeLay.setContentsMargins(0, 0, 0, 0)
-        self.dugmeLay.setSpacing(24)
+        self.dugmeLay.setSpacing(30)
 
         icerikLay = QHBoxLayout()
         icerikLay.setContentsMargins(0, 0, 0, 0)

@@ -18,6 +18,7 @@ class BaslikWidget(QWidget):
     # ---------------------------------------------------------------------
     def __init__(self, kapatilabilir_mi=False, parent=None):
         super(BaslikWidget, self).__init__(parent)
+        self.solClickKucultBuyult = False
 
     # ---------------------------------------------------------------------
     def mousePressEvent(self, event):

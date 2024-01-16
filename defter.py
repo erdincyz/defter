@@ -177,7 +177,8 @@ class DefterAnaPencere(QMainWindow):
         self.undoGroup = QUndoGroup(self)
 
         # clean_mode icin
-        self.state_before_clean_mode = None
+        self.sade_gorunum_oncesi_ana_pencere_durumu= None
+        self.sade_gorunum_oncesi_yw_durumlari_liste = []
 
         self.imlec_arac = None
 
@@ -8728,7 +8729,7 @@ class DefterAnaPencere(QMainWindow):
     @Slot(bool)
     def act_clean_mode(self, checked):
         if checked:
-            self.state_before_clean_mode = self.saveState(version=1)
+            self.sade_gorunum_oncesi_ana_pencere_durumu = self.saveState(version=1)
             self.toolsToolBar.hide()
             self.propertiesToolBar.hide()
             self.fontToolBar.hide()
@@ -8738,15 +8739,36 @@ class DefterAnaPencere(QMainWindow):
             self.utilitiesToolBar.hide()
             self._statusBar.hide()
             self.mBar.hide()
-            self.nesneOzellikleriYW2.hide()
-            self.stillerYW2.hide()
-            self.baskiSiniriCizimAyarlariYW.hide()
-            self.sayfalarYW.hide()
-            self.kutuphaneYW.hide()
+
+            self.sade_gorunum_oncesi_yw_durumlari_liste = []
+            if not self.nesneOzellikleriYW2.kucuk_mu:
+                self.nesneOzellikleriYW2.kucult()
+                self.sade_gorunum_oncesi_yw_durumlari_liste.append(self.nesneOzellikleriYW2)
+
+            if not self.stillerYW2.kucuk_mu:
+                self.stillerYW2.kucult()
+                self.sade_gorunum_oncesi_yw_durumlari_liste.append(self.stillerYW2)
+
+            if not self.baskiSiniriCizimAyarlariYW.kucuk_mu:
+                self.baskiSiniriCizimAyarlariYW.kucult()
+                self.sade_gorunum_oncesi_yw_durumlari_liste.append(self.baskiSiniriCizimAyarlariYW)
+
+            if not self.sayfalarYW.kucuk_mu:
+                self.sayfalarYW.kucult()
+                self.sade_gorunum_oncesi_yw_durumlari_liste.append(self.sayfalarYW)
+
+            if not self.kutuphaneYW.kucuk_mu:
+                self.kutuphaneYW.kucult()
+                self.sade_gorunum_oncesi_yw_durumlari_liste.append(self.kutuphaneYW)
+
         else:
             self.mBar.show()
             self._statusBar.show()
-            self.restoreState(self.state_before_clean_mode, version=1)
+
+            for yw in self.sade_gorunum_oncesi_yw_durumlari_liste:
+                yw.buyult()
+
+            self.restoreState(self.sade_gorunum_oncesi_ana_pencere_durumu, version=1)
 
     # ---------------------------------------------------------------------
     @Slot()
