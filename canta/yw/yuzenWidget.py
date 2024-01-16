@@ -7,7 +7,7 @@ __author__ = 'Erdinç Yılmaz'
 
 from PySide6.QtCore import Qt, QPoint, Signal, QMimeData
 from PySide6.QtGui import QColor, QDrag, QPixmap, QPainter, QPen
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QScrollArea
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QScrollArea, QSizePolicy
 
 from canta.yanBolme.dikeyEtiket import DikeyEtiket
 
@@ -171,7 +171,7 @@ class YuzenWidget(QWidget):
         # scroll.setLayout(self.anaLay)
         self.anaLay.addWidget(self.icerikScroll)
 
-        # self.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        self.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
 
     # ---------------------------------------------------------------------
     def yazBaslik(self, yazi):

@@ -3850,10 +3850,10 @@ class DefterAnaPencere(QMainWindow):
         self.actionPrintOrExportAsPdf.setShortcut(QKeySequence("Ctrl+P"))
         self.actionPrintOrExportAsPdf.triggered.connect(self.act_print_document)
 
-        self.actionExportPageAsImage = QAction(QIcon(':icons/file-image.png'),
-                                               self.tr("Export Page as Image"), self.mBar)
-        self.actionExportPageAsImage.setShortcut(QKeySequence("Ctrl+Shift+P"))
-        self.actionExportPageAsImage.triggered.connect(self.act_export_page_as_image)
+        self.actionExportViewAsImage = QAction(QIcon(':icons/file-image.png'),
+                                               self.tr("Export View as Image"), self.mBar)
+        self.actionExportViewAsImage.setShortcut(QKeySequence("Ctrl+Shift+P"))
+        self.actionExportViewAsImage.triggered.connect(self.act_export_view_as_image)
 
         self.actionPrintSelectedTextItemContent = QAction(QIcon(':icons/print.png'),
                                                           self.tr("Print && Export Selected Text Item Content as PDF"), self.mBar)
@@ -3919,7 +3919,7 @@ class DefterAnaPencere(QMainWindow):
                                   self.actionExportDocumentAsHTML,
                                   self.fileMenu.addSeparator(),
                                   self.actionPrintOrExportAsPdf,
-                                  self.actionExportPageAsImage,
+                                  self.actionExportViewAsImage,
                                   self.fileMenu.addSeparator(),
                                   self.actionImportImages,
                                   self.actionImportVideos,
@@ -4748,7 +4748,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionExportPageAsHTML,
                                           self.actionExportDocumentAsHTML,
                                           self.actionPrintOrExportAsPdf,
-                                          self.actionExportPageAsImage,
+                                          self.actionExportViewAsImage,
                                           self.actionSetBackgroundImage,
                                           self.actionImportImages,
                                           self.actionImportVideos,
@@ -10742,13 +10742,13 @@ class DefterAnaPencere(QMainWindow):
         self.lutfen_bekleyin_gizle()
 
     # ---------------------------------------------------------------------
-    def act_export_page_as_image(self):
+    def act_export_view_as_image(self):
         # sayfa = self.sayfalarYWTreeView.get_current_sayfa()
         # baseName = sayfa.adi
         fn = QFileDialog.getSaveFileName(self,
                                          self.tr('Save Image as'),
                                          self.sonKlasorDisaAktar,  # hem sonklasor hem dosyaadi
-                                         self.supportedImageFormats
+                                         self.tr('jpg Files (*.jpg);;All Files(*)')
                                          )
         path = fn[0]
         if path:
@@ -10758,7 +10758,7 @@ class DefterAnaPencere(QMainWindow):
             self.lutfen_bekleyin_goster()
 
             # image = QImage(self.cSecne.itemsBoundingRect().toRect(), QImage.Format_ARGB32_Premultiplied)
-            image = QImage(self.cScene.itemsBoundingRect().size().toSize(), QImage.Format.Format_ARGB32)
+            # image = QImage(self.cScene.itemsBoundingRect().size().toSize(), QImage.Format.Format_ARGB32)
             image = QImage(self.cView.viewport().size(), QImage.Format.Format_ARGB32)
             image.fill(Qt.GlobalColor.transparent)
             painter = QPainter(image)
@@ -10767,7 +10767,7 @@ class DefterAnaPencere(QMainWindow):
             painter.end()
             image.save(path)
 
-            self.log(self.tr("Page succesfully exported as image. {}".format(path)), 7000)
+            self.log(self.tr("View succesfully exported as image. {}".format(path)), 7000)
 
             self.sonKlasorDisaAktar = os.path.dirname(path)
 
