@@ -25,21 +25,25 @@ Contains many **Bugs** and **incomplete features**. It is recommended that you d
 You can follow the known bugs and features that are intended to be added (although not up-to-date at the moment) from the [Issues](https://github.com/erdincyz/defter/issues) section on this page.
 
 ### INSTALLING
-It works on Python3 and needs PySide6 (>= 6.4) module.
+It works on Python3.
 
-You can download Python 3 from [https://www.python.org/downloads/](https://www.python.org/downloads/)
+You can download and install Python 3 from [https://www.python.org/downloads/](https://www.python.org/downloads/)
 
-If you have Python 3 already, you can install PySide6 with:
+If you already have Python 3, you can install it with:
 ```
-pip install -U PySide6
+python3 -m pip install -U defter-argekod
 
 ```
-After you download or clone this repo,
-cd in to "defter" directory 
-and run defter.py with your python3 interpreter.
+After installation is finished, you can run defter with
+
 ```
-cd defter
-python3 defter.py
+defter
+```
+
+If you wish, you can uninstall it with
+```
+python3 -m pip uninstall defter-argekod
+
 ```
 
 ### File Structure:
@@ -74,6 +78,6 @@ You can use this shortcut.
 Command + Shift + 4
 ```
 
-Defter supports pasting from the clipboard. You can copy the screenshot to the clipboard and paste it into the Defter using the methods above or any other method you prefer.
+Defter supports pasting images from the clipboard. You can copy the screenshot to the clipboard and paste it into the Defter using the methods above or any other method you prefer.
 
 ### Thanks.
