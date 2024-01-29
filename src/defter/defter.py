@@ -95,7 +95,7 @@ from .canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "(v0.95)"
+VERSION = "0.95.1"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -194,9 +194,13 @@ class DefterAnaPencere(QMainWindow):
         self.olustur_tools_toolbar()
         self.olustur_properties_toolbar()
         self.olustur_cizgi_ozellikleri_toolbar()
-        self.olustur_font_toolbar()
         self.olustur_renk_toolbar()
+        self.olustur_utilities_toolbar()
+        self.removeToolBarBreak(self.utilitiesToolBar)
+        self.addToolBarBreak()
+        self.olustur_font_toolbar()
         self.olustur_nesne_hizalama_arac_cubugu()
+        self.removeToolBarBreak(self.hizalaAracCubugu)
         self.olustur_menu_bar()
         self.olustur_status_bar()
         self.olustur_nesne_sag_menuler()
@@ -210,7 +214,6 @@ class DefterAnaPencere(QMainWindow):
         self.olustur_tercumeYW()
         self.olustur_baskiSiniriYW()
         self.olustur_yw_menu()
-        self.olustur_utilities_toolbar()
         self.olustur_dummy_widget_for_actions()
         self.arsivleme_programi_adres_belirle()
 
@@ -1976,11 +1979,13 @@ class DefterAnaPencere(QMainWindow):
             self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi(self.settings.value("baskiSiniriCizimAyarlariYWYonDurum", "00102"))
 
         else:  # ilk acilis
-            self.sayfalarYW.yukleme_bilgisi("00110")
-            self.kutuphaneYW.yukleme_bilgisi("00111")
-            self.nesneOzellikleriYW2.yukleme_bilgisi("00100")
-            self.stillerYW2.yukleme_bilgisi("00101")
-            self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi("00102")
+            self.sayfalarYW.yukleme_bilgisi("00010")
+            self.sayfalarYW.sol_kenara_yanastir()
+            self.kutuphaneYW.yukleme_bilgisi("01111")
+            self.nesneOzellikleriYW2.yukleme_bilgisi("10000")
+            self.nesneOzellikleriYW2.sag_kenara_yanastir()
+            self.stillerYW2.yukleme_bilgisi("01101")
+            self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi("01102")
         self.settings.endGroup()
 
         self.settings.beginGroup("StylePresets")
@@ -5671,8 +5676,7 @@ class DefterAnaPencere(QMainWindow):
         self.actionAlwaysOnTopToggle.triggered.connect(self.act_toggle_always_on_top)
         self.actionAlwaysOnTopToggle.setToolTip(self.tr("If checked on, Defter will stay on top of other windows."))
 
-        spacerWidget = QWidget(self.utilitiesToolBar)
-        spacerWidget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
 
         ekranGoruntusuMenuPB = QPushButton(self.utilitiesToolBar)
         ekranGoruntusuMenuPB.setFlat(True)
@@ -5697,10 +5701,10 @@ class DefterAnaPencere(QMainWindow):
                                        self.actionSecimEkranGoruntusuAlCmOff,
                                        self.actionScreenshotFullscreen))
 
+        spacerWidget = QWidget(self.utilitiesToolBar)
+        spacerWidget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.utilitiesToolBar.addWidget(spacerWidget)
-        # self.utilitiesToolBar.addWidget(self.actionAlwaysOnTopToggle)
         self.utilitiesToolBar.addWidget(ekranGoruntusuMenuPB)
-        self.utilitiesToolBar.addAction(self.actionToggleBaskiSiniriCizimAyarlariYW)
         self.utilitiesToolBar.addAction(self.actionAlwaysOnTopToggle)
 
         self.addToolBar(self.utilitiesToolBar)
@@ -5718,19 +5722,21 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     def act_stiller_sag_menu_goster(self, pos):
-        globalPos = self.stillerLW.mapToGlobal(pos)
-        menu = QMenu()
-        yeniden_adlandir = menu.addAction(self.tr("Rename"), self.act_stil_yeniden_adlandir)
-        sil = menu.addAction(self.tr("Delete"), self.act_stil_sil)
-        menu.exec(globalPos)
+        if self.stillerLW.currentItem():
+            globalPos = self.stillerLW.mapToGlobal(pos)
+            menu = QMenu()
+            yeniden_adlandir = menu.addAction(self.tr("Rename"), self.act_stil_yeniden_adlandir)
+            sil = menu.addAction(self.tr("Delete"), self.act_stil_sil)
+            menu.exec(globalPos)
 
     # ---------------------------------------------------------------------
     def act_stillerYW_sag_menu_goster(self, pos):
-        globalPos = self.stillerYLW.mapToGlobal(pos)
-        menu = QMenu()
-        yeniden_adlandir = menu.addAction(self.tr("Rename"), lambda: self.act_stil_yeniden_adlandir(yw=True))
-        sil = menu.addAction(self.tr("Delete"), lambda: self.act_stil_sil(yw=True))
-        menu.exec(globalPos)
+        if self.stillerYLW.currentItem():
+            globalPos = self.stillerYLW.mapToGlobal(pos)
+            menu = QMenu()
+            yeniden_adlandir = menu.addAction(self.tr("Rename"), lambda: self.act_stil_yeniden_adlandir(yw=True))
+            sil = menu.addAction(self.tr("Delete"), lambda: self.act_stil_sil(yw=True))
+            menu.exec(globalPos)
 
     # ---------------------------------------------------------------------
     @Slot()

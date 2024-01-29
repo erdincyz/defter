@@ -11,6 +11,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QS
 
 from ..yanBolme.dikeyEtiket import DikeyEtiket
 
+
 #######################################################################
 class BaslikWidget(QWidget):
     sol_tiklandi = Signal()
@@ -224,9 +225,9 @@ class YuzenWidget(QWidget):
     # ---------------------------------------------------------------------
     def yukleme_bilgisi(self, bilgi):
         dikey_mi = bool(int(bilgi[0]))
+        self.kucuk_mu = bool(int(bilgi[1]))
         self.cubukta_mi = bool(int(bilgi[2]))
         self.sol_cubukta_mi = bool(int(bilgi[3]))
-        self.kucuk_mu = bool(int(bilgi[1]))
         self.sira = int(bilgi[4])
 
         if self.cubukta_mi:
@@ -461,7 +462,6 @@ class YuzenWidget(QWidget):
                     self.btnKucult.setText("<")
             # self.btnKucult.setText("<")
 
-
     # ---------------------------------------------------------------------
     def kucult_buyult(self):
 
@@ -502,6 +502,16 @@ class YuzenWidget(QWidget):
                 self.enAltY = self.height()
                 self.sagClick = True
                 self.setCursor(Qt.CursorShape.SizeAllCursor)
+
+    # ---------------------------------------------------------------------
+    def sag_kenara_yanastir(self):
+        pr = self.parent().rect()
+        self.move(pr.right() - self.width() - 9, pr.top() + 30)
+
+    # ---------------------------------------------------------------------
+    def sol_kenara_yanastir(self):
+        pr = self.parent().rect()
+        self.move(10, pr.top() + 30)
 
     # ---------------------------------------------------------------------
     def mouseMoveEvent(self, event):
@@ -579,4 +589,3 @@ class YuzenWidget(QWidget):
             self.sagClick = False
             self.solClick = False
             self.setCursor(Qt.CursorShape.ArrowCursor)
-

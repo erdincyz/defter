@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "defter-argekod"
-version = "0.95"
+version = "0.95.1"
 authors = [
   { name="argekod"},
 ]
-description = "A visual note taking app"
-readme = "README_EN.md"
+description = "Görsel bir not tutma uygulaması. (A visual note-taking app.)"
+readme = "README.md"
 requires-python = ">=3.8"
 keywords = ["note taking", "freeform", "drawing", "visual", 
 "graphics", "lighttable", "html generator", "PDF generator" ,"PySide6"]
@@ -31,7 +31,7 @@ classifiers = [
 ]
 
 dependencies = [
-    'PySide6>6.4',
+    'PySide6',
 ]
 
 
