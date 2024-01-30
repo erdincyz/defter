@@ -46,6 +46,7 @@ from PySide6.QtPrintSupport import QPrinter, QPrinterInfo
 
 from .canta import shared
 from .canta.dockWidget import DockWidget
+from .canta.action import Action
 from .canta.lutfenBekleyin import LutfenBekleyin
 from .canta.yw.nesneOzellikleriYW import NesneOzellikleriYW
 from .canta.pdfyiResmeCevirPenceresi import PdfyiResmeCevirPenceresi
@@ -95,7 +96,7 @@ from .canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.95.1"
+VERSION = "0.95.2"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -4970,43 +4971,43 @@ class DefterAnaPencere(QMainWindow):
 
         actionGroup = QActionGroup(self)
 
-        self.actionSwitchToSelectionTool = QAction(QIcon(':icons/arrow.png'), self.tr("Select"), actionGroup)
+        self.actionSwitchToSelectionTool = Action(QIcon(':icons/arrow.png'), self.tr("Select"), actionGroup)
         self.actionSwitchToSelectionTool.setShortcut(QKeySequence("Q"))
         self.actionSwitchToSelectionTool.triggered.connect(self.act_switch_to_selection_tool)
         self.actionSwitchToSelectionTool.setCheckable(True)
         self.ikonSecimAraci = self.actionSwitchToSelectionTool.icon().pixmap(16, 16)
 
-        self.actionAddTextItem = QAction(QIcon(':icons/t.png'), self.tr("Add Text"), actionGroup)
+        self.actionAddTextItem = Action(QIcon(':icons/t.png'), self.tr("Add Text"), actionGroup)
         self.actionAddTextItem.setShortcut(QKeySequence("T"))
         self.actionAddTextItem.triggered.connect(self.act_add_text_item)
         self.actionAddTextItem.setCheckable(True)
         self.ikonYaziAraci = self.actionAddTextItem.icon().pixmap(16, 16)
 
-        self.actionAddRectItem = QAction(QIcon(':icons/rectangle.png'), self.tr("Add Rectangle"), actionGroup)
+        self.actionAddRectItem = Action(QIcon(':icons/rectangle.png'), self.tr("Add Rectangle"), actionGroup)
         self.actionAddRectItem.setShortcut(QKeySequence("R"))
         self.actionAddRectItem.triggered.connect(self.act_add_rect_item)
         self.actionAddRectItem.setCheckable(True)
         self.ikonKutuAraci = self.actionAddRectItem.icon().pixmap(16, 16)
 
-        self.actionAddEllipseItem = QAction(QIcon(':icons/circle.png'), self.tr("Add Ellipse"), actionGroup)
+        self.actionAddEllipseItem = Action(QIcon(':icons/circle.png'), self.tr("Add Ellipse"), actionGroup)
         self.actionAddEllipseItem.setShortcut(QKeySequence("E"))
         self.actionAddEllipseItem.triggered.connect(self.act_add_ellipse_item)
         self.actionAddEllipseItem.setCheckable(True)
         self.ikonYuvarlakAraci = self.actionAddEllipseItem.icon().pixmap(16, 16)
 
-        self.actionDrawLineItem = QAction(QIcon(':icons/line.png'), self.tr("Draw Line"), actionGroup)
+        self.actionDrawLineItem = Action(QIcon(':icons/line.png'), self.tr("Draw Line"), actionGroup)
         self.actionDrawLineItem.setShortcut(QKeySequence("L"))
         self.actionDrawLineItem.triggered.connect(self.act_draw_line_item)
         self.actionDrawLineItem.setCheckable(True)
         self.ikonOkAraci = self.actionDrawLineItem.icon().pixmap(16, 16)
 
-        self.actionDrawPathItem = QAction(QIcon(':icons/pen.png'), self.tr("Draw Path"), actionGroup)
+        self.actionDrawPathItem = Action(QIcon(':icons/pen.png'), self.tr("Draw Path"), actionGroup)
         self.actionDrawPathItem.setShortcut(QKeySequence("D"))
         self.actionDrawPathItem.triggered.connect(self.act_draw_path_item)
         self.actionDrawPathItem.setCheckable(True)
         self.ikonKalemAraci = self.actionDrawLineItem.icon().pixmap(16, 16)
 
-        # self.actionAddImageItem = QAction(QIcon(':icons/file-image.png'), self.tr("Add Image"), actionGroup)
+        # self.actionAddImageItem = Action(QIcon(':icons/file-image.png'), self.tr("Add Image"), actionGroup)
         # self.actionAddImageItem.setShortcut(QKeySequence("I"))
         # self.actionAddImageItem.triggered.connect(self.act_add_image_item)
         # self.actionAddImageItem.setCheckable(True)
@@ -5021,19 +5022,19 @@ class DefterAnaPencere(QMainWindow):
         self.recentImagesMenu.aboutToShow.connect(self.on_recent_images_menu_about_to_show)
         self.ikonResimAraci = self.actionAddImageItem.icon().pixmap(16, 16)
 
-        self.actionAddVideoItem = QAction(QIcon(':icons/file-video.png'), self.tr("Add Video"), actionGroup)
+        self.actionAddVideoItem = Action(QIcon(':icons/file-video.png'), self.tr("Add Video"), actionGroup)
         self.actionAddVideoItem.setShortcut(QKeySequence("V"))
         self.actionAddVideoItem.triggered.connect(self.act_add_video_item)
         self.actionAddVideoItem.setCheckable(True)
         self.ikonVideoAraci = self.actionAddVideoItem.icon().pixmap(16, 16)
 
-        self.actionEkleDosyaNesnesi = QAction(QIcon(':icons/import-file.png'), self.tr("Add File"), actionGroup)
+        self.actionEkleDosyaNesnesi = Action(QIcon(':icons/import-file.png'), self.tr("Add File"), actionGroup)
         self.actionEkleDosyaNesnesi.setShortcut(QKeySequence("O"))
         self.actionEkleDosyaNesnesi.triggered.connect(self.act_ekle_dosya_nesnesi)
         self.actionEkleDosyaNesnesi.setCheckable(True)
         self.ikonDosyaAraci = self.actionEkleDosyaNesnesi.icon().pixmap(16, 16)
 
-        self.actionWebBrowserAc = QAction(QIcon(':icons/web-browser.png'), self.tr("Web Browser"), actionGroup)
+        self.actionWebBrowserAc = Action(QIcon(':icons/web-browser.png'), self.tr("Web Browser"), actionGroup)
         # self.actionWebBrowserAc.setShortcut(QKeySequence("W"))
         self.actionWebBrowserAc.triggered.connect(self.act_web_browser_ac)
         # self.actionWebBrowserAc.setCheckable(True)
@@ -5142,7 +5143,7 @@ class DefterAnaPencere(QMainWindow):
         self.fontPointSizeFDSBox_tbar.valueChangedFromDoubleSpinBoxGuiNotBySetValue.connect(self.act_change_font_point_sizef)
         self.fontPointSizeFDSBox_tbar.setToolTip(self.tr("Text Size"))
 
-        self.actionBold = QAction(QIcon(':icons/bold.png'),
+        self.actionBold = Action(QIcon(':icons/bold.png'),
                                   self.tr("Bold"),
                                   self,
                                   shortcut="Ctrl+B",
@@ -5152,21 +5153,21 @@ class DefterAnaPencere(QMainWindow):
         # bold.setBold(True)
         # self.actionBold.setFont(bold)
 
-        self.actionItalic = QAction(QIcon(':icons/italic.png'),
+        self.actionItalic = Action(QIcon(':icons/italic.png'),
                                     self.tr("Italic"),
                                     self,
                                     shortcut="Ctrl+I",
                                     triggered=lambda durum: self.act_italic(durum=durum, from_button=False),
                                     checkable=True)
 
-        self.actionUnderline = QAction(QIcon(':icons/underline.png'),
+        self.actionUnderline = Action(QIcon(':icons/underline.png'),
                                        self.tr("Underline"),
                                        self,
                                        shortcut="Ctrl+U",
                                        triggered=lambda durum: self.act_underline(durum=durum, from_button=False),
                                        checkable=True)
 
-        self.actionStrikeOut = QAction(QIcon(':icons/strikeout.png'),
+        self.actionStrikeOut = Action(QIcon(':icons/strikeout.png'),
                                        self.tr("Strike Out"),
                                        self,
                                        priority=QAction.Priority.LowPriority,
@@ -5174,7 +5175,7 @@ class DefterAnaPencere(QMainWindow):
                                        triggered=lambda durum: self.act_strikeout(durum=durum, from_button=False),
                                        checkable=True)
 
-        self.actionOverline = QAction(QIcon(':icons/overline.png'),
+        self.actionOverline = Action(QIcon(':icons/overline.png'),
                                       self.tr("Overline"),
                                       self,
                                       priority=QAction.Priority.LowPriority,
@@ -5185,16 +5186,16 @@ class DefterAnaPencere(QMainWindow):
         grp = QActionGroup(self.fontToolBar)
         grp.triggered.connect(self.act_yazi_hizala_action)
 
-        self.actionYaziHizalaSola = QAction(QIcon(':icons/yazi-hizala-sola.png'),
+        self.actionYaziHizalaSola = Action(QIcon(':icons/yazi-hizala-sola.png'),
                                             self.tr("Align Left"), grp)
 
-        self.actionYaziHizalaOrtala = QAction(QIcon(':icons/yazi-hizala-ortala.png'),
+        self.actionYaziHizalaOrtala = Action(QIcon(':icons/yazi-hizala-ortala.png'),
                                               self.tr("Centered"), grp)
 
-        self.actionYaziHizalaSaga = QAction(QIcon(':icons/yazi-hizala-saga.png'),
+        self.actionYaziHizalaSaga = Action(QIcon(':icons/yazi-hizala-saga.png'),
                                             self.tr("Align Right"), grp)
 
-        self.actionYaziHizalaSigdir = QAction(QIcon(':icons/yazi-hizala-sigdir.png'),
+        self.actionYaziHizalaSigdir = Action(QIcon(':icons/yazi-hizala-sigdir.png'),
                                               self.tr("Justify"), grp)
 
         self.actionYaziHizalaSola.setShortcut("Ctrl+L")
@@ -5566,68 +5567,68 @@ class DefterAnaPencere(QMainWindow):
         self.hizalaAracCubugu.setWindowTitle(self.tr("Align Tool Bar"))
         self.hizalaAracCubugu.setIconSize(QSize(16, 16))
 
-        self.actionMirrorX = QAction(QIcon(':icons/mirror-x.png'), self.tr("Mirror X"), self.hizalaAracCubugu)
+        self.actionMirrorX = Action(QIcon(':icons/mirror-x.png'), self.tr("Mirror X"), self.hizalaAracCubugu)
         self.actionMirrorX.setShortcut(QKeySequence("M"))
         self.actionMirrorX.triggered.connect(self.act_pre_mirror_x)
 
-        self.actionMirrorY = QAction(QIcon(':icons/mirror-y.png'), self.tr("Mirror Y"), self.hizalaAracCubugu)
+        self.actionMirrorY = Action(QIcon(':icons/mirror-y.png'), self.tr("Mirror Y"), self.hizalaAracCubugu)
         self.actionMirrorY.setShortcut(QKeySequence("B"))
         self.actionMirrorY.triggered.connect(self.act_pre_mirror_y)
 
-        self.actionAlignLeft = QAction(QIcon(':icons/align-left-edges.png'), self.tr("Align left edges"),
+        self.actionAlignLeft = Action(QIcon(':icons/align-left-edges.png'), self.tr("Align left edges"),
                                        self.hizalaAracCubugu)
         self.actionAlignLeft.setShortcut(QKeySequence("Shift+Ctrl+Left"))
         self.actionAlignLeft.triggered.connect(self.act_align_left)
 
-        self.actionAlignRight = QAction(QIcon(':icons/align-right-edges.png'), self.tr("Align right edges"),
+        self.actionAlignRight = Action(QIcon(':icons/align-right-edges.png'), self.tr("Align right edges"),
                                         self.hizalaAracCubugu)
         self.actionAlignRight.setShortcut(QKeySequence("Shift+Ctrl+Right"))
         self.actionAlignRight.triggered.connect(self.act_align_right)
 
-        self.actionAlignTop = QAction(QIcon(':icons/align-top-edges.png'), self.tr("Align top edges"),
+        self.actionAlignTop = Action(QIcon(':icons/align-top-edges.png'), self.tr("Align top edges"),
                                       self.hizalaAracCubugu)
         self.actionAlignTop.setShortcut(QKeySequence("Shift+Ctrl+Up"))
         self.actionAlignTop.triggered.connect(self.act_align_top)
 
-        self.actionAlignBottom = QAction(QIcon(':icons/align-bottom-edges.png'), self.tr("Align bottom edges"),
+        self.actionAlignBottom = Action(QIcon(':icons/align-bottom-edges.png'), self.tr("Align bottom edges"),
                                          self.hizalaAracCubugu)
         self.actionAlignBottom.setShortcut(QKeySequence("Shift+Ctrl+Down"))
         self.actionAlignBottom.triggered.connect(self.act_align_bottom)
 
-        self.actionAlignVerticalCenter = QAction(QIcon(':icons/align-centers-vertically.png'),
+        self.actionAlignVerticalCenter = Action(QIcon(':icons/align-centers-vertically.png'),
                                                  self.tr("Align centers vertically"), self.hizalaAracCubugu)
         self.actionAlignVerticalCenter.setShortcut(QKeySequence("Shift+Ctrl+V"))
         self.actionAlignVerticalCenter.triggered.connect(self.act_align_vertical_center)
 
-        self.actionAlignHorizontalCenter = QAction(QIcon(':icons/align-centers-horizontally.png'),
+        self.actionAlignHorizontalCenter = Action(QIcon(':icons/align-centers-horizontally.png'),
                                                    self.tr("Align centers horizontally"), self.hizalaAracCubugu)
         self.actionAlignHorizontalCenter.setShortcut(QKeySequence("Shift+Ctrl+H"))
         self.actionAlignHorizontalCenter.triggered.connect(self.act_align_horizontal_center)
 
-        self.actionEqualizeHorizontalGaps = QAction(QIcon(':icons/equalize-horizontal-gaps.png'),
+        self.actionEqualizeHorizontalGaps = Action(QIcon(':icons/equalize-horizontal-gaps.png'),
                                                     self.tr("Make horizontal gaps between items equal"),
                                                     self.hizalaAracCubugu)
         self.actionEqualizeHorizontalGaps.setShortcut(QKeySequence("Shift+Ctrl+X"))
         self.actionEqualizeHorizontalGaps.triggered.connect(self.act_equalize_horizontal_gaps)
 
-        self.actionEqualizeVerticalGaps = QAction(QIcon(':icons/equalize-vertical-gaps.png'),
+        self.actionEqualizeVerticalGaps = Action(QIcon(':icons/equalize-vertical-gaps.png'),
                                                   self.tr("Make vertical gaps between items equal"),
                                                   self.hizalaAracCubugu)
         self.actionEqualizeVerticalGaps.setShortcut(QKeySequence("Shift+Ctrl+Y"))
         self.actionEqualizeVerticalGaps.triggered.connect(self.act_equalize_vertical_gaps)
 
-        self.actionNesneleriDagitDikeyde = QAction(QIcon(':icons/distribute-vertically.png'),
+        self.actionNesneleriDagitDikeyde = Action(QIcon(':icons/distribute-vertically.png'),
                                                    self.tr("Distribute items vertically"),
                                                    self.hizalaAracCubugu)
         self.actionNesneleriDagitDikeyde.setShortcut(QKeySequence("Shift+Ctrl+D"))
         self.actionNesneleriDagitDikeyde.triggered.connect(self.act_nesneleri_dagit_dikeyde)
 
-        self.actionNesneleriDagitYatayda = QAction(QIcon(':icons/distribute-horizontally.png'),
+        self.actionNesneleriDagitYatayda = Action(QIcon(':icons/distribute-horizontally.png'),
                                                    self.tr("Distribute items horizontally"), self.hizalaAracCubugu)
         self.actionNesneleriDagitYatayda.setShortcut(QKeySequence("Shift+Ctrl+F"))
         self.actionNesneleriDagitYatayda.triggered.connect(self.act_nesneleri_dagit_yatayda)
 
-        self.actionNesneleriDagit = QAction(QIcon(':icons/distribute.png'),
+        self.actionNesneleriDagit = Action(QIcon(':icons/distribute.png'),
                                             self.tr("Distribute items"), self.hizalaAracCubugu)
         self.actionNesneleriDagit.setShortcut(QKeySequence("Shift+Ctrl+M"))
         self.actionNesneleriDagit.triggered.connect(self.act_nesneleri_dagit)
@@ -5670,7 +5671,7 @@ class DefterAnaPencere(QMainWindow):
         # self.actionAlwaysOnTopToggle.toggled.connect(self.act_toggle_always_on_top)
         # self.actionAlwaysOnTopToggle.setToolTip(self.tr("If checked on, Defter will stay on top of other windows."))
 
-        self.actionAlwaysOnTopToggle = QAction(QIcon(":icons/pin.png"), self.tr("Always on Top"), self.utilitiesToolBar)
+        self.actionAlwaysOnTopToggle = Action(QIcon(":icons/pin.png"), self.tr("Always on Top"), self.utilitiesToolBar)
         self.actionAlwaysOnTopToggle.setCheckable(True)
         self.actionAlwaysOnTopToggle.setShortcut(QKeySequence("Shift+Ctrl+Alt+T"))
         self.actionAlwaysOnTopToggle.triggered.connect(self.act_toggle_always_on_top)
@@ -5686,7 +5687,7 @@ class DefterAnaPencere(QMainWindow):
         ekranGoruntusuMenu.aboutToShow.connect(self.on_ekranGoruntusuMenu_about_to_show)
         ekranGoruntusuMenuPB.setMenu(ekranGoruntusuMenu)
 
-        self.actionSecimEkranGoruntusuAlCmOn = QAction(self.tr("Selected Area (Comp On)"), self.utilitiesToolBar)
+        self.actionSecimEkranGoruntusuAlCmOn = Action(self.tr("Selected Area (Comp On)"), self.utilitiesToolBar)
         self.actionSecimEkranGoruntusuAlCmOn.setShortcut(QKeySequence(Qt.Key.Key_Print))
         self.actionSecimEkranGoruntusuAlCmOn.triggered.connect(self.act_ekran_goruntusu_secim_cm_on)
 
