@@ -134,8 +134,8 @@ class PdfyiResmeCevirPenceresi(QDialog):
     def act_donustur(self):
         self.donusturTiklandi.emit(self.genislikSBox.value(),
                                    self.yukseklikSBox.value(),
-                                   self.ilkSayfaSBox.value(),
-                                   self.sonSayfaSBox.value(),
+                                   self.ilkSayfaSBox.value()-1,
+                                   self.sonSayfaSBox.value()-1,
                                    self.sayfaArasiBoslukSBox.value()
                                    )
         self.accept()
