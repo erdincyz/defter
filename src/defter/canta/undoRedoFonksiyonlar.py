@@ -6,18 +6,18 @@ __date__ = '05/Nov/2018'
 __author__ = 'Erdinç Yılmaz'
 
 from .undoRedoSiniflar import (UndoableSayfaAdiDegistir, UndoableAddItem, UndoableRemoveItem, UndoableGroup,
-                                    UndoableUnGroup, UndoableParent, UndoableUnParent, UndoableResizeBaseItem, UndoableScaleBaseItemByResizing,
-                                    UndoableScalePathItemByScalingPath, UndoableSetFont, UndoableSetFontSizeF, UndoableRotate,
-                                    UndoableRotateWithOffset, UndoableSetZValue, UndoableSetLineStyle, UndoableSetLineJoinStyle,
-                                    UndoableSetLineCapStyle, UndoableSetLineColor, UndoableSetTextColor,
-                                    UndoableSetLineColorAlpha, UndoableSetTextColorAlpha, UndoableSetItemBackgroundColor,
-                                    UndoableSetItemBackgroundColorAlpha, UndoableStilAdiDegistir, UndoableStiliNesneyeUygula, UndoableStiliUygula,
-                                    UndoableSetImageOpacity, UndoableSetSceneBackgroundBrush, UndoableSetSceneBackgroundImage,
-                                    UndoableEmbedSceneBackgroundImage, UndoableSetPinStatus, UndoableItemSetText, UndoableItemCustomCommand,
-                                    UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, UndoableResizeLineItem,
-                                    UndoableMovePathPoint, UndoableSetTextAlignment, UndoableSetCharacterFormat, UndoableSetLineWidthF,
-                                    UndoableConvertToPlainText, UndoRedoBaglantisiYaziNesnesiDocuna, UndoableScaleLineItemByScalingLine,
-                                    UndoableScaleTextItemByResizing, UndoableScaleGroupItemByResizing, UndoableDeletePathPoint)
+                               UndoableUnGroup, UndoableParent, UndoableUnParent, UndoableResizeBaseItem, UndoableScaleBaseItemByResizing,
+                               UndoableScalePathItemByScalingPath, UndoableSetFont, UndoableSetFontSizeF, UndoableRotate,
+                               UndoableRotateWithOffset, UndoableSetZValue, UndoableSetLineStyle, UndoableSetLineJoinStyle,
+                               UndoableSetLineCapStyle, UndoableSetLineColor, UndoableSetTextColor,
+                               UndoableSetLineColorAlpha, UndoableSetTextColorAlpha, UndoableSetItemBackgroundColor,
+                               UndoableSetItemBackgroundColorAlpha, UndoableStilAdiDegistir, UndoableStiliNesneyeUygula, UndoableStiliUygula,
+                               UndoableSetImageOpacity, UndoableSetSceneBackgroundBrush, UndoableSetSceneBackgroundImage,
+                               UndoableEmbedSceneBackgroundImage, UndoableSetPinStatus, UndoableItemSetText, UndoableItemCustomCommand,
+                               UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, UndoableResizeLineItem,
+                               UndoableMovePathPoint, UndoableSetTextAlignment, UndoableSetCharacterFormat, UndoableSetLineWidthF,
+                               UndoableConvertToPlainText, UndoRedoBaglantisiYaziNesnesiDocuna, UndoableScaleLineItemByScalingLine,
+                               UndoableScaleTextItemByResizing, UndoableScaleGroupItemByResizing, UndoableDeletePathPoint, UndoableResizeGroupItem)
 
 
 # ---------------------------------------------------------------------
@@ -79,6 +79,10 @@ def undoableResizeLineItem(undoStack, description, item, yeniLine, eskiLine, esk
     command = UndoableResizeLineItem(description, item, yeniLine, eskiLine, eskiPos, degisenNokta)
     undoStack.push(command)
 
+# ---------------------------------------------------------------------
+def undoableResizeGroupItem(undoStack, description, item, eskiRect, yeniRect, eskiPos, yeniPos, diff, scaleFactorX, scaleFactorY):
+    command = UndoableResizeGroupItem(description, item, eskiRect, yeniRect, eskiPos, yeniPos, diff, scaleFactorX, scaleFactorY)
+    undoStack.push(command)
 
 # ---------------------------------------------------------------------
 def undoableScaleGroupItemByResizing(undoStack, description, item, yeniRect, scaleFactor, yeniPos):

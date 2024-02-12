@@ -25,7 +25,6 @@ class BaseItem(QGraphicsItem):
 
         self.setPos(pos)
         self._rect = rect
-        self._boundingRect = QRectF()
 
         self.setAcceptHoverEvents(True)
 
@@ -39,7 +38,7 @@ class BaseItem(QGraphicsItem):
         self._resizing = False
         self.handleSize = 10
         self.resizeHandleSize = QSizeF(self.handleSize, self.handleSize)
-        self.update_resize_handles()
+        self.sifirNoktasi = QPointF(0, 0)
 
         self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
                       QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
@@ -52,7 +51,11 @@ class BaseItem(QGraphicsItem):
         self._brush = QBrush()
         self._font = font
 
-        self.boundingRectTasmaDegeri = max(self.handleSize, self._pen.widthF() / 2)
+        # self.boundingRectTasmaDegeri = max(self.handleSize, self._pen.widthF() / 2)
+        self.boundingRectTasmaDegeri = ((self._pen.widthF() / 2) + (self.handleSize/2))
+        self._boundingRect = QRectF()
+
+        self.update_resize_handles()
 
         self.painterTextOption = QTextOption()
         self.painterTextOption.setWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere)
@@ -323,15 +326,21 @@ class BaseItem(QGraphicsItem):
         else:
             resizeHandleSize = self.resizeHandleSize
 
-        self.topLeftHandle = QRectF(self._rect.topLeft(), resizeHandleSize)
-        self.topRightHandle = QRectF(self._rect.topRight(), resizeHandleSize)
-        self.bottomRightHandle = QRectF(self._rect.bottomRight(), resizeHandleSize)
-        self.bottomLeftHandle = QRectF(self._rect.bottomLeft(), resizeHandleSize)
+        # bunlarin yeri onemli degil, QSize(0,0) da olur, asagida yerlerine kaydiriliorlar
+        self.topLeftHandle = QRectF(self.sifirNoktasi, resizeHandleSize)
+        self.topRightHandle = QRectF(self.sifirNoktasi, resizeHandleSize)
+        self.bottomRightHandle = QRectF(self.sifirNoktasi, resizeHandleSize)
+        self.bottomLeftHandle = QRectF(self.sifirNoktasi, resizeHandleSize)
 
         # self.topLeftHandle.moveTopLeft(self._rect.topLeft())
-        self.topRightHandle.moveTopRight(self._rect.topRight())
-        self.bottomRightHandle.moveBottomRight(self._rect.bottomRight())
-        self.bottomLeftHandle.moveBottomLeft(self._rect.bottomLeft())
+        # self.topRightHandle.moveTopRight(self._rect.topRight())
+        # self.bottomRightHandle.moveBottomRight(self._rect.bottomRight())
+        # self.bottomLeftHandle.moveBottomLeft(self._rect.bottomLeft())
+
+        self.topLeftHandle.moveCenter(self._rect.topLeft())
+        self.topRightHandle.moveCenter(self._rect.topRight())
+        self.bottomRightHandle.moveCenter(self._rect.bottomRight())
+        self.bottomLeftHandle.moveCenter(self._rect.bottomLeft())
 
     # ---------------------------------------------------------------------
     def hide_resize_handles(self):
@@ -519,6 +528,10 @@ class BaseItem(QGraphicsItem):
 
         # self.handlePen = QPen(_selectionLineBgColor, self.secili_nesne_kalem_kalinligi, Qt.PenStyle.SolidLine)
         self.handlePen = QPen(_activeItemLineColor, self.secili_nesne_kalem_kalinligi, Qt.PenStyle.SolidLine)
+        if col.value() > 245:
+            self.handleBrush = shared.handleBrushKoyu
+        else:
+            self.handleBrush = shared.handleBrushAcik
 
         self.update()
 
@@ -536,7 +549,8 @@ class BaseItem(QGraphicsItem):
     def setCizgiKalinligi(self, width):
         self._pen.setWidthF(width)
         self.textPen.setWidthF(width)
-        self.boundingRectTasmaDegeri = max(self.handleSize, width / 2)
+        # self.boundingRectTasmaDegeri = max(self.handleSize, width / 2)
+        self.boundingRectTasmaDegeri = ((self._pen.widthF() / 2) + (self.handleSize/2))
         # self.selectionPenBottom.setWidthF(width)
         # self.selectionPenBottomIfAlsoActiveItem.setWidthF(width)
         # self.selectionPenTop.setWidthF(width)
@@ -564,7 +578,8 @@ class BaseItem(QGraphicsItem):
     def shape(self):
         path = QPainterPath()
         # path.addRect(self.rect)
-        path.addRect(self._rect)
+        # path.addRect(self._rect)
+        path.addRect(self.boundingRect())
         return self.qt_graphicsItem_shapeFromPath(path, self._pen)
 
     # ---------------------------------------------------------------------
@@ -665,6 +680,13 @@ class BaseItem(QGraphicsItem):
 
             if self.isActiveItem:
                 selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
+                if not self.isPinned:
+                    painter.setPen(Qt.PenStyle.NoPen)
+                    painter.setBrush(self.handleBrush)
+                    painter.drawRect(self.topLeftHandle)
+                    painter.drawRect(self.topRightHandle)
+                    painter.drawRect(self.bottomRightHandle)
+                    painter.drawRect(self.bottomLeftHandle)
             else:
                 selectionPenBottom = self.selectionPenBottom
 
@@ -676,15 +698,18 @@ class BaseItem(QGraphicsItem):
             # painter.setPen(self.selectionPenTop)
             # painter.drawRect(self._rect)
 
-            #######################################################################
-            # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
-            #######################################################################
-            # if not self.isPinned and self.isActiveItem:
-            # painter.setPen(self.handlePen)
-            # painter.drawRect(self.topLeftHandle)
-            # painter.drawRect(self.topRightHandle)
-            # painter.drawRect(self.bottomRightHandle)
-            # painter.drawRect(self.bottomLeftHandle)
+        # if option.state & QStyle.State_MouseOver:
+        #     #######################################################################
+        #     # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
+        #     #######################################################################
+        #     # if not self.isPinned and self.isActiveItem:
+        #     # painter.setPen(self.handlePen)
+        #     painter.setPen(Qt.PenStyle.NoPen)
+        #     painter.setBrush(self.handleBrush)
+        #     painter.drawRect(self.topLeftHandle)
+        #     painter.drawRect(self.topRightHandle)
+        #     painter.drawRect(self.bottomRightHandle)
+        #     painter.drawRect(self.bottomLeftHandle)
 
             # painter.setPen(QPen(Qt.GlobalColor.red, 3))
             # painter.drawPoint(self.topLeftHandle.center())

@@ -109,6 +109,14 @@ class Ellipse(BaseItem):
 
             if self.isActiveItem:
                 selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
+                if not self.isPinned:
+
+                    painter.setPen(Qt.PenStyle.NoPen)
+                    painter.setBrush(self.handleBrush)
+                    painter.drawRect(self.topLeftHandle)
+                    painter.drawRect(self.topRightHandle)
+                    painter.drawRect(self.bottomRightHandle)
+                    painter.drawRect(self.bottomLeftHandle)
             else:
                 selectionPenBottom = self.selectionPenBottom
 
@@ -121,19 +129,20 @@ class Ellipse(BaseItem):
             # painter.drawEllipse(self._rect)
 
             if not self.isPinned:
-                painter.setPen(selectionPenBottom)
-                # painter.drawRect(self.boundingRect())
+            #     # painter.drawRect(self.boundingRect())
                 painter.drawRect(self._rect)
-
-                # painter.setPen(self.selectionPenTop)
-                # painter.drawRect(self.boundingRect())
-                # painter.drawRect(self._rect)
-
-                # draw handles
-                painter.drawRect(self.topLeftHandle)
-                painter.drawRect(self.topRightHandle)
-                painter.drawRect(self.bottomRightHandle)
-                painter.drawRect(self.bottomLeftHandle)
+            #
+            #     painter.setPen(Qt.PenStyle.NoPen)
+            #     painter.setBrush(self.handleBrush)
+            #     # painter.setPen(self.selectionPenTop)
+            #     # painter.drawRect(self.boundingRect())
+            #     # painter.drawRect(self._rect)
+            #
+            #     # draw handles
+            #     painter.drawRect(self.topLeftHandle)
+            #     painter.drawRect(self.topRightHandle)
+            #     painter.drawRect(self.bottomRightHandle)
+            #     painter.drawRect(self.bottomLeftHandle)
 
         # if option.state & QStyle.StateFlag.State_MouseOver:
         #     painter.setBrush(Qt.BrushStyle.NoBrush)

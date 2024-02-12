@@ -14,7 +14,6 @@ from ..nesneler.text import Text
 from .. import shared
 
 
-
 ########################################################################
 class Image(BaseItem):
     Type = shared.IMAGE_ITEM_TYPE
@@ -591,6 +590,13 @@ class Image(BaseItem):
 
             if self.isActiveItem:
                 selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
+                if not self.isPinned:
+                    painter.setPen(Qt.PenStyle.NoPen)
+                    painter.setBrush(self.handleBrush)
+                    painter.drawRect(self.topLeftHandle)
+                    painter.drawRect(self.topRightHandle)
+                    painter.drawRect(self.bottomRightHandle)
+                    painter.drawRect(self.bottomLeftHandle)
             else:
                 selectionPenBottom = self.selectionPenBottom
 
@@ -613,11 +619,12 @@ class Image(BaseItem):
             # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
             ########################################################################
             # if not self.isPinned and self.isActiveItem:
-            #     painter.setPen(self.handlePen)
-            #     painter.drawRect(self.topLeftHandle)
-            #     painter.drawRect(self.topRightHandle)
-            #     painter.drawRect(self.bottomRightHandle)
-            #     painter.drawRect(self.bottomLeftHandle)
+            # painter.setPen(Qt.PenStyle.NoPen)
+            # painter.setBrush(self.handleBrush)
+            # painter.drawRect(self.topLeftHandle)
+            # painter.drawRect(self.topRightHandle)
+            # painter.drawRect(self.bottomRightHandle)
+            # painter.drawRect(self.bottomLeftHandle)
             ########################################################################
         if self._isCropping:
             # painter.setBrush(Qt.green)

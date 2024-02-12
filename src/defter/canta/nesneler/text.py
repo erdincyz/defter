@@ -264,15 +264,21 @@ class Text(QGraphicsTextItem):
         else:
             resizeHandleSize = self.resizeHandleSize
 
+        # bunlarin yeri onemli degil, QSize(0,0) da olur, asagida yerlerine kaydiriliorlar
         self.topLeftHandle = QRectF(self._rect.topLeft(), resizeHandleSize)
         self.topRightHandle = QRectF(self._rect.topRight(), resizeHandleSize)
         self.bottomRightHandle = QRectF(self._rect.bottomRight(), resizeHandleSize)
         self.bottomLeftHandle = QRectF(self._rect.bottomLeft(), resizeHandleSize)
 
-        # self.topLeftHandle.moveTopLeft(self.boundingRect().topLeft())
-        self.topRightHandle.moveTopRight(self.boundingRect().topRight())
-        self.bottomRightHandle.moveBottomRight(self.boundingRect().bottomRight())
-        self.bottomLeftHandle.moveBottomLeft(self.boundingRect().bottomLeft())
+        # # self.topLeftHandle.moveTopLeft(self._rect.topLeft())
+        # self.topRightHandle.moveTopRight(self._rect.topRight())
+        # self.bottomRightHandle.moveBottomRight(self._rect.bottomRight())
+        # self.bottomLeftHandle.moveBottomLeft(self._rect.bottomLeft())
+
+        self.topLeftHandle.moveCenter(self._rect.topLeft())
+        self.topRightHandle.moveCenter(self._rect.topRight())
+        self.bottomRightHandle.moveCenter(self._rect.bottomRight())
+        self.bottomLeftHandle.moveCenter(self._rect.bottomLeft())
 
     # ---------------------------------------------------------------------
     def sceneCenter(self):
@@ -536,6 +542,10 @@ class Text(QGraphicsTextItem):
     def setArkaPlanRengi(self, col):
         self.arkaPlanRengi = col
         self.setBrush(QBrush(col))
+        if col.value() > 245:
+            self.handleBrush = shared.handleBrushKoyu
+        else:
+            self.handleBrush = shared.handleBrushAcik
 
     # ---------------------------------------------------------------------
     def itemChange(self, change, value):
@@ -1227,20 +1237,29 @@ class Text(QGraphicsTextItem):
         if option.state & QStyle.StateFlag.State_Selected or self.cosmeticSelect:
             if self.isActiveItem:
                 selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
+                if not self.isPinned:
+                    painter.setPen(Qt.PenStyle.NoPen)
+                    painter.setBrush(self.handleBrush)
+                    painter.drawRect(self.topLeftHandle)
+                    painter.drawRect(self.topRightHandle)
+                    painter.drawRect(self.bottomRightHandle)
+                    painter.drawRect(self.bottomLeftHandle)
             else:
                 selectionPenBottom = self.selectionPenBottom
             painter.setPen(selectionPenBottom)
+            painter.setBrush(Qt.BrushStyle.NoBrush)
             painter.drawRect(option.rect)
 
             ########################################################################
             # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
             ########################################################################
             # if not self.isPinned and self.isActiveItem:
-            #     # painter.setPen(self.handlePen)
-            #     painter.drawRect(self.topLeftHandle)
-            #     painter.drawRect(self.topRightHandle)
-            #     painter.drawRect(self.bottomRightHandle)
-            #     painter.drawRect(self.bottomLeftHandle)
+            # painter.setPen(Qt.PenStyle.NoPen)
+            # painter.setBrush(self.handleBrush)
+            # painter.drawRect(self.topLeftHandle)
+            # painter.drawRect(self.topRightHandle)
+            # painter.drawRect(self.bottomRightHandle)
+            # painter.drawRect(self.bottomLeftHandle)
             ########################################################################
 
         # if option.state & QStyle.StateFlag.State_MouseOver:

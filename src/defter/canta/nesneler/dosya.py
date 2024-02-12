@@ -177,6 +177,13 @@ class DosyaNesnesi(BaseItem):
 
             if self.isActiveItem:
                 selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
+                if not self.isPinned:
+                    painter.setPen(Qt.PenStyle.NoPen)
+                    painter.setBrush(self.handleBrush)
+                    painter.drawRect(self.topLeftHandle)
+                    painter.drawRect(self.topRightHandle)
+                    painter.drawRect(self.bottomRightHandle)
+                    painter.drawRect(self.bottomLeftHandle)
             else:
                 selectionPenBottom = self.selectionPenBottom
 
@@ -192,11 +199,12 @@ class DosyaNesnesi(BaseItem):
             # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
             ########################################################################
             # if not self.isPinned and self.isActiveItem:
-            #     painter.setPen(self.handlePen)
-            #     painter.drawRect(self.topLeftHandle)
-            #     painter.drawRect(self.topRightHandle)
-            #     painter.drawRect(self.bottomRightHandle)
-            #     painter.drawRect(self.bottomLeftHandle)
+            # painter.setPen(Qt.PenStyle.NoPen)
+            # painter.setBrush(self.handleBrush)
+            # painter.drawRect(self.topLeftHandle)
+            # painter.drawRect(self.topRightHandle)
+            # painter.drawRect(self.bottomRightHandle)
+            # painter.drawRect(self.bottomLeftHandle)
             ########################################################################
 
         # if option.state & QStyle.StateFlag.State_MouseOver:

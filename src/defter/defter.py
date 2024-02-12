@@ -96,7 +96,7 @@ from .canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.95.4"
+VERSION = "0.95.5"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -8133,6 +8133,21 @@ class DefterAnaPencere(QMainWindow):
                                                         yeniLine=yeniLine,
                                                         eskiLine=eskiLine,
                                                         eskiPos=item.pos())
+                elif item.type() == shared.GROUP_ITEM_TYPE:
+                    if not startedMacro:
+                        self.cScene.undoStack.beginMacro(self.tr("change width"))
+                        startedMacro = True
+                        scaleFactorX = width / item.rect().width()
+                        undoRedo.undoableResizeGroupItem(self.cScene.undoStack,
+                                                          "change width",
+                                                          item,
+                                                          item.rect(),
+                                                          QRectF(item.rect().topLeft(), self.itemSize),
+                                                          item.pos(),
+                                                          item.pos(),
+                                                          QPointF(0, 0),
+                                                          scaleFactorX,
+                                                          1)
 
             if startedMacro:
                 self.cScene.undoStack.endMacro()
@@ -8156,6 +8171,22 @@ class DefterAnaPencere(QMainWindow):
                                                     QRectF(item.rect().topLeft(), self.itemSize),
                                                     item.rect(),
                                                     item.pos())
+                elif item.type() == shared.GROUP_ITEM_TYPE:
+                    if not startedMacro:
+                        self.cScene.undoStack.beginMacro(self.tr("change height"))
+                        startedMacro = True
+                        scaleFactorY = height / item.rect().height()
+                        undoRedo.undoableResizeGroupItem(self.cScene.undoStack,
+                                                          "change height",
+                                                          item,
+                                                          item.rect(),
+                                                          QRectF(item.rect().topLeft(), self.itemSize),
+                                                          item.pos(),
+                                                          item.pos(),
+                                                          QPointF(0, 0),
+                                                          1,
+                                                          scaleFactorY)
+
             if startedMacro:
                 self.cScene.undoStack.endMacro()
 
@@ -9899,8 +9930,9 @@ class DefterAnaPencere(QMainWindow):
         # self.degistir_yazi_rengi_ikonu(group.cizgiRengi)
         # self.degistir_nesne_arkaplan_rengi_ikonu(group.arkaPlanRengi)
 
-        self.itemRotationSBox_tbar.setValue(group.rotation())
-        self.itemRotationSBox_nesnedw.setValue(group.rotation())
+        # self.itemRotationSBox_tbar.setValue(group.rotation())
+        # self.itemRotationSBox_nesnedw.setValue(group.rotation())
+        self.change_transform_box_values(group)
         self.change_line_style_options(group._pen)
 
     # ---------------------------------------------------------------------

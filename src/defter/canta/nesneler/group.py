@@ -5,7 +5,7 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
-from PySide6.QtCore import Qt, QRectF, QPointF
+from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF
 from PySide6.QtGui import QColor, QPen
 from PySide6.QtWidgets import QStyle, QGraphicsItem
 from .. import shared
@@ -15,15 +15,17 @@ from .. import shared
 class Group(QGraphicsItem):
     Type = shared.GROUP_ITEM_TYPE
 
-    def __init__(self, arkaPlanRengi=Qt.GlobalColor.transparent,
-                 yaziRengi=Qt.GlobalColor.transparent, pen=QPen(Qt.PenStyle.DotLine),
+    def __init__(self, arkaPlanRengi=QColor(Qt.GlobalColor.transparent),
+                 yaziRengi=QColor(Qt.GlobalColor.transparent), 
+                 pen=QPen(Qt.PenStyle.DotLine),
                  parent=None):
         super(Group, self).__init__(parent)
 
         self._kim = shared.kim(kac_basamak=16)
 
         self.ustGrup = None
-        self._itemsBoundingRect = QRectF()
+        # self._rect aslinda => self._itemsBoundingRect
+        self._rect = QRectF()
 
         self.setHandlesChildEvents(False)
         self.setFlags(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable
@@ -52,6 +54,290 @@ class Group(QGraphicsItem):
         self.allFirstLevelGroupChildren = []  # we use this for calculating group's bounding box.
 
         self.oklar_dxdy_nokta = {}
+
+        self._eskiRectBeforeResize = None
+        self._eskiPosBeforeResize = None
+
+        self._resizing = False
+        self.handleSize = 10
+        self.resizeHandleSize = QSizeF(self.handleSize, self.handleSize)
+        self.update_resize_handles()
+
+    # ---------------------------------------------------------------------
+    def setRect(self, rect):
+        if self._rect == rect:
+            return
+        self.prepareGeometryChange()
+        self._rect = rect
+        self.update_resize_handles()
+        # self.update()
+
+    # ---------------------------------------------------------------------
+    def rect(self):
+        return self._rect
+
+    # ---------------------------------------------------------------------
+    def update_resize_handles(self):
+        self.prepareGeometryChange()
+
+        if self.scene():
+            resizeHandleSize = self.resizeHandleSize / self.scene().views()[0].transform().m11()
+        else:
+            resizeHandleSize = self.resizeHandleSize
+
+        self.topLeftHandle = QRectF(self._rect.topLeft(), resizeHandleSize)
+        self.topRightHandle = QRectF(self._rect.topRight(), resizeHandleSize)
+        self.bottomRightHandle = QRectF(self._rect.bottomRight(), resizeHandleSize)
+        self.bottomLeftHandle = QRectF(self._rect.bottomLeft(), resizeHandleSize)
+
+        # self.topLeftHandle.moveTopLeft(self._rect.topLeft())
+        self.topRightHandle.moveTopRight(self._rect.topRight())
+        self.bottomRightHandle.moveBottomRight(self._rect.bottomRight())
+        self.bottomLeftHandle.moveBottomLeft(self._rect.bottomLeft())
+
+    # ---------------------------------------------------------------------
+    def hide_resize_handles(self):
+        self.isPinned = True
+
+    # ---------------------------------------------------------------------
+    def show_resize_handles(self):
+        self.isPinned = False
+
+    # ---------------------------------------------------------------------
+    def mousePressEvent(self, event):
+
+        self._resizing = False  # we could use "self._resizingFrom = 0" instead, but self._resizing is more explicit.
+        self._fixedResizePoint = None
+        self._resizingFrom = None
+        self._eskiRectBeforeResize = None
+
+        self._eskiPosBeforeResize = self.pos()
+        self._ilk_tik_event_pos = event.pos()
+        # self._eskiPosBeforeResize = self.scenePos()
+
+        if self.topLeftHandle.contains(event.pos()):
+            self._resizing = True
+            self._fixedResizePoint = self._rect.bottomRight()
+            self._resizingFrom = 1
+        elif self.topRightHandle.contains(event.pos()):
+            self._resizing = True
+            self._fixedResizePoint = self._rect.bottomLeft()
+            self._resizingFrom = 2
+        elif self.bottomRightHandle.contains(event.pos()):
+            self._resizing = True
+            self._fixedResizePoint = self._rect.topLeft()
+            self._resizingFrom = 3
+        elif self.bottomLeftHandle.contains(event.pos()):
+            self._resizing = True
+            self._fixedResizePoint = self._rect.topRight()
+            self._resizingFrom = 4
+        self._eskiRectBeforeResize = self._rect
+
+        super(Group, self).mousePressEvent(event)
+
+        # print(self.allFirstLevelGroupChildren)
+        # print(self.allNonGroupGroupChildren)
+        # print(self.parentedWithParentOperation)
+
+        # TODO: bu kozmetik amacli, sadece release de olunca gecikmeli seciyormus hissi oluyor
+        if self.isSelected() and self.parentedWithParentOperation:
+            self.scene().select_all_children_recursively(self, cosmeticSelect=True)
+
+        # self.scene().deactivate_item(self)
+        # self.scene().activate_item(self)
+
+    # ---------------------------------------------------------------------
+    def mouseMoveEvent(self, event):
+
+        # TODO: burda QRectF().normalized da kullanilabilir belki..
+
+        if self._resizing:
+
+            # cunku px=1 , py=1 olarak basliyor cizmeye. burda sifirliyoruz eger ilk sahneye ekleme cizimi ise.
+            if not self._eskiRectBeforeResize.size() == QSizeF(1, 1):
+                px = self._fixedResizePoint.x()
+                py = self._fixedResizePoint.y()
+            else:
+                px = py = 0
+            # mx = event.scenePos().x()
+            # my = event.scenePos().y()
+            mx = event.pos().x()
+            my = event.pos().y()
+            topLeft = QPointF(min(px, mx), min(py, my))  # top-left corner (x,y)
+            bottomRight = QPointF(max(px, mx), max(py, my))  # bottom-right corner (x,y)
+            # size = QSizeF(fabs(mx - px), fabs(my - py))
+            # rect = QRectF(topLeft, size)
+
+            rect = QRectF(topLeft, bottomRight)
+
+            c = self._rect.center()
+
+            # Alt Key - to resize around center.
+            # if event.modifiers() & Qt.AltModifier:
+            if event.modifiers() == Qt.KeyboardModifier.AltModifier:
+                rect.moveCenter(c)
+
+            # ---------------------------------------------------------------------
+            #  Ctrl Key - to keep aspect ratio while resizing.
+            if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
+                tl = self._rect.topLeft()
+                tr = self._rect.topRight()
+                br = self._rect.bottomRight()
+                bl = self._rect.bottomLeft()
+                c = self._rect.center()
+
+                yeniSize = rect.size()
+                eskiSize = self._rect.size()
+                # eskiSize.scale(yeniSize, Qt.KeepAspectRatio)
+                eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+                # eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.KeepAspectRatio)
+
+                # if not eskiSize.isNull():
+                if not eskiSize.isEmpty():
+                    self.yedekSize = QSizeF(eskiSize)
+
+                else:
+                    eskiSize = QSizeF(self.yedekSize)
+
+                rect.setSize(eskiSize)
+                h = rect.height()
+                w = rect.width()
+
+                if self._resizingFrom == 1:
+                    rect.moveTopLeft(QPointF(br.x() - w, br.y() - h))
+
+                if self._resizingFrom == 2:
+                    rect.moveTopRight(QPointF(bl.x() + w, bl.y() - h))
+
+                if self._resizingFrom == 3:
+                    rect.moveBottomRight(QPointF(tl.x() + w, tl.y() + h))
+
+                elif self._resizingFrom == 4:
+                    rect.moveBottomLeft(QPointF(tr.x() - w, tr.y() + h))
+
+                # Alt Key - to resize around center
+                if event.modifiers() == Qt.KeyboardModifier.AltModifier:
+                    rect.moveCenter(c)
+
+            # ---------------------------------------------------------------------
+            # Shift Key - to make square (equals width and height)
+            if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
+                height = my - py
+                if self._resizingFrom == 1:
+                    rect.setCoords(px + height, py + height, px, py)
+                    rect = rect.normalized()
+
+                elif self._resizingFrom == 2:
+                    rect.setCoords(px, py + height, px - height, py)
+                    rect = rect.normalized()
+
+                elif self._resizingFrom == 3:
+                    rect.setCoords(px, py, px + height, py + height)
+                    rect = rect.normalized()
+
+                elif self._resizingFrom == 4:
+                    rect.setCoords(px - height, py, px, py + height)
+                    rect = rect.normalized()
+
+                # Alt Key - to resize around center
+                if event.modifiers() == Qt.KeyboardModifier.AltModifier:
+                    rect.moveCenter(c)
+
+            fark = event.pos() - self._ilk_tik_event_pos
+
+            # self.setRect(rect)
+            # self.setPos(newPos)
+            # TODO : alt calismiyor move to 0,0 dan dolayi
+            self._resize(rect, fark)  # mouse release eventten gonderiyoruz undoya
+            # self.setRect(rect)  # mouse release eventten gonderiyoruz undoya
+            self.update_resize_handles()
+            self.scene().parent().change_transform_box_values(self)
+            # self.setPos(x, y)
+            # return QGraphicsItem.mouseMoveEvent(self, event)
+
+            # self.update_painter_text_rect()
+
+        # event.accept()
+        else:
+            super(Group, self).mouseMoveEvent(event)
+
+        # super(Group, self).mouseMoveEvent(event)
+
+    # ---------------------------------------------------------------------
+    def mouseReleaseEvent(self, event):
+        if self._resizing:
+
+            yeniRect = self._rect
+
+            try:
+                scaleFactorX = yeniRect.width() / self._eskiRectBeforeResize.width()
+                scaleFactorY = yeniRect.height() / self._eskiRectBeforeResize.height()
+            except ZeroDivisionError:
+                # scaleFactorX = scaleFactorY = 1
+                super(Group, self).mouseReleaseEvent(event)
+                return
+
+            fark = yeniRect.topLeft() - self._eskiRectBeforeResize.topLeft()
+
+            yeniPos = self.mapToScene(yeniRect.topLeft())
+            if self.parentItem():
+                yeniPos = self.mapToParent(yeniRect.topLeft())
+            # self.setPos(yeniPos)
+            # yeniRect.moveTo(0, 0)
+            # self.update_resize_handles()
+
+            # self.setPos(self.mapToScene(yeniRect.topLeft()))
+
+            self.scene().undoRedo.undoableResizeGroupItem(self.scene().undoStack,
+                                                          "_resized by group",
+                                                          self,
+                                                          self._eskiRectBeforeResize,
+                                                          yeniRect,
+                                                          self._eskiPosBeforeResize,
+                                                          yeniPos,
+                                                          fark,
+                                                          scaleFactorX,
+                                                          scaleFactorY)
+
+            self._resizing = False
+
+            # self.update_painter_text_rect()
+            self.scene().unite_with_scene_rect(self.sceneBoundingRect())
+        super(Group, self).mouseReleaseEvent(event)
+
+        if self.parentedWithParentOperation:
+            if self.isSelected():
+                self.scene().select_all_children_recursively(self, cosmeticSelect=False, topmostParent=True)
+            else:
+                self.scene().select_all_children_recursively(self, cosmeticSelect=False, topmostParent=False)
+
+    # ---------------------------------------------------------------------
+    def _resize(self, yeniRect, fark):
+        if self._rect == yeniRect:
+            return
+
+        # eskiRect = self._rect
+
+        # try:
+        #     scaleFactorX = yeniRect.width() / eskiRect.width()
+        #     scaleFactorY = yeniRect.height() / eskiRect.height()
+        # except ZeroDivisionError:
+        #     # scaleFactorX = scaleFactorY = 1
+        #     return
+
+        # yeniPos = self.mapToScene(yeniRect.topLeft())
+        # if self.parentItem():
+        #     yeniPos = self.mapToParent(yeniRect.topLeft())
+        # yeniPos = yeniPos + fark
+        # self.setPos(yeniPos)
+        # yeniRect.moveTo(0,0)
+        # for c in self.allFirstLevelGroupChildren:
+        #     # c.setPos(c.pos()+fark)
+        #     c.moveBy(fark.x(), fark.y())
+
+        self.setRect(yeniRect)
+
+        # shared._resizeGroupsChildItems(self, fark, scaleFactorX, scaleFactorY)
 
     # ---------------------------------------------------------------------
     def type(self):
@@ -117,15 +403,6 @@ class Group(QGraphicsItem):
                 return parentItem
             parentItem = parentItem.parentItem()
         return None
-
-    # ---------------------------------------------------------------------
-    def update_resize_handles(self):
-        # dummy method
-        # while zooming, view, updates activeItem's resize handles.
-        # filtering out group type is an another option but,
-        # we may add resize functions to the group object in the future.
-        # so ...
-        pass
 
     # ---------------------------------------------------------------------
     def get_properties_for_save_binary(self):
@@ -217,7 +494,7 @@ class Group(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def moveCenterToPosition(self, scenePos):
-        self.setPos(scenePos - self._itemsBoundingRect.center())
+        self.setPos(scenePos - self._rect.center())
 
     # ---------------------------------------------------------------------
     def flipHorizontal(self, mposx):
@@ -284,15 +561,13 @@ class Group(QGraphicsItem):
             if item.childItems():
                 rect = self._update_rect_recursively(item.childItems(), rect)
 
-        # self._itemsBoundingRect = rect
-
         # TODO: bir bak
         # pozisyonu sahne koordinatlarında topLefte almak icin,
         # ama scaled group mirrorunu bozuyor.
         diff = self.scenePos() - self.mapToScene(rect.topLeft())
         self.setPos(self.mapToScene(rect.topLeft()))
         rect.moveTo(0, 0)
-        self._itemsBoundingRect = rect
+        self.setRect(rect)
         for c in self.allFirstLevelGroupChildren:
             # c.setPos(c.pos()+diff)
             c.moveBy(diff.x(), diff.y())
@@ -302,7 +577,7 @@ class Group(QGraphicsItem):
     # # ---------------------------------------------------------------------
     # def tumElemanlariEkleyincePozisyonGuncelle(self):
     #     # self.updateBoundingRect()
-    #     self.setPos(self.mapToScene(self._itemsBoundingRect.topLeft()))
+    #     self.setPos(self.mapToScene(self._rect.topLeft()))
 
     # ---------------------------------------------------------------------
     def addSingleItemToGroup(self, item):
@@ -413,17 +688,17 @@ class Group(QGraphicsItem):
 
         # no need to below, because we will delete this instance immediately.
         # self.prepareGeometryChange()
-        # self._itemsBoundingRect = self.childrenBoundingRect()
+        # self.setRect(self.childrenBoundingRect())
 
     # ---------------------------------------------------------------------
     def boundingRect(self):
-        return self._itemsBoundingRect
+        return self._rect
 
     # # ---------------------------------------------------------------------
     # def shape(self):
     #     path = QPainterPath()
     #     # path.addRect(self.rect)
-    #     path.addRect(self._itemsBoundingRect)
+    #     path.addRect(self._rect)
     #     # return self.qt_graphicsItem_shapeFromPath(path, self._pen)
     #     return path
 
@@ -487,6 +762,11 @@ class Group(QGraphicsItem):
                                                        Qt.PenStyle.DashLine,
                                                        Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
 
+        if col.value() > 245:
+            self.handleBrush = shared.handleBrushKoyu
+        else:
+            self.handleBrush = shared.handleBrushAcik
+
         self.update()
 
     # ---------------------------------------------------------------------
@@ -510,31 +790,6 @@ class Group(QGraphicsItem):
         # arkaplanRengi ve yaziRengi grup nesnesinde kullanilmiyor
         # fasulyeden method
         self.yaziRengi = col
-
-    # ---------------------------------------------------------------------
-    def mousePressEvent(self, event):
-
-        super(Group, self).mousePressEvent(event)
-
-        # print(self.allFirstLevelGroupChildren)
-        # print(self.allNonGroupGroupChildren)
-        # print(self.parentedWithParentOperation)
-
-        # TODO: bu kozmetik amacli, sadece release de olunca gecikmeli seciyormus hissi oluyor
-        if self.isSelected() and self.parentedWithParentOperation:
-            self.scene().select_all_children_recursively(self, cosmeticSelect=True)
-
-    # ---------------------------------------------------------------------
-    def mouseReleaseEvent(self, event):
-
-        super(Group, self).mouseReleaseEvent(event)
-
-        # TODO: and self.childItems() a gerek var mi. bos grup olmuyor cunku.
-        if self.parentedWithParentOperation:
-            if self.isSelected():
-                self.scene().select_all_children_recursively(self, cosmeticSelect=False, topmostParent=True)
-            else:
-                self.scene().select_all_children_recursively(self, cosmeticSelect=False, topmostParent=False)
 
     # ---------------------------------------------------------------------
     def wheelEvent(self, event):
@@ -590,7 +845,7 @@ class Group(QGraphicsItem):
 
         # eskiTamCerceve = self.boundingRect() | self.childrenBoundingRect()
         # rect = self.childrenBoundingRect()
-        rect = self._itemsBoundingRect
+        rect = self._rect
         center = rect.center()
 
         rect = QRectF(rect.topLeft(), rect.size() * scaleFactor)
@@ -659,41 +914,70 @@ class Group(QGraphicsItem):
     def paint(self, painter, option, widget=None):
         # painter.setBrush(self.arkaPlanRengi)
 
+        painter.setPen(self._pen)
+        # painter.drawRect(self.boundingRect())
+        painter.drawRect(self._rect)
+
         if option.state & QStyle.StateFlag.State_Selected or self.cosmeticSelect:
             if self.isActiveItem:
                 selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
+                if not self.isPinned:
+                    painter.setPen(Qt.PenStyle.NoPen)
+                    painter.setBrush(self.handleBrush)
+                    painter.drawRect(self.topLeftHandle)
+                    painter.drawRect(self.topRightHandle)
+                    painter.drawRect(self.bottomRightHandle)
+                    painter.drawRect(self.bottomLeftHandle)
             else:
                 selectionPenBottom = self.selectionPenBottom
 
+            painter.setBrush(Qt.BrushStyle.NoBrush)
             painter.setPen(selectionPenBottom)
             # painter.drawRect(self.boundingRect())
-            painter.drawRect(self._itemsBoundingRect)
+            painter.drawRect(self._rect)
 
             # painter.setPen(self.selectionPenTop)
             # painter.drawRect(self.boundingRect())
 
-        else:
-            painter.setPen(self._pen)
-            # painter.drawRect(self.boundingRect())
-            painter.drawRect(self._itemsBoundingRect)
+            #######################################################################
+            # !!! simdilik iptal, gorsel fazlalik olusturmakta !!!
+            #######################################################################
+            # if not self.isPinned and self.isActiveItem:
+            # painter.setPen(self.handlePen)
+            # painter.setPen(Qt.PenStyle.NoPen)
+            # painter.setBrush(self.handleBrush)
+            # painter.drawRect(self.topLeftHandle)
+            # painter.drawRect(self.topRightHandle)
+            # painter.drawRect(self.bottomRightHandle)
+            # painter.drawRect(self.bottomLeftHandle)
+
+            # painter.setPen(QPen(Qt.GlobalColor.red, 3))
+            # painter.drawPoint(self.topLeftHandle.center())
+            # painter.drawPoint(self.topRightHandle.center())
+            # painter.drawPoint(self.bottomRightHandle.center())
+            # painter.drawPoint(self.bottomLeftHandle.center())
 
         # if option.state & QStyle.StateFlag.State_MouseOver:
         #     painter.setBrush(Qt.BrushStyle.NoBrush)
         #     painter.setPen(self.selectionPenBottom)
-        #     painter.drawRect(self._itemsBoundingRect)
+        #     painter.drawRect(self._rect)
 
         # # # # # debug start - pos() # # # # #
         # p = self.pos()
         # s = self.scenePos()
         # painter.drawText(self.boundingRect(),
         #                  "{0:.2f},  {1:.2f} pos \n{2:.2f},  {3:.2f} spos".format(p.x(), p.y(), s.x(), s.y()))
-        # painter.setPen(QPen(Qt.green, 8))
-        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
+        # painter.setPen(QPen(Qt.green, 20))
         # painter.drawPoint(0, 0)
+        # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
+        # painter.setPen(QPen(Qt.cyan, 24))
+        # painter.drawPoint(p)
+        # painter.setPen(QPen(Qt.yellow, 20))
+        # painter.drawPoint(s)
         # painter.setPen(QPen(Qt.red, 16))
-        # painter.drawPoint(self.mapFromScene(self.scenePos()))
+        # painter.drawPoint(self.mapFromScene(p))
         # painter.setPen(QPen(Qt.blue, 12))
-        # painter.drawPoint(self.mapFromScene(self.scenePos()))
+        # painter.drawPoint(self.mapFromScene(s))
         # t = self.transformOriginPoint()
         # painter.drawRect(t.x()-12, t.y()-12,24,24)
         # mapped = self.mapToScene(self.boundingRect().topLeft())

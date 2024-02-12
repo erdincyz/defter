@@ -858,6 +858,45 @@ class UndoableResizeLineItem(QUndoCommand):
 
 
 ########################################################################
+class UndoableResizeGroupItem(QUndoCommand):
+    """ """
+
+    # ---------------------------------------------------------------------
+    def __init__(self, description, item, eskiRect, yeniRect, eskiPos, yeniPos, diff, scaleFactorX, scaleFactorY, parent=None):
+        super(UndoableResizeGroupItem, self).__init__(description, parent)
+        self.item = item
+        # self.eskiRect = item._rect
+        self.eskiRect = eskiRect
+        self.yeniRect = yeniRect
+        self.scaleFactorX = scaleFactorX
+        self.scaleFactorY = scaleFactorY
+
+        self.diff = diff
+
+        self.eskiPos = eskiPos
+        self.yeniPos = yeniPos
+
+    # ---------------------------------------------------------------------
+    def redo(self):
+        self.item.setPos(self.yeniPos)
+        self.yeniRect.moveTo(0, 0)
+        self.item.setRect(self.yeniRect)
+        # Dikkat: Demiyoruz ki; burda gerek yok zaten mouseMoveda bu islem hallediliyor
+        # geri-al ileri-al yapılırsa ihtiyac olacak
+        shared._resizeGroupsChildItems(self.item, self.diff, self.scaleFactorX, self.scaleFactorY)
+        self.item.update_resize_handles()
+        self.item.scene().parent().change_transform_box_values(self.item)
+
+    # ---------------------------------------------------------------------
+    def undo(self):
+        self.item.setPos(self.eskiPos)
+        self.item.setRect(self.eskiRect)
+        shared._resizeGroupsChildItems(self.item, -self.diff, 1 / self.scaleFactorX, 1 / self.scaleFactorY)
+        self.item.update_resize_handles()
+        self.item.scene().parent().change_transform_box_values(self.item)
+
+
+########################################################################
 class UndoableScaleTextItemByResizing(QUndoCommand):
     """ """
 
@@ -906,7 +945,7 @@ class UndoableScaleGroupItemByResizing(QUndoCommand):
     def __init__(self, description, item, yeniRect, scaleFactor, yeniPos, parent=None):
         super(UndoableScaleGroupItemByResizing, self).__init__(description, parent)
         self.item = item
-        self.eskiRect = item._itemsBoundingRect
+        self.eskiRect = item._rect
         self.yeniRect = yeniRect
         self.scaleFactor = scaleFactor
         self.yeniPos = yeniPos
@@ -914,7 +953,7 @@ class UndoableScaleGroupItemByResizing(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 7
+        return 8
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -928,13 +967,13 @@ class UndoableScaleGroupItemByResizing(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def redo(self):
-        self.item._itemsBoundingRect = self.yeniRect
+        self.item.setRect(self.yeniRect)
         self.item.setPos(self.yeniPos)
         shared._scaleChildItemsByResizing(self.item, self.scaleFactor)
 
     # ---------------------------------------------------------------------
     def undo(self):
-        self.item._itemsBoundingRect = self.eskiRect
+        self.item.setRect(self.eskiRect)
         self.item.setPos(self.eskiPos)
         shared._scaleChildItemsByResizing(self.item, 1 / self.scaleFactor)
 
@@ -955,7 +994,7 @@ class UndoableScaleBaseItemByResizing(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 7
+        return 9
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -1004,7 +1043,7 @@ class UndoableScalePathItemByScalingPath(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 8
+        return 10
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -1041,7 +1080,7 @@ class UndoableScaleLineItemByScalingLine(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 8
+        return 11
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -1077,7 +1116,7 @@ class UndoableRotate(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 10
+        return 12
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -1114,7 +1153,7 @@ class UndoableRotateWithOffset(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 11
+        return 13
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -1149,7 +1188,7 @@ class UndoableSetZValue(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 12
+        return 14
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -1182,7 +1221,7 @@ class UndoableSetLineCapStyle(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 13
+        return 15
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -1217,7 +1256,7 @@ class UndoableSetLineJoinStyle(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 14
+        return 16
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -1252,7 +1291,7 @@ class UndoableSetLineStyle(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 15
+        return 17
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -1287,7 +1326,7 @@ class UndoableSetLineWidthF(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 16
+        return 18
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -1387,7 +1426,7 @@ class UndoableSetLineColorAlpha(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 17
+        return 19
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -1428,7 +1467,7 @@ class UndoableSetTextColorAlpha(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 18
+        return 20
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -1464,7 +1503,7 @@ class UndoableSetItemBackgroundColor(QUndoCommand):
 
     # # ---------------------------------------------------------------------
     # def id(self):
-    #     return 19
+    #     return 21
     #
     # # ---------------------------------------------------------------------
     # def mergeWith(self, enSonUndo):
@@ -1512,7 +1551,7 @@ class UndoableSetItemBackgroundColorAlpha(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 20
+        return 22
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -1585,7 +1624,7 @@ class UndoableStiliUygula(QUndoCommand):
 
     # # ---------------------------------------------------------------------
     # def id(self):
-    #     return 21
+    #     return 23
 
     # # ---------------------------------------------------------------------
     # def mergeWith(self, enSonUndo):
@@ -1659,7 +1698,7 @@ class UndoableStiliNesneyeUygula(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 22
+        return 24
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):
@@ -1731,7 +1770,7 @@ class UndoableSetImageOpacity(QUndoCommand):
 
     # ---------------------------------------------------------------------
     def id(self):
-        return 23
+        return 25
 
     # ---------------------------------------------------------------------
     def mergeWith(self, enSonUndo):

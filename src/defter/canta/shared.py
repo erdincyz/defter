@@ -10,7 +10,7 @@ from unicodedata import normalize
 from re import sub
 from uuid import uuid4
 
-from PySide6.QtCore import Qt, QRectF
+from PySide6.QtCore import Qt, QRectF, QSizeF
 from PySide6.QtGui import QColor, QPixmap, QPainter, QBrush, QTransform
 from PySide6.QtWidgets import QGraphicsItem
 
@@ -27,6 +27,9 @@ renk_kirmizi = QColor(Qt.GlobalColor.red)
 renk_siyah = QColor(Qt.GlobalColor.black)
 renk_mavi = QColor(Qt.GlobalColor.blue)
 activeItemLineColor = QColor(Qt.GlobalColor.red)
+
+handleBrushAcik = QBrush(QColor(250, 250, 250))
+handleBrushKoyu = QBrush(QColor(25, 25, 25))
 
 # bunlarin degerleri degismesin, cunku nesneler kaydedilirken bu degerler de kaydediliyor.
 # sonra eski dosyalar acilmaz, degisiklik yapilirsa
@@ -118,6 +121,64 @@ def kutulu_arkaplan_olustur(widget, kareBoyutu=10):
     widget.setAutoFillBackground(True)
     widget.setPalette(palette)
 
+# ---------------------------------------------------------------------
+def _resizeGroupsChildItems(nesne, fark, scaleFactorX, scaleFactorY=None):
+
+    if not scaleFactorY:
+        scaleFactorY = scaleFactorX
+
+    for c in nesne.childItems():
+        if c.childItems():
+            _resizeGroupsChildItems(c, fark, scaleFactorX)
+
+        if c.type() == TEXT_ITEM_TYPE:
+
+            # c.setTransformOriginPoint(c.boundingRect().center())
+            fontPointSizeF = c.fontPointSizeF() * scaleFactorX
+            c.setFontPointSizeF(fontPointSizeF)
+            c.yazi_kutusunu_daralt()
+
+        elif c.type() == GROUP_ITEM_TYPE:
+            rect = QRectF(c._rect.topLeft(), c._rect.size() * scaleFactorX)
+            rect.moveTo(0, 0)
+            c._rect = rect
+            c.update_resize_handles()
+
+        elif c.type() == PATH_ITEM_TYPE:
+            scaleMatrix = QTransform()
+            scaleMatrix.scale(scaleFactorX, scaleFactorY)
+            scaledPath = c.path() * scaleMatrix
+            c.setPath(scaledPath)
+
+            c.update_resize_handles()
+            c.update_painter_text_rect()
+
+        elif c.type() == LINE_ITEM_TYPE:
+            scaleMatrix = QTransform()
+            scaleMatrix.scale(scaleFactorX, scaleFactorY)
+            scaledLine = c.line() * scaleMatrix
+            c.setLine(scaledLine)
+
+            c.update_resize_handles()
+            c.update_painter_text_rect()
+
+        else:
+            # rect = QRectF(c.rect().topLeft(), c.rect().size() * scaleFactorX)
+            w = c.rect().width() * scaleFactorX
+            h = c.rect().height() * scaleFactorY
+            rect = QRectF(c.rect().topLeft(), QSizeF(w, h))
+            rect.moveTo(0, 0)
+            c.setRect(rect)
+
+            c.update_resize_handles()
+            c.update_painter_text_rect()
+
+        c.setX(c.x() * scaleFactorX)
+        c.setY(c.y() * scaleFactorY)
+        # c.setX((c.x() + fark.x()) * scaleFactorX)
+        # c.setY((c.y() + fark.y()) * scaleFactorY)
+        # c.moveBy(fark.x(), fark.y() )
+
 
 # ---------------------------------------------------------------------
 def _scaleChildItemsByResizing(nesne, scaleFactor):
@@ -133,9 +194,9 @@ def _scaleChildItemsByResizing(nesne, scaleFactor):
             c.yazi_kutusunu_daralt()
 
         elif c.type() == GROUP_ITEM_TYPE:
-            rect = QRectF(c._itemsBoundingRect.topLeft(), c._itemsBoundingRect.size() * scaleFactor)
+            rect = QRectF(c._rect.topLeft(), c._rect.size() * scaleFactor)
             rect.moveTo(0, 0)
-            c._itemsBoundingRect = rect
+            c._rect = rect
 
         elif c.type() == PATH_ITEM_TYPE:
             scaleMatrix = QTransform()

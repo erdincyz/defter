@@ -709,11 +709,16 @@ class VideoItem(BaseItem):
 
             if self.isActiveItem:
                 selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
+                painter.setPen(Qt.PenStyle.NoPen)
+                painter.setBrush(self.handleBrush)
+                painter.drawRect(self.topLeftHandle)
+                painter.drawRect(self.topRightHandle)
+                painter.drawRect(self.bottomRightHandle)
+                painter.drawRect(self.bottomLeftHandle)
             else:
                 selectionPenBottom = self.selectionPenBottom
 
             painter.setBrush(Qt.BrushStyle.NoBrush)
-
             painter.setPen(selectionPenBottom)
             painter.drawRect(self.rect())
 
