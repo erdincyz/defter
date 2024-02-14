@@ -862,7 +862,7 @@ class UndoableResizeGroupItem(QUndoCommand):
     """ """
 
     # ---------------------------------------------------------------------
-    def __init__(self, description, item, eskiRect, yeniRect, eskiPos, yeniPos, diff, scaleFactorX, scaleFactorY, parent=None):
+    def __init__(self, description, item, eskiRect, yeniRect, eskiPos, yeniPos, scaleFactorX, scaleFactorY, parent=None):
         super(UndoableResizeGroupItem, self).__init__(description, parent)
         self.item = item
         # self.eskiRect = item._rect
@@ -870,8 +870,6 @@ class UndoableResizeGroupItem(QUndoCommand):
         self.yeniRect = yeniRect
         self.scaleFactorX = scaleFactorX
         self.scaleFactorY = scaleFactorY
-
-        self.diff = diff
 
         self.eskiPos = eskiPos
         self.yeniPos = yeniPos
@@ -883,7 +881,7 @@ class UndoableResizeGroupItem(QUndoCommand):
         self.item.setRect(self.yeniRect)
         # Dikkat: Demiyoruz ki; burda gerek yok zaten mouseMoveda bu islem hallediliyor
         # geri-al ileri-al yapılırsa ihtiyac olacak
-        shared._resizeGroupsChildItems(self.item, self.diff, self.scaleFactorX, self.scaleFactorY)
+        shared._scaleChildItemsByResizing(self.item, self.scaleFactorX, self.scaleFactorY, True)
         self.item.update_resize_handles()
         self.item.scene().parent().change_transform_box_values(self.item)
 
@@ -891,8 +889,36 @@ class UndoableResizeGroupItem(QUndoCommand):
     def undo(self):
         self.item.setPos(self.eskiPos)
         self.item.setRect(self.eskiRect)
-        shared._resizeGroupsChildItems(self.item, -self.diff, 1 / self.scaleFactorX, 1 / self.scaleFactorY)
+        shared._scaleChildItemsByResizing(self.item, 1 / self.scaleFactorX, 1 / self.scaleFactorY, True)
         self.item.update_resize_handles()
+        self.item.scene().parent().change_transform_box_values(self.item)
+
+
+########################################################################
+class UndoableResizePathItem(QUndoCommand):
+    """ """
+
+    # ---------------------------------------------------------------------
+    def __init__(self, description, item, scaledPath, yeniPos, parent=None):
+        super(UndoableResizePathItem, self).__init__(description, parent)
+        self.item = item
+        self.eskiPath = item.path()
+        self.eskiPos = item.pos()
+        self.yeniPath = scaledPath
+        self.yeniPos = yeniPos
+
+    # ---------------------------------------------------------------------
+    def redo(self):
+        self.item.setPath(self.yeniPath)
+        self.item.setPos(self.yeniPos)
+        self.item.update_painter_text_rect()
+        self.item.scene().parent().change_transform_box_values(self.item)
+
+    # ---------------------------------------------------------------------
+    def undo(self):
+        self.item.setPath(self.eskiPath)
+        self.item.setPos(self.eskiPos)
+        self.item.update_painter_text_rect()
         self.item.scene().parent().change_transform_box_values(self.item)
 
 
@@ -970,12 +996,14 @@ class UndoableScaleGroupItemByResizing(QUndoCommand):
         self.item.setRect(self.yeniRect)
         self.item.setPos(self.yeniPos)
         shared._scaleChildItemsByResizing(self.item, self.scaleFactor)
+        self.item.scene().parent().change_transform_box_values(self.item)
 
     # ---------------------------------------------------------------------
     def undo(self):
         self.item.setRect(self.eskiRect)
         self.item.setPos(self.eskiPos)
         shared._scaleChildItemsByResizing(self.item, 1 / self.scaleFactor)
+        self.item.scene().parent().change_transform_box_values(self.item)
 
 
 ########################################################################
@@ -1058,12 +1086,14 @@ class UndoableScalePathItemByScalingPath(QUndoCommand):
         self.item.setPath(self.path)
         shared._scaleChildItemsByResizing(self.item, self.scaleFactor)
         self.item.update_painter_text_rect()
+        self.item.scene().parent().change_transform_box_values(self.item)
 
     # ---------------------------------------------------------------------
     def undo(self):
         self.item.setPath(self.eskiPath)
         shared._scaleChildItemsByResizing(self.item, 1 / self.scaleFactor)
         self.item.update_painter_text_rect()
+        self.item.scene().parent().change_transform_box_values(self.item)
 
 
 ########################################################################
@@ -1095,12 +1125,14 @@ class UndoableScaleLineItemByScalingLine(QUndoCommand):
         self.item.setLine(self.line)
         shared._scaleChildItemsByResizing(self.item, self.scaleFactor)
         self.item.update_painter_text_rect()
+        self.item.scene().parent().change_transform_box_values(self.item)
 
     # ---------------------------------------------------------------------
     def undo(self):
         self.item.setLine(self.eskiLine)
         shared._scaleChildItemsByResizing(self.item, self.scaleFactor)
         self.item.update_painter_text_rect()
+        self.item.scene().parent().change_transform_box_values(self.item)
 
 
 ########################################################################

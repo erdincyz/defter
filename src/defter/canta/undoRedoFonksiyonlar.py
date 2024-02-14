@@ -17,7 +17,8 @@ from .undoRedoSiniflar import (UndoableSayfaAdiDegistir, UndoableAddItem, Undoab
                                UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, UndoableResizeLineItem,
                                UndoableMovePathPoint, UndoableSetTextAlignment, UndoableSetCharacterFormat, UndoableSetLineWidthF,
                                UndoableConvertToPlainText, UndoRedoBaglantisiYaziNesnesiDocuna, UndoableScaleLineItemByScalingLine,
-                               UndoableScaleTextItemByResizing, UndoableScaleGroupItemByResizing, UndoableDeletePathPoint, UndoableResizeGroupItem)
+                               UndoableScaleTextItemByResizing, UndoableScaleGroupItemByResizing, UndoableDeletePathPoint, UndoableResizeGroupItem,
+                               UndoableResizePathItem)
 
 
 # ---------------------------------------------------------------------
@@ -79,10 +80,18 @@ def undoableResizeLineItem(undoStack, description, item, yeniLine, eskiLine, esk
     command = UndoableResizeLineItem(description, item, yeniLine, eskiLine, eskiPos, degisenNokta)
     undoStack.push(command)
 
+
 # ---------------------------------------------------------------------
-def undoableResizeGroupItem(undoStack, description, item, eskiRect, yeniRect, eskiPos, yeniPos, diff, scaleFactorX, scaleFactorY):
-    command = UndoableResizeGroupItem(description, item, eskiRect, yeniRect, eskiPos, yeniPos, diff, scaleFactorX, scaleFactorY)
+def undoableResizeGroupItem(undoStack, description, item, eskiRect, yeniRect, eskiPos, yeniPos, scaleFactorX, scaleFactorY):
+    command = UndoableResizeGroupItem(description, item, eskiRect, yeniRect, eskiPos, yeniPos, scaleFactorX, scaleFactorY)
     undoStack.push(command)
+
+
+# ---------------------------------------------------------------------
+def undoableResizePathItem(undoStack, description, item, scaledPath, yeniPos):
+    command = UndoableResizePathItem(description, item, scaledPath, yeniPos)
+    undoStack.push(command)
+
 
 # ---------------------------------------------------------------------
 def undoableScaleGroupItemByResizing(undoStack, description, item, yeniRect, scaleFactor, yeniPos):

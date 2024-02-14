@@ -21,8 +21,11 @@ class PathItem(QGraphicsItem):
         super(PathItem, self).__init__(parent)
 
         self._kim = shared.kim(kac_basamak=16)
+        self.setAcceptHoverEvents(True)
 
         self.setPos(pos)
+
+        self._rect = QRectF()
 
         if path:
             self._path = path
@@ -91,9 +94,56 @@ class PathItem(QGraphicsItem):
         self.painterTextOption.setWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere)
         self.painterTextOption.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        self.oklar_dxdy_nokta = {}
+
+        self._resizing = False
+        self.handleSize = 10
+        self.resizeHandleSize = QSizeF(self.handleSize, self.handleSize)
+        self.boundingRectTasmaDegeri = self.handleSize / 2
+
         self.painterTextRect = QRectF(self.boundingRect())
 
-        self.oklar_dxdy_nokta = {}
+        self.update_resize_handles()
+
+    # ---------------------------------------------------------------------
+    def setRect(self, rect):
+        if self._rect == rect:
+            return
+        # self.prepareGeometryChange()
+        self._rect = rect
+        self.update_resize_handles()
+        # self.update()
+
+    # ---------------------------------------------------------------------
+    def rect(self):
+        return self._rect
+
+    # ---------------------------------------------------------------------
+    def update_resize_handles(self):
+        self.prepareGeometryChange()
+
+        if self.scene():
+            resizeHandleSize = self.resizeHandleSize / self.scene().views()[0].transform().m11()
+        else:
+            resizeHandleSize = self.resizeHandleSize
+
+        self.topLeftHandle = QRectF(self._rect.topLeft(), resizeHandleSize)
+        self.topRightHandle = QRectF(self._rect.topRight(), resizeHandleSize)
+        self.bottomRightHandle = QRectF(self._rect.bottomRight(), resizeHandleSize)
+        self.bottomLeftHandle = QRectF(self._rect.bottomLeft(), resizeHandleSize)
+
+        self.topLeftHandle.moveCenter(self._rect.topLeft())
+        self.topRightHandle.moveCenter(self._rect.topRight())
+        self.bottomRightHandle.moveCenter(self._rect.bottomRight())
+        self.bottomLeftHandle.moveCenter(self._rect.bottomLeft())
+
+    # ---------------------------------------------------------------------
+    def hide_resize_handles(self):
+        self.isPinned = True
+
+    # ---------------------------------------------------------------------
+    def show_resize_handles(self):
+        self.isPinned = False
 
     # ---------------------------------------------------------------------
     def type(self):
@@ -180,15 +230,6 @@ class PathItem(QGraphicsItem):
                 return parentItem
             parentItem = parentItem.parentItem()
         return None
-
-    # ---------------------------------------------------------------------
-    def update_resize_handles(self):
-        # dummy method
-        # while zooming, view, updates activeItem's resize handles.
-        # filtering out pathItem type is an another option but,
-        # we may add resize functions to the PathItem object in the future.
-        # so ...
-        pass
 
     # # ---------------------------------------------------------------------
     # def isPathClosed(self):
@@ -365,6 +406,10 @@ class PathItem(QGraphicsItem):
                                                        Qt.PenStyle.DashLine,
                                                        Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)
 
+        if col.value() > 245:
+            self.handleBrush = shared.handleBrushKoyu
+        else:
+            self.handleBrush = shared.handleBrushAcik
         self.update()
 
     # ---------------------------------------------------------------------
@@ -375,7 +420,7 @@ class PathItem(QGraphicsItem):
     # ---------------------------------------------------------------------
     def setCizgiKalinligi(self, width):
         self._pen.setWidthF(width)
-
+        self.boundingRectTasmaDegeri = self.handleSize / 2
         self.update()
 
     # ---------------------------------------------------------------------
@@ -645,6 +690,7 @@ class PathItem(QGraphicsItem):
         self.setPos(crect.center())
         self._path.translate(diff)
         self.update_painter_text_rect()
+
         self.isDrawingFinished = True
 
         # self.pathi_pixmap_yap()
@@ -697,7 +743,7 @@ class PathItem(QGraphicsItem):
 
                 # son noktayi basitlestirilmis cizgiye dahil ediyoruz
                 liste.append([self.lastPath.elementAt(self.lastPath.elementCount() - 1).x,
-                            self.lastPath.elementAt(self.lastPath.elementCount() - 1).y])
+                              self.lastPath.elementAt(self.lastPath.elementCount() - 1).y])
             #
             except Exception as e:
                 print(e)
@@ -756,7 +802,9 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def boundingRect(self):
-        return self.shape().controlPointRect()
+        r = self.shape().controlPointRect()
+        return r
+
         # return self._path.controlPointRect()
 
         # if self._boundingRect.isNull():
@@ -769,8 +817,14 @@ class PathItem(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def shape(self):
-        return self.qt_graphicsItem_shapeFromPath(QPainterPath(self._path), self.pen())
-        # return self.qt_graphicsItem_shapeFromPath(self._path, self.pen())
+        p = self.qt_graphicsItem_shapeFromPath(QPainterPath(self._path), self.pen())
+        r = p.controlPointRect()
+        if not self._resizing:
+            self.setRect(QRectF(r))
+        r.adjust(-self.boundingRectTasmaDegeri, -self.boundingRectTasmaDegeri,
+                 self.boundingRectTasmaDegeri, self.boundingRectTasmaDegeri)
+        p.addRect(r)
+        return p
 
     # ---------------------------------------------------------------------
     def update_painter_text_rect(self):
@@ -779,6 +833,43 @@ class PathItem(QGraphicsItem):
         size.setWidth(self.sceneWidth() - self.textPadding)
         r.moveCenter(self.boundingRect().center())
         self.painterTextRect = r
+
+    # ---------------------------------------------------------------------
+    def hoverEnterEvent(self, event):
+        # event propagationdan dolayi bos da olsa burda implement etmek lazim
+        # mousePress,release,move,doubleclick de bu mantıkta...
+        # baska yerden baslayip mousepress ile , mousemove baska, mouseReleas baska widgetta gibi
+        # icinden cikilmaz durumlara sebep olabiliyor.
+        # ayrica override edince accept() de edilmis oluyor mouseeventler
+        super(PathItem, self).hoverEnterEvent(event)
+
+    # ---------------------------------------------------------------------
+    def hoverMoveEvent(self, event):
+
+        # cursor = self.scene().parent().cursor()
+
+        # if self.isSelected() and self.scene().aktifArac == self.scene().SecimAraci:
+        if not self.ustGrup:
+            if self.scene().aktifArac == self.scene().SecimAraci:
+                if self.topLeftHandle.contains(event.pos()) or self.bottomRightHandle.contains(event.pos()):
+                    self.scene().parent().setCursor(Qt.CursorShape.SizeFDiagCursor, gecici_mi=True)
+                    # self.setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
+                elif self.topRightHandle.contains(event.pos()) or self.bottomLeftHandle.contains(event.pos()):
+                    self.scene().parent().setCursor(Qt.CursorShape.SizeBDiagCursor, gecici_mi=True)
+                    # self.setCursor(Qt.SizeBDiagCursor, gecici_mi=True)
+                else:
+                    self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
+
+        super(PathItem, self).hoverMoveEvent(event)
+
+    # ---------------------------------------------------------------------
+    def hoverLeaveEvent(self, event):
+        # if self.isSelected():
+        # self.setCursor(self.saved_cursor)
+        if not self.ustGrup:
+            self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
+
+        super(PathItem, self).hoverLeaveEvent(event)
 
     # ---------------------------------------------------------------------
     def wheelEvent(self, event):
@@ -1053,6 +1144,34 @@ class PathItem(QGraphicsItem):
                 self.movedPointsList.append((self.secilen_nokta_idx, self.secilen_nokta.x, self.secilen_nokta.y))
                 self.update()
 
+        else:
+            self._resizing = False  # we could use "self._resizingFrom = 0" instead, but self._resizing is more explicit.
+            self._fixedResizePoint = None
+            self._resizingFrom = None
+            self._eskiRectBeforeResize = None
+
+            self._eskiPosBeforeResize = self.pos()
+            self._ilk_tik_event_pos = event.pos()
+            # self._eskiPosBeforeResize = self.scenePos()
+
+            if self.topLeftHandle.contains(event.pos()):
+                self._resizing = True
+                self._fixedResizePoint = self._rect.bottomRight()
+                self._resizingFrom = 1
+            elif self.topRightHandle.contains(event.pos()):
+                self._resizing = True
+                self._fixedResizePoint = self._rect.bottomLeft()
+                self._resizingFrom = 2
+            elif self.bottomRightHandle.contains(event.pos()):
+                self._resizing = True
+                self._fixedResizePoint = self._rect.topLeft()
+                self._resizingFrom = 3
+            elif self.bottomLeftHandle.contains(event.pos()):
+                self._resizing = True
+                self._fixedResizePoint = self._rect.topRight()
+                self._resizingFrom = 4
+            self._eskiRectBeforeResize = self._rect
+
         super(PathItem, self).mousePressEvent(event)
 
         # TODO: bu kozmetik amacli, sadece release de olunca gecikmeli seciyormus hissi oluyor
@@ -1069,6 +1188,108 @@ class PathItem(QGraphicsItem):
 
                 self.update()
                 return
+
+        elif self._resizing:
+
+            px = self._fixedResizePoint.x()
+            py = self._fixedResizePoint.y()
+            # mx = event.scenePos().x()
+            # my = event.scenePos().y()
+            mx = event.pos().x()
+            my = event.pos().y()
+            topLeft = QPointF(min(px, mx), min(py, my))  # top-left corner (x,y)
+            bottomRight = QPointF(max(px, mx), max(py, my))  # bottom-right corner (x,y)
+            # size = QSizeF(fabs(mx - px), fabs(my - py))
+            # rect = QRectF(topLeft, size)
+
+            rect = QRectF(topLeft, bottomRight)
+
+            c = self._rect.center()
+
+            # Alt Key - to resize around center.
+            # if event.modifiers() & Qt.AltModifier:
+            if event.modifiers() == Qt.KeyboardModifier.AltModifier:
+                rect.moveCenter(c)
+
+            # ---------------------------------------------------------------------
+            #  Ctrl Key - to keep aspect ratio while resizing.
+            if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
+                tl = self._rect.topLeft()
+                tr = self._rect.topRight()
+                br = self._rect.bottomRight()
+                bl = self._rect.bottomLeft()
+                c = self._rect.center()
+
+                yeniSize = rect.size()
+                eskiSize = self._rect.size()
+                # eskiSize.scale(yeniSize, Qt.KeepAspectRatio)
+                eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+                # eskiSize.scale(yeniSize.height(), yeniSize.height(), Qt.KeepAspectRatio)
+
+                # if not eskiSize.isNull():
+                if not eskiSize.isEmpty():
+                    self.yedekSize = QSizeF(eskiSize)
+
+                else:
+                    eskiSize = QSizeF(self.yedekSize)
+
+                rect.setSize(eskiSize)
+                h = rect.height()
+                w = rect.width()
+
+                if self._resizingFrom == 1:
+                    rect.moveTopLeft(QPointF(br.x() - w, br.y() - h))
+
+                if self._resizingFrom == 2:
+                    rect.moveTopRight(QPointF(bl.x() + w, bl.y() - h))
+
+                if self._resizingFrom == 3:
+                    rect.moveBottomRight(QPointF(tl.x() + w, tl.y() + h))
+
+                elif self._resizingFrom == 4:
+                    rect.moveBottomLeft(QPointF(tr.x() - w, tr.y() + h))
+
+                # Alt Key - to resize around center
+                if event.modifiers() == Qt.KeyboardModifier.AltModifier:
+                    rect.moveCenter(c)
+
+            # ---------------------------------------------------------------------
+            # Shift Key - to make square (equals width and height)
+            if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
+                height = my - py
+                if self._resizingFrom == 1:
+                    rect.setCoords(px + height, py + height, px, py)
+                    rect = rect.normalized()
+
+                elif self._resizingFrom == 2:
+                    rect.setCoords(px, py + height, px - height, py)
+                    rect = rect.normalized()
+
+                elif self._resizingFrom == 3:
+                    rect.setCoords(px, py, px + height, py + height)
+                    rect = rect.normalized()
+
+                elif self._resizingFrom == 4:
+                    rect.setCoords(px - height, py, px, py + height)
+                    rect = rect.normalized()
+
+                # Alt Key - to resize around center
+                if event.modifiers() == Qt.KeyboardModifier.AltModifier:
+                    rect.moveCenter(c)
+
+            # fark = event.pos() - self._ilk_tik_event_pos
+
+            # self.setRect(rect)
+            # self.setPos(newPos)
+            # TODO : alt calismiyor move to 0,0 dan dolayi
+            self._resize(rect)  # mouse release eventten gonderiyoruz undoya
+            # self.setRect(rect)  # mouse release eventten gonderiyoruz undoya
+            self.update_resize_handles()
+            self.scene().parent().change_transform_box_values(self)
+            # self.setPos(x, y)
+            # return QGraphicsItem.mouseMoveEvent(self, event)
+
+            return
 
         super(PathItem, self).mouseMoveEvent(event)
 
@@ -1089,6 +1310,23 @@ class PathItem(QGraphicsItem):
             # self.secilen_nokta = None
             # self.update()
 
+        elif self._resizing:
+
+            devam, scaledPath, yeniPos = self._yeni_path_ve_pos_hesapla(yeniRect=self._rect)
+            if devam:
+                # self.setPos(yeniPos)
+                # self.setPath(scaledPath)
+                self.scene().undoRedo.undoableResizePathItem(self.scene().undoStack,
+                                                             "resize",
+                                                             self,
+                                                             scaledPath,
+                                                             yeniPos)
+            self._resizing = False
+
+            # super(PathItem, self).mouseReleaseEvent(event)
+
+            # self.update_painter_text_rect()
+
         self.scene().unite_with_scene_rect(self.sceneBoundingRect())
 
         if self.childItems():
@@ -1096,6 +1334,49 @@ class PathItem(QGraphicsItem):
                 self.scene().select_all_children_recursively(self, cosmeticSelect=False, topmostParent=True)
             else:
                 self.scene().select_all_children_recursively(self, cosmeticSelect=False)
+
+    # ---------------------------------------------------------------------
+    def _yeni_path_ve_pos_hesapla(self, yeniRect, eskiRect=None,
+                                  scaleFactorX=None,
+                                  scaleFactorY=None,
+                                  merkez=False):
+        try:
+            if not eskiRect:
+                eskiRect = self._eskiRectBeforeResize
+
+            if not scaleFactorX:
+                scaleFactorX = yeniRect.width() / eskiRect.width()
+            if not scaleFactorY:
+                scaleFactorY = yeniRect.height() / eskiRect.height()
+
+            yeniPos = self.mapToScene(yeniRect.center())
+            if self.parentItem():
+                yeniPos = self.mapToParent(yeniRect.center())
+
+            scaleMatrix = QTransform()
+            scaleMatrix.scale(scaleFactorX, scaleFactorY)
+            scaledPath = self._path * scaleMatrix
+
+            if merkez:
+                fark = self.scenePos() - yeniPos
+                scaledPath.translate(2 * fark)
+
+            return True, scaledPath, yeniPos
+
+        except ZeroDivisionError:
+            # scaleFactorX = scaleFactorY = 1
+            return False, None, None
+
+    # ---------------------------------------------------------------------
+    def _resize(self, yeniRect):
+        self.setRect(yeniRect)
+        # if self._rect == yeniRect:
+        return
+
+        # devam, scaledPath, yeniPos = self._yeni_path_ve_pos_hesapla(yeniRect=self._rect)
+        # if devam:
+        #     self.setPos(yeniPos)
+        #     self.setPath(scaledPath)
 
     # ---------------------------------------------------------------------
     def secilen_noktalari_tasi(self):
@@ -1179,6 +1460,13 @@ class PathItem(QGraphicsItem):
 
             if self.isActiveItem:
                 selectionPenBottom = self.selectionPenBottomIfAlsoActiveItem
+                if not self.isPinned:
+                    painter.setPen(Qt.PenStyle.NoPen)
+                    painter.setBrush(self.handleBrush)
+                    painter.drawRect(self.topLeftHandle)
+                    painter.drawRect(self.topRightHandle)
+                    painter.drawRect(self.bottomRightHandle)
+                    painter.drawRect(self.bottomLeftHandle)
             else:
                 selectionPenBottom = self.selectionPenBottom
 
@@ -1204,7 +1492,7 @@ class PathItem(QGraphicsItem):
 
             else:
                 painter.setPen(selectionPenBottom)
-                painter.drawRect(self.boundingRect())
+                painter.drawRect(self._rect)
 
         # if option.state & QStyle.StateFlag.State_MouseOver:
         #     painter.setBrush(Qt.BrushStyle.NoBrush)
@@ -1225,7 +1513,11 @@ class PathItem(QGraphicsItem):
         # p = self.pos()
         # s = self.scenePos()
         # painter.drawText(self.boundingRect(), "{},  {}\n{},  {}".format(p.x(), p.y(), s.x(), s.y()))
-        # painter.setPen(QPen(Qt.green, 12))
+        # # painter.setPen(QPen(Qt.green, 12))
+        # painter.setPen(QPen(Qt.red, 16))
+        # painter.drawPoint(self.mapFromScene(p))
+        # painter.setPen(QPen(Qt.blue, 12))
+        # painter.drawPoint(self.mapFromScene(s))
         # painter.drawPoint(self.mapFromScene(self.sceneBoundingRect().center()))
         # painter.drawRect(self.boundingRect())
         # painter.drawRect(p.x(),p.y(),100,100)

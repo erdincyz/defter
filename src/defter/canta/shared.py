@@ -121,15 +121,20 @@ def kutulu_arkaplan_olustur(widget, kareBoyutu=10):
     widget.setAutoFillBackground(True)
     widget.setPalette(palette)
 
-# ---------------------------------------------------------------------
-def _resizeGroupsChildItems(nesne, fark, scaleFactorX, scaleFactorY=None):
 
+# ---------------------------------------------------------------------
+def _scaleChildItemsByResizing(nesne, scaleFactorX, scaleFactorY=None, resizeGroup=False):
     if not scaleFactorY:
         scaleFactorY = scaleFactorX
 
-    for c in nesne.childItems():
+    if nesne.type() == GROUP_ITEM_TYPE and resizeGroup:
+        childItems = nesne.allFirstLevelGroupChildren
+    else:
+        childItems = nesne.childItems()
+
+    for c in childItems:
         if c.childItems():
-            _resizeGroupsChildItems(c, fark, scaleFactorX)
+            _scaleChildItemsByResizing(c, scaleFactorX)
 
         if c.type() == TEXT_ITEM_TYPE:
 
@@ -139,8 +144,11 @@ def _resizeGroupsChildItems(nesne, fark, scaleFactorX, scaleFactorY=None):
             c.yazi_kutusunu_daralt()
 
         elif c.type() == GROUP_ITEM_TYPE:
-            rect = QRectF(c._rect.topLeft(), c._rect.size() * scaleFactorX)
-            rect.moveTo(0, 0)
+            # rect = QRectF(c._rect.topLeft(), c._rect.size() * scaleFactorX)
+            # rect.moveTo(0, 0)
+            w = c.rect().width() * scaleFactorX
+            h = c.rect().height() * scaleFactorY
+            rect = QRectF(0, 0, w, h)
             c._rect = rect
             c.update_resize_handles()
 
@@ -166,8 +174,7 @@ def _resizeGroupsChildItems(nesne, fark, scaleFactorX, scaleFactorY=None):
             # rect = QRectF(c.rect().topLeft(), c.rect().size() * scaleFactorX)
             w = c.rect().width() * scaleFactorX
             h = c.rect().height() * scaleFactorY
-            rect = QRectF(c.rect().topLeft(), QSizeF(w, h))
-            rect.moveTo(0, 0)
+            rect = QRectF(0, 0, w, h)
             c.setRect(rect)
 
             c.update_resize_handles()
@@ -180,52 +187,52 @@ def _resizeGroupsChildItems(nesne, fark, scaleFactorX, scaleFactorY=None):
         # c.moveBy(fark.x(), fark.y() )
 
 
-# ---------------------------------------------------------------------
-def _scaleChildItemsByResizing(nesne, scaleFactor):
-    for c in nesne.childItems():
-        if c.childItems():
-            _scaleChildItemsByResizing(c, scaleFactor)
-
-        if c.type() == TEXT_ITEM_TYPE:
-
-            # c.setTransformOriginPoint(c.boundingRect().center())
-            fontPointSizeF = c.fontPointSizeF() * scaleFactor
-            c.setFontPointSizeF(fontPointSizeF)
-            c.yazi_kutusunu_daralt()
-
-        elif c.type() == GROUP_ITEM_TYPE:
-            rect = QRectF(c._rect.topLeft(), c._rect.size() * scaleFactor)
-            rect.moveTo(0, 0)
-            c._rect = rect
-
-        elif c.type() == PATH_ITEM_TYPE:
-            scaleMatrix = QTransform()
-            scaleMatrix.scale(scaleFactor, scaleFactor)
-            scaledPath = c.path() * scaleMatrix
-            c.setPath(scaledPath)
-
-            c.update_resize_handles()
-            c.update_painter_text_rect()
-
-        elif c.type() == LINE_ITEM_TYPE:
-            scaleMatrix = QTransform()
-            scaleMatrix.scale(scaleFactor, scaleFactor)
-            scaledLine = c.line() * scaleMatrix
-            c.setLine(scaledLine)
-
-            c.update_resize_handles()
-            c.update_painter_text_rect()
-
-        else:
-            rect = QRectF(c.rect().topLeft(), c.rect().size() * scaleFactor)
-            rect.moveTo(0, 0)
-            c.setRect(rect)
-
-            c.update_resize_handles()
-            c.update_painter_text_rect()
-
-        c.setX(c.x() * scaleFactor)
-        c.setY(c.y() * scaleFactor)
+# # ---------------------------------------------------------------------
+# def _scaleChildItemsByResizing(nesne, scaleFactor):
+#     for c in nesne.childItems():
+#         if c.childItems():
+#             _scaleChildItemsByResizing(c, scaleFactor)
+#
+#         if c.type() == TEXT_ITEM_TYPE:
+#
+#             # c.setTransformOriginPoint(c.boundingRect().center())
+#             fontPointSizeF = c.fontPointSizeF() * scaleFactor
+#             c.setFontPointSizeF(fontPointSizeF)
+#             c.yazi_kutusunu_daralt()
+#
+#         elif c.type() == GROUP_ITEM_TYPE:
+#             rect = QRectF(c._rect.topLeft(), c._rect.size() * scaleFactor)
+#             rect.moveTo(0, 0)
+#             c._rect = rect
+#
+#         elif c.type() == PATH_ITEM_TYPE:
+#             scaleMatrix = QTransform()
+#             scaleMatrix.scale(scaleFactor, scaleFactor)
+#             scaledPath = c.path() * scaleMatrix
+#             c.setPath(scaledPath)
+#
+#             c.update_resize_handles()
+#             c.update_painter_text_rect()
+#
+#         elif c.type() == LINE_ITEM_TYPE:
+#             scaleMatrix = QTransform()
+#             scaleMatrix.scale(scaleFactor, scaleFactor)
+#             scaledLine = c.line() * scaleMatrix
+#             c.setLine(scaledLine)
+#
+#             c.update_resize_handles()
+#             c.update_painter_text_rect()
+#
+#         else:
+#             rect = QRectF(c.rect().topLeft(), c.rect().size() * scaleFactor)
+#             rect.moveTo(0, 0)
+#             c.setRect(rect)
+#
+#             c.update_resize_handles()
+#             c.update_painter_text_rect()
+#
+#         c.setX(c.x() * scaleFactor)
+#         c.setY(c.y() * scaleFactor)
 
 
 # ---------------------------------------------------------------------

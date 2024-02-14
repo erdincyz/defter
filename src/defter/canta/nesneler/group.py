@@ -16,12 +16,13 @@ class Group(QGraphicsItem):
     Type = shared.GROUP_ITEM_TYPE
 
     def __init__(self, arkaPlanRengi=QColor(Qt.GlobalColor.transparent),
-                 yaziRengi=QColor(Qt.GlobalColor.transparent), 
+                 yaziRengi=QColor(Qt.GlobalColor.transparent),
                  pen=QPen(Qt.PenStyle.DotLine),
                  parent=None):
         super(Group, self).__init__(parent)
 
         self._kim = shared.kim(kac_basamak=16)
+        self.setAcceptHoverEvents(True)
 
         self.ustGrup = None
         # self._rect aslinda => self._itemsBoundingRect
@@ -61,6 +62,8 @@ class Group(QGraphicsItem):
         self._resizing = False
         self.handleSize = 10
         self.resizeHandleSize = QSizeF(self.handleSize, self.handleSize)
+        self.boundingRectTasmaDegeri = ((self._pen.widthF() / 2) + (self.handleSize / 2))
+
         self.update_resize_handles()
 
     # ---------------------------------------------------------------------
@@ -90,10 +93,10 @@ class Group(QGraphicsItem):
         self.bottomRightHandle = QRectF(self._rect.bottomRight(), resizeHandleSize)
         self.bottomLeftHandle = QRectF(self._rect.bottomLeft(), resizeHandleSize)
 
-        # self.topLeftHandle.moveTopLeft(self._rect.topLeft())
-        self.topRightHandle.moveTopRight(self._rect.topRight())
-        self.bottomRightHandle.moveBottomRight(self._rect.bottomRight())
-        self.bottomLeftHandle.moveBottomLeft(self._rect.bottomLeft())
+        self.topLeftHandle.moveCenter(self._rect.topLeft())
+        self.topRightHandle.moveCenter(self._rect.topRight())
+        self.bottomRightHandle.moveCenter(self._rect.bottomRight())
+        self.bottomLeftHandle.moveCenter(self._rect.bottomLeft())
 
     # ---------------------------------------------------------------------
     def hide_resize_handles(self):
@@ -153,12 +156,8 @@ class Group(QGraphicsItem):
 
         if self._resizing:
 
-            # cunku px=1 , py=1 olarak basliyor cizmeye. burda sifirliyoruz eger ilk sahneye ekleme cizimi ise.
-            if not self._eskiRectBeforeResize.size() == QSizeF(1, 1):
-                px = self._fixedResizePoint.x()
-                py = self._fixedResizePoint.y()
-            else:
-                px = py = 0
+            px = self._fixedResizePoint.x()
+            py = self._fixedResizePoint.y()
             # mx = event.scenePos().x()
             # my = event.scenePos().y()
             mx = event.pos().x()
@@ -277,7 +276,7 @@ class Group(QGraphicsItem):
                 super(Group, self).mouseReleaseEvent(event)
                 return
 
-            fark = yeniRect.topLeft() - self._eskiRectBeforeResize.topLeft()
+            # fark = yeniRect.topLeft() - self._eskiRectBeforeResize.topLeft()
 
             yeniPos = self.mapToScene(yeniRect.topLeft())
             if self.parentItem():
@@ -295,7 +294,6 @@ class Group(QGraphicsItem):
                                                           yeniRect,
                                                           self._eskiPosBeforeResize,
                                                           yeniPos,
-                                                          fark,
                                                           scaleFactorX,
                                                           scaleFactorY)
 
@@ -337,7 +335,7 @@ class Group(QGraphicsItem):
 
         self.setRect(yeniRect)
 
-        # shared._resizeGroupsChildItems(self, fark, scaleFactorX, scaleFactorY)
+        # shared._scaleChildItemsByResizing(self, fark, scaleFactorX, scaleFactorY)
 
     # ---------------------------------------------------------------------
     def type(self):
@@ -692,7 +690,10 @@ class Group(QGraphicsItem):
 
     # ---------------------------------------------------------------------
     def boundingRect(self):
-        return self._rect
+        boundingRect = QRectF(self._rect)
+        return boundingRect.adjusted(-self.boundingRectTasmaDegeri, -self.boundingRectTasmaDegeri,
+                                     self.boundingRectTasmaDegeri, self.boundingRectTasmaDegeri)
+        # return self._rect
 
     # # ---------------------------------------------------------------------
     # def shape(self):
@@ -772,6 +773,7 @@ class Group(QGraphicsItem):
     # ---------------------------------------------------------------------
     def setCizgiKalinligi(self, width):
         self._pen.setWidthF(width)
+        self.boundingRectTasmaDegeri = ((self._pen.widthF() / 2) + (self.handleSize / 2))
         # self.textPen.setWidthF(width)
         # self.selectionPenBottom.setWidthF(width)
         # self.selectionPenBottomIfAlsoActiveItem.setWidthF(width)
@@ -790,6 +792,43 @@ class Group(QGraphicsItem):
         # arkaplanRengi ve yaziRengi grup nesnesinde kullanilmiyor
         # fasulyeden method
         self.yaziRengi = col
+
+    # ---------------------------------------------------------------------
+    def hoverEnterEvent(self, event):
+        # event propagationdan dolayi bos da olsa burda implement etmek lazim
+        # mousePress,release,move,doubleclick de bu mantıkta...
+        # baska yerden baslayip mousepress ile , mousemove baska, mouseReleas baska widgetta gibi
+        # icinden cikilmaz durumlara sebep olabiliyor.
+        # ayrica override edince accept() de edilmis oluyor mouseeventler
+        super(Group, self).hoverEnterEvent(event)
+
+    # ---------------------------------------------------------------------
+    def hoverMoveEvent(self, event):
+
+        # cursor = self.scene().parent().cursor()
+
+        # if self.isSelected() and self.scene().aktifArac == self.scene().SecimAraci:
+        if not self.ustGrup:
+            if self.scene().aktifArac == self.scene().SecimAraci:
+                if self.topLeftHandle.contains(event.pos()) or self.bottomRightHandle.contains(event.pos()):
+                    self.scene().parent().setCursor(Qt.CursorShape.SizeFDiagCursor, gecici_mi=True)
+                    # self.setCursor(Qt.SizeFDiagCursor, gecici_mi=True)
+                elif self.topRightHandle.contains(event.pos()) or self.bottomLeftHandle.contains(event.pos()):
+                    self.scene().parent().setCursor(Qt.CursorShape.SizeBDiagCursor, gecici_mi=True)
+                    # self.setCursor(Qt.SizeBDiagCursor, gecici_mi=True)
+                else:
+                    self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
+
+        super(Group, self).hoverMoveEvent(event)
+
+    # ---------------------------------------------------------------------
+    def hoverLeaveEvent(self, event):
+        # if self.isSelected():
+        # self.setCursor(self.saved_cursor)
+        if not self.ustGrup:
+            self.scene().parent().setCursor(self.scene().parent().imlec_arac, gecici_mi=True)
+
+        super(Group, self).hoverLeaveEvent(event)
 
     # ---------------------------------------------------------------------
     def wheelEvent(self, event):

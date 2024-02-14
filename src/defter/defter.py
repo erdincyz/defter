@@ -96,7 +96,7 @@ from .canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.95.5"
+VERSION = "0.95.6"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -8145,9 +8145,25 @@ class DefterAnaPencere(QMainWindow):
                                                           QRectF(item.rect().topLeft(), self.itemSize),
                                                           item.pos(),
                                                           item.pos(),
-                                                          QPointF(0, 0),
                                                           scaleFactorX,
                                                           1)
+                elif item.type() == shared.PATH_ITEM_TYPE:
+                    scaleFactorX = width / item.rect().width()
+                    yeniRect = QRectF(item.rect().topLeft(), self.itemSize)
+                    yeniRect.moveCenter(item.rect().center())
+                    devam, scaledPath, yeniPos = item._yeni_path_ve_pos_hesapla(yeniRect,
+                                                                                item._rect,
+                                                                                scaleFactorX,
+                                                                                1,
+                                                                                False)
+                    if devam and not startedMacro:
+                        self.cScene.undoStack.beginMacro(self.tr("change width"))
+                        startedMacro = True
+                        undoRedo.undoableResizePathItem(self.cScene.undoStack,
+                                                                     "resize",
+                                                                     item,
+                                                                     scaledPath,
+                                                                     yeniPos)
 
             if startedMacro:
                 self.cScene.undoStack.endMacro()
@@ -8183,9 +8199,25 @@ class DefterAnaPencere(QMainWindow):
                                                           QRectF(item.rect().topLeft(), self.itemSize),
                                                           item.pos(),
                                                           item.pos(),
-                                                          QPointF(0, 0),
                                                           1,
                                                           scaleFactorY)
+                elif item.type() == shared.PATH_ITEM_TYPE:
+                    scaleFactorY = height / item.rect().height()
+                    yeniRect = QRectF(item.rect().topLeft(), self.itemSize)
+                    yeniRect.moveCenter(item.rect().center())
+                    devam, scaledPath, yeniPos = item._yeni_path_ve_pos_hesapla(yeniRect,
+                                                                                item._rect,
+                                                                                1,
+                                                                                scaleFactorY,
+                                                                                True)
+                    if devam and not startedMacro:
+                        self.cScene.undoStack.beginMacro(self.tr("change height"))
+                        startedMacro = True
+                        undoRedo.undoableResizePathItem(self.cScene.undoStack,
+                                                                     "resize",
+                                                                     item,
+                                                                     scaledPath,
+                                                                     yeniPos)
 
             if startedMacro:
                 self.cScene.undoStack.endMacro()
@@ -9881,8 +9913,9 @@ class DefterAnaPencere(QMainWindow):
         self.degistir_nesne_arkaplan_rengi_ikonu(item.arkaPlanRengi, item.yaziRengi, item._pen.color())
         self.change_font_point_sizef_spinbox_value(item.font().pointSizeF())
         self.change_font_combobox_value(item.font())
-        self.itemRotationSBox_tbar.setValue(item.rotation())
-        self.itemRotationSBox_nesnedw.setValue(item.rotation())
+        # self.itemRotationSBox_tbar.setValue(item.rotation())
+        # self.itemRotationSBox_nesnedw.setValue(item.rotation())
+        self.change_transform_box_values(item)
         self.yazi_hizalama_degisti()
         self.karakter_bicimi_degisti()
         self.change_line_style_options(item._pen)
