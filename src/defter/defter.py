@@ -96,7 +96,7 @@ from .canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.95.6"
+VERSION = "0.95.7"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -7453,62 +7453,6 @@ class DefterAnaPencere(QMainWindow):
         self.act_radio_secim_degisti(self.radioCizgi)
         self.log(self.tr("Grouped"), 5000, toStatusBarOnly=True)
         self.lutfen_bekleyin_gizle()
-
-    # # ---------------------------------------------------------------------
-    # @Slot()
-    # def act_group_items_ilk(self):
-    # 
-    #     group = Group()
-    #     # group = QGraphicsItemGroup(None)
-    #     group.setFlags(Group.ItemIsSelectable
-    #                    | Group.ItemIsMovable
-    #                    # | Group.ItemIsFocusable
-    #                    )
-    # 
-    #     self.cScene.undoStack.beginMacro(self.tr("group"))
-    # 
-    #     undoRedo.undoableAddItem(self.cScene.undoStack, 
-    #                              description=self.tr("add group"), 
-    #                              scene=self.cScene, item=group)
-    #     self.increase_zvalue(group)
-    #     items = self.cScene.selectedItems()
-    # 
-    #     # TODO: muhtemelen duzeldi, ama İnşaAllah yine bi bakalim sonra : 
-    #     #  self.unGroupedRootItems a ekleniyor ve silinmiyordu itemlar. 
-    #     #  ama bu tabi eski sistemde. child ve parent secili ise şimdi sadece parentlar ekleniyor gruba.
-
-    #     for item in items:
-    #         if item.parentItem():
-    #             if item.parentItem() in items:  # o zaman bunu gruplamaya gerek yok cunku parenti gruplanacak zaten.
-    #                 item.setFlag(item.ItemIsSelectable, False)
-    #                 item.setFlag(item.ItemIsMovable, False)
-    #                 item.setFlag(item.ItemIsFocusable, False)
-    #                 # muhtemelen parentta da sorun var
-    #                 # continue
-    #             else:
-    #                 self.act_unparent_items(item)
-    #                 # group.addSingleItemToGroup(item)
-    #                 undoRedo.undoableGroup(self.cScene.undoStack, self.tr("add single item to group"), item, group)
-    #                 # TODO: if ile kontrol etsek once daha mi hizli olur, time complexity ye bakmak lazim.
-    #                 # gruplandigi icin referansi parentta olacak ayrica tutmaya gerek yok
-    #                 # burda da ihtiyac var discarda cunku yukarda unparent edilince ekleniyor unGroupedRootItems a.
-    #                 self.cScene.unGroupedRootItems.discard(item)
-    #         else:
-    #             if item.childItems():  # sadece parent secilmis iken alt nesneleri secilemez hale getiriyoruz.
-    #                 for c in item.childItems():
-    #                     c.setFlag(item.ItemIsSelectable, False)
-    #                     c.setFlag(item.ItemIsMovable, False)
-    #                     c.setFlag(item.ItemIsFocusable, False)
-    #             # group.addSingleItemToGroup(item)
-    #             undoRedo.undoableGroup(self.cScene.undoStack, self.tr("add single item to group"), item, group)
-    #             # TODO: if ile kontrol etsek once daha mi hizli olur, time complexity ye bakmak lazim.
-    #             # gruplandigi icin referansi parentta olacak ayrica tutmaya gerek yok
-    #             self.cScene.unGroupedRootItems.discard(item)
-    #     group.updateBoundingRect()
-    #     group.setSelected(True)
-    #
-    #     self.cScene.undoStack.endMacro()
-    #     self.log(self.tr("Grouped"), 5000, toStatusBarOnly=True)
 
     # ---------------------------------------------------------------------
     @Slot()

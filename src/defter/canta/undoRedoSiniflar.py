@@ -394,6 +394,10 @@ class UndoableUnGroup(QUndoCommand):
         self.group.destroyGroup()
         self.scene.removeItem(self.group)
         # self.group.scene().removeItem(self.group)
+        # oklar varsa, oktan bu nesneyi sil, (silinen nesne bir ok nesnesi degil)
+        if self.group.oklar_dxdy_nokta:
+            for ok in self.group.oklar_dxdy_nokta.keys():
+                del ok.baglanmis_nesneler[self.group._kim]
 
     # ---------------------------------------------------------------------
     def undo(self):
@@ -436,6 +440,12 @@ class UndoableUnGroup(QUndoCommand):
                 self.scene.unGroupedRootItems.discard(item)
             item.setPos(itemEskiPos)
         # #### self.group.updateBoundingRect()
+        # oklar varsa oka bu nesneyi kaydet
+        if self.group.oklar_dxdy_nokta:
+            for ok, dx_dy_nokta in self.group.oklar_dxdy_nokta.items():
+                ok.baglanmis_nesneler[self.group._kim] = dx_dy_nokta[2]
+
+
         self.group.setSelected(True)
 
 
