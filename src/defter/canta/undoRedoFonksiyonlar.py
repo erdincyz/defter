@@ -226,8 +226,8 @@ def undoableSetTextColorAlpha(undoStack, description, item, color):
 
 
 # ---------------------------------------------------------------------
-def undoableStilAdiDegistir(undoStack, description, nesne, nesne2, yeni_isim):
-    command = UndoableStilAdiDegistir(description, nesne, nesne2, yeni_isim)
+def undoableStilAdiDegistir(undoStack, description, nesne, yeni_isim):
+    command = UndoableStilAdiDegistir(description, nesne, yeni_isim)
     undoStack.push(command)
 
 

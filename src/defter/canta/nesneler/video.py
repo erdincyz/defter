@@ -24,6 +24,9 @@ class GraphicsVideoItem(QGraphicsVideoItem):
         super(GraphicsVideoItem, self).__init__(parent)
         self.ustGrup = None
 
+    def text(self):
+        return ""
+
     # ---------------------------------------------------------------------
     def html_dive_cevir(self, html_klasor_kayit_adres, video_kopyalaniyor_mu):
         return ""

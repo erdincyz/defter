@@ -48,7 +48,6 @@ from .canta import shared
 from .canta.dockWidget import DockWidget
 from .canta.action import Action
 from .canta.lutfenBekleyin import LutfenBekleyin
-from .canta.yw.nesneOzellikleriYW import NesneOzellikleriYW
 from .canta.pdfyiResmeCevirPenceresi import PdfyiResmeCevirPenceresi
 from .canta.printPreviewDialog import PrintPreviewDialog
 from .canta.renkSecici import RenkSeciciWidget
@@ -96,7 +95,7 @@ from .canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.95.7"
+VERSION = "0.95.8"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -208,9 +207,7 @@ class DefterAnaPencere(QMainWindow):
 
         self.ekle_hotkeys()
 
-        self.olustur_nesne_ozellikleriYW2()
         self.olustur_nesne_ozellikleriYW()
-        self.olustur_stillerYW2()
         self.olustur_stillerYW()
         self.olustur_tercumeYW()
         self.olustur_baskiSiniriYW()
@@ -318,20 +315,20 @@ class DefterAnaPencere(QMainWindow):
             self.sagYanBolme.yw_cubuga_tasi_veya_kapat(yw, yuklenirken_mi)
 
     # ---------------------------------------------------------------------
-    def olustur_nesne_ozellikleriYW2(self):
+    def olustur_nesne_ozellikleriYW(self):
 
-        self.nesneOzellikleriYW2 = YuzenWidget(parent=self.centralW)
-        self.nesneOzellikleriYW2.yazBaslik(self.tr("Item && Tool Properties"))
-        # self.nesneOzellikleriYW2.setMinimumWidth(315)
-        # self.nesneOzellikleriYW2.setMinimumHeight(190)
-        self.nesneOzellikleriYW2.setMinimumSize(310, 215)
-        # self.nesneOzellikleriYW2.icerikScroll.setMinimumSize(315, 250)
-        self.nesneOzellikleriYW2.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
-        # self.nesneOzellikleriYW2.hide()
+        self.nesneOzellikleriYW = YuzenWidget(parent=self.centralW)
+        self.nesneOzellikleriYW.yazBaslik(self.tr("Item && Tool Properties"))
+        # self.nesneOzellikleriYW.setMinimumWidth(315)
+        # self.nesneOzellikleriYW.setMinimumHeight(190)
+        self.nesneOzellikleriYW.setMinimumSize(310, 215)
+        # self.nesneOzellikleriYW.icerikScroll.setMinimumSize(315, 250)
+        self.nesneOzellikleriYW.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
+        # self.nesneOzellikleriYW.hide()
 
-        temelW = QWidget(self.nesneOzellikleriYW2)
+        temelW = QWidget(self.nesneOzellikleriYW)
         # temelW.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
-        self.nesneOzellikleriYW2.ekleWidget(temelW)
+        self.nesneOzellikleriYW.ekleWidget(temelW)
         anaLay = QVBoxLayout(temelW)
         # anaLay.setSizeConstraint(QVBoxLayout.SetFixedSize)
         # anaLay.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinAndMaxSize)
@@ -882,55 +879,16 @@ class DefterAnaPencere(QMainWindow):
             self.act_set_item_line_color(renk, renkSecicidenMi=False)
 
     # ---------------------------------------------------------------------
-    def ekrandan_renk_secicide_renk_degisti_ywden(self, renk, bilgi):
-
-        self.log(bilgi, toStatusBarOnly=True)
-
-        if self.nesneOzellikleriYW.renk_tipi == "a":
-            self.cScene.aktifArac.arkaPlanRengi = renk
-            self.act_set_item_background_color(renk, renkSecicidenMi=False)
-        elif self.nesneOzellikleriYW.renk_tipi == "y":
-            self.cScene.aktifArac.yaziRengi = renk
-            self.act_set_item_text_color(renk, renkSecicidenMi=False)
-        elif self.nesneOzellikleriYW.renk_tipi == "c":
-            self.cScene.aktifArac.cizgiRengi = renk
-            self.act_set_item_line_color(renk, renkSecicidenMi=False)
-
-    # ---------------------------------------------------------------------
     def olustur_stillerYW(self):
 
-        self.stillerYW = YuzenWidget(kapatilabilir_mi=True, parent=self.centralW)
+        self.stillerYW = YuzenWidget(parent=self.centralW)
         self.stillerYW.yazBaslik(self.tr("Style Presets"))
-        self.stillerYW.setMinimumSize(150, 150)
-        self.stillerYW.hide()
+        self.stillerYW.setMinimumSize(200, 100)
+        self.stillerYW.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
+        # self.stillerYW.hide()
 
-        self.stillerYLW = QListWidget(self.stillerYW)
-        self.stillerYLW.setMinimumWidth(150)
-        self.stillerYLW.setMinimumHeight(100)
-        # self.stillerYLW.setMaximumHeight(500)
-        # self.stillerYLW.resize(250, 100)
-        self.stillerYLW.setSpacing(3)
-        self.stillerYLW.itemDoubleClicked.connect(self.act_apply_selected_style)
-
-        self.stillerYLW.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.stillerYLW.customContextMenuRequested.connect(self.act_stillerYW_sag_menu_goster)
-
-        delegate = ListWidgetItemDelegate(self.stillerYLW)
-        self.stillerYLW.setItemDelegate(delegate)
-
-        self.stillerYW.ekleWidget(self.stillerYLW)
-
-    # ---------------------------------------------------------------------
-    def olustur_stillerYW2(self):
-
-        self.stillerYW2 = YuzenWidget(parent=self.centralW)
-        self.stillerYW2.yazBaslik(self.tr("Style Presets"))
-        self.stillerYW2.setMinimumSize(200, 100)
-        self.stillerYW2.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
-        # self.stillerYW2.hide()
-
-        temelW = QWidget(parent=self.stillerYW2)
-        self.stillerYW2.ekleWidget(temelW)
+        temelW = QWidget(parent=self.stillerYW)
+        self.stillerYW.ekleWidget(temelW)
 
         temelW.setContentsMargins(0, 0, 0, 0)
         anaLay = QVBoxLayout(temelW)
@@ -1969,12 +1927,12 @@ class DefterAnaPencere(QMainWindow):
             self.kutuphaneYW.restoreGeometry(self.settings.value("kutuphaneYWGeo"))
             self.kutuphaneYW.setMinimumSize(self.settings.value("kutuphaneYWMinSize", QSize(200, 200)))
             self.kutuphaneYW.yukleme_bilgisi(self.settings.value("kutuphaneYWYonDurum", "00111"))
-            self.nesneOzellikleriYW2.restoreGeometry(self.settings.value("nesneOzellikleriYW2Geo"))
-            self.nesneOzellikleriYW2.setMinimumSize(self.settings.value("nesneOzellikleriYW2MinSize", QSize(310, 215)))
-            self.nesneOzellikleriYW2.yukleme_bilgisi(self.settings.value("nesneOzellikleriYW2YonDurum", "00100"))
-            self.stillerYW2.restoreGeometry(self.settings.value("stillerYW2Geo"))
-            self.stillerYW2.setMinimumSize(self.settings.value("stillerYW2MinSize", QSize(200, 200)))
-            self.stillerYW2.yukleme_bilgisi(self.settings.value("stillerYW2YonDurum", "00101"))
+            self.nesneOzellikleriYW.restoreGeometry(self.settings.value("nesneOzellikleriYWGeo"))
+            self.nesneOzellikleriYW.setMinimumSize(self.settings.value("nesneOzellikleriYWMinSize", QSize(310, 215)))
+            self.nesneOzellikleriYW.yukleme_bilgisi(self.settings.value("nesneOzellikleriYWYonDurum", "00100"))
+            self.stillerYW.restoreGeometry(self.settings.value("stillerYWGeo"))
+            self.stillerYW.setMinimumSize(self.settings.value("stillerYWMinSize", QSize(200, 200)))
+            self.stillerYW.yukleme_bilgisi(self.settings.value("stillerYWYonDurum", "00101"))
             self.baskiSiniriCizimAyarlariYW.restoreGeometry(self.settings.value("baskiSiniriCizimAyarlariYWGeo"))
             self.baskiSiniriCizimAyarlariYW.setMinimumSize(self.settings.value("baskiSiniriCizimAyarlariYWMinSize", QSize(182, 250)))
             self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi(self.settings.value("baskiSiniriCizimAyarlariYWYonDurum", "00102"))
@@ -1983,9 +1941,9 @@ class DefterAnaPencere(QMainWindow):
             self.sayfalarYW.yukleme_bilgisi("00010")
             self.sayfalarYW.sol_kenara_yanastir()
             self.kutuphaneYW.yukleme_bilgisi("01111")
-            self.nesneOzellikleriYW2.yukleme_bilgisi("10000")
-            self.nesneOzellikleriYW2.sag_kenara_yanastir()
-            self.stillerYW2.yukleme_bilgisi("01101")
+            self.nesneOzellikleriYW.yukleme_bilgisi("10000")
+            self.nesneOzellikleriYW.sag_kenara_yanastir()
+            self.stillerYW.yukleme_bilgisi("01101")
             self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi("01102")
         self.settings.endGroup()
 
@@ -2015,18 +1973,18 @@ class DefterAnaPencere(QMainWindow):
         self.settings.setValue("sayfalarYWGeo", self.sayfalarYW.saveGeometry())
         self.settings.setValue("sayfalarYWMinSize", self.sayfalarYW.eskiMinimumSize)
         self.settings.setValue("sayfalarYWYonDurum", self.sayfalarYW.kaydetme_bilgisi())
-        self.settings.setValue("nesneOzellikleriYW2Geo", self.nesneOzellikleriYW2.saveGeometry())
-        self.settings.setValue("nesneOzellikleriYW2MinSize", self.nesneOzellikleriYW2.eskiMinimumSize)
-        self.settings.setValue("nesneOzellikleriYW2YonDurum", self.nesneOzellikleriYW2.kaydetme_bilgisi())
+        self.settings.setValue("nesneOzellikleriYWGeo", self.nesneOzellikleriYW.saveGeometry())
+        self.settings.setValue("nesneOzellikleriYWMinSize", self.nesneOzellikleriYW.eskiMinimumSize)
+        self.settings.setValue("nesneOzellikleriYWYonDurum", self.nesneOzellikleriYW.kaydetme_bilgisi())
         self.settings.setValue("baskiSiniriCizimAyarlariYWGeo", self.baskiSiniriCizimAyarlariYW.saveGeometry())
         self.settings.setValue("baskiSiniriCizimAyarlariYWMinSize", self.baskiSiniriCizimAyarlariYW.eskiMinimumSize)
         self.settings.setValue("baskiSiniriCizimAyarlariYWYonDurum", self.baskiSiniriCizimAyarlariYW.kaydetme_bilgisi())
         self.settings.setValue("kutuphaneYWGeo", self.kutuphaneYW.saveGeometry())
         self.settings.setValue("kutuphaneYWMinSize", self.kutuphaneYW.eskiMinimumSize)
         self.settings.setValue("kutuphaneYWYonDurum", self.kutuphaneYW.kaydetme_bilgisi())
-        self.settings.setValue("stillerYW2Geo", self.stillerYW2.saveGeometry())
-        self.settings.setValue("stillerYW2MinSize", self.stillerYW2.eskiMinimumSize)
-        self.settings.setValue("stillerYW2YonDurum", self.stillerYW2.kaydetme_bilgisi())
+        self.settings.setValue("stillerYWGeo", self.stillerYW.saveGeometry())
+        self.settings.setValue("stillerYWMinSize", self.stillerYW.eskiMinimumSize)
+        self.settings.setValue("stillerYWYonDurum", self.stillerYW.kaydetme_bilgisi())
 
         self.settings.endGroup()
 
@@ -3762,7 +3720,6 @@ class DefterAnaPencere(QMainWindow):
         # self._statusBar.addAction(QAction("deneme"))
         # self._statusBar.addPermanentWidget(QPushButton("deneme"))
 
-
     # ---------------------------------------------------------------------
     def olustur_yw_menu(self):
         yuzenWidgetsMenu = QMenu(self.tr("Panels"), self.viewMenu)
@@ -3782,12 +3739,12 @@ class DefterAnaPencere(QMainWindow):
                                                       yuzenWidgetsMenu)
         self.actionToggleNesneOzellikleriYW.setShortcut(QKeySequence("Ctrl+Alt+2"))
         self.actionToggleNesneOzellikleriYW.setCheckable(True)
-        self.actionToggleNesneOzellikleriYW.triggered.connect(self.nesneOzellikleriYW2.kucult_buyult)
+        self.actionToggleNesneOzellikleriYW.triggered.connect(self.nesneOzellikleriYW.kucult_buyult)
 
         self.actionToggleStillerYW = QAction(QIcon(':icons/properties.png'), self.tr('Style Presets'), yuzenWidgetsMenu)
         self.actionToggleStillerYW.setShortcut(QKeySequence("Ctrl+Alt+3"))
         self.actionToggleStillerYW.setCheckable(True)
-        self.actionToggleStillerYW.triggered.connect(self.stillerYW2.kucult_buyult)
+        self.actionToggleStillerYW.triggered.connect(self.stillerYW.kucult_buyult)
 
         self.actionToggleKutuphaneYW = QAction(QIcon(':icons/properties.png'), self.tr('Library'), yuzenWidgetsMenu)
         self.actionToggleKutuphaneYW.setShortcut(QKeySequence("Ctrl+Alt+4"))
@@ -4133,8 +4090,6 @@ class DefterAnaPencere(QMainWindow):
                                  self.actionToggleRenkAracCubugu,
                                  self.actionToggleHizalaAracCubugu,
                                  self.actionToggleUtilitiesToolbar))
-
-
 
         self.zoomMenu = QMenu(self.tr("Zoom"), self.viewMenu)
         self.zoomMenu.setIcon(QIcon(":/icons/zoom.png"))
@@ -4888,65 +4843,43 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def stil_uygulaYW_goster_gizle(self):
 
-        # if not self.stillerYLW.isVisible():
-        if not self.stillerYW.isVisible():
-            self.stillerYW.move(self.cView.mapFromGlobal(QCursor.pos()))
-            # self.stillerYLW.resize(250, self.stillerYLW.count() * 21)
+        if self.stillerYW.kucuk_mu:
+            if not self.stillerYW.cubukta_mi:
+                self.stillerYW.eskiYuzenPos = self.stillerYW.pos()
+                self.stillerYW.move(self.cView.mapFromGlobal(QCursor.pos()))
+            # self.stillerLW.resize(250, self.stillerLW.count() * 21)
             # self.stillerYW.adjustSize()
-            self.stillerYW.setVisible(True)
+            self.stillerYW.buyult()
         else:
-            self.stillerYW.setVisible(False)
-
-    # # ---------------------------------------------------------------------
-    # def stil_uygulaYW_goster_gizle2(self):
-    #
-    #     # if not self.stillerYLW.isVisible():
-    #     if not self.stillerYW2.isVisible():
-    #         self.stillerYW2.setFloating(True)
-    #         self.stillerYW2.move(self.cView.mapFromGlobal(QCursor.pos()))
-    #         # self.stillerYLW.resize(250, self.stillerYLW.count() * 21)
-    #         # self.stillerYW.adjustSize()
-    #         self.stillerYW2.setVisible(True)
-    #     else:
-    #         self.stillerYW2.setVisible(False)
+            self.stillerYW.kucult()
+            if not self.stillerYW.cubukta_mi:
+                self.stillerYW.move(self.stillerYW.eskiYuzenPos)
 
     # ---------------------------------------------------------------------
     def tercumeYW_goster_gizle(self):
 
-        if not self.tercumeYW.isVisible():
-            self.tercumeYW.move(self.cView.mapFromGlobal(QCursor.pos()))
-            # self.stillerYLW.resize(250, self.stillerYLW.count() * 21)
-            # self.stillerYW.adjustSize()
-            self.tercumeYW.setVisible(True)
+        if self.tercumeYW.kucuk_mu:
+            if not self.tercumeYW.cubukta_mi:
+                self.tercumeYW.eskiYuzenPos = self.tercumeYW.pos()
+                self.tercumeYW.move(self.cView.mapFromGlobal(QCursor.pos()))
+            self.tercumeYW.buyult()
         else:
-            self.tercumeYW.setVisible(False)
+            self.tercumeYW.kucult()
+            if not self.tercumeYW.cubukta_mi:
+                self.tercumeYW.move(self.tercumeYW.eskiYuzenPos)
 
     # ---------------------------------------------------------------------
     def nesne_ozellikleriYW_goster_gizle(self):
 
-        if not self.nesneOzellikleriYW.isVisible():
-            self.nesneOzellikleriYW.move(self.cView.mapFromGlobal(QCursor.pos()))
-            self.nesneOzellikleriYW.setVisible(True)
+        if self.nesneOzellikleriYW.kucuk_mu:
+            if not self.nesneOzellikleriYW.cubukta_mi:
+                self.nesneOzellikleriYW.eskiYuzenPos = self.nesneOzellikleriYW.pos()
+                self.nesneOzellikleriYW.move(self.cView.mapFromGlobal(QCursor.pos()))
+            self.nesneOzellikleriYW.buyult()
         else:
-            self.nesneOzellikleriYW.setVisible(False)
-
-    # ---------------------------------------------------------------------
-    def olustur_nesne_ozellikleriYW(self):
-
-        # self.arkaPlanRengi vs iptal edilince, nesneye bile tiklasak, secim aracina geciyor, sahneye tiklasa yine ayni
-        # kalemde iken de kalem secili zaten
-        self.nesneOzellikleriYW = NesneOzellikleriYW(self.cScene.aktifArac.arkaPlanRengi,  # secim toolu
-                                                     self.cScene.aktifArac.yaziRengi,
-                                                     self.cScene.aktifArac.cizgiRengi,
-                                                     self.cScene.aktifArac.cizgiKalinligi, self)
-        self.nesneOzellikleriYW.hide()
-        self.nesneOzellikleriYW.arkaPlanRengiDegisti.connect(lambda color: self.act_set_item_background_color(color, renkSecicidenMi=True))
-        self.nesneOzellikleriYW.yaziRengiDegisti.connect(lambda color: self.act_set_item_text_color(color, renkSecicidenMi=True))
-        self.nesneOzellikleriYW.cizgiRengiDegisti.connect(lambda color: self.act_set_item_line_color(color, renkSecicidenMi=True))
-        self.nesneOzellikleriYW.ekranRenkSeciciDugmesindenRenkDegisti.connect(self.ekrandan_renk_secicide_renk_degisti_ywden)
-        self.nesneOzellikleriYW.cizgiKalinligiDegisti.connect(self.act_cizgi_kalinligi_degistir)
-        self.nesneOzellikleriYW.cizgiKalinligiDegisti.connect(
-            lambda x: self.cizgiKalinligiDSliderWithDSBox_tbar.setValue(x * 10))
+            self.nesneOzellikleriYW.kucult()
+            if not self.nesneOzellikleriYW.cubukta_mi:
+                self.nesneOzellikleriYW.move(self.nesneOzellikleriYW.eskiYuzenPos)
 
     # ---------------------------------------------------------------------
     def olustur_tercumeYW(self):
@@ -5144,59 +5077,59 @@ class DefterAnaPencere(QMainWindow):
         self.fontPointSizeFDSBox_tbar.setToolTip(self.tr("Text Size"))
 
         self.actionBold = Action(QIcon(':icons/bold.png'),
-                                  self.tr("Bold"),
-                                  self,
-                                  shortcut="Ctrl+B",
-                                  triggered=lambda durum: self.act_bold(durum=durum, from_button=False),
-                                  checkable=True)
+                                 self.tr("Bold"),
+                                 self,
+                                 shortcut="Ctrl+B",
+                                 triggered=lambda durum: self.act_bold(durum=durum, from_button=False),
+                                 checkable=True)
         # bold = QFont()
         # bold.setBold(True)
         # self.actionBold.setFont(bold)
 
         self.actionItalic = Action(QIcon(':icons/italic.png'),
-                                    self.tr("Italic"),
-                                    self,
-                                    shortcut="Ctrl+I",
-                                    triggered=lambda durum: self.act_italic(durum=durum, from_button=False),
-                                    checkable=True)
+                                   self.tr("Italic"),
+                                   self,
+                                   shortcut="Ctrl+I",
+                                   triggered=lambda durum: self.act_italic(durum=durum, from_button=False),
+                                   checkable=True)
 
         self.actionUnderline = Action(QIcon(':icons/underline.png'),
-                                       self.tr("Underline"),
-                                       self,
-                                       shortcut="Ctrl+U",
-                                       triggered=lambda durum: self.act_underline(durum=durum, from_button=False),
-                                       checkable=True)
+                                      self.tr("Underline"),
+                                      self,
+                                      shortcut="Ctrl+U",
+                                      triggered=lambda durum: self.act_underline(durum=durum, from_button=False),
+                                      checkable=True)
 
         self.actionStrikeOut = Action(QIcon(':icons/strikeout.png'),
-                                       self.tr("Strike Out"),
-                                       self,
-                                       priority=QAction.Priority.LowPriority,
-                                       # shortcut="Ctrl+U",
-                                       triggered=lambda durum: self.act_strikeout(durum=durum, from_button=False),
-                                       checkable=True)
-
-        self.actionOverline = Action(QIcon(':icons/overline.png'),
-                                      self.tr("Overline"),
+                                      self.tr("Strike Out"),
                                       self,
                                       priority=QAction.Priority.LowPriority,
                                       # shortcut="Ctrl+U",
-                                      triggered=lambda durum: self.act_overline(durum=durum, from_button=False),
+                                      triggered=lambda durum: self.act_strikeout(durum=durum, from_button=False),
                                       checkable=True)
+
+        self.actionOverline = Action(QIcon(':icons/overline.png'),
+                                     self.tr("Overline"),
+                                     self,
+                                     priority=QAction.Priority.LowPriority,
+                                     # shortcut="Ctrl+U",
+                                     triggered=lambda durum: self.act_overline(durum=durum, from_button=False),
+                                     checkable=True)
 
         grp = QActionGroup(self.fontToolBar)
         grp.triggered.connect(self.act_yazi_hizala_action)
 
         self.actionYaziHizalaSola = Action(QIcon(':icons/yazi-hizala-sola.png'),
-                                            self.tr("Align Left"), grp)
+                                           self.tr("Align Left"), grp)
 
         self.actionYaziHizalaOrtala = Action(QIcon(':icons/yazi-hizala-ortala.png'),
-                                              self.tr("Centered"), grp)
+                                             self.tr("Centered"), grp)
 
         self.actionYaziHizalaSaga = Action(QIcon(':icons/yazi-hizala-saga.png'),
-                                            self.tr("Align Right"), grp)
+                                           self.tr("Align Right"), grp)
 
         self.actionYaziHizalaSigdir = Action(QIcon(':icons/yazi-hizala-sigdir.png'),
-                                              self.tr("Justify"), grp)
+                                             self.tr("Justify"), grp)
 
         self.actionYaziHizalaSola.setShortcut("Ctrl+L")
         self.actionYaziHizalaSola.setCheckable(True)
@@ -5677,8 +5610,6 @@ class DefterAnaPencere(QMainWindow):
         self.actionAlwaysOnTopToggle.triggered.connect(self.act_toggle_always_on_top)
         self.actionAlwaysOnTopToggle.setToolTip(self.tr("If checked on, Defter will stay on top of other windows."))
 
-
-
         ekranGoruntusuMenuPB = QPushButton(self.utilitiesToolBar)
         ekranGoruntusuMenuPB.setFlat(True)
         ekranGoruntusuMenuPB.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
@@ -5731,15 +5662,6 @@ class DefterAnaPencere(QMainWindow):
             menu.exec(globalPos)
 
     # ---------------------------------------------------------------------
-    def act_stillerYW_sag_menu_goster(self, pos):
-        if self.stillerYLW.currentItem():
-            globalPos = self.stillerYLW.mapToGlobal(pos)
-            menu = QMenu()
-            yeniden_adlandir = menu.addAction(self.tr("Rename"), lambda: self.act_stil_yeniden_adlandir(yw=True))
-            sil = menu.addAction(self.tr("Delete"), lambda: self.act_stil_sil(yw=True))
-            menu.exec(globalPos)
-
-    # ---------------------------------------------------------------------
     @Slot()
     def on_view_menu_about_to_show(self):
         self.actionToggleStatusBar.setChecked(self._statusBar.isVisible())
@@ -5771,8 +5693,8 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def on_yuzen_widgets_menu_about_to_show(self):
         self.actionToggleSayfalarYW.setChecked(not self.sayfalarYW.kucuk_mu)
-        self.actionToggleNesneOzellikleriYW.setChecked(not self.nesneOzellikleriYW2.kucuk_mu)
-        self.actionToggleStillerYW.setChecked(not self.stillerYW2.kucuk_mu)
+        self.actionToggleNesneOzellikleriYW.setChecked(not self.nesneOzellikleriYW.kucuk_mu)
+        self.actionToggleStillerYW.setChecked(not self.stillerYW.kucuk_mu)
         self.actionToggleKutuphaneYW.setChecked(not self.kutuphaneYW.kucuk_mu)
         self.actionToggleBaskiSiniriCizimAyarlariYW.setChecked(not self.baskiSiniriCizimAyarlariYW.kucuk_mu)
 
@@ -5780,8 +5702,8 @@ class DefterAnaPencere(QMainWindow):
     def act_tum_panelleri_goster(self):
         self.sayfalarYW.buyult()
         self.kutuphaneYW.buyult()
-        self.nesneOzellikleriYW2.buyult()
-        self.stillerYW2.buyult()
+        self.nesneOzellikleriYW.buyult()
+        self.stillerYW.buyult()
         self.baskiSiniriCizimAyarlariYW.buyult()
 
     # ---------------------------------------------------------------------
@@ -5999,7 +5921,6 @@ class DefterAnaPencere(QMainWindow):
         self.radioArkaplan.setChecked(True)
         self.act_radio_secim_degisti(self.radioArkaplan)
         self.aracIkonuEtiketi.setPixmap(self.ikonSecimAraci)
-        self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonSecimAraci)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -6014,7 +5935,6 @@ class DefterAnaPencere(QMainWindow):
         self.radioCizgi.setChecked(True)
         self.act_radio_secim_degisti(self.radioCizgi)
         self.aracIkonuEtiketi.setPixmap(self.ikonOkAraci)
-        self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonOkAraci)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -6026,7 +5946,6 @@ class DefterAnaPencere(QMainWindow):
         self.radioArkaplan.setChecked(True)
         self.act_radio_secim_degisti(self.radioArkaplan)
         self.aracIkonuEtiketi.setPixmap(self.ikonKutuAraci)
-        self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonKutuAraci)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -6038,7 +5957,6 @@ class DefterAnaPencere(QMainWindow):
         self.radioArkaplan.setChecked(True)
         self.act_radio_secim_degisti(self.radioArkaplan)
         self.aracIkonuEtiketi.setPixmap(self.ikonYuvarlakAraci)
-        self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonYuvarlakAraci)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -6053,7 +5971,6 @@ class DefterAnaPencere(QMainWindow):
         self.radioCizgi.setChecked(True)
         self.act_radio_secim_degisti(self.radioCizgi)
         self.aracIkonuEtiketi.setPixmap(self.ikonKalemAraci)
-        self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonKalemAraci)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -6065,7 +5982,6 @@ class DefterAnaPencere(QMainWindow):
         self.radioYazi.setChecked(True)
         self.act_radio_secim_degisti(self.radioYazi)
         self.aracIkonuEtiketi.setPixmap(self.ikonYaziAraci)
-        self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonYaziAraci)
 
     # # ---------------------------------------------------------------------
     # def toggle_transforms_for_base(self):
@@ -6109,7 +6025,6 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.aktif_arac_degistir(aktifArac=self.cScene.ResimAraci, dosyaYolu=filePath)
             self.actionAddImageItem.setChecked(True)
             self.aracIkonuEtiketi.setPixmap(self.ikonResimAraci)
-            self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonResimAraci)
 
             add = True
 
@@ -6228,7 +6143,6 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.aktif_arac_degistir(aktifArac=self.cScene.VideoAraci, dosyaYolu=filePath)
             self.actionAddVideoItem.setChecked(True)
             self.aracIkonuEtiketi.setPixmap(self.ikonVideoAraci)
-            self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonVideoAraci)
 
             self.sonKlasorVideolar = os.path.dirname(filePath)
 
@@ -6303,7 +6217,6 @@ class DefterAnaPencere(QMainWindow):
             self.cScene.aktif_arac_degistir(aktifArac=self.cScene.DosyaAraci, dosyaYolu=filePath)
             self.actionEkleDosyaNesnesi.setChecked(True)
             self.aracIkonuEtiketi.setPixmap(self.ikonDosyaAraci)
-            self.nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.ikonDosyaAraci)
 
             self.sonKlasorDosyalar = os.path.dirname(filePath)
 
@@ -7804,8 +7717,6 @@ class DefterAnaPencere(QMainWindow):
             if not renkSecicidenMi:
                 if self.renk_tipi == "y":
                     self.renkSecici.disardan_renk_gir(yaziRengi)
-                if self.nesneOzellikleriYW.renk_tipi == "y":
-                    self.nesneOzellikleriYW.renkSecici.disardan_renk_gir(yaziRengi)
 
         except Exception as e:
             pass
@@ -7849,8 +7760,6 @@ class DefterAnaPencere(QMainWindow):
             if not renkSecicidenMi:
                 if self.renk_tipi == "c":
                     self.renkSecici.disardan_renk_gir(cizgiRengi)
-                if self.nesneOzellikleriYW.renk_tipi == "c":
-                    self.nesneOzellikleriYW.renkSecici.disardan_renk_gir(cizgiRengi)
         except Exception as e:
             pass
 
@@ -7908,8 +7817,6 @@ class DefterAnaPencere(QMainWindow):
             if not renkSecicidenMi:
                 if self.renk_tipi == "a":
                     self.renkSecici.disardan_renk_gir(arkaPlanRengi)
-                if self.nesneOzellikleriYW.renk_tipi == "a":
-                    self.nesneOzellikleriYW.renkSecici.disardan_renk_gir(arkaPlanRengi)
 
         except Exception as e:
             pass
@@ -8327,22 +8234,11 @@ class DefterAnaPencere(QMainWindow):
         # preset.setText("{}: {}pt - {}px".format(presetName, self.fontPointSizeF, self._pen.widthF()))
 
         self.stillerLW.addItem(preset)
-
-        preset2 = ListWidgetItem(presetName)
-        preset2.setForeground(fg)
-        preset2.setBackground(bg)
-        preset2.setCizgiRengi(cizgiRengi)
-        preset2.setPen(QPen(pen))
-        preset2.setPresetFont(font)
-        preset2.setFont(font2)
-        self.stillerYLW.addItem(preset2)
-
         count = self.stillerLW.count()
 
         # ! burayi for dongusune cevirmeyin...
         if count < 10:
             preset.setToolTip("Alt + {}".format(count))
-            preset2.setToolTip("Alt + {}".format(count))
             # def make_callback(_dosya):
             #     return lambda: self.act_open_def_file(_dosya)
             #
@@ -8403,25 +8299,18 @@ class DefterAnaPencere(QMainWindow):
         if ok:
             if text == "":
                 text = self.tr("style")
-            if yw:
-                nesne = self.stillerYLW.currentItem()
-                satir = self.stillerYLW.row(nesne)
-                nesne2 = self.stillerLW.item(satir)
-            else:
                 nesne = self.stillerLW.currentItem()
                 satir = self.stillerLW.row(nesne)
-                nesne2 = self.stillerYLW.item(satir)
-            yeni_isim = "  {}:  {}pt  {:.1f}px".format(text, nesne.presetFont().pointSizeF(), nesne.pen().widthF())
-            # item.setFlags(item.flags() | Qt.ItemFlags.ItemIsEditable)
-            # self.stillerLW.editItem(item)
-            # item.setFlags(item.flags() ^ Qt.ItemFlags.ItemIsEditable)
+                yeni_isim = "  {}:  {}pt  {:.1f}px".format(text, nesne.presetFont().pointSizeF(), nesne.pen().widthF())
+                # item.setFlags(item.flags() | Qt.ItemFlags.ItemIsEditable)
+                # self.stillerLW.editItem(item)
+                # item.setFlags(item.flags() ^ Qt.ItemFlags.ItemIsEditable)
 
-            undoRedo.undoableStilAdiDegistir(self.cScene.undoStack,
-                                             self.tr('rename style preset'),
-                                             nesne=nesne,
-                                             nesne2=nesne2,
-                                             yeni_isim=yeni_isim
-                                             )
+                undoRedo.undoableStilAdiDegistir(self.cScene.undoStack,
+                                                 self.tr('rename style preset'),
+                                                 nesne=nesne,
+                                                 yeni_isim=yeni_isim
+                                                 )
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -8443,27 +8332,11 @@ class DefterAnaPencere(QMainWindow):
 
         msgBox.exec()
         if msgBox.clickedButton() == deleteButton:
-
-            if yw:
-                for item in self.stillerYLW.selectedItems():
-                    row = self.stillerYLW.row(item)
-                    itemToDelete = self.stillerYLW.takeItem(row)
-                    # itemToDelete = None
-                    del itemToDelete
-
-                    itemToDelete2 = self.stillerLW.takeItem(row)
-                    # itemToDelete = None
-                    del itemToDelete2
-            else:
-                for item in self.stillerLW.selectedItems():
-                    row = self.stillerLW.row(item)
-                    itemToDelete = self.stillerLW.takeItem(row)
-                    # itemToDelete = None
-                    del itemToDelete
-
-                    itemToDelete2 = self.stillerYLW.takeItem(row)
-                    # itemToDelete = None
-                    del itemToDelete2
+            for item in self.stillerLW.selectedItems():
+                row = self.stillerLW.row(item)
+                itemToDelete = self.stillerLW.takeItem(row)
+                # itemToDelete = None
+                del itemToDelete
 
     # ---------------------------------------------------------------------
     @Slot(QListWidgetItem)
@@ -8637,7 +8510,6 @@ class DefterAnaPencere(QMainWindow):
     @Slot()
     def act_stilleri_sifirla(self):
         self.stillerLW.clear()
-        self.stillerYLW.clear()
 
     # ---------------------------------------------------------------------
     def get_style_presets_list_for_saving_binary(self):
@@ -8774,13 +8646,13 @@ class DefterAnaPencere(QMainWindow):
             self.mBar.hide()
 
             self.sade_gorunum_oncesi_yw_durumlari_liste = []
-            if not self.nesneOzellikleriYW2.kucuk_mu:
-                self.nesneOzellikleriYW2.kucult()
-                self.sade_gorunum_oncesi_yw_durumlari_liste.append(self.nesneOzellikleriYW2)
+            if not self.nesneOzellikleriYW.kucuk_mu:
+                self.nesneOzellikleriYW.kucult()
+                self.sade_gorunum_oncesi_yw_durumlari_liste.append(self.nesneOzellikleriYW)
 
-            if not self.stillerYW2.kucuk_mu:
-                self.stillerYW2.kucult()
-                self.sade_gorunum_oncesi_yw_durumlari_liste.append(self.stillerYW2)
+            if not self.stillerYW.kucuk_mu:
+                self.stillerYW.kucult()
+                self.sade_gorunum_oncesi_yw_durumlari_liste.append(self.stillerYW)
 
             if not self.baskiSiniriCizimAyarlariYW.kucuk_mu:
                 self.baskiSiniriCizimAyarlariYW.kucult()

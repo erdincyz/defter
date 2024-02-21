@@ -491,7 +491,6 @@ class Scene(QGraphicsScene):
         # self.deleteLater()
         self.parent().actionSwitchToSelectionTool.setChecked(True)
         self.parent().aracIkonuEtiketi.setPixmap(self.parent().ikonSecimAraci)
-        self.parent().nesneOzellikleriYW.aracIkonuEtiketi.setPixmap(self.parent().ikonSecimAraci)
 
     # ---------------------------------------------------------------------
     def _fircaBoyutuItem_olustur(self):
