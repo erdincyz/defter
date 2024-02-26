@@ -41,13 +41,20 @@ defter
 
 komutu ile programı çalıştırabilirsiniz.
 
-Programı silmek içinse 
+Varsa, programı yeni sürüme güncellemek için;
+
+```
+python3 -m pip install -U defter-argekod
+
+```
+
+ve dilerseniz programı silmek için;
 
 ```
 python3 -m pip uninstall defter-argekod
 
 ```
-komutunu kullanabilirsiniz.
+komutlarını kullanabilirsiniz.
 
 
 ### [YARDIM SAYFALARI](https://github.com/erdincyz/defter/wiki)

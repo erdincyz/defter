@@ -31,7 +31,7 @@ You can download and install Python 3 from [https://www.python.org/downloads/](h
 
 If you already have Python 3, you can install it with:
 ```
-python3 -m pip install -U defter-argekod
+python3 -m pip install defter-argekod
 
 ```
 After installation is finished, you can run defter with
@@ -40,7 +40,14 @@ After installation is finished, you can run defter with
 defter
 ```
 
-If you wish, you can uninstall it with
+To update to the latest version;
+
+```
+python3 -m pip install -U defter-argekod
+
+```
+
+Also, if you wish, you can uninstall it with
 ```
 python3 -m pip uninstall defter-argekod
 

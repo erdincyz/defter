@@ -5,8 +5,6 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '3/28/16'
 
-# from math import fabs
-
 from PySide6.QtCore import Qt, Signal, QSizeF, QRectF, QPointF, Slot, QUrl
 from PySide6.QtGui import QBrush, QPen, QColor, QPainterPath, QFontMetricsF, QTextCursor
 from PySide6.QtWidgets import QGraphicsTextItem, QStyle
@@ -40,9 +38,14 @@ class Text(QGraphicsTextItem):
         self.doc.undoCommandAdded.connect(self.act_undo_eklendi)
 
         self.setFont(font)
+        self.secili_nesne_kalem_kalinligi = 0
 
         self.isTextOverflowed = False
         self._resizing = False
+
+        self.handleSize = 10
+        self.resizeHandleSize = QSizeF(self.handleSize, self.handleSize)
+        self.boundingRectTasmaDegeri = self.handleSize / 2
 
         if not rect:
             # self._rect = QRectF()
@@ -54,6 +57,9 @@ class Text(QGraphicsTextItem):
             self._rect = rect
             self.setTextWidth(rect.size().width())
 
+        self._boundingRect = self._rect.adjusted(-self.boundingRectTasmaDegeri, -self.boundingRectTasmaDegeri,
+                                                 self.boundingRectTasmaDegeri, self.boundingRectTasmaDegeri)
+
         self.docLayout.documentSizeChanged.connect(self.doc_layout_changed)
 
         # self.setPos(cursorPos + QPointF(1, 1))
@@ -62,9 +68,6 @@ class Text(QGraphicsTextItem):
         self._eskiRectBeforeResize = None
         self._eskiPosBeforeResize = None
 
-        self.secili_nesne_kalem_kalinligi = 0
-        self.handleSize = 10
-        self.resizeHandleSize = QSizeF(self.handleSize, self.handleSize)
         self.update_resize_handles()
 
         # self.setCacheMode(Text.DeviceCoordinateCache)
@@ -252,8 +255,12 @@ class Text(QGraphicsTextItem):
         # self._rect.setSize(self.doc.size())
         if size.width() > self._rect.size().width() or size.height() > self._rect.size().height():
             self._rect.setSize(size)
+            self._boundingRect = self._rect.adjusted(-self.boundingRectTasmaDegeri,
+                                                     -self.boundingRectTasmaDegeri,
+                                                     self.boundingRectTasmaDegeri,
+                                                     self.boundingRectTasmaDegeri)
 
-        self.update_resize_handles()
+            self.update_resize_handles()
 
     # ---------------------------------------------------------------------
     def update_resize_handles(self):
@@ -990,8 +997,10 @@ class Text(QGraphicsTextItem):
         self.prepareGeometryChange()
         self._rect = rect
         # TODO: burda direkt self.settextwidth niye demedik ki
-        self.doc.setTextWidth(rect.width())
+        # self.doc.setTextWidth(rect.width())
         # self.doc.setPageSize(rect.size())
+        self._boundingRect = rect.adjusted(-self.boundingRectTasmaDegeri, -self.boundingRectTasmaDegeri,
+                                           self.boundingRectTasmaDegeri, self.boundingRectTasmaDegeri)
         self.update_resize_handles()
         # self.adjustSize()
         # self.scene().parent().change_transform_box_values(self)
@@ -1027,29 +1036,15 @@ class Text(QGraphicsTextItem):
         #     return path
 
         path = QPainterPath()
-        path.addRect(self._rect)
+        # path.addRect(self._rect)
+        path.addRect(self._boundingRect)
         return path
 
     # ---------------------------------------------------------------------
-    def boundingRectttt(self):
-        if self._rect.isEmpty():
-            print("empty")
-            return super(Text, self).boundingRect()
-            # self.setRect(super(Text, self).boundingRect())
-        return self._rect
-
-    # ---------------------------------------------------------------------
-    def boundingRecttt(self):
-        bRect = super(Text, self).boundingRect()
-        if bRect.width() > self._rect.width():
-            self._rect.setSize(QSizeF(bRect.width(), self._rect.height()))
-        if bRect.height() > self._rect.height():
-            self._rect.setSize(QSizeF(self._rect.width(), bRect.height()))
-        return self._rect
-
-    # ---------------------------------------------------------------------
     def boundingRect(self):
-        return self._rect
+        # return self._rect
+        return self._boundingRect
+        # br = QRectF(self.rect())
 
     # void QGraphicsTextItemPrivate::_q_updateBoundingRect(const QSizeF &size)
     # {
@@ -1269,8 +1264,8 @@ class Text(QGraphicsTextItem):
         #     painter.drawRect(option.rect)
 
         if self.isTextOverflowed:
-            painter.setPen(QPen(Qt.GlobalColor.red, 2, Qt.PenStyle.DashLine))
-            painter.drawLine(self._rect.bottomLeft(), self._rect.bottomRight())
+            painter.setPen(QPen(Qt.GlobalColor.red, 2, Qt.PenStyle.DotLine))
+            painter.drawLine(self._boundingRect.bottomLeft(), self._boundingRect.bottomRight())
 
         # if not self.isPlainText:
         #     # painter.drawEllipse(self.zenginYaziBelirteci)
@@ -1285,13 +1280,13 @@ class Text(QGraphicsTextItem):
 
         # option2 = QStyleOptionGraphicsItem(option)
         # option2.state = 0
-        # option.state &= ~(QStyle.State_Selected | QStyle.State_HasFocus)
+        # option.state &= ~(QStyle.StateFlag.State_Selected | QStyle.StateFlag.State_HasFocus)
         # option2.exposedRect.setSize(self.document().pageSize())
-        # option2.exposedRect.setSize(self.document().documentLayout().documentSize())
-
+        # # option2.exposedRect.setSize(self.document().documentLayout().documentSize())
+        #
         # option.exposedRect = self.boundingRect()
         # option.rect = option.exposedRect.toRect()
-
+        #
         # rect = QRectF(self._rect)
         # rect.moveTo(0, 0)
         # option2.exposedRect = rect
