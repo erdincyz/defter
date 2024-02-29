@@ -95,7 +95,7 @@ from .canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.95.9"
+VERSION = "0.96.0"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -10070,9 +10070,11 @@ class DefterAnaPencere(QMainWindow):
 
         for ic_sayfa in sayfa.ic_sayfalar():
             if ic_sayfa.adi[0] == "★":
-                sayfa_adi = f"{ic_sayfa.adi[2:]}.html"
+                sayfa_adi = f"{ic_sayfa._kayit_adi[2:]}.html"
             else:
-                sayfa_adi = f"{ic_sayfa.adi}.html"
+                sayfa_adi = f"{ic_sayfa._kayit_adi}.html"
+
+
             html_dosya_kayit_adres = os.path.join(kayit_klasor, sayfa_adi)
 
             if def_dosyasi_icine_kaydet:
@@ -10142,9 +10144,9 @@ class DefterAnaPencere(QMainWindow):
                                            tekSayfaMi=True, def_dosyasi_icine_kaydet=False,
                                            dosya_kopyalaniyor_mu=dosyalar_kopyalansin_mi)
             if sayfa.adi[0] == "★":
-                sayfa_adi = f"{sayfa.adi[2:]}.html"
+                sayfa_adi = f"{sayfa._kayit_adi[2:]}.html"
             else:
-                sayfa_adi = f"{sayfa.adi}.html"
+                sayfa_adi = f"{sayfa._kayit_adi}.html"
             self.html_sayfa_kaydet(html, os.path.join(html_klasor_kayit_adres, sayfa_adi))
             self.lutfen_bekleyin_gizle()
 
