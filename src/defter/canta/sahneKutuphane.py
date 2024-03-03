@@ -6,6 +6,8 @@ __date__ = '25/Oct/2018'
 __author__ = 'Erdinç Yılmaz'
 
 import os
+
+from shiboken6 import Shiboken
 from PySide6.QtCore import QPoint, Qt
 from PySide6.QtWidgets import QGraphicsScene
 from . import shared
@@ -51,6 +53,16 @@ class SahneKutuphane(QGraphicsScene):
         self.suruklenmekte_olan_nesne = None
 
         self.desteklenen_tipler = [shared.IMAGE_ITEM_TYPE, shared.VIDEO_ITEM_TYPE, shared.DOSYA_ITEM_TYPE]
+
+    # ---------------------------------------------------------------------
+    def tum_nesneleri_sil(self):
+        # self.clear()
+        for nesne in self.items():
+            if Shiboken.isValid(nesne):
+                Shiboken.delete(nesne)
+                # print(Shiboken.isValid(nesne))
+                # del nesne
+        # print(len(self.items()))
 
     # ---------------------------------------------------------------------
     def zDeger_arttir(self, nesne):

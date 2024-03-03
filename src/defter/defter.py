@@ -22,8 +22,8 @@ from collections import deque
 
 # from PySide6.QtOpenGL import QGLWidget
 
-from PySide6.QtGui import (QCursor, QKeySequence, QIcon, QPixmap, QColor, QPen, QFont, QPainter, QPainterPath,
-                           QImageReader, QImage, QPixmapCache, QTextCharFormat, QTextCursor, QPalette, QTextListFormat,
+from PySide6.QtGui import (QCursor, QKeySequence, QIcon, QPixmap, QColor, QPen, QFont, QPainter, QPainterPath, QImageReader, 
+                           QImage, QPixmapCache, QTextCharFormat, QTextCursor, QPalette, QTextListFormat,
                            QTextBlockFormat, QPageSize, QPageLayout, QAction, QActionGroup, QUndoGroup,
                            QShortcut)
 
@@ -95,7 +95,7 @@ from .canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.96.0"
+VERSION = "0.96.1"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -229,8 +229,13 @@ class DefterAnaPencere(QMainWindow):
 
         # self.pixmapCache = QPixmapCache()
 
+        # default 10240 KB - 10MB
+        # Resim nesnesi için kullanmıyoruz.
+        # Ancak kutuphaneden tasinanlar icin veya arac cubugundaki menuden
+        # daha once yuklenmis resimleri tekrar sahneye tasirken kullanmak dusunulebilir.
         # QPixmapCache.setCacheLimit(1024000)  # 1 GB
-        QPixmapCache.setCacheLimit(524288)  # 512 MB
+        # QPixmapCache.setCacheLimit(501200)  # 512 MB
+
 
         # this is for text item's "Localize HTML" action
         self.is_fetching = False
@@ -1502,8 +1507,18 @@ class DefterAnaPencere(QMainWindow):
     #     print(scene)
     #     print(modeller)
     #     print(sayfalar)
+    #
+    #     print([i.parent() for i in undoStack])
+    #
+    #     # print(self.eskiCscene)
+    #     # print(self.eskiCscene._kimlik_nesne_sozluk)
+    #
+    #     print(len(QApplication.allWidgets()))
+    #
+    #     for w in QApplication.allWidgets():
+    #         if not w.parent():
+    #             print(w)
 
-    # print([i.parent() for i in undoStack])
 
     # ---------------------------------------------------------------------
     def ekle_sil_butonlari_guncelle(self):
@@ -1592,11 +1607,13 @@ class DefterAnaPencere(QMainWindow):
         # self.sayfa_ilk_acildiginda_resimleri_yukle()
 
         try:
-            self.sahneKutuphane.clear()
+            # self.sahneKutuphane.clear()
             self.sahneKutuphane.tempDirPath = self.cModel.tempDirPath
             self.sahneKutuphane.aktif_sahne = self.cScene
             # list(self.cModel.sayfalar()) cunku generator, ilk islemde tuketiyoruz, sonra problem
             self.sahneKutuphane.sayfalar = list(self.cModel.sayfalar())
+            self.sahneKutuphane.suruklenmekte_olan_nesne = None
+            self.sahneKutuphane.tum_nesneleri_sil()
         except AttributeError:
             print("ilk açılışta problem olmasin diye.")
 
@@ -1735,21 +1752,7 @@ class DefterAnaPencere(QMainWindow):
     def tw_modeli_ve_sayfalari_sil(self, model):
 
         with signals_blocked(model):
-            # dikkat! burda dongu yaptigimiz listeden sayfa siliyoruz, satir sil diyerek
-            # o yuzden kopya uzerinde dongu yapiyoruz.
-            for sayfa in model.kokSayfa.ic_sayfalar()[:]:
-                sayfa.scene.undoStack.clear()
-                self.undoGroup.removeStack(sayfa.scene.undoStack)
-                sayfa.scene.undoStack.setParent(None)
-                sayfa.scene.undoStack.deleteLater()
-                # sayfa.scene.clear()
-                sayfa.scene.setParent(None)
-                sayfa.scene.deleteLater()
-                sayfa.view.setParent(None)
-                sayfa.view.deleteLater()
-                if sayfa._ic_sayfalar:
-                    self._tw_sayfalari_sil(sayfa, model)
-                model.satir_sil(sayfa)
+            self._tw_sayfalari_sil(model.kokSayfa, model)
 
         # model.sifirla()
         # model.deleteLater()
@@ -1771,6 +1774,7 @@ class DefterAnaPencere(QMainWindow):
     #
     # ---------------------------------------------------------------------
     def _tw_sayfalari_sil(self, parentItem, model):
+
         # dikkat! burda dongu yaptigimiz listeden sayfa siliyoruz, satir sil diyerek
         # o yuzden kopya uzerinde dongu yapiyoruz.
         for sayfa in parentItem.ic_sayfalar()[:]:
@@ -1778,6 +1782,13 @@ class DefterAnaPencere(QMainWindow):
             self.undoGroup.removeStack(sayfa.scene.undoStack)
             sayfa.scene.undoStack.setParent(None)
             sayfa.scene.undoStack.deleteLater()
+            del sayfa.scene._kimlik_nesne_sozluk
+            del sayfa.scene.unGroupedRootItems
+            del sayfa.scene.tasinanNesnelerinListesi
+            del sayfa.scene.selectionQueue
+            # sayfa.scene.clear()
+            sayfa.scene.tum_nesneleri_sil()
+            sayfa.scene.activeItem = None
             sayfa.scene.setParent(None)
             sayfa.scene.deleteLater()
             sayfa.view.setParent(None)
@@ -2502,11 +2513,13 @@ class DefterAnaPencere(QMainWindow):
             self.act_aramayi_temizle()
 
             try:
-                self.sahneKutuphane.clear()
+                # self.sahneKutuphane.clear()
                 self.sahneKutuphane.tempDirPath = self.cModel.tempDirPath
                 self.sahneKutuphane.aktif_sahne = self.cScene
                 # list(self.cModel.sayfalar()) cunku generator, ilk islemde tuketiyoruz, sonra problem
                 self.sahneKutuphane.sayfalar = list(self.cModel.sayfalar())
+                self.sahneKutuphane.suruklenmekte_olan_nesne = None
+                self.sahneKutuphane.tum_nesneleri_sil()
             except AttributeError:
                 print("ilk açılışta problem olmasin diye.")
 

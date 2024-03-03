@@ -9,6 +9,7 @@ __date__ = '3/27/16'
 import os
 import shutil
 
+from shiboken6 import Shiboken
 from PySide6.QtCore import Qt, QRectF, QPointF, Slot, Signal, QThread, QLineF, QObject
 from PySide6.QtGui import QPixmap, QPen, QImage, QUndoStack, QColor, QFont
 from PySide6.QtWidgets import QApplication, QGraphicsScene
@@ -109,7 +110,19 @@ class Scene(QGraphicsScene):
 
         self.undoRedo = undoRedo
 
+        # DIKKAT: bu item tutuyor, bunu sildikten sonra bir de scene.clear()
+        # (tum_nesneleri_sil() e gecildi sonrasinda clear() yerine) gerekti bellek sızıntısı olmamasi icin
         self._kimlik_nesne_sozluk = {}
+
+    # ---------------------------------------------------------------------
+    def tum_nesneleri_sil(self):
+        # self.clear()
+        for nesne in self.items():
+            if Shiboken.isValid(nesne):
+                Shiboken.delete(nesne)
+                # print(Shiboken.isValid(nesne))
+                # del nesne
+        # print(len(self.items()))
 
     # ---------------------------------------------------------------------
     def get_properties_for_save(self):

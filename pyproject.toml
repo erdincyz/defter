@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "defter-argekod"
-version = "0.96.0"
+version = "0.96.1"
 authors = [
   { name="argekod"},
 ]
