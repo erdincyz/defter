@@ -16,6 +16,7 @@ from .spinBoxlar import SpinBox
 class PdfyiResmeCevirPenceresi(QDialog):
     # genislik, yukseklik, ilk, son, sayfalar arasi bosluk
     donusturTiklandi = Signal(int, int, int, int, int)
+    iptalTiklandi = Signal()
 
     # ---------------------------------------------------------------------
     def __init__(self, boyut_point, pdf_sayfa_sayisi, parent=None):
@@ -88,12 +89,12 @@ class PdfyiResmeCevirPenceresi(QDialog):
 
         donusturBtn = QPushButton(self.tr("C&onvert"), self)
         donusturBtn.clicked.connect(self.act_donustur)
-        kapatBtn = QPushButton(self.tr("&Close"), self)
-        kapatBtn.setDefault(True)
-        kapatBtn.clicked.connect(self.reject)
+        self.kapatBtn = QPushButton(self.tr("&Close"), self)
+        self.kapatBtn.setDefault(True)
+        self.kapatBtn.clicked.connect(self.kapat_yada_iptal_et)
         layBtn = QHBoxLayout()
         layBtn.addWidget(donusturBtn)
-        layBtn.addWidget(kapatBtn)
+        layBtn.addWidget(self.kapatBtn)
 
         layout.addLayout(layOraniKoru)
         layout.addLayout(layGenislik)
@@ -106,6 +107,16 @@ class PdfyiResmeCevirPenceresi(QDialog):
         self.olustur_ayarlar()
         self.oku_ayarlar()
         # commandDialog.accepted.connect()
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def kapat_yada_iptal_et(self):
+
+        if self.kapatBtn.text == "&Close":
+            self.reject()
+        else:
+            self.iptalTiklandi.emit()
+            self.reject()
 
     # ---------------------------------------------------------------------
     @Slot(int)
@@ -132,6 +143,7 @@ class PdfyiResmeCevirPenceresi(QDialog):
     # ---------------------------------------------------------------------
     @Slot()
     def act_donustur(self):
+        self.kapatBtn.setText(self.tr("&Cancel"))
         self.donusturTiklandi.emit(self.genislikSBox.value(),
                                    self.yukseklikSBox.value(),
                                    self.ilkSayfaSBox.value()-1,

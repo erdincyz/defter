@@ -11,6 +11,7 @@ from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QSplitter, QFrame
 
 from ..yanBolme.dikeyDugme import DikeyDugme
 from ..yanBolme.kenarBoyut import KenarBoyutSol, KenarBoyutSag
+from ..yw.yuzenWidget import YuzenWidget
 
 
 # ########################################################################
@@ -197,6 +198,9 @@ class YanBolme(QFrame):
 
     # ---------------------------------------------------------------------
     def dragEnterEvent(self, e):
+        if not isinstance(e.source(), YuzenWidget):
+            e.ignore()
+            return
         e.accept()
         self.renk_degistir(self.renkArkaplanSurukleBirakBelirt)
 

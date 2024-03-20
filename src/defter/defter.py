@@ -22,7 +22,7 @@ from collections import deque
 
 # from PySide6.QtOpenGL import QGLWidget
 
-from PySide6.QtGui import (QCursor, QKeySequence, QIcon, QPixmap, QColor, QPen, QFont, QPainter, QPainterPath, QImageReader, 
+from PySide6.QtGui import (QCursor, QKeySequence, QIcon, QPixmap, QColor, QPen, QFont, QPainter, QPainterPath, QImageReader,
                            QImage, QPixmapCache, QTextCharFormat, QTextCursor, QPalette, QTextListFormat,
                            QTextBlockFormat, QPageSize, QPageLayout, QAction, QActionGroup, QUndoGroup,
                            QShortcut)
@@ -30,13 +30,13 @@ from PySide6.QtGui import (QCursor, QKeySequence, QIcon, QPixmap, QColor, QPen, 
 from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QStackedLayout, QApplication,
                                QFileDialog, QMenuBar, QMenu, QColorDialog, QMessageBox,
                                QStatusBar, QSizePolicy, QLabel, QPushButton, QScrollArea,
-                               QDialog, QTextEdit, QInputDialog, QListWidget, QListWidgetItem,
+                               QDialog, QTextEdit, QInputDialog, QListWidget,
                                QLineEdit, QToolButton, QComboBox, QButtonGroup, QGroupBox, QRadioButton,
                                QCheckBox, QGraphicsItem)
 
 from PySide6.QtCore import (Qt, QRectF, QSettings, QPoint, Slot, QSizeF, QSize, QFile, QSaveFile,
                             QIODevice, QDataStream, QMimeData, QByteArray, QPointF, qCompress, qUncompress, QLocale,
-                            QThread, QUrl, QLineF, QObject, QRect, QTimer, QDir, QTranslator)
+                            QThread, QUrl, QLineF, QObject, QRect, QTimer, QDir, QTranslator, QTime, Signal)
 
 from PySide6.QtWebEngineCore import QWebEngineSettings  # , QWebEngineProfile, QWebEnginePage
 from PySide6.QtWebEngineWidgets import QWebEngineView
@@ -49,6 +49,7 @@ from .canta.dockWidget import DockWidget
 from .canta.action import Action
 from .canta.lutfenBekleyin import LutfenBekleyin
 from .canta.pdfyiResmeCevirPenceresi import PdfyiResmeCevirPenceresi
+from .canta.videoyuResmeCevirPenceresi import VideoyuResmeCevirPenceresi
 from .canta.printPreviewDialog import PrintPreviewDialog
 from .canta.renkSecici import RenkSeciciWidget
 from .canta.renkSecmeDugmesi import RenkSecmeDugmesi
@@ -85,8 +86,9 @@ from .canta.pushButton import PushButton, PushButtonRenk
 from .canta.yw.yuzenWidget import YuzenWidget
 from .canta.yanBolme.yanBolme import YanBolme
 from .canta.yw.tercumeYW import TercumeYW
+from .canta.yw.altyaziYW import AltyaziYW
 from .canta.with_signals_updates_blocked import (signals_blocked_and_updates_disabled as signals_updates_blocked,
-                                                signals_blocked)
+                                                 signals_blocked)
 
 from .canta import undoRedoFonksiyonlar as undoRedo
 
@@ -95,7 +97,7 @@ from .canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.96.1"
+VERSION = "0.96.2"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -111,6 +113,8 @@ DEFSTYLES_FILE_VERSION = 1
 
 ########################################################################
 class DefterAnaPencere(QMainWindow):
+
+    iptalTiklandi = Signal()
 
     # ---------------------------------------------------------------------
     def __init__(self, parent=None):
@@ -211,6 +215,7 @@ class DefterAnaPencere(QMainWindow):
         self.olustur_stillerYW()
         self.olustur_tercumeYW()
         self.olustur_baskiSiniriYW()
+        self.olustur_altyaziYW()
         self.olustur_yw_menu()
         self.olustur_dummy_widget_for_actions()
         self.arsivleme_programi_adres_belirle()
@@ -236,12 +241,12 @@ class DefterAnaPencere(QMainWindow):
         # QPixmapCache.setCacheLimit(1024000)  # 1 GB
         # QPixmapCache.setCacheLimit(501200)  # 512 MB
 
-
         # this is for text item's "Localize HTML" action
         self.is_fetching = False
 
+        self.iptal_tiklandi_mi = False
+
         # self.logViewerDialog = None
-        # self.logCounter = 0
         self.olustur_log_viewer_dialog()
 
         # import os
@@ -256,6 +261,20 @@ class DefterAnaPencere(QMainWindow):
     #     for item in self.findChildren(QAction):
     #         # print(item.parent().text())
     #         print(item.text()," --> ",item.shortcut().toString())
+
+    # ---------------------------------------------------------------------
+    def olustur_altyaziYW(self):
+
+        self.altyaziYW = AltyaziYW(self)
+
+        self.altyaziYW.yazBaslik(self.tr("Video Subtitles"))
+        self.altyaziYW.setMinimumSize(200, 100)
+        self.altyaziYW.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
+        # self.altyaziYW.hide()
+
+        self.altyaziYW.log.connect(self.log)
+        self.altyaziYW.sonKlasorVideolarGuncelle.connect(lambda: self.altyaziYW.sonKlasorVideolar_guncelle(self.sonKlasorVideolar))
+        self.altyaziYW.sahneAktifNesneBilgisiGuncelle.connect(lambda: self.altyaziYW.sahneAktifNesneBilgisi_guncelle(self.cScene.activeItem))
 
     # ---------------------------------------------------------------------
     def renk_degistir(self):
@@ -1742,6 +1761,14 @@ class DefterAnaPencere(QMainWindow):
             scene.undoStack.setParent(None)
             scene.undoStack.deleteLater()
             # self.undoGroup.blockSignals(False)
+            del scene._kimlik_nesne_sozluk
+            del scene.unGroupedRootItems
+            del scene.tasinanNesnelerinListesi
+            del scene.selectionQueue
+            del self.altyaziYW.sahneAktifNesne
+            # scene.clear()
+            scene.tum_nesneleri_sil()
+            scene.activeItem = None
 
             view.setParent(None)
             scene.setParent(None)
@@ -1786,6 +1813,7 @@ class DefterAnaPencere(QMainWindow):
             del sayfa.scene.unGroupedRootItems
             del sayfa.scene.tasinanNesnelerinListesi
             del sayfa.scene.selectionQueue
+            del self.altyaziYW.sahneAktifNesne
             # sayfa.scene.clear()
             sayfa.scene.tum_nesneleri_sil()
             sayfa.scene.activeItem = None
@@ -1934,19 +1962,22 @@ class DefterAnaPencere(QMainWindow):
 
             self.sayfalarYW.restoreGeometry(self.settings.value("sayfalarYWGeo"))
             self.sayfalarYW.setMinimumSize(self.settings.value("sayfalarYWMinSize", QSize(190, 315)))
-            self.sayfalarYW.yukleme_bilgisi(self.settings.value("sayfalarYWYonDurum", "00110"))
+            self.sayfalarYW.yukleme_bilgisi(self.settings.value("sayfalarYWYonDurum", "00100"))
             self.kutuphaneYW.restoreGeometry(self.settings.value("kutuphaneYWGeo"))
             self.kutuphaneYW.setMinimumSize(self.settings.value("kutuphaneYWMinSize", QSize(200, 200)))
-            self.kutuphaneYW.yukleme_bilgisi(self.settings.value("kutuphaneYWYonDurum", "00111"))
+            self.kutuphaneYW.yukleme_bilgisi(self.settings.value("kutuphaneYWYonDurum", "01111"))
             self.nesneOzellikleriYW.restoreGeometry(self.settings.value("nesneOzellikleriYWGeo"))
             self.nesneOzellikleriYW.setMinimumSize(self.settings.value("nesneOzellikleriYWMinSize", QSize(310, 215)))
-            self.nesneOzellikleriYW.yukleme_bilgisi(self.settings.value("nesneOzellikleriYWYonDurum", "00100"))
+            self.nesneOzellikleriYW.yukleme_bilgisi(self.settings.value("nesneOzellikleriYWYonDurum", "10000"))
             self.stillerYW.restoreGeometry(self.settings.value("stillerYWGeo"))
             self.stillerYW.setMinimumSize(self.settings.value("stillerYWMinSize", QSize(200, 200)))
-            self.stillerYW.yukleme_bilgisi(self.settings.value("stillerYWYonDurum", "00101"))
+            self.stillerYW.yukleme_bilgisi(self.settings.value("stillerYWYonDurum", "01101"))
             self.baskiSiniriCizimAyarlariYW.restoreGeometry(self.settings.value("baskiSiniriCizimAyarlariYWGeo"))
             self.baskiSiniriCizimAyarlariYW.setMinimumSize(self.settings.value("baskiSiniriCizimAyarlariYWMinSize", QSize(182, 250)))
-            self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi(self.settings.value("baskiSiniriCizimAyarlariYWYonDurum", "00102"))
+            self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi(self.settings.value("baskiSiniriCizimAyarlariYWYonDurum", "01112"))
+            self.altyaziYW.restoreGeometry(self.settings.value("altyaziYWGeo"))
+            self.altyaziYW.setMinimumSize(self.settings.value("altyaziYWMinSize", QSize(200, 200)))
+            self.altyaziYW.yukleme_bilgisi(self.settings.value("altyaziYWYonDurum", "01102"))
 
         else:  # ilk acilis
             self.sayfalarYW.yukleme_bilgisi("00010")
@@ -1955,7 +1986,8 @@ class DefterAnaPencere(QMainWindow):
             self.nesneOzellikleriYW.yukleme_bilgisi("10000")
             self.nesneOzellikleriYW.sag_kenara_yanastir()
             self.stillerYW.yukleme_bilgisi("01101")
-            self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi("01102")
+            self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi("01112")
+            self.altyaziYW.yukleme_bilgisi("01102")
         self.settings.endGroup()
 
         self.settings.beginGroup("StylePresets")
@@ -1996,6 +2028,9 @@ class DefterAnaPencere(QMainWindow):
         self.settings.setValue("stillerYWGeo", self.stillerYW.saveGeometry())
         self.settings.setValue("stillerYWMinSize", self.stillerYW.eskiMinimumSize)
         self.settings.setValue("stillerYWYonDurum", self.stillerYW.kaydetme_bilgisi())
+        self.settings.setValue("altyaziYWGeo", self.altyaziYW.saveGeometry())
+        self.settings.setValue("altyaziYWMinSize", self.altyaziYW.eskiMinimumSize)
+        self.settings.setValue("altyaziYWYonDurum", self.altyaziYW.kaydetme_bilgisi())
 
         self.settings.endGroup()
 
@@ -2759,9 +2794,6 @@ class DefterAnaPencere(QMainWindow):
                 return
             version = fromFileStream.readInt16()
             if version > DEF_FILE_VERSION:
-                # print("old file")
-                pass
-            if version > DEF_FILE_VERSION:
                 # print("new file")
                 pass
 
@@ -3396,12 +3428,17 @@ class DefterAnaPencere(QMainWindow):
         return sceneDict
 
     # ---------------------------------------------------------------------
-    def lutfen_bekleyin_goster(self, encok_deger: int = 0):
+    def lutfen_bekleyin_goster(self, encok_deger: int = 0, iptalBtnGoster=False):
         QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+        self.iptal_tiklandi_mi = False
         if encok_deger:
             self.lutfenBekleyinWidget.belirli_yuzde_moduna_al(encok_deger)
         else:
             self.lutfenBekleyinWidget.belirsiz_yuzde_moduna_al()
+        if iptalBtnGoster:
+            self.lutfenBekleyinWidget.iptalBtn.show()
+        else:
+            self.lutfenBekleyinWidget.iptalBtn.hide()
         self.lutfenBekleyinWidget.show()
 
         # Ozellikle QThread kullanmiyoruz.
@@ -3415,8 +3452,14 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def lutfen_bekleyin_gizle(self):
         self.lutfenBekleyinWidget.hide()
+        self.iptal_tiklandi_mi = False
         # self.setEnabled(True)
         QApplication.restoreOverrideCursor()
+
+    # ---------------------------------------------------------------------
+    def act_iptal_tiklandi(self):
+        self.iptal_tiklandi_mi = True
+        self.iptalTiklandi.emit()
 
     # ---------------------------------------------------------------------
     def save_file(self, zipDosyaTamAdres, cModel, varsa_ayni_adresteki_dosya_silinsin_mi, isSaveAs=False):
@@ -3681,6 +3724,7 @@ class DefterAnaPencere(QMainWindow):
         # self._statusBar.mouseDoubleClickEvent()
 
         self.lutfenBekleyinWidget = LutfenBekleyin(self._statusBar)
+        self.lutfenBekleyinWidget.iptalBtnTiklandi.connect(self.act_iptal_tiklandi)
         self.lutfenBekleyinWidget.hide()
         self._statusBar.addPermanentWidget(self.lutfenBekleyinWidget)
 
@@ -3721,15 +3765,16 @@ class DefterAnaPencere(QMainWindow):
         resetZoomBtn.clicked.connect(self.cView.zoomInitial)
         self._statusBar.addPermanentWidget(resetZoomBtn)
 
-        # btn = QPushButton("📜")
-        # btn = QPushButton("📖")
-        btn = QPushButton("☰", self._statusBar)
-        btn.setFlat(True)
-        btn.setMaximumWidth(25)
-        btn.setMaximumHeight(20)
-        btn.clicked.connect(self.act_toggle_log_viewer_dialog)
+        # self.logPenceresiAcKapaBtn = QPushButton("📜")
+        # self.logPenceresiAcKapaBtn = QPushButton("📖")
+        self.logPenceresiAcKapaBtn = QPushButton("☰", self._statusBar)
+        self.logPenceresiAcKapaBtn.setFlat(True)
+        self.logPenceresiAcKapaBtn.setMaximumWidth(35)
+        self.logPenceresiAcKapaBtn.setMaximumHeight(20)
+        self.logPenceresiAcKapaBtn.clicked.connect(self.act_toggle_log_viewer_dialog)
         # self._statusBar.addWidget(QCheckBox())
-        self._statusBar.addPermanentWidget(btn)
+        self._statusBar.addPermanentWidget(self.logPenceresiAcKapaBtn)
+        self.logPenceresiOkunmamisMesajSayisi = 0
         # self._statusBar.addAction(QAction("deneme"))
         # self._statusBar.addPermanentWidget(QPushButton("deneme"))
 
@@ -3770,12 +3815,20 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleBaskiSiniriCizimAyarlariYW.setCheckable(True)
         self.actionToggleBaskiSiniriCizimAyarlariYW.triggered.connect(self.baskiSiniriCizimAyarlariYW.kucult_buyult)
 
+        self.actionToggleAltyaziYW = QAction(QIcon(':icons/properties.png'),
+                                             self.tr('Video Subtitles'), yuzenWidgetsMenu)
+        self.actionToggleAltyaziYW.setShortcut(QKeySequence("Ctrl+Alt+6"))
+        self.actionToggleAltyaziYW.setCheckable(True)
+        self.actionToggleAltyaziYW.triggered.connect(self.altyaziYW.kucult_buyult)
+
         yuzenWidgetsMenu.addActions((self.actionTumPanelleriGoster,
                                      self.actionToggleSayfalarYW,
                                      self.actionToggleKutuphaneYW,
                                      self.actionToggleStillerYW,
                                      self.actionToggleNesneOzellikleriYW,
-                                     self.actionToggleBaskiSiniriCizimAyarlariYW))
+                                     self.actionToggleBaskiSiniriCizimAyarlariYW,
+                                     self.actionToggleAltyaziYW
+                                     ))
 
         # self.viewMenu.insertMenu(beforAction, menu)
         self.viewMenu.addSeparator(),
@@ -4342,8 +4395,30 @@ class DefterAnaPencere(QMainWindow):
         self.actionShowVideoInfo = QAction(QIcon(':icons/info.png'), self.tr("Show video info"), self.nesneSagMenu)
         self.actionShowVideoInfo.triggered.connect(self.act_show_video_info)
 
-        self.actionVideoyuResmeCevir = QAction(QIcon(':icons/file-image.png'), self.tr("Video to image(s)"), self.nesneSagMenu)
-        self.actionVideoyuResmeCevir.triggered.connect(self.act_videoyu_resme_cevir)
+        self.actionVideodanResimCekPaneli = QAction(QIcon(':icons/file-image.png'), self.tr("Video to Image(s)"), self.nesneSagMenu)
+        self.actionVideodanResimCekPaneli.setToolTip(self.tr("Captures current image from video and adds to the page"))
+        self.actionVideodanResimCekPaneli.setShortcut(QKeySequence("F12"))
+        self.actionVideodanResimCekPaneli.triggered.connect(self.act_videodan_resim_cek_paneli_ac)
+
+        self.actionVideodanResimCek = QAction(QIcon(':icons/file-image.png'), self.tr("Capture image"), self.nesneSagMenu)
+        self.actionVideodanResimCek.setToolTip(self.tr("Captures current image from video and adds to the page"))
+        self.actionVideodanResimCek.setShortcut(QKeySequence("F9"))
+        self.actionVideodanResimCek.triggered.connect(self.act_videodan_resim_cek)
+
+        self.actionVideodanResimCekAltyazili = QAction(QIcon(':icons/file-image.png'), self.tr("Capture image with subtitles"), self.nesneSagMenu)
+        self.actionVideodanResimCekAltyazili.setToolTip(self.tr("Captures current image and +-7 subtitles from video and adds them to the page"))
+        self.actionVideodanResimCekAltyazili.setShortcut(QKeySequence("F10"))
+        self.actionVideodanResimCekAltyazili.triggered.connect(lambda: self.act_videodan_resim_cek(altYazili=True))
+
+        self.actionVideodanResimCekAltyaziliBirSnOnce = QAction(QIcon(':icons/file-image.png'), self.tr("Capture image -1s with subtitles"), self.nesneSagMenu)
+        self.actionVideodanResimCekAltyaziliBirSnOnce.setToolTip(
+            self.tr("Captures image and +-7 subtitles from 1 second before of the current position of the video and adds them to the page."))
+        self.actionVideodanResimCekAltyaziliBirSnOnce.setShortcut(QKeySequence("F11"))
+        self.actionVideodanResimCekAltyaziliBirSnOnce.triggered.connect(lambda: self.act_videodan_resim_cek(altYazili=True, birSnOnce=True))
+
+        self.actionVideoyaAltYaziEkle = QAction(QIcon(':icons/file-image.png'), self.tr("Add subtitles"), self.nesneSagMenu)
+        self.actionVideoyaAltYaziEkle.setShortcut(QKeySequence("F8"))
+        self.actionVideoyaAltYaziEkle.triggered.connect(self.act_videoya_altyazi_ekle)
 
         # ---------------------------------------------------------------------
         self.actionEmbedDosya = QAction(QIcon(":icons/command.png"), self.tr("Embed file(s) to document"),
@@ -4469,7 +4544,13 @@ class DefterAnaPencere(QMainWindow):
                                       self.actionEditCommand,
                                       self.videoSagMenu.addSeparator(),
                                       self.actionShowVideoInfo,
-                                      self.actionVideoyuResmeCevir,
+                                      self.videoSagMenu.addSeparator(),
+                                      self.actionVideodanResimCek,
+                                      self.actionVideodanResimCekAltyazili,
+                                      self.actionVideodanResimCekAltyaziliBirSnOnce,
+                                      self.actionVideodanResimCekPaneli,
+                                      self.videoSagMenu.addSeparator(),
+                                      self.actionVideoyaAltYaziEkle,
                                       self.videoSagMenu.addSeparator(),
                                       self.actionEmbedVideo,
                                       self.actionExportVideo,
@@ -4717,7 +4798,11 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionEmbedVideo,
                                           self.actionExportVideo,
                                           self.actionShowVideoInfo,
-                                          self.actionVideoyuResmeCevir,
+                                          self.actionVideodanResimCek,
+                                          self.actionVideodanResimCekAltyazili,
+                                          self.actionVideodanResimCekAltyaziliBirSnOnce,
+                                          self.actionVideodanResimCekPaneli,
+                                          self.actionVideoyaAltYaziEkle,
                                           self.actionEmbedDosya,
                                           self.actionExportDosya,
                                           self.actionPdfyiResmeCevir,
@@ -4779,6 +4864,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionToggleStillerYW,
                                           self.actionToggleKutuphaneYW,
                                           self.actionToggleBaskiSiniriCizimAyarlariYW,
+                                          self.actionToggleAltyaziYW,
                                           # view menu actions
                                           self.actionToggleStatusBar,
                                           self.actionToggleMenuBar,
@@ -5710,6 +5796,7 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleStillerYW.setChecked(not self.stillerYW.kucuk_mu)
         self.actionToggleKutuphaneYW.setChecked(not self.kutuphaneYW.kucuk_mu)
         self.actionToggleBaskiSiniriCizimAyarlariYW.setChecked(not self.baskiSiniriCizimAyarlariYW.kucuk_mu)
+        self.actionToggleAltyaziYW.setChecked(not self.altyaziYW.kucuk_mu)
 
     # ---------------------------------------------------------------------
     def act_tum_panelleri_goster(self):
@@ -5718,6 +5805,7 @@ class DefterAnaPencere(QMainWindow):
         self.nesneOzellikleriYW.buyult()
         self.stillerYW.buyult()
         self.baskiSiniriCizimAyarlariYW.buyult()
+        self.altyaziYW.buyult()
 
     # ---------------------------------------------------------------------
     # @Slot() # this is called directly from base's overriden contextMenuEvent
@@ -8352,7 +8440,7 @@ class DefterAnaPencere(QMainWindow):
                 del itemToDelete
 
     # ---------------------------------------------------------------------
-    @Slot(QListWidgetItem)
+    @Slot(ListWidgetItem)
     def act_apply_selected_style(self, style):
         if self.cScene.selectionQueue:
             self.lutfen_bekleyin_goster()
@@ -8678,6 +8766,10 @@ class DefterAnaPencere(QMainWindow):
             if not self.kutuphaneYW.kucuk_mu:
                 self.kutuphaneYW.kucult()
                 self.sade_gorunum_oncesi_yw_durumlari_liste.append(self.kutuphaneYW)
+
+            if not self.altyaziYW.kucuk_mu:
+                self.altyaziYW.kucult()
+                self.sade_gorunum_oncesi_yw_durumlari_liste.append(self.altyaziYW)
 
         else:
             self.mBar.show()
@@ -9582,14 +9674,176 @@ class DefterAnaPencere(QMainWindow):
 
     # ---------------------------------------------------------------------
     @Slot()
-    def act_videoyu_resme_cevir(self):
+    def act_videoya_altyazi_ekle(self):
+
+        filtre = self.tr("srt Files (*.srt);;All Files(*)")
+        # filtre = self.tr("srt Files (*.srt);;webvtt Files (*.vtt);;All Files(*)")
+        fn = QFileDialog.getOpenFileNames(self,
+                                          self.tr("Open Subtitle Files..."),
+                                          self.sonKlasorVideolar,
+                                          filtre
+                                          )
+
+        # if fn:
+        if fn[0]:
+            videoNesne = self.cScene.activeItem
+            altyaziAdresleri = fn[0]
+            # altyaziAdres = altyaziAdresleri[0]
+            t1 = time.time()
+            videoNesne.altyazi_hesapla(altyaziAdresleri)
+            self.log(self.tr(f'Subtitles succesfully loaded!  -  {time.time() - t1:.2f} s'), 5000, 1)
+            self.sonKlasorVideolar = os.path.dirname(altyaziAdresleri[0])
+
+    # ---------------------------------------------------------------------
+    def act_videodan_resim_cek_paneli_ac(self):
+
+        if not self.cScene.activeItem:
+            self.log(self.tr("Please select a video item."))
+            return
+        else:
+            if not self.cScene.activeItem.type() == shared.VIDEO_ITEM_TYPE:
+                self.log(self.tr("Please select a video item."))
+                return
+
         videoNesne = self.cScene.activeItem
-        self.videoPos = videoNesne.scenePos() + QPoint(0, videoNesne.rect().height())
+        # if not videoNesne.videoHicOynatildiMi:
+        #     videoNesne.player.pause()
+
+        # if not videoNesne.videoHicOynatildiMi:
+        #     QMessageBox.information(self,
+        #                             'Defter',
+        #                             self.tr("The Video needs to be played for a few seconds to read the actual size of the videos.\n\nPlease play the video for a few seconds and then try again.\n\nThank you!"))
+        #     # return
+        #     videoNesne.player.pause()
+        #     # videoNesne.player.play()
+        # # videoNesne.player.pause()
+
+        self.videodanResimPos = videoNesne.scenePos() + QPoint(0, videoNesne.rect().height())
+
+        boyut_point = videoNesne.orjinal_boyut
+
+        if videoNesne.altyaziVarMi:
+            altyazi_sayisi = len(videoNesne.altyazilarSozluk[videoNesne.simdikiAltyazi][0])
+            altyazi_var_mi = True
+        else:
+            altyazi_sayisi = 0
+            altyazi_var_mi = False
+
+        sn, ms = divmod(videoNesne.player.duration(), 1000)
+        dk, sn = divmod(sn, 60)
+        saat, dk = divmod(dk, 60)
+        # videoNesne.player.duration() = f"{saat:02}:{dk:02}:{sn:02}"
+        video_sure = QTime(saat, dk, sn, ms)
+        videoyuResmeCevir = VideoyuResmeCevirPenceresi(boyut_point, video_sure, altyazi_var_mi, altyazi_sayisi)
+        videoyuResmeCevir.donusturTiklandi.connect(self._videodan_resim_cek)
+        videoyuResmeCevir.iptalTiklandi.connect(self.act_iptal_tiklandi)
+        videoyuResmeCevir.exec()
+
+    # ---------------------------------------------------------------------
+    @Slot(int, int, bool, int, int, int, int, int, int, int, int)
+    def _videodan_resim_cek(self,
+                            gen,
+                            yuk,
+                            orjinal_boyutu_koru,
+                            ilk_ms,
+                            son_ms,
+                            zaman_araligi_ms,
+                            dikeyBosluk,
+                            toplamResimSayisi,
+                            altyazi_ekle,
+                            onceki_altyazi_sayisi,
+                            sonraki_altyazi_sayisi):
+
+        self.lutfen_bekleyin_goster(toplamResimSayisi, iptalBtnGoster=False)
+        videoNesne = self.cScene.activeItem
+        # videoNesne.player.pause()
+        resimPos = videoNesne.scenePos() + QPoint(0, videoNesne.rect().height())
+        resimlerArasiDikeyBosluk = yuk + dikeyBosluk
+
+        resimSayisi = 1
+        for pos_ms in range(ilk_ms, son_ms, zaman_araligi_ms):
+            QApplication.processEvents()
+            if not self.iptal_tiklandi_mi:
+                sablon_dosya_adi = "image-from-video.png"
+                imageSavePath = self.cScene.get_unique_path_for_embeded_image(sablon_dosya_adi)
+
+                video_img, pos_ms_donen = videoNesne.kareAlZamanda(pos_ms)
+
+                if not orjinal_boyutu_koru:
+
+                    video_img = video_img.scaled(gen, yuk, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                    pixMap = QPixmap.fromImage(video_img)
+
+                else:
+                    # pixMap = QPixmap.convertFromImage(video_img)
+
+                    pixMap = QPixmap.fromImage(video_img)
+                    pixMap = pixMap.scaled(gen, yuk, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)  # Qt.FastTransformation
+
+                video_img.save(imageSavePath)
+                # print(image.byteCount())
+                # pixMap = QPixmap(imageSavePath)
+
+                # rectf = QRectF(pixMap.rect())
+                rectf = QRectF(0, 0, gen, yuk)
+
+                resimNesne = Image(imageSavePath, resimPos, rectf, pixMap,
+                                   self.cScene.ResimAraci.yaziRengi,
+                                   self.cScene.ResimAraci.arkaPlanRengi,
+                                   QPen(self.cScene.ResimAraci.kalem),
+                                   self.cScene.ResimAraci.yaziTipi)
+
+                resimNesne.isEmbeded = True
+
+                self.increase_zvalue(resimNesne)
+                self.cScene.undoRedo.undoableAddItem(self.cScene.undoStack,
+                                                     description=self.tr("Video to image"),
+                                                     scene=self.cScene,
+                                                     item=resimNesne)
+                resimNesne.reload_image_after_scale()
+                self.cScene.unite_with_scene_rect(resimNesne.sceneBoundingRect())
+
+                sn, ms = divmod(pos_ms, 1000)
+                dk, sn = divmod(sn, 60)
+                saat, dk = divmod(dk, 60)
+                pos_str = f"{saat:02}:{dk:02}:{sn:02}:{ms:03}"
+                self.log(self.tr(f"Image {resimSayisi} extracted from the video: {pos_str} "))
+
+                resimSayisi += 1
+
+                resimPos += QPoint(0, resimlerArasiDikeyBosluk)
+
+                self.lutfenBekleyinWidget.simdiki_deger_gir(resimSayisi)
+                if resimSayisi == self.lutfenBekleyinWidget.yuzdeCubukEnCokDeger():
+                    self.lutfen_bekleyin_gizle()
+
+                if altyazi_ekle and videoNesne.altyaziVarMi:
+                    yazi_pos = resimNesne.scenePos() + QPoint(0, resimNesne.rect().height())
+                    videoNesne.altyazidan_yazi_nesnesi_ekle(parentNesne=resimNesne, yazi_pos=yazi_pos,
+                                                            pos_ms=pos_ms_donen, onceki_altyazi_sayisi=onceki_altyazi_sayisi,
+                                                            sonraki_altyazi_sayisi=sonraki_altyazi_sayisi)
+
+            else:
+                self.lutfen_bekleyin_gizle()
+                self.log("Image extraction from the video is cancelled by the user!")
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def act_videodan_resim_cek(self, altYazili=False, birSnOnce=False):
+        if not self.cScene.activeItem:
+            return
+        else:
+            if not self.cScene.activeItem.type() == shared.VIDEO_ITEM_TYPE:
+                return
+        videoNesne = self.cScene.activeItem
+        # if not videoNesne.videoHicOynatildiMi:
+        #     videoNesne.player.pause()
+        resimPos = videoNesne.scenePos() + QPoint(0, videoNesne.rect().height())
 
         sablon_dosya_adi = "image-from-video.png"
         imageSavePath = self.cScene.get_unique_path_for_embeded_image(sablon_dosya_adi)
 
-        video_img = videoNesne.kareAl()
+        video_img, pos_ms = videoNesne.kareAl(birSnOnce=birSnOnce)
         video_img.save(imageSavePath)
         # print(image.byteCount())
 
@@ -9597,26 +9851,31 @@ class DefterAnaPencere(QMainWindow):
         # pixMap = QPixmap(sayfa_img)
         pixMap = QPixmap.fromImage(video_img)
         rectf = QRectF(pixMap.rect())
-        imageItem = Image(imageSavePath, self.videoPos, rectf, pixMap,
-                          self.cScene.ResimAraci.yaziRengi,
-                          self.cScene.ResimAraci.arkaPlanRengi,
-                          QPen(self.cScene.ResimAraci.kalem),
-                          self.cScene.ResimAraci.yaziTipi)
+        resimNesne = Image(imageSavePath, resimPos, rectf, pixMap,
+                           self.cScene.ResimAraci.yaziRengi,
+                           self.cScene.ResimAraci.arkaPlanRengi,
+                           QPen(self.cScene.ResimAraci.kalem),
+                           self.cScene.ResimAraci.yaziTipi)
 
-        imageItem.isEmbeded = True
+        resimNesne.isEmbeded = True
 
-        self.increase_zvalue(imageItem)
+        self.increase_zvalue(resimNesne)
         self.cScene.undoRedo.undoableAddItem(self.cScene.undoStack, description=self.tr("Video to image"),
                                              scene=self.cScene,
-                                             item=imageItem)
-        imageItem.reload_image_after_scale()
-        self.cScene.unite_with_scene_rect(imageItem.sceneBoundingRect())
+                                             item=resimNesne)
+        resimNesne.reload_image_after_scale()
+        self.cScene.unite_with_scene_rect(resimNesne.sceneBoundingRect())
 
-        # self.videoPos += QPoint(0, videoNesne.rect().height() + self.sayfa_arasi_bosluk)
-        # 
+        # resimPos += QPoint(0, videoNesne.rect().height() + self.sayfa_arasi_bosluk)
+        #
         # self.lutfenBekleyinWidget.simdiki_deger_gir(sayfa_no)
         # if sayfa_no == self.lutfenBekleyinWidget.yuzdeCubukEnCokDeger():
         #     self.lutfen_bekleyin_gizle()
+        if altYazili and videoNesne.altyaziVarMi:
+            yazi_pos = resimNesne.scenePos() + QPoint(0, resimNesne.rect().height())
+            videoNesne.altyazidan_yazi_nesnesi_ekle(parentNesne=resimNesne, yazi_pos=yazi_pos,
+                                                    pos_ms=pos_ms, onceki_altyazi_sayisi=7,
+                                                    sonraki_altyazi_sayisi=7)
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -9637,7 +9896,10 @@ class DefterAnaPencere(QMainWindow):
 
         pdfyiResmeCevir = PdfyiResmeCevirPenceresi(boyut_point, self.pdf.pageCount())
         pdfyiResmeCevir.donusturTiklandi.connect(self._pdf_resme_cevir_sayfalari_iste)
+        pdfyiResmeCevir.iptalTiklandi.connect(self.act_iptal_tiklandi)
         pdfyiResmeCevir.exec()
+
+        # self.pdfyi_resme_cevir_icin_iptal_tiklandi_mi = False
 
     # ---------------------------------------------------------------------
     @Slot(int, int, int, int, int)
@@ -9651,12 +9913,21 @@ class DefterAnaPencere(QMainWindow):
         rend.pageRendered.connect(self._pdf_resme_cevir_sayfa_hazir)
 
         for sayfa_no in range(ilk, 1 + son):
-            rend.requestPage(sayfa_no, QSize(gen, yuk))
+            QApplication.processEvents()
+            if not self.iptal_tiklandi_mi:
+                rend.requestPage(sayfa_no, QSize(gen, yuk))
+            else:
+                # self.pdfyi_resme_cevir_icin_iptal_tiklandi_mi = True
+                self.log("PDF to image is cancelled by the user!")
+                self.lutfen_bekleyin_gizle()
+                break
+
         self.pdf = None
 
     # ---------------------------------------------------------------------
     def _pdf_resme_cevir_sayfa_hazir(self, sayfa_no, boyut, sayfa_img, options, reqId):
 
+        # if not self.pdfyi_resme_cevir_icin_iptal_tiklandi_mi:
         sablon_dosya_adi = "image-from-pdf.png"
         imageSavePath = self.cScene.get_unique_path_for_embeded_image(sablon_dosya_adi)
 
@@ -9668,15 +9939,15 @@ class DefterAnaPencere(QMainWindow):
         pixMap = QPixmap.fromImage(sayfa_img)
         rectf = QRectF(pixMap.rect())
         imageItem = Image(imageSavePath, self.pdfPos, rectf, pixMap, self.cScene.ResimAraci.yaziRengi,
-                          self.cScene.ResimAraci.arkaPlanRengi,
-                          QPen(self.cScene.ResimAraci.kalem), self.cScene.ResimAraci.yaziTipi)
+                        self.cScene.ResimAraci.arkaPlanRengi,
+                        QPen(self.cScene.ResimAraci.kalem), self.cScene.ResimAraci.yaziTipi)
 
         imageItem.isEmbeded = True
 
         self.increase_zvalue(imageItem)
         self.cScene.undoRedo.undoableAddItem(self.cScene.undoStack, description=self.tr("PDF to image"),
-                                             scene=self.cScene,
-                                             item=imageItem)
+                                            scene=self.cScene,
+                                            item=imageItem)
         imageItem.reload_image_after_scale()
         self.cScene.unite_with_scene_rect(imageItem.sceneBoundingRect())
 
@@ -9710,6 +9981,38 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def item_deselected(self, item):
         self.cScene.selectionQueue.remove(item)
+
+    # ---------------------------------------------------------------------
+    def video_item_selected(self, item):
+        self.item_selected(item)
+        if item.altyaziVarMi and not self.altyaziYW.kucuk_mu:
+            if self.altyaziYW.otoGuncelleCBox.isChecked():
+                self.lutfen_bekleyin_goster()
+                self.altyaziYW.altyazilari_guncelle()
+                self.lutfen_bekleyin_gizle()
+
+            # ##########
+            # self.altyaziWorker = AltyaziWorker(self.altyaziYW.altyazilari_guncelle)
+            # self.threadpool.start(self.altyaziWorker)
+            ##########
+
+            ##########
+            # self.altyaziThread = QThread()
+            # self.altyaziWorker = AltyaziWorker()
+            # self.altyaziWorker.guncellendi.connect(self.altyaziThread_clean)
+            # self.altyaziWorker.moveToThread(self.altyaziThread)
+
+            # self.altyaziThread.start()
+            # self.altyaziWorker.guncelle.emit(self.altyaziYW)
+            ##########
+
+    # ---------------------------------------------------------------------
+    def video_item_deselected(self, item):
+        self.cScene.selectionQueue.remove(item)
+        if item.altyaziVarMi:
+            self.altyaziYW.altyaziCBox.clear()
+            self.altyaziYW.altyaziTW.clear()
+            self.altyaziYW.altyaziTW.setRowCount(0)
 
     # ---------------------------------------------------------------------
     def line_item_selected(self, item):
@@ -9836,8 +10139,8 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     @Slot()
     def act_toggle_log_viewer_dialog(self):
-        # self.logCounter = 0
-        # self.actionToggleLogViewer.setText(self.tr('Log'))
+        self.logPenceresiAcKapaBtn.setText("☰")
+        self.logPenceresiOkunmamisMesajSayisi = 0
         if self.logViewerDialog.isVisible():
             self.logViewerDialog.hide()
         else:
@@ -9877,9 +10180,9 @@ class DefterAnaPencere(QMainWindow):
         t = time.strftime("%H:%M:%S")
         self.logViewer.append(f"{t} :  {lvl}{txt}")
         self.logViewer.moveCursor(QTextCursor.MoveOperation.End)
-        # self.logCounter += 1
-        # if self.splitterMain.sizes()[1] == 0:
-        #     self.actionToggleLogViewer.setText(self.tr('Log (%s)' % self.logCounter))
+        self.logPenceresiOkunmamisMesajSayisi += 1
+        self.logPenceresiAcKapaBtn.setText(f"☰ {self.logPenceresiOkunmamisMesajSayisi}")
+
         if dialog:
             QMessageBox.warning(self, 'Defter', txt)
 

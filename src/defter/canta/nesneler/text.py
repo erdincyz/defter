@@ -997,7 +997,7 @@ class Text(QGraphicsTextItem):
         self.prepareGeometryChange()
         self._rect = rect
         # TODO: burda direkt self.settextwidth niye demedik ki
-        # self.doc.setTextWidth(rect.width())
+        self.doc.setTextWidth(rect.width())
         # self.doc.setPageSize(rect.size())
         self._boundingRect = rect.adjusted(-self.boundingRectTasmaDegeri, -self.boundingRectTasmaDegeri,
                                            self.boundingRectTasmaDegeri, self.boundingRectTasmaDegeri)

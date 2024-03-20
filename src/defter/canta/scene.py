@@ -12,7 +12,7 @@ import shutil
 from shiboken6 import Shiboken
 from PySide6.QtCore import Qt, QRectF, QPointF, Slot, Signal, QThread, QLineF, QObject
 from PySide6.QtGui import QPixmap, QPen, QImage, QUndoStack, QColor, QFont
-from PySide6.QtWidgets import QApplication, QGraphicsScene
+from PySide6.QtWidgets import QApplication, QGraphicsScene, QTableWidget
 from .arac import Arac
 from .nesneler.yuvarlakFircaBoyutu import YuvarlakFircaBoyutu
 from .treeView import TreeView
@@ -34,6 +34,7 @@ from . import shared
 class Scene(QGraphicsScene):
     # nesneTasindi = Signal(QGraphicsItem, QPointF)
     nesneTasindi = Signal(object, QPointF)
+    altYazilarSahneyeSuruklenipBirakildi = Signal(QPointF)
 
     # textItemSelected = Signal(QGraphicsTextItem)
 
@@ -1138,6 +1139,11 @@ class Scene(QGraphicsScene):
             return QGraphicsScene.keyPressEvent(self, event)
 
         else:
+            # video nesnesi secili iken ok tuslari iptal
+            # if self.activeItem -> None ise "and" sonrasina bakmaz.
+            if self.activeItem and self.activeItem.type() == shared.VIDEO_ITEM_TYPE:
+                return QGraphicsScene.keyPressEvent(self, event)
+
             if event.key() == Qt.Key.Key_Up:
                 self.yazi_yazilmiyorsa_nesneyi_kaydir(0, -1)
             if event.key() == Qt.Key.Key_Down:
@@ -1233,8 +1239,26 @@ class Scene(QGraphicsScene):
         # print(event.mimeData().formats())
         # print(event.mimeData().urls())
 
-        if type(event.source()) == YuzenWidget:
+        if isinstance(event.source(), YuzenWidget):
             event.source().parent().parent().yw_yuzdur(event.source())
+
+        # if isinstance(event.source(), QTableWidget):
+        if event.source().objectName() == "aTW":  # altyaziTW
+            yazilar = self.parent().altyaziYW.tasinanSatirlariYaziyaCevir()
+            textItem = Text(event.scenePos(), self.YaziAraci.yaziRengi, self.YaziAraci.arkaPlanRengi,
+                            QPen(self.YaziAraci.kalem),
+                            QFont(self.YaziAraci.yaziTipi))
+            textItem.set_document_url(self.tempDirPath)
+            # textItem.update_resize_handles()
+            textItem.setPlainText(yazilar)
+            textItem.textItemFocusedOut.connect(lambda: self.is_text_item_empty(textItem))
+            self.parent().increase_zvalue(textItem)
+            undoRedo.undoableAddItem(self.undoStack, self.tr("text from subtitle"), self, textItem)
+            textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+            cursor = textItem.textCursor()
+            cursor.clearSelection()
+            textItem.setTextCursor(cursor)
+            self.unite_with_scene_rect(textItem.sceneBoundingRect())
 
         if event.mimeData().hasUrls():
 
@@ -1346,8 +1370,6 @@ class Scene(QGraphicsScene):
                                 QPen(self.YaziAraci.kalem),
                                 QFont(self.YaziAraci.yaziTipi))
                 textItem.set_document_url(self.tempDirPath)
-                self.parent().increase_zvalue(textItem)
-
                 textItem.setPlainText(webUrl[0].toString())
                 textItem.textItemFocusedOut.connect(lambda: self.is_text_item_empty(textItem))
                 self.parent().increase_zvalue(textItem)
@@ -1370,7 +1392,6 @@ class Scene(QGraphicsScene):
             if QApplication.queryKeyboardModifiers() == Qt.KeyboardModifier.ShiftModifier:
                 textItem.setPlainText(event.mimeData().text())
                 textItem.textItemFocusedOut.connect(lambda: self.is_text_item_empty(textItem))
-                self.parent().increase_zvalue(textItem)
                 undoRedo.undoableAddItem(self.undoStack, self.tr("drag && drop text"), self, textItem)
                 textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
                 cursor = textItem.textCursor()
@@ -1382,7 +1403,6 @@ class Scene(QGraphicsScene):
                 # self.act_convert_to_plain_text(textItem)
                 # textItem.setPlainText(event.mimeData().text())
                 textItem.textItemFocusedOut.connect(lambda: self.is_text_item_empty(textItem))
-                self.parent().increase_zvalue(textItem)
                 undoRedo.undoableAddItem(self.undoStack, self.tr("drag && drop text"), self, textItem)
                 textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
                 cursor = textItem.textCursor()
@@ -1397,7 +1417,6 @@ class Scene(QGraphicsScene):
                             QFont(self.YaziAraci.yaziTipi))
             textItem.set_document_url(self.tempDirPath)
             # textItem.update_resize_handles()
-            self.parent().increase_zvalue(textItem)
             textItem.setPlainText(event.mimeData().text())
             textItem.textItemFocusedOut.connect(lambda: self.is_text_item_empty(textItem))
             self.parent().increase_zvalue(textItem)

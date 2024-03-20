@@ -10,11 +10,13 @@ import os
 from PySide6.QtCore import Qt, QUrl, QSizeF, QRectF, QPointF, QPoint, QLine
 from PySide6.QtGui import QPen, QPixmap, QPixmapCache, QPainterPath, QColor
 from PySide6.QtWidgets import QStyle
-from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
+from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput, QMediaMetaData
 from PySide6.QtMultimediaWidgets import QGraphicsVideoItem
 
 from .. import shared
 from ..nesneler.base import BaseItem
+from ..nesneler.text import Text
+from ..altyazi.srt_ayikla import SrtAyikla
 
 
 ########################################################################
@@ -59,6 +61,15 @@ class VideoItem(BaseItem):
         # self.videoItem.setFlag(QGraphicsVideoItem.ItemStacksBehindParent)
 
         self.kenarPen = QPen(pen.color(), 3, Qt.PenStyle.SolidLine)
+        self.altyaziVarMi = False
+        self.simdikiAltyazi = ""
+        self.altyaziSira = 0
+        self.altyazilarSozluk = {}
+        # bu altyazi hesapla icinde idi
+        # if self.arkaPlanRengi.alpha() < 1:
+        # self.setBrush(QBrush(QColor(0, 0, 0, 30)))
+
+        self.videoHicOynatildiMi = False
 
         self.videoItem.nativeSizeChanged.connect(self.act_native_size_changed)
         # resolution = media.canonicalResource().resolution()
@@ -155,12 +166,46 @@ class VideoItem(BaseItem):
             self.mouseReleaseEvent = super(VideoItem, self).mouseReleaseEvent
             self.hoverMoveEvent = super(VideoItem, self).hoverMoveEvent
 
-    # ---------------------------------------------------------------------
-    def kareAl(self):
+        self.orjinal_boyut = self.player.metaData().value(QMediaMetaData.Resolution)
+        # self.orjinal_boyut = self.player.videoSink().videoFrame().videoSize()
+        # self.orjinal_boyut = self.player.videoSink().videoFrame().size()
+        self.player.pause()
 
-        # self.player.setPosition()
-        image = self.player.videoSink().videoFrame().toImage()
-        return image
+    # # ---------------------------------------------------------------------
+    # def orjinal_boyuta_dondur(self):
+    #
+    #     yeniRect = QRectF(self._rect)
+    #     yeniRect.setSize(self.orjinal_boyut)
+    #
+    #     self.scene().undoRedo.undoableResizeBaseItem(self.scene().undoStack,
+    #                                                  "resize to original",
+    #                                                  self,
+    #                                                  # yeniRect=self._rect,
+    #                                                  yeniRect=yeniRect,
+    #                                                  eskiRect=QRectF(self._rect),
+    #                                                  eskiPos=self.pos())
+    #
+    #     self.update_resize_handles()
+    #     self.scene().parent().change_transform_box_values(self)
+    #     self.update_painter_text_rect()
+    #     self.scene().unite_with_scene_rect(self.sceneBoundingRect())
+    #
+    # # ---------------------------------------------------------------------
+    # def mouseDoubleClickEvent(self, event):
+    #
+    #     if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
+    #         self.orjinal_boyuta_dondur()
+    #         return  # QGraphicsItem.mouseDoubleClickEvent(self, event)
+    #
+    #     super(VideoItem, self).mouseDoubleClickEvent(event)
+
+    # ---------------------------------------------------------------------
+    def update_painter_text_rect(self):
+        if self.altyaziVarMi:
+            self.painterTextRect = QRectF(0, 0, self._rect.width(), self._rect.height() / 5)
+            self.painterTextRect.moveTopLeft(self._rect.bottomLeft())
+        else:
+            super(VideoItem, self).update_painter_text_rect()
 
     # ---------------------------------------------------------------------
     def setRect(self, rect):
@@ -174,10 +219,22 @@ class VideoItem(BaseItem):
 
     # ---------------------------------------------------------------------
     def keyPressEvent(self, event) -> None:
+        fark = 10000
+        if event.modifiers() == Qt.KeyboardModifier.AltModifier:
+            fark = 100
+        elif event.modifiers() == Qt.KeyboardModifier.ControlModifier:
+            fark = 1000
+
         if event.key() == Qt.Key.Key_Right:
-            self.player.setPosition(self.player.position() + 10000)
+            self.player_set_position(self.player.position() + fark)
         elif event.key() == Qt.Key.Key_Left:
-            self.player.setPosition(self.player.position() - 10000)
+            self.player_set_position(self.player.position() - fark)
+        elif event.key() == Qt.Key.Key_Up:
+            self.audioOutput.setVolume(self.audioOutput.volume() + 0.1)
+            self.audioSliderEllipseHesapla()
+        elif event.key() == Qt.Key.Key_Down:
+            self.audioOutput.setVolume(self.audioOutput.volume() - 0.1)
+            self.audioSliderEllipseHesapla()
         elif event.key() == Qt.Key.Key_Space:
             if self.player.playbackState() == QMediaPlayer.PlaybackState.StoppedState \
                     or self.player.playbackState() == QMediaPlayer.PlaybackState.PausedState:
@@ -279,10 +336,13 @@ class VideoItem(BaseItem):
 
     # ---------------------------------------------------------------------
     def setCizgiKalinligi(self, width):
-        self._pen.setWidthF(width)
-        self.textPen.setWidthF(width)
-        self.boundingRectTasmaDegeri = max(self.handleSize, self._pen.widthF() / 2, self.yariIkonBoyutu)
-        self.update()
+        pass
+        # Vıdeo nesnesinde cizgi kalinligi kullanmiyoruz,
+        # Base nesneden dolayı boundingRectTasmaDegeri degismesin diye burda da bos geciyoruz
+        # self._pen.setWidthF(width)
+        # self.textPen.setWidthF(width)
+        # self.boundingRectTasmaDegeri = max(self.handleSize, self._pen.widthF() / 2, self.yariIkonBoyutu)
+        # self.update()
 
     # ---------------------------------------------------------------------
     def daire_ici_ikonlari_olustur(self):
@@ -333,6 +393,8 @@ class VideoItem(BaseItem):
 
     # ---------------------------------------------------------------------
     def act_native_size_changed(self, nativeSize):
+        self.orjinal_boyut = nativeSize
+        self.videoHicOynatildiMi = True
         if not nativeSize.isEmpty():  # videoItem silinice bos QSizeF() gonderiyor.
             self._rect.setSize(nativeSize.scaled(self.videoItem.size(), Qt.AspectRatioMode.KeepAspectRatio))
             self.update_elements_after_resize()
@@ -361,8 +423,7 @@ class VideoItem(BaseItem):
         #  ama tabi x ekseni gecerli olsun mavi de oyle ters eksende.
         # self.videoSliderEllipseRect.moveCenter(QPointF(event.pos().x(), self.playControlsY))
         # TODO: aynı zamanda y oranını tekrar hesaplamak lazım.
-        self.audioSliderEllipseRect.moveCenter(QPointF(self._rect.center().x(),
-                                                       self._rect.height() - self._rect.height() * self.audioOutput.volume()))
+        self.audioSliderEllipseHesapla()
 
         if self.player.duration():  # olasi bir sifira bolmek durumu olmasin diye
             self.videoSliderEllipseRect.moveCenter(
@@ -371,12 +432,17 @@ class VideoItem(BaseItem):
                         self.playControlsY))
 
     # ---------------------------------------------------------------------
+    def audioSliderEllipseHesapla(self):
+        self.audioSliderEllipseRect.moveCenter(QPointF(self._rect.center().x(),
+                                                       self._rect.height() - self._rect.height() * self.audioOutput.volume()))
+
+    # ---------------------------------------------------------------------
     def itemChange(self, change, value):
         if change == BaseItem.GraphicsItemChange.ItemSelectedChange:
             if value:
-                self.scene().parent().item_selected(self)
+                self.scene().parent().video_item_selected(self)
             else:
-                self.scene().parent().item_deselected(self)
+                self.scene().parent().video_item_deselected(self)
         elif change == BaseItem.GraphicsItemChange.ItemSceneChange:
             # The value argument is the new scene or a null pointer if the item is removed from a scene.
             # When item removed from the scene, we stop the player, to prevent stream errors.
@@ -392,14 +458,6 @@ class VideoItem(BaseItem):
         # self.sliderEllipseCenterX = self.videoItem.size().width() / 100 * yuzde
         # self.sliderEllipseCenter = QPointF(self.videoItem.size().width() * pos / self.player.duration(), 100)
 
-        # TODO:
-        """
-        self.videoSliderEllipseRect.moveCenter(QPointF(self.videoItem.size().width() * pos / self.player.duration(),
-         self.playControlsY))
-        ZeroDivisionError: float division by zero
-        """
-        # print(pos)
-        # return
         if self.player.duration():
             self.videoSliderEllipseRect.moveCenter(
                 QPointF(self.videoItem.pos().x() + (self.videoItem.size().width() * pos_ms / self.player.duration()),
@@ -409,6 +467,112 @@ class VideoItem(BaseItem):
         dk, sn = divmod((pos_ms // 1000), 60)
         saat, dk = divmod(dk, 60)
         self.video_poziyon_sure_str = f"{saat:02}:{dk:02}:{sn:02}"
+
+        # if self.altYaziBitisZaman > pos_ms > self.altYaziBaslamaZamanlari[self.altyaziSira]
+        if self.altyaziVarMi:
+            if pos_ms > self.altyazilarSozluk[self.simdikiAltyazi][0][self.altyaziSira]:  # altYaziBaslamaZamanlari
+                self.setText(self.altyazilarSozluk[self.simdikiAltyazi][1][self.altyaziSira])
+                if self.altyaziYWAcikMi():
+                    self.altyaziYW.satir_sec(self.altyaziSira)
+                self.altyaziSira += 1
+            # else:
+            #     self.altyaziSira -= 1
+
+    # ---------------------------------------------------------------------
+    def player_set_position(self, pos_ms):
+        if self.altyaziVarMi:
+            self.altyazi_sira_bul(pos_ms)
+        self.player.setPosition(pos_ms)
+
+    # ---------------------------------------------------------------------
+    def altyaziYWAcikMi(self):
+        self.altyaziYW = self.scene().parent().altyaziYW
+        return self.altyaziYW.isVisible()
+
+    # ---------------------------------------------------------------------
+    def altyazi_sira_bul(self, pos_ms):
+        # if pos_ms < self.player.duration()/2:
+        for i, zaman in enumerate(self.altyazilarSozluk[self.simdikiAltyazi][0]):  # altYaziBaslamaZamanlari
+            if pos_ms < zaman:
+                self.altyaziSira = i - 1
+                break
+        if self.altyaziYWAcikMi():
+            self.altyaziYW.satir_sec(self.altyaziSira)
+
+    # ---------------------------------------------------------------------
+    def altyazi_hesapla(self, altyaziAdresleri):
+
+        en_son_guncelle = len(altyaziAdresleri) > 1
+
+        for altyaziAdres in altyaziAdresleri:
+            if altyaziAdres not in self.altyazilarSozluk:
+                s = SrtAyikla(altyaziAdres)
+                altYaziBaslamaZamanlari, altYaziYazilar, altYaziBitisZamanlari = s.listelere_ayikla()
+
+                self.altyaziVarMi = True
+                self.altyazilarSozluk[altyaziAdres] = [altYaziBaslamaZamanlari, altYaziYazilar, altYaziBitisZamanlari]
+
+            # altyazi zaten hesaplanmis ve yuklenmis
+            self.simdikiAltyazi = altyaziAdres
+            if self.altyaziYWAcikMi():
+                if not en_son_guncelle:
+                    if not self.altyaziYW.altyaziCBox.currentData() == altyaziAdres:
+                        self.altyaziYW.altyazilari_guncelle()
+
+    # ---------------------------------------------------------------------
+    def altyazidan_yazi_nesnesi_ekle(self, parentNesne, yazi=None,
+                                     yazi_pos=None, pos_ms=None, onceki_altyazi_sayisi=7, sonraki_altyazi_sayisi=7):
+        if not yazi:
+            self.altyazi_sira_bul(pos_ms=pos_ms)
+            yazi = ""
+            try:
+                for i in range(self.altyaziSira - onceki_altyazi_sayisi,
+                               self.altyaziSira + sonraki_altyazi_sayisi):
+                    yazi += self.altyazilarSozluk[self.simdikiAltyazi][1][i] + "\n"
+            except IndexError:
+                pass
+
+        if not yazi_pos:
+            yazi_pos = QPointF(self.sceneLeft(), self.sceneBottom() + 10)
+
+        textItem = Text(yazi_pos, self.yaziRengi, self.arkaPlanRengi, self.pen(), self.font())
+        textItem.set_document_url(self.scene().tempDirPath)
+        textItem.textItemFocusedOut.connect(self.scene().is_text_item_empty)
+        self.scene().parent().increase_zvalue(textItem)
+        # textItem.textItemSelectedChanged.connect(self.textItemSelected)
+        # self.addItem(textItem)
+
+        textItem.setText(yazi)
+        self.scene().undoRedo.undoableAddItem(self.scene().undoStack, description=self.scene().tr("text from subtitle"),
+                                              scene=self.scene(),
+                                              item=textItem)
+        textItem.setFocus()
+        yeniPos = self.mapFromScene(textItem.scenePos())
+        self.scene().undoRedo.undoableParent(self.scene().undoStack, self.scene().tr("_parent"), textItem, parentNesne, yeniPos)
+
+    # ---------------------------------------------------------------------
+    def kareAl(self, birSnOnce=False):
+
+        # print(self.player.videoSink().videoSize())
+
+        if birSnOnce:
+            self.player_set_position(max(0, (self.player.position() - 1000)))
+        vf = self.player.videoSink().videoFrame()
+        pos_ms = vf.startTime()
+        # pos_ms = vf.endTime()
+        image = vf.toImage()
+        return image, pos_ms
+
+    # ---------------------------------------------------------------------
+    def kareAlZamanda(self, pos_ms):
+
+        self.player_set_position(pos_ms)
+        vf = self.player.videoSink().videoFrame()
+        # pos_ms = vf.startTime()
+        # pos_ms = vf.endTime()
+        image = vf.toImage()
+
+        return image, pos_ms
 
     # ---------------------------------------------------------------------
     def act_player_duration_changed(self, toplam_sure_ms):
@@ -458,7 +622,7 @@ class VideoItem(BaseItem):
                 self.yeniPlayerPosition = int(oran * self.player.duration())
                 # print(duration, "/", self.player.duration())
 
-                # self.player.setPosition(int(self.yeniPlayerPosition))
+                # self.player_set_position(int(self.yeniPlayerPosition))
                 # self.player.play()
 
                 # print(self.player.position(), self.yeniPlayerPosition)
@@ -469,7 +633,7 @@ class VideoItem(BaseItem):
 
                 # self.playControlsY = event.pos().y()
 
-                # self.player.setPosition(event.pos().x()/self.videoItem.size().width() * 100 * self.player.duration())
+                # self.player_set_position(event.pos().x()/self.videoItem.size().width() * 100 * self.player.duration())
             return
 
         if self.audioSliderEllipseStartDrag:
@@ -564,10 +728,12 @@ class VideoItem(BaseItem):
         if self.videoSliderEllipseStartDrag:
             if self.yeniPlayerPosition:
                 self.player.blockSignals(True)
-                self.player.setPosition(int(self.yeniPlayerPosition))
+                self.player_set_position(int(self.yeniPlayerPosition))
                 self.player.blockSignals(False)
                 self.update()
                 self.player.play()
+                if self.altyaziVarMi:
+                    self.altyazi_sira_bul(self.player.position())
             self.videoSliderEllipseStartDrag = False
 
         # if self.audioSliderEllipseRect.contains(event.pos()):
@@ -620,8 +786,7 @@ class VideoItem(BaseItem):
         else:
             self.audioOutput.setVolume(self.audioOutput.volume() - 0.025)
 
-        self.audioSliderEllipseRect.moveCenter(QPointF(self._rect.center().x(),
-                                                       self._rect.size().height() - self._rect.size().height() * self.audioOutput.volume()))
+        self.audioSliderEllipseHesapla()
 
     # ---------------------------------------------------------------------
     def wheelEvent(self, event):
@@ -679,25 +844,25 @@ class VideoItem(BaseItem):
     def paint(self, painter, option, widget=None):
         # super(VideoItem, self).paint(painter, option, widget)
 
-        if not self._pen.width():
-            painter.setPen(Qt.PenStyle.NoPen)
-        else:
-            painter.setPen(self._pen)
-        painter.setBrush(self._brush)
-
         painter.setPen(self.kenarPen)
+        painter.setBrush(Qt.BrushStyle.NoBrush)
         painter.drawRect(self._rect)
+
+        # self.altyaziVarMi
 
         if self._text:
             # painter.setWorldMatrixEnabled(False)
             painter.save()
+            painter.setBrush(self._brush)
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.drawRect(self.painterTextRect)
             painter.setFont(self._font)
             # we recreate textPen from same exact color. otherwise, color's alpha not working.
             painter.setPen(self.textPen)
-            painter.translate(self._rect.center())
+            painter.translate(self.painterTextRect.center())
             painter.rotate(-self.rotation())
 
-            painter.translate(-self._rect.center())
+            painter.translate(-self.painterTextRect.center())
 
             painter.drawText(self.painterTextRect, self._text, self.painterTextOption)
 

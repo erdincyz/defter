@@ -8,10 +8,9 @@ __date__ = '20/Aug/2016'
 from urllib.error import HTTPError
 # from urllib.request import urlretrieve
 from urllib.request import URLopener
-from PySide6.QtCore import QObject, Slot, Signal, QPointF
+from PySide6.QtCore import QObject, Slot, Signal, QPointF, QPoint, QRunnable
 
-
-# from PyQt5.QtGui import QIcon
+# from PySide6.QtGui import QIcon
 
 # ########################################################################
 # class IkonOlusturucuWorker(QObject):

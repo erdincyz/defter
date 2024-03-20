@@ -107,3 +107,26 @@
 
 
 - **Alt + sağ tık** ile farenin bulundugu yerde baska bir stiller listesi açıp kapatılabilir.
+
+---
+
+### Video Nesnesi
+- Video üzerinde **Fare tekeri** ile ses seviyesi ayarlanabilir.
+
+
+- Video seçili iken **aşağı - yukarı ok** tuşları ile ses seviyesi ayarlanabilir.
+
+- Video seçili iken **sağ - sol ok** tuşları ile 10 sn ileri veya geri atlanabilir.
+
+- Video seçili iken **Ctrl + sağ - sol ok** tuşları ile 1 sn ileri veya geri atlanabilir.
+
+- Video seçili iken **Alt + sağ - sol ok** tuşları ile 0.1 sn ileri veya geri atlanabilir.
+
+- Video seçili iken **F9** tuşu videonun o anki görüntüsünü yakalayıp videonun altına resim olarak sayfaya ekler. Videoda altyazı varsa onceki 7 satir ve sonraki 7 satir altyazılar birlesitirip resme eklenir.
+
+- Video seçili iken **F10** tuşu videonun 1 saniye öncesinden kare yakalayıp videonun altına resim olarak sayfaya ekler. Videoda altyazı varsa onceki 7 satir ve sonraki 7 satir altyazılar birlesitirip resme eklenir.
+
+- Video seçili iken **F11** tuşu videonun o anki görüntüsünü yakalayıp videonun altına resim olarak sayfaya ekler. Altyazi eklemez.
+
+
+---

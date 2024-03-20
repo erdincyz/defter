@@ -5,14 +5,14 @@
 ### Hoşgeldiniz
 İnşallah, **Defter** vakit buldukça ve ihtiyaç duyuldukça halen geliştirilmekte olan açık kaynak bir yazılımdır. 
 
-* Sayfanın her hangi bir yerine çift tıklayıp, hızlıca not almak için,
+* Sınırlandırılmamış bir sayfanın her hangi bir yerine çift tıklayıp, hızlıca not almak için,
 * Şekiller diyagramlar çizmek için,
 * İnternetten sürükle bırak veri toplamak için,
 * Belli konulardaki toplanmış verileri bir araya toparlamak için kullanılabilir.
 * Görsellik ön plandadır. Belgeye fotoğraf, video, (herhangi bir formatta)dosya ekleyebilme ve browserdan (ve diğer yazılımlardan) kopyala yapıştır, sürükle bırak yazı(HMTL destekler),ekleyebilme desteği vardır.
 * HTML içeren yazi nesnelerini, nesneye sağ tıklayınca açılan menüdeki **Web Sayfası Olarak** göster özelliğini kullanarak tekrar içerdiği linklere tıklanabilir hale getirebilirsiniz.
-* Mesela sahneye taşıyacağınız, **veya** izlemekte olduğunuz bir videodan ekran görüntüsü alıp, sahneye yapıştıracağınız o resmin üzerine çift tıklayınca, resmin tıkladığınız noktasında bir metin kutusu oluşur. Böylece resmin üzerine de dilediğiniz kadar not alabilirsiniz. 
-* Sahneyi veya tüm belgeyi PDF veya HTML dosyası olarak kaydedebilirsiniz.
+* Mesela sayfaya taşıyacağınız, **veya** izlemekte olduğunuz bir videodan ekran görüntüsü alıp, sayfaya yapıştıracağınız o resmin üzerine çift tıklayınca, resmin tıkladığınız noktasında bir metin kutusu oluşur. Böylece resmin üzerine de dilediğiniz kadar not alabilirsiniz. 
+* Sayfayı veya tüm belgeyi PDF veya HTML dosyası olarak kaydedebilirsiniz.
 
 _Bu yazılım kağıt kaleme alternatif değildir. Dijital ortamlardan verileri hızlıca bir araya toparlayabilmek için faydalıdır belki en fazla._
 
