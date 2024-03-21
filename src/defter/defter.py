@@ -9818,10 +9818,11 @@ class DefterAnaPencere(QMainWindow):
                     self.lutfen_bekleyin_gizle()
 
                 if altyazi_ekle and videoNesne.altyaziVarMi:
-                    yazi_pos = resimNesne.scenePos() + QPoint(0, resimNesne.rect().height())
-                    videoNesne.altyazidan_yazi_nesnesi_ekle(parentNesne=resimNesne, yazi_pos=yazi_pos,
+                    videoNesne.altyazidan_yazi_nesnesi_ekle(parentNesne=resimNesne,
                                                             pos_ms=pos_ms_donen, onceki_altyazi_sayisi=onceki_altyazi_sayisi,
                                                             sonraki_altyazi_sayisi=sonraki_altyazi_sayisi)
+
+
 
             else:
                 self.lutfen_bekleyin_gizle()
@@ -9872,9 +9873,9 @@ class DefterAnaPencere(QMainWindow):
         # if sayfa_no == self.lutfenBekleyinWidget.yuzdeCubukEnCokDeger():
         #     self.lutfen_bekleyin_gizle()
         if altYazili and videoNesne.altyaziVarMi:
-            yazi_pos = resimNesne.scenePos() + QPoint(0, resimNesne.rect().height())
-            videoNesne.altyazidan_yazi_nesnesi_ekle(parentNesne=resimNesne, yazi_pos=yazi_pos,
-                                                    pos_ms=pos_ms, onceki_altyazi_sayisi=7,
+            videoNesne.altyazidan_yazi_nesnesi_ekle(parentNesne=resimNesne,
+                                                    pos_ms=pos_ms,
+                                                    onceki_altyazi_sayisi=7,
                                                     sonraki_altyazi_sayisi=7)
 
     # ---------------------------------------------------------------------

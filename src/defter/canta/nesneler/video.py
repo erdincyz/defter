@@ -519,21 +519,21 @@ class VideoItem(BaseItem):
                     if not self.altyaziYW.altyaziCBox.currentData() == altyaziAdres:
                         self.altyaziYW.altyazilari_guncelle()
 
-    # ---------------------------------------------------------------------
-    def altyazidan_yazi_nesnesi_ekle(self, parentNesne, yazi=None,
-                                     yazi_pos=None, pos_ms=None, onceki_altyazi_sayisi=7, sonraki_altyazi_sayisi=7):
-        if not yazi:
-            self.altyazi_sira_bul(pos_ms=pos_ms)
-            yazi = ""
-            try:
-                for i in range(self.altyaziSira - onceki_altyazi_sayisi,
-                               self.altyaziSira + sonraki_altyazi_sayisi):
-                    yazi += self.altyazilarSozluk[self.simdikiAltyazi][1][i] + "\n"
-            except IndexError:
-                pass
+        self.update_painter_text_rect()
 
-        if not yazi_pos:
-            yazi_pos = QPointF(self.sceneLeft(), self.sceneBottom() + 10)
+    # ---------------------------------------------------------------------
+    def altyazidan_yazi_nesnesi_ekle(self, parentNesne, pos_ms=None, onceki_altyazi_sayisi=7, sonraki_altyazi_sayisi=7):
+
+        self.altyazi_sira_bul(pos_ms=pos_ms)
+        yazi = ""
+        try:
+            for i in range(max(0, self.altyaziSira - onceki_altyazi_sayisi),
+                            (self.altyaziSira + sonraki_altyazi_sayisi) + 1):
+                yazi += self.altyazilarSozluk[self.simdikiAltyazi][1][i] + "\n"
+        except IndexError:
+            pass
+
+        yazi_pos = QPointF(parentNesne.sceneLeft(), parentNesne.sceneBottom() + 10)
 
         textItem = Text(yazi_pos, self.yaziRengi, self.arkaPlanRengi, self.pen(), self.font())
         textItem.set_document_url(self.scene().tempDirPath)
@@ -547,7 +547,7 @@ class VideoItem(BaseItem):
                                               scene=self.scene(),
                                               item=textItem)
         textItem.setFocus()
-        yeniPos = self.mapFromScene(textItem.scenePos())
+        yeniPos = parentNesne.mapFromScene(textItem.scenePos())
         self.scene().undoRedo.undoableParent(self.scene().undoStack, self.scene().tr("_parent"), textItem, parentNesne, yeniPos)
 
     # ---------------------------------------------------------------------

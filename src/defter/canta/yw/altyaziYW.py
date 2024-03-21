@@ -267,8 +267,8 @@ class AltyaziYW(YuzenWidget):
         if videoNesne:
             if videoNesne.altyazilarSozluk[videoNesne.simdikiAltyazi][0]:
                 videoNesne.altyazi_sira_bul(videoNesne.player.position())
-            print(nesne.data(Qt.ItemDataRole.UserRole))
-            print(videoNesne.player.position())
+            # print(nesne.data(Qt.ItemDataRole.UserRole))
+            # print(videoNesne.player.position())
             videoNesne.player_set_position(nesne.data(Qt.ItemDataRole.UserRole))
 
     # ---------------------------------------------------------------------
