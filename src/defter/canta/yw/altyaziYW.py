@@ -307,7 +307,7 @@ class AltyaziYW(YuzenWidget):
                 # altyaziAdres = altyaziAdresleri[0]
                 t1 = time.time()
                 videoNesne.altyazi_hesapla(altyaziAdresleri)
-                self.log.emit(self.tr(f'Subtitles succesfully loaded!  -  {time.time() - t1:.2f} s'), 5000, 1)
+                self.log.emit(self.tr(f'Subtitles succesfully loaded!  -  {time.time() - t1:.2f} s'))
                 self.sonKlasorVideolar = os.path.dirname(altyaziAdresleri[0])
         else:
             self.log.emit(self.tr("Please select a video item"))
