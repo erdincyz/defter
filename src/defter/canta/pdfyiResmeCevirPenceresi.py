@@ -143,7 +143,7 @@ class PdfyiResmeCevirPenceresi(QDialog):
     # ---------------------------------------------------------------------
     @Slot()
     def act_donustur(self):
-        self.kapatBtn.setText(self.tr("&Cancel"))
+        # self.kapatBtn.setText(self.tr("&Cancel"))
         self.donusturTiklandi.emit(self.genislikSBox.value(),
                                    self.yukseklikSBox.value(),
                                    self.ilkSayfaSBox.value()-1,

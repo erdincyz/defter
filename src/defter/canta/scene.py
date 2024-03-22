@@ -1243,22 +1243,23 @@ class Scene(QGraphicsScene):
             event.source().parent().parent().yw_yuzdur(event.source())
 
         # if isinstance(event.source(), QTableWidget):
-        if event.source().objectName() == "aTW":  # altyaziTW
-            yazilar = self.parent().altyaziYW.tasinanSatirlariYaziyaCevir()
-            textItem = Text(event.scenePos(), self.YaziAraci.yaziRengi, self.YaziAraci.arkaPlanRengi,
-                            QPen(self.YaziAraci.kalem),
-                            QFont(self.YaziAraci.yaziTipi))
-            textItem.set_document_url(self.tempDirPath)
-            # textItem.update_resize_handles()
-            textItem.setPlainText(yazilar)
-            textItem.textItemFocusedOut.connect(lambda: self.is_text_item_empty(textItem))
-            self.parent().increase_zvalue(textItem)
-            undoRedo.undoableAddItem(self.undoStack, self.tr("text from subtitle"), self, textItem)
-            textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
-            cursor = textItem.textCursor()
-            cursor.clearSelection()
-            textItem.setTextCursor(cursor)
-            self.unite_with_scene_rect(textItem.sceneBoundingRect())
+        if event.source():
+            if event.source().objectName() == "aTW":  # altyaziTW
+                yazilar = self.parent().altyaziYW.tasinanSatirlariYaziyaCevir()
+                textItem = Text(event.scenePos(), self.YaziAraci.yaziRengi, self.YaziAraci.arkaPlanRengi,
+                                QPen(self.YaziAraci.kalem),
+                                QFont(self.YaziAraci.yaziTipi))
+                textItem.set_document_url(self.tempDirPath)
+                # textItem.update_resize_handles()
+                textItem.setPlainText(yazilar)
+                textItem.textItemFocusedOut.connect(lambda: self.is_text_item_empty(textItem))
+                self.parent().increase_zvalue(textItem)
+                undoRedo.undoableAddItem(self.undoStack, self.tr("text from subtitle"), self, textItem)
+                textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+                cursor = textItem.textCursor()
+                cursor.clearSelection()
+                textItem.setTextCursor(cursor)
+                self.unite_with_scene_rect(textItem.sceneBoundingRect())
 
         if event.mimeData().hasUrls():
 

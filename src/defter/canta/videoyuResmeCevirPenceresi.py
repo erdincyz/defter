@@ -152,6 +152,8 @@ class VideoyuResmeCevirPenceresi(QDialog):
             self.altyaziCBox.setDisabled(True)
             self.oncekiAltyaziSBox.setDisabled(True)
             self.sonrakiAltyaziSBox.setDisabled(True)
+        else:
+            self.altyaziCBox.setChecked(True)
 
         donusturBtn = QPushButton(self.tr("&Extract"), self)
         donusturBtn.clicked.connect(self.act_donustur)
@@ -165,8 +167,8 @@ class VideoyuResmeCevirPenceresi(QDialog):
         layout.addWidget(self.oraniKoruCBox)
         layout.addLayout(layGenislik)
         layout.addLayout(layYukseklik)
-        layout.addWidget(self.orjinalBoyutuKoru)
         layout.addLayout(layResimArasiBosluk)
+        layout.addWidget(self.orjinalBoyutuKoru)
         layout.addLayout(layBaslangic)
         layout.addLayout(layBitis)
         layout.addLayout(layZamanAraligi)
@@ -246,7 +248,7 @@ class VideoyuResmeCevirPenceresi(QDialog):
             devam = True
 
         if devam:
-            self.kapatBtn.setText(self.tr("&Cancel"))
+            # self.kapatBtn.setText(self.tr("&Cancel"))
             self.donusturTiklandi.emit(self.genislikSBox.value(),
                                        self.yukseklikSBox.value(),
                                        self.orjinalBoyutuKoru.isChecked(),

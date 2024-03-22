@@ -73,13 +73,13 @@ class SrtAyikla:
         su_an_ki_sira = 0
 
         i = 0
-        for i in range (len(self.satirlar)):
+        while i < len(self.satirlar):
             satir = self.satirlar[i].strip()
             if satir:
                 if satir.isdigit():
                     satir_int = int(satir)
                     sonraki_sira_no_indexi = self.sonraki_sira_no_ve_indexi(i, satir_int)
-                    self.boslari_temizle_listelere_ekle(satir_int,i+1,sonraki_sira_no_indexi)
+                    self.boslari_temizle_listelere_ekle(satir_int, i+1, sonraki_sira_no_indexi)
                     i=sonraki_sira_no_indexi
                     continue
             i += 1
@@ -89,13 +89,13 @@ class SrtAyikla:
     # ---------------------------------------------------------------------
     def boslari_temizle_listelere_ekle(self, satir_int, z, sonraki_sira_no_indexi):
         # self.blokSozluk[satir_int] = (self.satirlar[i:sonraki_sira_no_indexi])
-        blok_liste = []
+        # blok_liste = []
         yazi = ""
         bas=son=None
         for y in range(z, sonraki_sira_no_indexi):
             satir = self.satirlar[y].strip()
             if satir:
-                if not bas:
+                if bas is None:
                     bas,son =self.ilk_son_zaman_cevir(satir)
                 else:
                     yazi =f"{yazi} {satir}"
@@ -156,7 +156,7 @@ class SrtAyikla:
 # ---------------------------------------------------------------------
 def calistir():
     # pass
-    altyaziAdres = "altyazi.srt"
+    altyaziAdres = "altyazi2.srt"
     s = SrtAyikla(altyaziAdres)
     # bir_sey_dondurmuyor = s.sozluge_ayikla()
     basL, yaziL, sonL = s.listelere_ayikla()
