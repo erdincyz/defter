@@ -97,7 +97,7 @@ from .canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.96.3"
+VERSION = "0.96.4"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -1765,7 +1765,8 @@ class DefterAnaPencere(QMainWindow):
             del scene.unGroupedRootItems
             del scene.tasinanNesnelerinListesi
             del scene.selectionQueue
-            del self.altyaziYW.sahneAktifNesne
+            if self.altyaziYW.sahneAktifNesne:
+                del self.altyaziYW.sahneAktifNesne
             # scene.clear()
             scene.tum_nesneleri_sil()
             scene.activeItem = None
@@ -1813,7 +1814,8 @@ class DefterAnaPencere(QMainWindow):
             del sayfa.scene.unGroupedRootItems
             del sayfa.scene.tasinanNesnelerinListesi
             del sayfa.scene.selectionQueue
-            del self.altyaziYW.sahneAktifNesne
+            if self.altyaziYW.sahneAktifNesne:
+                del self.altyaziYW.sahneAktifNesne
             # sayfa.scene.clear()
             sayfa.scene.tum_nesneleri_sil()
             sayfa.scene.activeItem = None
@@ -3383,11 +3385,11 @@ class DefterAnaPencere(QMainWindow):
         # ayrica sayfa isimleri de bir base64 islemden gecsin. ve de bi maz uzunluk mesele 50 karakter.
         #     hmm ayrica filename collison olma durumu var bas 64 ile bi ek yapmak gerekebilir.
 
-    # https://stackoverflow.com/questions/7406102/create-sane-safe-filename-from-any-unsafe-string
+        # https://stackoverflow.com/questions/7406102/create-sane-safe-filename-from-any-unsafe-string
 
-    # https://stackoverflow.com/questions/295135/turn-a-string-into-a-valid-filename
+        # https://stackoverflow.com/questions/295135/turn-a-string-into-a-valid-filename
 
-    # https://gist.github.com/wassname/1393c4a57cfcbf03641dbc31886123b8
+        # https://gist.github.com/wassname/1393c4a57cfcbf03641dbc31886123b8
 
     # ---------------------------------------------------------------------
     def scene_to_dict_binary_recursive(self, children):
@@ -9809,20 +9811,18 @@ class DefterAnaPencere(QMainWindow):
                 pos_str = f"{saat:02}:{dk:02}:{sn:02}:{ms:03}"
                 self.log(self.tr(f"Image {resimSayisi} extracted from the video: {pos_str} "))
 
-                resimSayisi += 1
-
                 resimPos += QPoint(0, resimlerArasiDikeyBosluk)
-
-                self.lutfenBekleyinWidget.simdiki_deger_gir(resimSayisi)
-                if resimSayisi == self.lutfenBekleyinWidget.yuzdeCubukEnCokDeger():
-                    self.lutfen_bekleyin_gizle()
 
                 if altyazi_ekle and videoNesne.altyaziVarMi:
                     videoNesne.altyazidan_yazi_nesnesi_ekle(parentNesne=resimNesne,
                                                             pos_ms=pos_ms_donen, onceki_altyazi_sayisi=onceki_altyazi_sayisi,
                                                             sonraki_altyazi_sayisi=sonraki_altyazi_sayisi)
 
+                self.lutfenBekleyinWidget.simdiki_deger_gir(resimSayisi)
+                if resimSayisi == self.lutfenBekleyinWidget.yuzdeCubukEnCokDeger():
+                    self.lutfen_bekleyin_gizle()
 
+                resimSayisi += 1
 
             else:
                 self.lutfen_bekleyin_gizle()

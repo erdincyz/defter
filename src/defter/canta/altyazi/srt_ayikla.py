@@ -2,11 +2,11 @@
 # .
 
 __project_name__ = 'Defter'
-__author__ = 'Erdinç Yılmaz'
+__author__ = 'E.Y.'
 __date__ = '14/03/2024'
 
+from datetime import timedelta
 
-from datetime import datetime, timedelta
 
 ########################################################################
 class SrtAyikla:
@@ -24,6 +24,10 @@ class SrtAyikla:
         self.bitisZamanlari = []
         self.yazilar = []
 
+    # ---------------------------------------------------------------------
+    def oku(self):
+        with open(self.dosya_adresi, "r", encoding="utf-8") as f:
+            self.satirlar = f.readlines()
 
     # # ---------------------------------------------------------------------
     # def sozluge_ayikla(self):
@@ -67,10 +71,27 @@ class SrtAyikla:
     #         self.blokSozluk[satir_int] = blok_liste
 
     # ---------------------------------------------------------------------
+    def sonraki_altyazinin_sira_no_indexini_bul(self, su_an_ki_sira, satir_int):
+        satir_int_arti_bir = satir_int + 1
+        for i, satir in enumerate(self.satirlar[su_an_ki_sira:]):
+            satir = satir.strip()
+            if satir:
+                if satir.isdigit():
+                    satir_int = int(satir)
+                    # TODO: burda mesela yazi satiri "10" olsa ve biz 9. altyaziyi ayikliyor olsak
+                    # problem olabilir, dusuk de olsa ihtimal var.
+                    # sonraki bir kaç satira da bakmak lazim
+                    if satir_int == satir_int_arti_bir:
+                        # mesela belki,
+                        # if "-->" in self.satirlar[su_an_ki_sira + i + 1]:
+                        #     break
+                        break
+        return i + su_an_ki_sira
+
+    # ---------------------------------------------------------------------
     def listelere_ayikla(self):
 
         self.oku()
-        su_an_ki_sira = 0
 
         i = 0
         while i < len(self.satirlar):
@@ -78,28 +99,30 @@ class SrtAyikla:
             if satir:
                 if satir.isdigit():
                     satir_int = int(satir)
-                    sonraki_sira_no_indexi = self.sonraki_sira_no_ve_indexi(i, satir_int)
-                    self.boslari_temizle_listelere_ekle(satir_int, i+1, sonraki_sira_no_indexi)
-                    i=sonraki_sira_no_indexi
+                    sonraki_sira_no_indexi = self.sonraki_altyazinin_sira_no_indexini_bul(i, satir_int)
+                    self.boslari_temizle_listelere_ekle(i + 1, sonraki_sira_no_indexi)
+                    # i ve sonraki_sira_no_indexi arasindaki satirlar islendi listelere eklendi
+                    # dolayisi ile i= sonraki_sira_no_indexi deyip, ordan devam ediyoruz
+                    i = sonraki_sira_no_indexi
                     continue
             i += 1
 
         return self.baslamaZamanlari, self.yazilar, self.bitisZamanlari
 
     # ---------------------------------------------------------------------
-    def boslari_temizle_listelere_ekle(self, satir_int, z, sonraki_sira_no_indexi):
+    def boslari_temizle_listelere_ekle(self, blok_icerik_baslangic, sonraki_sira_no_indexi):
         # self.blokSozluk[satir_int] = (self.satirlar[i:sonraki_sira_no_indexi])
         # blok_liste = []
         yazi = ""
-        bas=son=None
-        for y in range(z, sonraki_sira_no_indexi):
-            satir = self.satirlar[y].strip()
+        bas = son = None
+        for i in range(blok_icerik_baslangic, sonraki_sira_no_indexi):
+            satir = self.satirlar[i].strip()
             if satir:
                 if bas is None:
-                    bas,son =self.ilk_son_zaman_cevir(satir)
+                    bas, son = self.ilk_son_zaman_cevir(satir)
                 else:
-                    yazi =f"{yazi} {satir}"
-            y += 1
+                    yazi = f"{yazi} {satir}"
+            i += 1
 
         if yazi:
             try:
@@ -117,26 +140,10 @@ class SrtAyikla:
                 self.bitisZamanlari.append(son)
 
     # ---------------------------------------------------------------------
-    def oku(self):
-        with open(self.dosya_adresi, "r", encoding="utf-8") as f:
-            self.satirlar = f.readlines()
-
-    # ---------------------------------------------------------------------
-    def sonraki_sira_no_ve_indexi(self, su_an_ki_sira, satir_int):
-        satir_int_arti_bir = satir_int + 1
-        for i, satir in enumerate(self.satirlar[su_an_ki_sira:]):
-            satir = satir.strip()
-            if satir:
-                if satir.isdigit():
-                    satir_int = int(satir)
-                    if satir_int == satir_int_arti_bir:
-                        break
-        return i + su_an_ki_sira
-
-    # ---------------------------------------------------------------------
     def ilk_son_zaman_cevir(self, zaman):
 
-        zaman = zaman.replace("."," ").replace(","," ").replace(":"," ").replace("-->"," ")
+        # :)
+        zaman = zaman.replace(".", " ").replace(",", " ").replace(":", " ").replace("-->", " ")
 
         basH, basM, basS, basMs, sonH, sonM, sonS, sonMs = zaman.split()
 
@@ -163,7 +170,6 @@ def calistir():
     print(basL)
     print(yaziL)
     print(sonL)
-
 
 
 # ---------------------------------------------------------------------
