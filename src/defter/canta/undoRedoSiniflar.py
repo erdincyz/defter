@@ -702,6 +702,8 @@ class UndoableResizeBaseItem(QUndoCommand):
         self.item.scene().parent().change_transform_box_values(self.item)
         if self.item.type() == shared.IMAGE_ITEM_TYPE:
             self.item.reload_image_after_scale()
+        elif self.item.type() == shared.VIDEO_ITEM_TYPE:
+            self.item.update_elements_after_resize()
 
     # ---------------------------------------------------------------------
     def undo(self):
@@ -713,6 +715,9 @@ class UndoableResizeBaseItem(QUndoCommand):
         self.item.scene().parent().change_transform_box_values(self.item)
         if self.item.type() == shared.IMAGE_ITEM_TYPE:
             self.item.reload_image_after_scale()
+        elif self.item.type() == shared.VIDEO_ITEM_TYPE:
+            self.item.update_elements_after_resize()
+
 
 
 ########################################################################
@@ -1053,6 +1058,8 @@ class UndoableScaleBaseItemByResizing(QUndoCommand):
         self.item.update_painter_text_rect()
         if self.item.type() == shared.IMAGE_ITEM_TYPE:
             self.item.reload_image_after_scale()
+        elif self.item.type() == shared.VIDEO_ITEM_TYPE:
+            self.item.update_elements_after_resize()
 
     # ---------------------------------------------------------------------
     def undo(self):
@@ -1064,6 +1071,8 @@ class UndoableScaleBaseItemByResizing(QUndoCommand):
         self.item.update_painter_text_rect()
         if self.item.type() == shared.IMAGE_ITEM_TYPE:
             self.item.reload_image_after_scale()
+        elif self.item.type() == shared.VIDEO_ITEM_TYPE:
+            self.item.update_elements_after_resize()
 
 
 ########################################################################

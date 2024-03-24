@@ -198,7 +198,7 @@ class VideoyuResmeCevirPenceresi(QDialog):
 
         self.resimSayisi = ((
                                     self.bitisTE.time().msecsSinceStartOfDay() - self.baslangicTE.time().msecsSinceStartOfDay()) // self.zamanAraligiTE.time().msecsSinceStartOfDay()) + 1
-        self.lblToplamResimSayisi.setText(self.tr(f"{self.resimSayisi} image(s)"))
+        self.lblToplamResimSayisi.setText(self.tr("{} image(s)".format(self.resimSayisi)))
 
     # ---------------------------------------------------------------------
     @Slot(int)

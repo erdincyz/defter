@@ -2310,7 +2310,7 @@ Dosya okunup anlamlandırılamadı!</translation>
     <message>
         <location filename="defter.py" line="4403"/>
         <source>Video to Image(s)</source>
-        <translation>Videodan Resim Yakala</translation>
+        <translation>Videodan Resim Yakala Paneli</translation>
     </message>
     <message>
         <location filename="defter.py" line="4409"/>
@@ -2320,12 +2320,12 @@ Dosya okunup anlamlandırılamadı!</translation>
     <message>
         <location filename="defter.py" line="4408"/>
         <source>Capture image</source>
-        <translation>Resim yakala</translation>
+        <translation>Şu anki resmi yakala</translation>
     </message>
     <message>
         <location filename="defter.py" line="4413"/>
         <source>Capture image with subtitles</source>
-        <translation>Altyazı ile birlikte resmi yakala</translation>
+        <translation>Altyazı ile birlikte şu anki resmi yakala</translation>
     </message>
     <message>
         <location filename="defter.py" line="4414"/>
@@ -2335,7 +2335,7 @@ Dosya okunup anlamlandırılamadı!</translation>
     <message>
         <location filename="defter.py" line="4418"/>
         <source>Capture image -1s with subtitles</source>
-        <translation>1sn önceki resmi altyazı ile birlikte yakala</translation>
+        <translation>1 sn önceki resmi altyazı ile birlikte yakala</translation>
     </message>
     <message>
         <location filename="defter.py" line="4420"/>
@@ -2813,6 +2813,11 @@ Dosya okunup anlamlandırılamadı!</translation>
         <location filename="canta/videoyuResmeCevirPenceresi.py" line="237"/>
         <source>&amp;Cancel</source>
         <translation>&amp;İptal</translation>
+    </message>
+    <message>
+        <location filename="canta/videoyuResmeCevirPenceresi.py" line="201"/>
+        <source>{} image(s)</source>
+        <translation>{} adet resim</translation>
     </message>
 </context>
 <context>
