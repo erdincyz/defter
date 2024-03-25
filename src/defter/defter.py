@@ -97,7 +97,7 @@ from .canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.96.4"
+VERSION = "0.96.5"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -11451,7 +11451,7 @@ class DefterAnaPencere(QMainWindow):
 # ---------------------------------------------------------------------
 def calistir():
     prog = QApplication(sys.argv)
-    prog.setWindowIcon(QIcon(":icons/defter.png"))
+    prog.setWindowIcon(QIcon(":icons/defter-logo.png"))
     # if > win7 icin fusion, win 10 icin bakilabilir belki win kalabilir
     # "macintosh" var osx icin
     # linux icin "gtk"
