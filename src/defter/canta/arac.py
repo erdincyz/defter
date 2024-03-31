@@ -5,29 +5,50 @@ __project_name__ = 'defter'
 __date__ = '05/07/22'
 __author__ = 'E. Y.'
 
-from PySide6.QtGui import QPen, QFont, QColor, Qt, QPixmap, QCursor
-
-
-# ---------------------------------------------------------------------
-def ver_arac_ikon_tipi(tip):
-    tipIkonAdresSozluk = {'secimAraci': Qt.CursorShape.ArrowCursor,
-                          'okAraci': ':icons/cursor-line.png',
-                          'kutuAraci': ':icons/cursor-rectangle.png',
-                          'yuvarlakAraci': ':icons/cursor-circle.png',
-                          'kalemAraci': ':icons/cursor-pen.png',
-                          'yaziAraci': ':icons/cursor-text.png',
-                          'resimAraci': ':icons/cursor-image.png',
-                          'videoAraci': ":icons/cursor-pen.png",
-                          'dosyaAraci': ":icons/cursor-pen.png",
-                          'aynalaXAraci': Qt.CursorShape.ArrowCursor,
-                          'aynalaYAraci': Qt.CursorShape.ArrowCursor,
-                          'resimKirpAraci': Qt.CursorShape.CrossCursor,
-                          }
-    return tipIkonAdresSozluk[tip]
+from PySide6.QtGui import QPen, QFont, QColor, Qt, QPixmap, QCursor, QIcon
+from PySide6.QtCore import QT_TRANSLATE_NOOP
 
 
 #######################################################################
 class Arac(object):
+    # [tip] = (imlecAdresi , ikonAdresi, aracAdi)
+    aracSozluk = {'secimAraci': (Qt.CursorShape.ArrowCursor,
+                                 ":icons/arrow.png",
+                                 QT_TRANSLATE_NOOP('DefterAnaPencere', 'selection')),
+                  'okAraci': (":icons/cursor-line.png",
+                              ":icons/line.png",
+                              QT_TRANSLATE_NOOP('DefterAnaPencere', 'line')),
+                  'kutuAraci': (":icons/cursor-rectangle.png",
+                                ":icons/rectangle.png",
+                                QT_TRANSLATE_NOOP('DefterAnaPencere', 'rectangle')),
+                  'yuvarlakAraci': (":icons/cursor-circle.png",
+                                    ":icons/circle.png",
+                                    QT_TRANSLATE_NOOP('DefterAnaPencere', 'ellipse')),
+                  'kalemAraci': (":icons/cursor-pen.png",
+                                 ":icons/pen.png",
+                                 QT_TRANSLATE_NOOP('DefterAnaPencere', 'draw path')),
+                  'yaziAraci': (":icons/cursor-text.png",
+                                ":icons/t.png",
+                                QT_TRANSLATE_NOOP('DefterAnaPencere', 'text')),
+                  'resimAraci': (":icons/cursor-image.png",
+                                 ":icons/file-image.png",
+                                 QT_TRANSLATE_NOOP('DefterAnaPencere', 'image')),
+                  'videoAraci': (":icons/cursor-pen.png",
+                                 ":icons/file-video.png",
+                                 QT_TRANSLATE_NOOP('DefterAnaPencere', 'video')),
+                  'dosyaAraci': (":icons/cursor-pen.png",
+                                 ":icons/import-file.png",
+                                 QT_TRANSLATE_NOOP('DefterAnaPencere', 'file')),
+                  'aynalaXAraci': (Qt.CursorShape.ArrowCursor,
+                                   "",
+                                   ""),
+                  'aynalaYAraci': (Qt.CursorShape.ArrowCursor,
+                                   "",
+                                   ""),
+                  'resimKirpAraci': (Qt.CursorShape.CrossCursor,
+                                     "",
+                                     "")
+                  }
 
     # ---------------------------------------------------------------------
     def __init__(self, tip):
@@ -35,7 +56,9 @@ class Arac(object):
 
         self.tip = tip
 
-        self.ikonAdres = ver_arac_ikon_tipi(tip)
+        self.imlecAdresi = Arac.aracSozluk[tip][0]
+        self.ikonAdresi = Arac.aracSozluk[tip][1]
+        self.adi = Arac.aracSozluk[tip][2]
         self._imlec = None
 
         self.kalem = QPen(QColor(0, 0, 0),
@@ -84,10 +107,10 @@ class Arac(object):
     @property
     def imlec(self):
         if not self._imlec:
-            if type(self.ikonAdres) is str:
-                self._imlec = QCursor(QPixmap(self.ikonAdres))
+            if type(self.imlecAdresi) is str:
+                self._imlec = QCursor(QPixmap(self.imlecAdresi))
             else:  # Qt.CursorShape
-                self._imlec = self.ikonAdres  # Qt.ArrowCursor gibi
+                self._imlec = self.imlecAdresi  # Qt.ArrowCursor gibi
 
         return self._imlec
 

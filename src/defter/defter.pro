@@ -3,6 +3,7 @@ SOURCES	     += canta/nesneler/base.py
 SOURCES	     += canta/treeModel.py
 SOURCES	     += canta/tabWidget.py
 SOURCES	     += canta/scene.py
+SOURCES	     += canta/arac.py
 SOURCES	     += canta/printPreviewDialog.py
 SOURCES	     += canta/lutfenBekleyin.py
 SOURCES	     += canta/renkSecmeDugmesi.py

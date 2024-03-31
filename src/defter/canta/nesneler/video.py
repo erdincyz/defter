@@ -60,6 +60,8 @@ class VideoItem(BaseItem):
         # self.videoItem = GraphicsVideoItem(self)
         # self.videoItem.setFlag(QGraphicsVideoItem.ItemStacksBehindParent)
 
+        self.aracTipi = "videoAraci"
+
         self.kenarPen = QPen(pen.color(), 3, Qt.PenStyle.SolidLine)
         self.altyaziVarMi = False
         self.simdikiAltyazi = ""

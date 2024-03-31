@@ -4,16 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "defter-argekod"
-version = "0.96.5"
+version = "0.96.6"
 authors = [
-  { name="argekod"},
+    { name = "argekod" },
 ]
 description = "Görsel bir not tutma uygulaması. (A visual note-taking app.)"
 readme = "README.md"
 requires-python = ">=3.8"
-keywords = ["note taking", "freeform", "drawing", "visual", 
-"graphics", "lighttable", "html generator", "PDF generator" ,"PySide6"]
-license = {text = "GNU General Public License v3 (GPLv3)"}
+keywords = ["note taking", "freeform", "drawing", "visual",
+    "graphics", "lighttable", "html generator", "PDF generator", "PySide6"]
+license = { text = "GNU General Public License v3 (GPLv3)" }
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3 :: Only",

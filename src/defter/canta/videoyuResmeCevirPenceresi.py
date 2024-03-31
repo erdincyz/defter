@@ -196,9 +196,10 @@ class VideoyuResmeCevirPenceresi(QDialog):
     @Slot(QTime)
     def act_resim_sayisi_hesapla(self, lazim_degil=None):
 
-        self.resimSayisi = ((
-                                    self.bitisTE.time().msecsSinceStartOfDay() - self.baslangicTE.time().msecsSinceStartOfDay()) // self.zamanAraligiTE.time().msecsSinceStartOfDay()) + 1
-        self.lblToplamResimSayisi.setText(self.tr("{} image(s)".format(self.resimSayisi)))
+        self.resimSayisi = ((self.bitisTE.time().msecsSinceStartOfDay()
+                             - self.baslangicTE.time().msecsSinceStartOfDay())
+                            // self.zamanAraligiTE.time().msecsSinceStartOfDay()) + 1
+        self.lblToplamResimSayisi.setText(self.tr("%n image(s)", "", self.resimSayisi))
 
     # ---------------------------------------------------------------------
     @Slot(int)

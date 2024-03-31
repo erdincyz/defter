@@ -28,6 +28,8 @@ class DosyaNesnesi(BaseItem):
                  parent=None):
         super(DosyaNesnesi, self).__init__(pos, rect, yaziRengi, arkaPlanRengi, pen, font, parent)
 
+        self.aracTipi = "dosyaAraci"
+
         if os.path.isfile(dosyaAdresi):
             iconProvider = QFileIconProvider()
             self.ikon = iconProvider.icon(QFileInfo(dosyaAdresi))

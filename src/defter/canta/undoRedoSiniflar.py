@@ -719,7 +719,6 @@ class UndoableResizeBaseItem(QUndoCommand):
             self.item.update_elements_after_resize()
 
 
-
 ########################################################################
 class UndoableResizeLineItem(QUndoCommand):
     """ """
@@ -1647,14 +1646,14 @@ class UndoableStilAdiDegistir(QUndoCommand):
 
 
 ########################################################################
-class UndoableStiliUygula(QUndoCommand):
+class UndoableStiliAracaUygula(QUndoCommand):
     """ """
 
     # ---------------------------------------------------------------------
     def __init__(self, description, eskiPen, yeniPen, yaziRengi, eskiYaziRengi, cizgiRengi, eskiCizgiRengi,
                  eskiArkaPlanRengi, yeniArkaPlanRengi, eskiFont, yeniFont,
-                 scene, parent=None):
-        super(UndoableStiliUygula, self).__init__(description, parent)
+                 sahneArac, defterAnaPencere, parent=None):
+        super(UndoableStiliAracaUygula, self).__init__(description, parent)
         self.font = yeniFont
         self.eskiFont = eskiFont
         self.pen = yeniPen
@@ -1667,7 +1666,11 @@ class UndoableStiliUygula(QUndoCommand):
         self.yeniArkaPlanRengi = yeniArkaPlanRengi
         # self.cizgiKalinligi = yeniPen.widthF()
         # self.eskiCizgiKalinligi = eskiPen.widthF()
-        self.scene = scene
+        # self.sahneArac = sahneArac
+        # self.defterArac = defterAnaPencere.araclarSozluk[sahneArac.tip]
+        self.defterAnaPencere = defterAnaPencere
+        # sahne araci ve defterdeki ana arac
+        self.araclar = (sahneArac, defterAnaPencere.araclarSozluk[sahneArac.tip])
 
     # # ---------------------------------------------------------------------
     # def id(self):
@@ -1688,38 +1691,36 @@ class UndoableStiliUygula(QUndoCommand):
     # ---------------------------------------------------------------------
     def redo(self):
         # self.scene.parent().currentFont=QFont(self.font)
-        self.scene.aktifArac.yaziTipi = self.font
+        for arac in self.araclar:
+            arac.yaziTipi = self.font
+            arac.kalem = self.pen
+            arac.yaziRengi = self.yaziRengi
+            arac.cizgiRengi = self.cizgiRengi
+            arac.arkaPlanRengi = self.yeniArkaPlanRengi
 
-        self.scene.aktifArac.kalem = self.pen
-
-        self.scene.aktifArac.yaziRengi = self.yaziRengi
-        self.scene.aktifArac.cizgiRengi = self.cizgiRengi
-        self.scene.aktifArac.arkaPlanRengi = self.yeniArkaPlanRengi
-
-        self.scene.parent().degistir_yazi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
-        self.scene.parent().degistir_cizgi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
-        self.scene.parent().degistir_nesne_arkaplan_rengi_ikonu()
-        self.scene.parent().change_font_point_sizef_spinbox_value(self.font.pointSizeF())
-        self.scene.parent().change_line_style_options(self.pen)
-        self.scene.parent().change_font_combobox_value(self.font)
+        self.defterAnaPencere.degistir_yazi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
+        self.defterAnaPencere.degistir_cizgi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
+        self.defterAnaPencere.degistir_nesne_arkaplan_rengi_ikonu()
+        self.defterAnaPencere.change_font_point_sizef_spinbox_value(self.font.pointSizeF())
+        self.defterAnaPencere.change_line_style_options(self.pen)
+        self.defterAnaPencere.change_font_combobox_value(self.font)
 
     # ---------------------------------------------------------------------
     def undo(self):
         # self.scene.parent().currentFont=QFont(self.font)
-        self.scene.aktifArac.yaziTipi = self.eskiFont
+        for arac in self.araclar:
+            arac.yaziTipi = self.eskiFont
+            arac.kalem = self.eskiPen
+            arac.yaziRengi = self.eskiYaziRengi
+            arac.cizgiRengi = self.eskiCizgiRengi
+            arac.arkaPlanRengi = self.eskiArkaPlanRengi
 
-        self.scene.aktifArac.kalem = self.eskiPen
-
-        self.scene.aktifArac.yaziRengi = self.eskiYaziRengi
-        self.scene.aktifArac.cizgiRengi = self.eskiCizgiRengi
-        self.scene.aktifArac.arkaPlanRengi = self.eskiArkaPlanRengi
-
-        self.scene.parent().degistir_yazi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
-        self.scene.parent().degistir_cizgi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
-        self.scene.parent().degistir_nesne_arkaplan_rengi_ikonu()
-        self.scene.parent().change_font_point_sizef_spinbox_value(self.eskiFont.pointSizeF())
-        self.scene.parent().change_line_style_options(self.eskiPen)
-        self.scene.parent().change_font_combobox_value(self.eskiFont)
+        self.defterAnaPencere.degistir_yazi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
+        self.defterAnaPencere.degistir_cizgi_rengi_ikonu(nesne_arkaplan_ikonu_guncelle=False)
+        self.defterAnaPencere.degistir_nesne_arkaplan_rengi_ikonu()
+        self.defterAnaPencere.change_font_point_sizef_spinbox_value(self.eskiFont.pointSizeF())
+        self.defterAnaPencere.change_line_style_options(self.eskiPen)
+        self.defterAnaPencere.change_font_combobox_value(self.eskiFont)
 
 
 ########################################################################

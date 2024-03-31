@@ -20,6 +20,8 @@ class Ellipse(BaseItem):
     def __init__(self, pos, rect, yaziRengi, arkaPlanRengi, pen, font, parent=None):
         super(Ellipse, self).__init__(pos, rect, yaziRengi, arkaPlanRengi, pen, font, parent)
 
+        self.aracTipi = "yuvarlakAraci"
+
     # ---------------------------------------------------------------------
     def type(self):
         # Enable the use of qgraphicsitem_cast with this item.

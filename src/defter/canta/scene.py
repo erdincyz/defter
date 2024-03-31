@@ -60,9 +60,18 @@ class Scene(QGraphicsScene):
         self.AynalaYAraci = Arac('aynalaYAraci')
         self.ResimKirpAraci = Arac('resimKirpAraci')
 
-        self.araclar = (self.SecimAraci, self.OkAraci, self.KutuAraci, self.YuvarlakAraci, self.KalemAraci,
-                        self.YaziAraci, self.ResimAraci, self.VideoAraci, self.DosyaAraci, self.AynalaXAraci,
-                        self.AynalaYAraci, self.ResimKirpAraci)
+        self.araclarSozluk = {"secimAraci": self.SecimAraci,
+                              "okAraci": self.OkAraci,
+                              "kutuAraci": self.KutuAraci,
+                              "yuvarlakAraci": self.YuvarlakAraci,
+                              "kalemAraci": self.KalemAraci,
+                              "yaziAraci": self.YaziAraci,
+                              "resimAraci": self.ResimAraci,
+                              "videoAraci": self.VideoAraci,
+                              "dosyaAraci": self.DosyaAraci,
+                              "aynalaXAraci": self.AynalaXAraci,
+                              "aynalaYAraci": self.AynalaYAraci,
+                              "resimKirpAraci": self.ResimKirpAraci}
 
         self.setItemIndexMethod(QGraphicsScene.ItemIndexMethod.NoIndex)
 
@@ -129,8 +138,8 @@ class Scene(QGraphicsScene):
     def get_properties_for_save(self):
 
         aracOzellikleriSozluk = {}
-        for arac in self.araclar:
-            aracOzellikleriSozluk[arac.tip] = arac.oku_ozellikler()
+        for aracTipi, arac in self.araclarSozluk.items():
+            aracOzellikleriSozluk[aracTipi] = arac.oku_ozellikler()
 
         view = self.views()[0]
         properties = {
@@ -149,13 +158,21 @@ class Scene(QGraphicsScene):
         return properties
 
     # ---------------------------------------------------------------------
-    def arac_ozellikleri_yukle(self, aracOzellikleriSozluk):
+    def arac_ozellikleri_yukle(self, aracOzellikleriSozluk, kayitliDosyadan=False):
+
         if aracOzellikleriSozluk:
-            for arac in self.araclar:
-                try:
-                    arac.yaz_ozellikler(aracOzellikleriSozluk[arac.tip])
-                except Exception as e:
-                    pass
+            if kayitliDosyadan:
+                for aracTipi, arac in self.araclarSozluk.items():
+                    try:
+                        arac.yaz_ozellikler(aracOzellikleriSozluk[aracTipi])
+                    except Exception as e:
+                        pass
+            else:
+                for aracTipi, arac in self.araclarSozluk.items():
+                    try:
+                        arac.yaz_ozellikler(aracOzellikleriSozluk[aracTipi].oku_ozellikler())
+                    except Exception as e:
+                        print(e)
 
     # ---------------------------------------------------------------------
     def nesne_ozellikleri_guncelle(self):

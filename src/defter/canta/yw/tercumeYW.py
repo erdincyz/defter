@@ -16,7 +16,7 @@ class TercumeYW(YuzenWidget):
     def __init__(self, parent=None):
         super(TercumeYW, self).__init__(kapatilabilir_mi=True, parent=parent)
 
-        self.okuBtn = QPushButton(self.tr("Oku"), self)
+        self.okuBtn = QPushButton(self.tr("Read"), self)
         self.girisYaziLE = QLineEdit(self)
         self.tercumeTrBtn = QPushButton(self.tr("Tr"), self)
         self.tercumeTrBtn.clicked.connect(self.yap_tr_tercume)

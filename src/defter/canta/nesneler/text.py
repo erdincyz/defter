@@ -24,6 +24,8 @@ class Text(QGraphicsTextItem):
     def __init__(self, cursorPos, yaziRengi, arkaPlanRengi, pen, font, rect=None, text=None, parent=None):
         super(Text, self).__init__(text, parent)
 
+        self.aracTipi = "yaziAraci"
+
         self._kim = shared.kim(kac_basamak=16)
 
         self.setAcceptHoverEvents(True)

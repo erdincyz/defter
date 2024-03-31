@@ -27,6 +27,10 @@ class Web(BaseItem):
         # web.settings().setAttribute(QWebEngineSettings.ScreenCaptureEnabled, True)
         # web.load(QUrl.fromLocalFile(dosyaAdresi))
 
+        # bunu su anda kullanmıyoruz, ve de bunun bir aracı yok, en yakın arac tip yazı aracı
+        # belki bir birlestirmeye gidilir. unutulmasın ilerde diye.
+        self.aracTipi = "yaziAraci"
+
         self.proxy = QGraphicsProxyWidget(self)
         # self.proxy.setFlags(self.ItemIsSelectable |
         #               self.ItemIsMovable |

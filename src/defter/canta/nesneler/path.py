@@ -20,6 +20,8 @@ class PathItem(QGraphicsItem):
     def __init__(self, pos, yaziRengi, arkaPlanRengi, pen, font, path=None, parent=None):
         super(PathItem, self).__init__(parent)
 
+        self.aracTipi = "kalemAraci"
+
         self._kim = shared.kim(kac_basamak=16)
         self.setAcceptHoverEvents(True)
 

@@ -22,6 +22,8 @@ class Image(BaseItem):
     # def __init__(self, filePath, pixmap, rect, arkaPlanRengi, cizgiRengi, parent=None, scene=None):
     def __init__(self, filePath, pos, rectf, pixmap, yaziRengi, arkaPlanRengi, pen, font, isEmbeded=False, parent=None):
 
+        self.aracTipi = "resimAraci"
+
         self.isEmbeded = isEmbeded
         self.filePathForSave = filePath
         if not isEmbeded:

@@ -18,6 +18,8 @@ class Rect(BaseItem):
     def __init__(self, pos, rect, yaziRengi, arkaPlanRengi, pen, font, parent=None):
         super(Rect, self).__init__(pos, rect, yaziRengi, arkaPlanRengi, pen, font, parent)
 
+        self.aracTipi = "kutuAraci"
+
     # ---------------------------------------------------------------------
     def type(self):
         # Enable the use of qgraphicsitem_cast with this item.

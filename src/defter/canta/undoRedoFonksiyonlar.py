@@ -11,7 +11,7 @@ from .undoRedoSiniflar import (UndoableSayfaAdiDegistir, UndoableAddItem, Undoab
                                UndoableRotateWithOffset, UndoableSetZValue, UndoableSetLineStyle, UndoableSetLineJoinStyle,
                                UndoableSetLineCapStyle, UndoableSetLineColor, UndoableSetTextColor,
                                UndoableSetLineColorAlpha, UndoableSetTextColorAlpha, UndoableSetItemBackgroundColor,
-                               UndoableSetItemBackgroundColorAlpha, UndoableStilAdiDegistir, UndoableStiliNesneyeUygula, UndoableStiliUygula,
+                               UndoableSetItemBackgroundColorAlpha, UndoableStilAdiDegistir, UndoableStiliNesneyeUygula, UndoableStiliAracaUygula,
                                UndoableSetImageOpacity, UndoableSetSceneBackgroundBrush, UndoableSetSceneBackgroundImage,
                                UndoableEmbedSceneBackgroundImage, UndoableSetPinStatus, UndoableItemSetText, UndoableItemCustomCommand,
                                UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, UndoableResizeLineItem,
@@ -238,13 +238,12 @@ def undoableStiliNesneyeUygula(undoStack, description, item, pen, brush, font, y
 
 
 # ---------------------------------------------------------------------
-def undoableStiliUygula(undoStack, description, eskiPen, yeniPen, yaziRengi, eskiYaziRengi, cizgiRengi,
-                        eskiCizgiRengi,
-                        eskiArkaPlanRengi, yeniArkaPlanRengi, eskiFont, yeniFont, scene):
-    command = UndoableStiliUygula(description, eskiPen, yeniPen, yaziRengi, eskiYaziRengi, cizgiRengi,
-                                  eskiCizgiRengi,
-                                  eskiArkaPlanRengi, yeniArkaPlanRengi, eskiFont, yeniFont,
-                                  scene)
+def undoableStiliAracaUygula(undoStack, description, eskiPen, yeniPen, yaziRengi, eskiYaziRengi, cizgiRengi,
+                             eskiCizgiRengi,
+                             eskiArkaPlanRengi, yeniArkaPlanRengi, eskiFont, yeniFont, sahneArac, defterAnaPencere):
+    command = UndoableStiliAracaUygula(description, eskiPen, yeniPen, yaziRengi, eskiYaziRengi, cizgiRengi,
+                                       eskiCizgiRengi,
+                                       eskiArkaPlanRengi, yeniArkaPlanRengi, eskiFont, yeniFont, sahneArac, defterAnaPencere)
     undoStack.push(command)
 
 
