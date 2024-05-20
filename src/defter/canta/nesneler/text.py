@@ -1143,7 +1143,7 @@ class Text(QGraphicsTextItem):
                 if self.toPlainText() or self.childItems():
                     self.setSelected(False)
                     self.scene().create_empty_text_object_with_double_click(
-                        QPointF(self.sceneLeft(), self.sceneBottom() + 10))
+                        QPointF(self.sceneLeft() + self.boundingRectTasmaDegeri, self.sceneBottom() + 10))
 
         super(Text, self).keyPressEvent(event)
 
