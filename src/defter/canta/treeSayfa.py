@@ -5,8 +5,6 @@ __project_name__ = 'Defter'
 __date__ = '01/Jun/2018'
 __author__ = 'Erdinç Yılmaz'
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor
 from .shared import kim, slugify
 
 
@@ -35,7 +33,7 @@ class Sayfa(object):
         self._no = Sayfa.sayfa_no
         self._adi = "{} - {}".format(adi, self._no)
         # @adi.setter da temizleniyor, bu ilk olusturma
-        self._kayit_adi = "{} - {}".format(slugify(self._adi, False), self._kim)
+        self._kayit_adi = "{} - {}".format(slugify(self._adi), self._kim)
 
         # print(self.adi)
 
@@ -54,7 +52,7 @@ class Sayfa(object):
     @adi.setter
     def adi(self, adi):
         self._adi = adi
-        self._kayit_adi = "{} - {}".format(slugify(self._adi, False), self._kim)
+        self._kayit_adi = "{} - {}".format(slugify(self._adi), self._kim)
 
     # @pyqtProperty(str)
     @property

@@ -22,8 +22,8 @@ from collections import deque
 
 # from PySide6.QtOpenGL import QGLWidget
 
-from PySide6.QtGui import (QCursor, QKeySequence, QIcon, QPixmap, QColor, QPen, QFont, QPainter, QPainterPath, QImageReader,
-                           QImage, QTextCharFormat, QTextCursor, QPalette, QTextListFormat,
+from PySide6.QtGui import (QCursor, QKeySequence, QIcon, QPixmap, QColor, QPen, QFont, QPainter, QPainterPath,
+                           QImageReader, QImage, QTextCharFormat, QTextCursor, QPalette, QTextListFormat,
                            QTextBlockFormat, QPageSize, QPageLayout, QAction, QActionGroup, QUndoGroup,
                            QShortcut)
 
@@ -98,11 +98,12 @@ from .canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.96.6"
+VERSION = "0.96.7"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
 DEFSTYLES_FILE_VERSION = 1
+
 
 # ---------------------------------------------------------------------
 # def get_cursor_pos(item):
@@ -115,7 +116,6 @@ DEFSTYLES_FILE_VERSION = 1
 
 ########################################################################
 class DefterAnaPencere(QMainWindow):
-
     iptalTiklandi = Signal()
 
     # ---------------------------------------------------------------------
@@ -302,8 +302,10 @@ class DefterAnaPencere(QMainWindow):
         # self.altyaziYW.hide()
 
         self.altyaziYW.log.connect(self.log)
-        self.altyaziYW.sonKlasorVideolarGuncelle.connect(lambda: self.altyaziYW.sonKlasorVideolar_guncelle(self.sonKlasorVideolar))
-        self.altyaziYW.sahneAktifNesneBilgisiGuncelle.connect(lambda: self.altyaziYW.sahneAktifNesneBilgisi_guncelle(self.cScene.activeItem))
+        self.altyaziYW.sonKlasorVideolarGuncelle.connect(
+            lambda: self.altyaziYW.sonKlasorVideolar_guncelle(self.sonKlasorVideolar))
+        self.altyaziYW.sahneAktifNesneBilgisiGuncelle.connect(
+            lambda: self.altyaziYW.sahneAktifNesneBilgisi_guncelle(self.cScene.activeItem))
 
     # ---------------------------------------------------------------------
     def renk_degistir(self):
@@ -503,7 +505,8 @@ class DefterAnaPencere(QMainWindow):
         self.fontPointSizeFDSBox_yazidw.setMaximum(999)
         self.fontPointSizeFDSBox_yazidw.setSingleStep(1)
         # self.fontPointSizeFDSBox_yazidw.valueChanged[int].connect(self.act_change_item_size)
-        self.fontPointSizeFDSBox_yazidw.valueChangedFromDoubleSpinBoxGuiNotBySetValue.connect(self.act_change_font_point_sizef)
+        self.fontPointSizeFDSBox_yazidw.valueChangedFromDoubleSpinBoxGuiNotBySetValue.connect(
+            self.act_change_font_point_sizef)
         self.fontPointSizeFDSBox_yazidw.valueChanged.connect(self.fontPointSizeFDSBox_tbar.setValue)
         # bu metod daha sonra cagrildigi ve fontPointSizeFDSBox_yazidw daha sonra olusturuldugu icin
         # fontPointSizeFDSBox_tbar atamasini burda yapiyoruz.
@@ -703,7 +706,8 @@ class DefterAnaPencere(QMainWindow):
 
         # ---- cizgi birlesim tipi -----------------------------------------------------------------
         self.grpBtnCizgiBirlesimTipi = QButtonGroup(self.yaziGrupW)
-        self.grpBtnCizgiBirlesimTipi.buttonClicked.connect(lambda x: self.act_cizgi_birlesim_tipi_degistir(x.cizgiBirlesimTipi))
+        self.grpBtnCizgiBirlesimTipi.buttonClicked.connect(
+            lambda x: self.act_cizgi_birlesim_tipi_degistir(x.cizgiBirlesimTipi))
 
         self.btnCizgiBirlesimTipiSivri = PushButton("", genislik=16, yukseklik=16, parent=self.yaziGrupW)
         self.btnCizgiBirlesimTipiSivri.setIcon(QIcon(':icons/cizgi-birlesim-sivri.png'))
@@ -1460,7 +1464,8 @@ class DefterAnaPencere(QMainWindow):
             fark_liste_adres = [eleman.adres for eleman in fark_liste_eleman]
             fark_liste_str = "\n".join(fark_liste_adres)
 
-            msgBox.setText(self.tr(f"Do you want to delete {len(fark_liste_eleman)} unused embeded file(s) in the document?"))
+            msgBox.setText(
+                self.tr(f"Do you want to delete {len(fark_liste_eleman)} unused embeded file(s) in the document?"))
             msgBox.setInformativeText(self.tr("This is undoable!"))
             msgBox.setDetailedText(fark_liste_str)
 
@@ -1977,7 +1982,8 @@ class DefterAnaPencere(QMainWindow):
             # self.actionAlwaysOnTopToggle.setChecked(bool(int(self.settings.value("alwaysOnTop", False))))
             with signals_blocked(self.actionAlwaysOnTopToggle):
                 self.actionAlwaysOnTopToggle.setChecked(int(self.settings.value("alwaysOnTop", False)))
-            self.ekranKutuphane.setBackgroundBrush(self.settings.value("kutuphaneArkaPlanRengi", QColor(Qt.GlobalColor.lightGray)))
+            self.ekranKutuphane.setBackgroundBrush(self.settings.value("kutuphaneArkaPlanRengi",
+                                                                       QColor(Qt.GlobalColor.lightGray)))
             self.cModel.treeViewIkonBoyutu = self.settings.value("treeViewIkonBoyutu", QSize(48, 48))
             self.sayfalarYWTreeView.setIconSize(self.cModel.treeViewIkonBoyutu)
 
@@ -1994,8 +2000,10 @@ class DefterAnaPencere(QMainWindow):
             self.stillerYW.setMinimumSize(self.settings.value("stillerYWMinSize", QSize(200, 200)))
             self.stillerYW.yukleme_bilgisi(self.settings.value("stillerYWYonDurum", "01101"))
             self.baskiSiniriCizimAyarlariYW.restoreGeometry(self.settings.value("baskiSiniriCizimAyarlariYWGeo"))
-            self.baskiSiniriCizimAyarlariYW.setMinimumSize(self.settings.value("baskiSiniriCizimAyarlariYWMinSize", QSize(182, 250)))
-            self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi(self.settings.value("baskiSiniriCizimAyarlariYWYonDurum", "01112"))
+            self.baskiSiniriCizimAyarlariYW.setMinimumSize(self.settings.value("baskiSiniriCizimAyarlariYWMinSize",
+                                                                               QSize(182, 250)))
+            self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi(self.settings.value("baskiSiniriCizimAyarlariYWYonDurum",
+                                                                                "01112"))
             self.altyaziYW.restoreGeometry(self.settings.value("altyaziYWGeo"))
             self.altyaziYW.setMinimumSize(self.settings.value("altyaziYWMinSize", QSize(200, 200)))
             self.altyaziYW.yukleme_bilgisi(self.settings.value("altyaziYWYonDurum", "01102"))
@@ -2705,7 +2713,7 @@ class DefterAnaPencere(QMainWindow):
 
             # import edilen dosyanin temp klasorunden diger ic resource klasorlerini kopyala
             prefix = os.path.splitext(os.path.basename(zipFilePath))[0]
-            for entry in os.scandir(tempDirPath):  # entry is a os.DirEntry object
+            for entry in os.scandir(tempDirPath):  # entry is an os.DirEntry object
                 if entry.is_dir():
                     currentSceneResourceTempFolderPath = os.path.join(self.cScene.tempDirPath, entry.name)
                     if not os.path.isdir(currentSceneResourceTempFolderPath):
@@ -2867,7 +2875,8 @@ class DefterAnaPencere(QMainWindow):
 
             self.lutfen_bekleyin_gizle()
             # self._statusBar.showMessage("%s succesfully loaded!" % os.path.basename(filePath), 5000)
-            self.log(self.tr('{0:s} succesfully loaded!  -  {1:.2f} s').format(self.cModel.fileName, time.time() - t1), 5000, 1)
+            self.log(self.tr('{0:s} succesfully loaded!  -  {1:.2f} s').format(self.cModel.fileName,
+                                                                               time.time() - t1), 5000, 1)
 
         # else:
         #     self._statusBar.showMessage("%s already opened" % self.cModel.fileName, 5000)
@@ -3937,7 +3946,8 @@ class DefterAnaPencere(QMainWindow):
         self.actionExportViewAsImage.triggered.connect(self.act_export_view_as_image)
 
         self.actionPrintSelectedTextItemContent = QAction(QIcon(':icons/print.png'),
-                                                          self.tr("Print && Export Selected Text Item Content as PDF"), self.mBar)
+                                                          self.tr("Print && Export Selected Text Item Content as PDF"),
+                                                          self.mBar)
         self.actionPrintSelectedTextItemContent.setShortcut(QKeySequence("Ctrl+Alt+P"))
         self.actionPrintSelectedTextItemContent.triggered.connect(self.act_print_selected_text_item_content)
 
@@ -4030,7 +4040,7 @@ class DefterAnaPencere(QMainWindow):
         # to be able to override the cursor to Qt.WaitCursor in undo and redo calls,
         # we did not use undoGroup.createRedoAction,
         # also we still need ordinary Qt.WaitCursor overrides all over the code.
-        # because of we re not overriding QUndoGroup's or QUndoStack's redo and undo,
+        # because we re not overriding QUndoGroup's or QUndoStack's redo and undo,
         # (because of merged commands and macros)
         # first redo() which called when QundoCommand pushed to the stack does not override the cursor.
 
@@ -4421,28 +4431,37 @@ class DefterAnaPencere(QMainWindow):
         self.actionShowVideoInfo = QAction(QIcon(':icons/info.png'), self.tr("Show video info"), self.nesneSagMenu)
         self.actionShowVideoInfo.triggered.connect(self.act_show_video_info)
 
-        self.actionVideodanResimCekPaneli = QAction(QIcon(':icons/file-image.png'), self.tr("Video to Image(s)"), self.nesneSagMenu)
+        self.actionVideodanResimCekPaneli = QAction(QIcon(':icons/file-image.png'), self.tr("Video to Image(s)"),
+                                                    self.nesneSagMenu)
         self.actionVideodanResimCekPaneli.setToolTip(self.tr("Captures current image from video and adds to the page"))
         self.actionVideodanResimCekPaneli.setShortcut(QKeySequence("F12"))
         self.actionVideodanResimCekPaneli.triggered.connect(self.act_videodan_resim_cek_paneli_ac)
 
-        self.actionVideodanResimCek = QAction(QIcon(':icons/file-image.png'), self.tr("Capture image"), self.nesneSagMenu)
+        self.actionVideodanResimCek = QAction(QIcon(':icons/file-image.png'), self.tr("Capture image"),
+                                              self.nesneSagMenu)
         self.actionVideodanResimCek.setToolTip(self.tr("Captures current image from video and adds to the page"))
         self.actionVideodanResimCek.setShortcut(QKeySequence("F9"))
         self.actionVideodanResimCek.triggered.connect(self.act_videodan_resim_cek)
 
-        self.actionVideodanResimCekAltyazili = QAction(QIcon(':icons/file-image.png'), self.tr("Capture image with subtitles"), self.nesneSagMenu)
-        self.actionVideodanResimCekAltyazili.setToolTip(self.tr("Captures current image and +-7 subtitles from video and adds them to the page"))
+        self.actionVideodanResimCekAltyazili = QAction(QIcon(':icons/file-image.png'),
+                                                       self.tr("Capture image with subtitles"), self.nesneSagMenu)
+        self.actionVideodanResimCekAltyazili.setToolTip(
+            self.tr("Captures current image and +-7 subtitles from video and adds them to the page"))
         self.actionVideodanResimCekAltyazili.setShortcut(QKeySequence("F10"))
         self.actionVideodanResimCekAltyazili.triggered.connect(lambda: self.act_videodan_resim_cek(altYazili=True))
 
-        self.actionVideodanResimCekAltyaziliBirSnOnce = QAction(QIcon(':icons/file-image.png'), self.tr("Capture image -1s with subtitles"), self.nesneSagMenu)
+        self.actionVideodanResimCekAltyaziliBirSnOnce = QAction(QIcon(':icons/file-image.png'),
+                                                                self.tr("Capture image -1s with subtitles"),
+                                                                self.nesneSagMenu)
         self.actionVideodanResimCekAltyaziliBirSnOnce.setToolTip(
-            self.tr("Captures image and +-7 subtitles from 1 second before of the current position of the video and adds them to the page."))
+            self.tr(
+                "Captures image and +-7 subtitles from 1 second before of the current position of the video and adds them to the page."))
         self.actionVideodanResimCekAltyaziliBirSnOnce.setShortcut(QKeySequence("F11"))
-        self.actionVideodanResimCekAltyaziliBirSnOnce.triggered.connect(lambda: self.act_videodan_resim_cek(altYazili=True, birSnOnce=True))
+        self.actionVideodanResimCekAltyaziliBirSnOnce.triggered.connect(
+            lambda: self.act_videodan_resim_cek(altYazili=True, birSnOnce=True))
 
-        self.actionVideoyaAltYaziEkle = QAction(QIcon(':icons/file-image.png'), self.tr("Add subtitles"), self.nesneSagMenu)
+        self.actionVideoyaAltYaziEkle = QAction(QIcon(':icons/file-image.png'), self.tr("Add subtitles"),
+                                                self.nesneSagMenu)
         self.actionVideoyaAltYaziEkle.setShortcut(QKeySequence("F8"))
         self.actionVideoyaAltYaziEkle.triggered.connect(self.act_videoya_altyazi_ekle)
 
@@ -4459,7 +4478,8 @@ class DefterAnaPencere(QMainWindow):
         self.actionShowDosyaInfo = QAction(QIcon(':icons/info.png'), self.tr("Show file info"), self.nesneSagMenu)
         self.actionShowDosyaInfo.triggered.connect(self.act_dosya_bilgisi_goster)
 
-        self.actionPdfyiResmeCevir = QAction(QIcon(':icons/file-image.png'), self.tr("PDF to image(s)"), self.nesneSagMenu)
+        self.actionPdfyiResmeCevir = QAction(QIcon(':icons/file-image.png'), self.tr("PDF to image(s)"),
+                                             self.nesneSagMenu)
         self.actionPdfyiResmeCevir.triggered.connect(self.act_pdfyi_resme_cevir)
 
         # -----
@@ -4877,7 +4897,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionSendToBack,
                                           self.actionDeleteItem,
                                           self.actionSelectAll,
-                                          # tool bar menu actions
+                                          # toolbar menu actions
                                           self.actionTumAracCubuklariniGoster,
                                           self.actionToggleToolsToolbar,
                                           self.actionTogglePropertiesToolbar,
@@ -4916,7 +4936,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionAddVideoItem,
                                           self.actionEkleDosyaNesnesi,
                                           self.actionWebBrowserAc,
-                                          # align tool bar actions
+                                          # align toolbar actions
                                           self.actionMirrorX,
                                           self.actionMirrorY,
                                           self.actionAlignLeft,
@@ -5201,7 +5221,8 @@ class DefterAnaPencere(QMainWindow):
         self.fontPointSizeFDSBox_tbar.setMaximum(999)
         self.fontPointSizeFDSBox_tbar.setSingleStep(1)
         # self.fontPointSizeFDSBox_tbar.valueChanged[int].connect(self.act_change_item_size)
-        self.fontPointSizeFDSBox_tbar.valueChangedFromDoubleSpinBoxGuiNotBySetValue.connect(self.act_change_font_point_sizef)
+        self.fontPointSizeFDSBox_tbar.valueChangedFromDoubleSpinBoxGuiNotBySetValue.connect(
+            self.act_change_font_point_sizef)
         self.fontPointSizeFDSBox_tbar.setToolTip(self.tr("Text Size"))
 
         self.actionBold = Action(QIcon(':icons/bold.png'),
@@ -5952,7 +5973,7 @@ class DefterAnaPencere(QMainWindow):
         self.on_nesne_sag_menu_about_to_show(item)
 
     # ---------------------------------------------------------------------
-    # @Slot() # this is called directly from groups's overriden contextMenuEvent
+    # @Slot() # this is called directly from groups' overriden contextMenuEvent
     def on_grup_sag_menu_about_to_show(self, group):
 
         self.on_nesne_sag_menu_about_to_show(group)
@@ -6206,7 +6227,8 @@ class DefterAnaPencere(QMainWindow):
                 action = QAction(QIcon(filePath), os.path.basename(filePath), self.recentImagesMenu)
                 action.setToolTip(filePath)
                 action.setStatusTip(filePath)
-                action.triggered.connect(lambda: self.cScene.aktif_arac_degistir(aktifArac=self.cScene.ResimAraci, dosyaYolu=filePath))
+                action.triggered.connect(
+                    lambda: self.cScene.aktif_arac_degistir(aktifArac=self.cScene.ResimAraci, dosyaYolu=filePath))
                 action.triggered.connect(lambda: self.actionAddImageItem.setChecked(True))
                 count = len(self.recentImagesMenu.actions())
                 if count < 9:
@@ -6717,7 +6739,7 @@ class DefterAnaPencere(QMainWindow):
         # ## START ##  from one doc's temp folder to newly pasted's temp folder    ## START ##
         # ## START ##   before object creation                                     ## START ##
         # ------------------------------------------------------------------------------------
-        # for ex, if you paste from one document to another, images don't show if we dont update this.
+        # for ex, if you paste from one document to another, images don't show if we don't update this.
 
         if itemDict["type"] == shared.TEXT_ITEM_TYPE and not itemDict["isPlainText"] and eskiTempDir:
             imgSrcParser = ImgSrcParser()
@@ -6850,7 +6872,7 @@ class DefterAnaPencere(QMainWindow):
 
         itemData = mimeData.data('scene/items')
 
-        # to prevent empty paste(actually is does not paste, but because of undoStack macro below,
+        # to prevent empty paste(actually it does not paste, but because of undoStack macro below,
         # it creates an undo.)
         if not itemData:
             # return
@@ -8926,7 +8948,7 @@ class DefterAnaPencere(QMainWindow):
         # if self.cScene.activeItem.type() == shared.TEXT_ITEM_TYPE:
         #     url = self.cScene.activeItem.get_document_url()
         #     url = url.toLocalFile()
-        # elif self.cScene.activeItem.type() == shared.IMAGE_ITEM_TYPE or self.cScene.activeItem.type() == shared.VIDEO_ITEM_TYPE:
+        # elif self.cScene.activeItem.type() in (shared.IMAGE_ITEM_TYPE ,shared.VIDEO_ITEM_TYPE):
         #     url = self.cScene.activeItem.filePathForSave
         # else:
         #     return
@@ -9010,8 +9032,9 @@ class DefterAnaPencere(QMainWindow):
     def create_thread(self, imageURL):
         extension = os.path.splitext(imageURL)[1][1:].lower()
         if extension not in self.supportedImageFormatList:
-            self.log(self.tr("Could not load image: Could not find the direct link to the image or "
-                             "image type is unsupported.: {}").format(imageURL), 7000, 3)
+            self.log(self.tr(f"Could not load image: {imageURL} \n"
+                             "Could not find the direct link to the image "
+                             "or image type is unsupported.: {}").format(imageURL), 7000, 3)
             return
 
         imageSavePath = self.cScene.get_unique_path_for_downloaded_html_image(os.path.basename(imageURL))
@@ -9065,8 +9088,9 @@ class DefterAnaPencere(QMainWindow):
 
         # iptal edildi !! -> onemli: text nesnesindeki set_document_url'de de images-html klasoru ekleniyor.
         # img src= direkt adres yazabiliyoruz boylelikle
-        text = self.cScene.activeItem.toHtml().replace(url, "{}".format(
-            os.path.join("images-html", os.path.basename(imagePath))))
+        # text = self.cScene.activeItem.toHtml().replace(url, "{}".format(os.path.join("images-html",
+        #                                                                              os.path.basename(imagePath))))
+        text = self.cScene.activeItem.toHtml().replace(url, imagePath)
         self.cScene.activeItem.setHtml(text)
         self.cScene.activeItem.update()
 
@@ -9835,14 +9859,16 @@ class DefterAnaPencere(QMainWindow):
 
                 if not orjinal_boyutu_koru:
 
-                    video_img = video_img.scaled(gen, yuk, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                    video_img = video_img.scaled(gen, yuk, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                                 Qt.TransformationMode.SmoothTransformation)
                     pixMap = QPixmap.fromImage(video_img)
 
                 else:
                     # pixMap = QPixmap.convertFromImage(video_img)
 
                     pixMap = QPixmap.fromImage(video_img)
-                    pixMap = pixMap.scaled(gen, yuk, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)  # Qt.FastTransformation
+                    pixMap = pixMap.scaled(gen, yuk, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                           Qt.TransformationMode.SmoothTransformation)  # Qt.FastTransformation
 
                 video_img.save(imageSavePath)
                 # print(image.byteCount())
@@ -9877,7 +9903,8 @@ class DefterAnaPencere(QMainWindow):
 
                 if altyazi_ekle and videoNesne.altyaziVarMi:
                     videoNesne.altyazidan_yazi_nesnesi_ekle(parentNesne=resimNesne,
-                                                            pos_ms=pos_ms_donen, onceki_altyazi_sayisi=onceki_altyazi_sayisi,
+                                                            pos_ms=pos_ms_donen,
+                                                            onceki_altyazi_sayisi=onceki_altyazi_sayisi,
                                                             sonraki_altyazi_sayisi=sonraki_altyazi_sayisi)
 
                 self.lutfenBekleyinWidget.simdiki_deger_gir(resimSayisi)
@@ -11517,6 +11544,9 @@ def calistir():
     # "macintosh" var osx icin
     # linux icin "gtk"
     prog.setStyle("fusion")
+
+    # print(os.path.join(os.path.dirname(QtCore.__file__), "plugins"))
+    # prog.addLibraryPath(os.path.join(os.path.dirname(QtCore.__file__), "plugins", "imageformats"))
 
     loc = QLocale.system().name()
     print(loc)

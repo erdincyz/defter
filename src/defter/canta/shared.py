@@ -10,7 +10,7 @@ from unicodedata import normalize
 from re import sub
 from uuid import uuid4
 
-from PySide6.QtCore import Qt, QRectF, QSizeF
+from PySide6.QtCore import Qt, QRectF
 from PySide6.QtGui import QColor, QPixmap, QPainter, QBrush, QTransform
 from PySide6.QtWidgets import QGraphicsItem
 
@@ -58,7 +58,13 @@ def kim(kac_basamak):
 
 
 # ---------------------------------------------------------------------
-def slugify(value, allow_unicode=False):
+def slugify(s, allow=False):
+    # return "".join([x if x.isalnum() else "_" for x in s])
+    return "".join(x for x in s if (x.isalpha() or x in "._- "))
+
+
+# ---------------------------------------------------------------------
+def slugify_eski(value, allow_unicode=False):
     # veya = "".join([x if x.isalnum() else "_" for x in value])
     # return veya
     """

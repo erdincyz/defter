@@ -35,8 +35,10 @@ class Image(BaseItem):
 
         if os.path.isfile(filePath):
             self.filePathForDraw = filePath
+            self.hatali_resim = False
         else:
             self.filePathForDraw = ':icons/warning.png'
+            self.hatali_resim = True
 
         # self.pixmap = QPixmapCache.find(self.filePathForDraw, self.pixmap)
         # self.pixmap = QPixmapCache.find(self.filePathForDraw)
@@ -46,6 +48,10 @@ class Image(BaseItem):
         else:
             # self.pixmap = QPixmap()
             self.pixmap = QPixmap(self.filePathForDraw)
+            if self.pixmap.isNull():
+                self.filePathForDraw = ":icons/warning.png"
+                self.pixmap = QPixmap(self.filePathForDraw)
+                self.hatali_resim = True
 
         # else:
         #     self.pixmap = QPixmap()
@@ -286,7 +292,7 @@ class Image(BaseItem):
 
             self.bilgi_olcek = f"{rect.width() / self.orjinal_boyut.width():.2f} " \
                                f"- {rect.height() / self.orjinal_boyut.height():.2f}"
-            self.scene().parent().log(txt=self.bilgi_olcek, msecs=500)
+            self.scene().parent().log(txt=self.bilgi_olcek, msecs=500, toStatusBarOnly=True)
             # self.setPos(x, y)
             # self.update_painter_text_rect()
 
@@ -319,7 +325,8 @@ class Image(BaseItem):
         if not os.path.isfile(self.filePathForSave):
             self.filePathForDraw = ':icons/warning.png'
         else:
-            self.filePathForDraw = self.filePathForSave
+            if not self.filePathForDraw == ":icons/warning.png":
+                self.filePathForDraw = self.filePathForSave
 
         # pixmap = QPixmapCache.find(self.filePathForDraw)
         # if not pixmap:

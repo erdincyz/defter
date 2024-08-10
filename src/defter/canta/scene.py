@@ -8,11 +8,12 @@ __date__ = '3/27/16'
 
 import os
 import shutil
+from urllib.parse import urlparse
 
 from shiboken6 import Shiboken
-from PySide6.QtCore import Qt, QRectF, QPointF, Slot, Signal, QThread, QLineF, QObject
+from PySide6.QtCore import Qt, QRectF, QPointF, Slot, Signal, QThread, QLineF, QObject, QByteArray, QUrl
 from PySide6.QtGui import QPixmap, QPen, QImage, QUndoStack, QColor, QFont
-from PySide6.QtWidgets import QApplication, QGraphicsScene, QTableWidget
+from PySide6.QtWidgets import QApplication, QGraphicsScene
 from .arac import Arac
 from .nesneler.yuvarlakFircaBoyutu import YuvarlakFircaBoyutu
 from .treeView import TreeView
@@ -329,13 +330,15 @@ class Scene(QGraphicsScene):
         return os.path.join(imageDirectory,
                             "defterHtml-{}-{}-{}".format(self.parent().cModel.embededImageCounter,
                                                          shared.kim(kac_basamak=5),
-                                                         baseName))
+                                                         shared.slugify(baseName)))
 
     # ---------------------------------------------------------------------
     def get_unique_path_for_embeded_image(self, baseName):
         imageFolder = os.path.join(self.tempDirPath, "images")
         if not os.path.exists(imageFolder):
             os.makedirs(imageFolder)
+
+        baseName = shared.slugify(baseName)
 
         self.parent().cModel.embededImageCounter += 1
         imgPath = os.path.join(imageFolder,
@@ -361,6 +364,8 @@ class Scene(QGraphicsScene):
         videoPath = os.path.join(videoDirectory,
                                  "{}-{}".format(self.parent().cModel.embededVideoCounter, baseName))
 
+        baseName = shared.slugify(baseName)
+
         if os.path.exists(videoPath):
             # 2_1_basename seklinde basa ekler
             videoPath = self.get_unique_path_for_embeded_video(baseName)
@@ -375,6 +380,8 @@ class Scene(QGraphicsScene):
         self.parent().cModel.embededFileCounter += 1
         filePath = os.path.join(fileDirectory,
                                 "{}-{}".format(self.parent().cModel.embededFileCounter, baseName))
+
+        baseName = shared.slugify(baseName)
 
         if os.path.exists(filePath):
             # 2_1_basename seklinde basa ekler
@@ -598,7 +605,7 @@ class Scene(QGraphicsScene):
     def yazi_yazilmiyorsa_nesneyi_kaydir(self, x, y):
         devam = False
 
-        # TODO: basitlesitrilebilir , if hasattr(self.activeItem, 'tempTextItem'): ile belki..
+        # TODO: basitlestirilebilir , if hasattr(self.activeItem, 'tempTextItem'): ile belki..
         if self.activeItem:
             if self.activeItem.type() == shared.TEXT_ITEM_TYPE:
                 if not self.activeItem.hasFocus():
@@ -1090,7 +1097,7 @@ class Scene(QGraphicsScene):
             self.space_tusu_su_an_basili = True
 
         if event.key() == Qt.Key.Key_Delete \
-                or event.key() == Qt.Key_Backspace:
+                or event.key() == Qt.Key.Key_Backspace:
             if self.aktifArac == self.KalemAraci:
                 if self.pathItem:
                     if self.pathItem.path().elementCount() > 1:
@@ -1255,10 +1262,28 @@ class Scene(QGraphicsScene):
 
         # print(event.mimeData().formats())
         # print(event.mimeData().urls())
+        #
+        # for f in event.mimeData().formats():
+        #     print(f)
+        #
+        # with open("deneme", "w") as aa:
+        #     for f in event.mimeData().formats():
+        #         # print(f)
+        #         # print(event.mimeData().data(f))
+        #         # print("-----"*10)
+        #         aa.write(f)
+        #         aa.write("\n")
+        #         aa.write(str(event.mimeData().data(f)))
+        #         aa.write("\n")
+        #         aa.write("-----" * 10)
+        #         aa.write("\n")
 
         if isinstance(event.source(), YuzenWidget):
             event.source().parent().parent().yw_yuzdur(event.source())
+            event.accept()
+            return
 
+        # print(event.source())
         # if isinstance(event.source(), QTableWidget):
         if event.source():
             if event.source().objectName() == "aTW":  # altyaziTW
@@ -1277,56 +1302,70 @@ class Scene(QGraphicsScene):
                 cursor.clearSelection()
                 textItem.setTextCursor(cursor)
                 self.unite_with_scene_rect(textItem.sceneBoundingRect())
+                event.accept()
+                return
 
+        webImage = []
         if event.mimeData().hasUrls():
-
             # bu tek eleman, browserdan veya webviewdan drag drop edilirse link, ya da resimde link vardir href gibi..
             webUrl = []
-            imgPaths = []
+            yerelImgPaths = []
             defPaths = []
             otherFilePaths = []
             pos = event.scenePos()
+            kutuphaneden_mi = False
+
             for url in event.mimeData().urls():
                 # links.append(url.toLocalFile())
+                # print(url)
                 if url.isLocalFile():
                     filePath = url.toLocalFile()
-                    extension = os.path.splitext(filePath)[1][1:].lower()
+                    uzanti = os.path.splitext(filePath)[1][1:].lower()
                     # surukle birakla pdf doya olarak eklensin, resim olarak degil.
                     # pdf ayni zamanda supportedImageFormatList icinde de var,
                     # o listeden pdf silmiyoruz cunku resim ekle menusunden pdfi resim olarak secebilsin.
-                    if extension == "pdf":
+                    if uzanti == "pdf":
                         otherFilePaths.append(filePath)
+                        # pdf desteklenenler icinde de olabilir
                         continue
-                    if extension in self.parent().supportedImageFormatList:
-                        imgPaths.append(filePath)
-                    elif extension == "def":
+                    if uzanti in self.parent().supportedImageFormatList:
+                        yerelImgPaths.append(filePath)
+                    elif uzanti == "def":
                         defPaths.append(filePath)
                     else:
                         if not os.path.isdir(filePath):
                             otherFilePaths.append(filePath)
                 else:
-                    webUrl.append(url)
+                    parsedUrl = urlparse(url.toString())
+                    parsedUrl = parsedUrl._replace(params="")._replace(query="")._replace(fragment="").geturl()
+                    uzanti = os.path.splitext(parsedUrl)[1][1:].lower()
+                    # print(parsedUrl)
+                    # print(uzanti)
+                    if uzanti in self.parent().supportedImageFormatList:
+                        webImage.append(url)
+                    else:
+                        webUrl.append(url)
+                        self.parent().log(
+                                f"Could not load image: {url.toString()}\n"
+                                f"Could not find the direct link to the image or image type is unsupported.",
+                                7000, 2)
 
             # nesne kutuphanede drag drop edildi ise embeded isaretleyebilmek icin.
-            kutuphaneden_mi = False
             if event.source():
-                if event.source().objectName() == "kev":  # kutuphane_ekran_viewport
-                    kutuphaneden_mi = True
-                # mini web browserdan tek imaj tasiyinca
-                # secim yapip tasiyinca html tasiyor, onu mimedata.hasHtml() hallediyor.
-                elif event.source().objectName() == "webview":
+                if event.source().objectName() == "webview":
+                    # mini web browserdan tek imaj tasiyinca
+                    # secim yapip tasiyinca html tasiyor, onu mimedata.hasHtml() hallediyor.
+                    if yerelImgPaths:
+                        imageFilePath = yerelImgPaths[0]
 
-                    if imgPaths:
-                        imageFilePath = imgPaths[0]
-
-                        extension = os.path.splitext(imageFilePath)[1][1:]
+                        uzanti = os.path.splitext(imageFilePath)[1][1:]
                         # (zaten kullanmiyoruz asagidaki firefox ile ilgili kisimdaki gibi uzantilari ama)
                         # ayrica chrome da octet/streamden aldigimiz icin datayi, uzantiya gerek de olmayabilir.
                         # her hangi bir turde imaj dosyasi yine jpg olarak kaydedilemez mi acaba.
-                        if extension:
+                        if uzanti:
                             # This is for image imports from ggle search like pages.
                             # They dont have standart file name structure.
-                            if len(extension) > 4:
+                            if len(uzanti) > 4:
                                 basename = "image-from-web.jpg"
                             else:
                                 basename = os.path.basename(imageFilePath)
@@ -1361,42 +1400,93 @@ class Scene(QGraphicsScene):
                         if event.mimeData().hasFormat("text/uri-list"):
                             imageItem.originalSourceFilePath = str(event.mimeData().data("text/uri-list"),
                                                                    encoding='utf-8')
+                        event.accept()
                         return
 
-            if imgPaths:
+                elif event.source().objectName() == "kev":  # kutuphane_ekran_viewport
+                    kutuphaneden_mi = True
+
+            if yerelImgPaths:
                 if kutuphaneden_mi:
                     # kutuphaneden simdilik tek nesne tasiyoruz, bir cok nesn secilebilir olsada
-                    # act_add_multiple_images kullansak da imgPaths(cogul) ile, tek nesne ekliyoruz sahneye
+                    # act_add_multiple_images kullansak da yerelImgPaths(cogul) ile, tek nesne ekliyoruz sahneye
                     isEmbeded = self.parent().sahneKutuphane.suruklenmekte_olan_nesne.isEmbeded
-                    self.parent().act_add_multiple_images(pos, imgPaths, isEmbeded)
+                    self.parent().act_add_multiple_images(pos, yerelImgPaths, isEmbeded)
                 else:
-                    self.parent().act_add_multiple_images(pos, imgPaths)
+                    # web browserdan gelmiyor testi
+                    if not event.mimeData().hasFormat('text/x-moz-url'):
+                        self.parent().act_add_multiple_images(pos, yerelImgPaths)
+                    else:
+                        # windows web browserdan geliyor
+                        # burda windows temp klasore bir bmp kaydediyor ve sonra siliyor onu silinmeden kopyalayaip
+                        # kopyayi kullanacagiz
+                        image = QImage(yerelImgPaths[0])
+                        basename = f"web-{os.path.basename(yerelImgPaths[0])}.jpg"
+                        imageSavePath = self.get_unique_path_for_embeded_image(basename)
+                        image.save(imageSavePath)
+
+                        # liste veya tuple gonderiyoruz
+                        self.parent().act_add_multiple_images(pos, (imageSavePath,))
+
             elif defPaths:
                 self.parent().import_def_files_into_current_def_file(defPaths)
             elif otherFilePaths:
                 if kutuphaneden_mi:
                     # kutuphaneden simdilik tek nesne tasiyoruz, bir cok nesn secilebilir olsada
-                    # act_add_multiple_images kullansak da imgPaths(cogul) ile, tek nesne ekliyoruz sahneye
+                    # act_add_multiple_images kullansak da yerelImgPaths(cogul) ile, tek nesne ekliyoruz sahneye
                     isEmbeded = self.parent().sahneKutuphane.suruklenmekte_olan_nesne.isEmbeded
                     self.parent().act_ekle_bircok_dosya_nesnesi(pos, otherFilePaths, isEmbeded)
                 else:
                     self.parent().act_ekle_bircok_dosya_nesnesi(pos, otherFilePaths)
 
             elif webUrl:
-                # for webUrl in webUrlPaths:
-                textItem = Text(event.scenePos(), self.YaziAraci.yaziRengi, self.YaziAraci.arkaPlanRengi,
-                                QPen(self.YaziAraci.kalem),
-                                QFont(self.YaziAraci.yaziTipi))
-                textItem.set_document_url(self.tempDirPath)
-                textItem.setPlainText(webUrl[0].toString())
-                textItem.textItemFocusedOut.connect(lambda: self.is_text_item_empty(textItem))
-                self.parent().increase_zvalue(textItem)
-                undoRedo.undoableAddItem(self.undoStack, self.tr("drag && drop url as text"), self, textItem)
-                textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
-                cursor = textItem.textCursor()
-                cursor.clearSelection()
-                textItem.setTextCursor(cursor)
-                self.unite_with_scene_rect(textItem.sceneBoundingRect())
+                webUrlStr = webUrl[0].toString()
+                if webUrlStr.startswith("data:image"):
+                    parcalar = webUrlStr.split(";")
+                    uzanti = parcalar[0].split("/")[-1].lower()
+                    # data:image/jpg;base64,...
+                    if uzanti:  # uzanti yoksa resim bozuk oluyor, gerek yok
+                        if uzanti in self.parent().supportedImageFormatList:
+                            base64kisim = parcalar[1].split(",")[1]
+                            base64kisimBytes = base64kisim.encode()
+                            imageData = QByteArray.fromBase64(base64kisimBytes)
+                            image = QImage.fromData(imageData, uzanti)
+
+                            # print(mimeData.imageData())
+                            # print(image.byteCount())
+                            # imagePath = self.get_unique_path_for_embeded_image()
+                            imagePath = self.get_unique_path_for_embeded_image(f"image.{uzanti}")
+                            image.save(imagePath)
+                            # pixMap = QPixmap(imagePath)
+                            pixMap = QPixmap(image)
+                            rectf = QRectF(pixMap.rect())
+                            imageItem = Image(imagePath, event.scenePos(), rectf, pixMap, self.ResimAraci.yaziRengi,
+                                              self.ResimAraci.arkaPlanRengi,
+                                              QPen(self.ResimAraci.kalem), QFont(self.ResimAraci.yaziTipi))
+
+                            imageItem.isEmbeded = True
+
+                            self.parent().increase_zvalue(imageItem)
+                            undoRedo.undoableAddItem(self.undoStack, description=self.tr("drag && drop image"),
+                                                     scene=self,
+                                                     item=imageItem)
+                            imageItem.reload_image_after_scale()
+                            self.unite_with_scene_rect(imageItem.sceneBoundingRect())
+                else:
+                    # for webUrl in webUrlPaths:
+                    textItem = Text(event.scenePos(), self.YaziAraci.yaziRengi, self.YaziAraci.arkaPlanRengi,
+                                    QPen(self.YaziAraci.kalem),
+                                    QFont(self.YaziAraci.yaziTipi))
+                    textItem.set_document_url(self.tempDirPath)
+                    textItem.setPlainText(webUrlStr)
+                    textItem.textItemFocusedOut.connect(lambda: self.is_text_item_empty(textItem))
+                    self.parent().increase_zvalue(textItem)
+                    undoRedo.undoableAddItem(self.undoStack, self.tr("drag && drop url as text"), self, textItem)
+                    textItem.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+                    cursor = textItem.textCursor()
+                    cursor.clearSelection()
+                    textItem.setTextCursor(cursor)
+                    self.unite_with_scene_rect(textItem.sceneBoundingRect())
 
         elif event.mimeData().hasHtml():
             textItem = Text(event.scenePos(), self.YaziAraci.yaziRengi, self.YaziAraci.arkaPlanRengi,
@@ -1445,11 +1535,116 @@ class Scene(QGraphicsScene):
             textItem.setTextCursor(cursor)
             self.unite_with_scene_rect(textItem.sceneBoundingRect())
 
-        # print(event.mimeData().formats())
-        # for f in event.mimeData().formats():
-        #     print(f, event.mimeData().data(f))
+        elif event.mimeData().hasImage():
+            # if mimeData.imageData():
 
-        if event.mimeData().hasFormat("application/octet-stream"):
+            # pixMap = QPixmap(item["filePath"]).scaled(rect.size().toSize(), Qt.KeepAspectRatio)
+            # filePath = "/home/n00/CODE/pyCharm/Defter/imaaaj.jpg"
+
+            #  burda QImage icine almak lazimi, yoksa image none olabiliyor, if mimeData.imageData()
+            #  veya  if mimeData.hasImage() dogru dondursede QImage icine almazsak none oluyor image.
+            image = QImage(event.mimeData().imageData())
+            # print(mimeData.imageData())
+            # print(image.byteCount())
+            # imagePath = self.get_unique_path_for_embeded_image()
+            imagePath = self.get_unique_path_for_embeded_image("image.jpg")
+            image.save(imagePath)
+            # pixMap = QPixmap(imagePath)
+            pixMap = QPixmap(image)
+            rectf = QRectF(pixMap.rect())
+            imageItem = Image(imagePath, event.scenePos(), rectf, pixMap, self.ResimAraci.yaziRengi,
+                              self.ResimAraci.arkaPlanRengi,
+                              QPen(self.ResimAraci.kalem), QFont(self.ResimAraci.yaziTipi))
+
+            imageItem.isEmbeded = True
+
+            self.parent().increase_zvalue(imageItem)
+            undoRedo.undoableAddItem(self.undoStack, description=self.tr("drag && drop image"), scene=self,
+                                     item=imageItem)
+            imageItem.reload_image_after_scale()
+            self.unite_with_scene_rect(imageItem.sceneBoundingRect())
+
+            event.accept()
+            return
+
+        if event.mimeData().hasFormat("image/jpeg"):
+            imageURL = str(event.mimeData().data("text/plain"), encoding='utf-8')
+            basename = f"web-{os.path.basename(imageURL)}.jpg"
+
+            imageSavePath = self.get_unique_path_for_embeded_image(basename)
+            with open(imageSavePath, 'wb') as file:
+                file.write(event.mimeData().data("image/jpeg"))
+
+            pixMap = QPixmap(imageSavePath)
+            rectf = QRectF(pixMap.rect())
+            imageItem = Image(imageSavePath, event.scenePos(), rectf, pixMap, self.ResimAraci.yaziRengi,
+                              self.ResimAraci.arkaPlanRengi,
+                              QPen(self.ResimAraci.kalem), QFont(self.ResimAraci.yaziTipi))
+
+            imageItem.isEmbeded = True
+
+            self.parent().increase_zvalue(imageItem)
+            undoRedo.undoableAddItem(self.undoStack, description=self.tr("drag && drop image from browser"),
+                                     scene=self,
+                                     item=imageItem)
+            imageItem.reload_image_after_scale()
+            self.unite_with_scene_rect(imageItem.sceneBoundingRect())
+
+            imageItem.originalSourceFilePath = imageURL
+
+        elif event.mimeData().hasFormat("image/png"):
+            imageURL = str(event.mimeData().data("text/plain"), encoding='utf-8')
+            basename = f"web-{os.path.basename(imageURL)}.png"
+
+            imageSavePath = self.get_unique_path_for_embeded_image(basename)
+            with open(imageSavePath, 'wb') as file:
+                file.write(event.mimeData().data("image/png"))
+
+            pixMap = QPixmap(imageSavePath)
+            rectf = QRectF(pixMap.rect())
+            imageItem = Image(imageSavePath, event.scenePos(), rectf, pixMap, self.ResimAraci.yaziRengi,
+                              self.ResimAraci.arkaPlanRengi,
+                              QPen(self.ResimAraci.kalem), QFont(self.ResimAraci.yaziTipi))
+
+            imageItem.isEmbeded = True
+
+            self.parent().increase_zvalue(imageItem)
+            undoRedo.undoableAddItem(self.undoStack, description=self.tr("drag && drop image from browser"),
+                                     scene=self,
+                                     item=imageItem)
+            imageItem.reload_image_after_scale()
+            self.unite_with_scene_rect(imageItem.sceneBoundingRect())
+
+            imageItem.originalSourceFilePath = imageURL
+
+        elif event.mimeData().hasFormat("application/x-qt-image"):
+            data = event.mimeData().data("application/x-qt-image")
+            if data:
+                imageURL = str(event.mimeData().data("text/plain"), encoding='utf-8')
+                basename = f"web-{os.path.basename(imageURL)}.png"
+
+                imageSavePath = self.get_unique_path_for_embeded_image(basename)
+                with open(imageSavePath, 'wb') as file:
+                    file.write(data)
+
+                pixMap = QPixmap(imageSavePath)
+                rectf = QRectF(pixMap.rect())
+                imageItem = Image(imageSavePath, event.scenePos(), rectf, pixMap, self.ResimAraci.yaziRengi,
+                                  self.ResimAraci.arkaPlanRengi,
+                                  QPen(self.ResimAraci.kalem), QFont(self.ResimAraci.yaziTipi))
+
+                imageItem.isEmbeded = True
+
+                self.parent().increase_zvalue(imageItem)
+                undoRedo.undoableAddItem(self.undoStack, description=self.tr("drag && drop image from browser"),
+                                         scene=self,
+                                         item=imageItem)
+                imageItem.reload_image_after_scale()
+                self.unite_with_scene_rect(imageItem.sceneBoundingRect())
+
+                imageItem.originalSourceFilePath = imageURL
+
+        elif event.mimeData().hasFormat("application/octet-stream"):
             # image = QImage(event.mimeData().data("application/octet-stream"))
             image = QImage()
             image.loadFromData(event.mimeData().data("application/octet-stream"))
@@ -1457,15 +1652,15 @@ class Scene(QGraphicsScene):
             # print(image.byteCount())
             # print(event.mimeData().data("application/octet-stream"))
 
-            imageURL = str(event.mimeData().data("text/uri-list"), encoding='utf-8')
-            # extension = os.path.splitext(internetName)[1][1:].lower()
-            extension = os.path.splitext(imageURL)[1][1:]
+            imageURL = str(event.mimeData().data("text/plain"), encoding='utf-8')
+            # uzanti = os.path.splitext(internetName)[1][1:].lower()
+            uzanti = os.path.splitext(imageURL)[1][1:]
             # (zaten kullanmiyoruz asagidaki firefox ile ilgili kisimdaki gibi uzantilari ama)
             # ayrica chrome da octet/streamden aldigimiz icin datayi, uzantiya gerek de olmayabilir.
             # her hangi bir turde imaj dosyasi yine jpg olarak kaydedilemez mi acaba.
-            if extension:
+            if uzanti:
                 # This is for image imports from ggle search like pages. They dont have standart file name structure.
-                if len(extension) > 4:
+                if len(uzanti) > 4:
                     basename = "image-from-web.jpg"
                 else:
                     basename = os.path.basename(imageURL)
@@ -1495,72 +1690,20 @@ class Scene(QGraphicsScene):
             imageItem.reload_image_after_scale()
             self.unite_with_scene_rect(imageItem.sceneBoundingRect())
 
-            if event.mimeData().hasFormat("text/uri-list"):
-                imageItem.originalSourceFilePath = str(event.mimeData().data("text/uri-list"), encoding='utf-8')
+            imageItem.originalSourceFilePath = imageURL
 
-        # this is for firefox, with chrome we use "application/octet-stream" and there for, we do not need to download
-        # the image, but with firefox we need to download the dragged image.
-        # using "text/uri-list" would be more convenient but chrome has that mime format too and, when we drag an image
-        # from chrome, it will add that image twice. so...
-        # if event.mimeData().hasFormat("text/uri-list"):
-        #     print(str(event.mimeData().data("text/uri-list"), encoding='ascii'))
-        if event.mimeData().hasFormat("_NETSCAPE_URL"):
-            # image = QImage(event.mimeData().data("application/octet-stream"))
-            # pix = QPixmap()
-            # pix.loadFromData(event.mimeData().data("text/unicode"))
-            # image = QImage(pix)
-            # url = str(event.mimeData().data("_NETSCAPE_URL"), encoding='utf-8').split('\n')[0]
-            imageURL = str(event.mimeData().data("text/uri-list"), encoding='utf-8')
-            # str(QByteArray, encoding='ascii')
-
-            # bazi path temizleme islmeleri -basla
-            # from urllib.parse import urlparse
-            # parsed = urlparse(imageURL)
-            # par = parse.parse_qs(parsed.query)
-            # print(imageURL)
-            # print(parsed)
-            # cleanedPath = os.path.join(parsed.netloc, parsed.path)
-            # for ex: www.example.com/example.jpg?param=123
-            # cleanedPath = "%s://%s%s" % (parsed.scheme, parsed.netloc, parsed.path)
-            # print(cleanedPath)
-
-            extension = os.path.splitext(imageURL)[1][1:].lower()
-            # fakat chromeda ggledan drop edebiliyoruz..
-            # ayrica uzantisi olmayan imajlari da drop edebiliyoruz. cunku mime data da gomulu imaj bilgisi var
-            # ffoxta indirmek gerekiyor dosyayi.
-            # denemek lazim aslinda uzantisi olmayan imaj dosyasi adresi ile ffox icin.
-            # o zaman asagidaki kodun ilgili kismi tekrar aktive edilebilir.
-
-            # if extension:
-            #     # This is for image imports from ggle search like pages. They dont have standart file name structure.
-            #     if len(extension) > 4:
-            #         from urllib import parse
-            #         # imageURL = parse.unquote(imageURL)
-            #         # non-standart key : parse result below, needs a key with a ggle domain name.
-            #         # different countries have different ggle adresses. so this is cancelled for now.
-            #         yeniImageURL = parse.parse_qs(imageURL)["https://www.ggle.com/imgres?imgurl"]
-            #         if yeniImageURL:
-            #             imageURL = yeniImageURL
-            #             basename = os.path.basename(imageURL)
-            #         else:
-            #             basename = "image-from-web.jpg"
-            #
-            #     else:
-            #         basename = os.path.basename(imageURL)
-            # else:
-            #     basename = "image-from-web.jpg"
-
-            if extension not in self.parent().supportedImageFormatList:
-                self.parent().log(
-                    "Could not load image: Could not find the direct link to the image or image type is unsupported.",
-                    7000, 2)
-                return None
-
-            # print(mimeData.imageData())
-            # print(image.byteCount())
-
+        if webImage:
+            imageURL = webImage[0].toString(QUrl.ComponentFormattingOption.FullyEncoded)
+            # uzanti = os.path.splitext(imageURL)[1][1:].lower()
+            # if uzanti not in self.parent().supportedImageFormatList:
+            #     self.parent().log(
+            #         f"Could not load image: {imageURL}\n"
+            #         f"Could not find the direct link to the image or image type is unsupported.",
+            #         7000, 2)
+            #     return None
             imageSavePath = self.get_unique_path_for_embeded_image(os.path.basename(imageURL))
-
+            # TODO: bunu thread havuzu yapmak lazım,
+            # bir resim indirmesi bitmeden digeri baslatilirsa isler karisabilir...
             self.dThread = QThread()
             self.dWorker = DownloadWorker()
             self.dWorker.moveToThread(self.dThread)
@@ -1571,38 +1714,94 @@ class Scene(QGraphicsScene):
             self.dThread.start()
             self.dWorker.downloadWithThread.emit(imageURL, imageSavePath, event.scenePos())
 
-        # TODO: this maybe unnecessary.
-        if event.mimeData().hasImage():
-            # if mimeData.imageData():
+        if webUrl:
+            imageURL = webUrl[0].url()
+            uzanti = os.path.splitext(imageURL)[1][1:].lower()
+            if uzanti not in self.parent().supportedImageFormatList:
+                self.parent().log(
+                    f"Could not load image: {imageURL}\n"
+                    f"Could not find the direct link to the image or image type is unsupported.",
+                    7000, 2)
+                return None
+            imageSavePath = self.get_unique_path_for_embeded_image(os.path.basename(imageURL))
+            # TODO: bunu thread havuzu yapmak lazım,
+            # bir resim indirmesi bitmeden digeri baslatilirsa isler karisabilir...
+            self.dThread = QThread()
+            self.dWorker = DownloadWorker()
+            self.dWorker.moveToThread(self.dThread)
+            self.dWorker.finished.connect(self.dThread_finished)
+            self.dWorker.failed.connect(self.dthread_clean)
+            self.dWorker.log.connect(self.parent().log)
 
-            # pixMap = QPixmap(item["filePath"]).scaled(rect.size().toSize(), Qt.KeepAspectRatio)
-            # filePath = "/home/n00/CODE/pyCharm/Defter/imaaaj.jpg"
+            self.dThread.start()
+            self.dWorker.downloadWithThread.emit(imageURL, imageSavePath, event.scenePos())
 
-            #  burda QImage icine almak lazimi, yoksa image none olabiliyor, if mimeData.imageData()
-            #  veya  if mimeData.hasImage() dogru dondursede QImage icine almazsak none oluyor image.
-            image = QImage(event.mimeData().imageData())
-            # print(mimeData.imageData())
-            # print(image.byteCount())
-            # imagePath = self.get_unique_path_for_embeded_image()
-            imagePath = self.get_unique_path_for_embeded_image("image.jpg")
-            image.save(imagePath)
-            # pixMap = QPixmap(imagePath)
-            pixMap = QPixmap(image)
-            rectf = QRectF(pixMap.rect())
-            imageItem = Image(imagePath, event.scenePos(), rectf, pixMap, self.ResimAraci.yaziRengi,
-                              self.ResimAraci.arkaPlanRengi,
-                              QPen(self.ResimAraci.kalem), QFont(self.ResimAraci.yaziTipi))
 
-            imageItem.isEmbeded = True
-
-            self.parent().increase_zvalue(imageItem)
-            undoRedo.undoableAddItem(self.undoStack, description=self.tr("drag && drop image"), scene=self,
-                                     item=imageItem)
-            imageItem.reload_image_after_scale()
-            self.unite_with_scene_rect(imageItem.sceneBoundingRect())
+        # # this is for firefox, with linux chrome we use "application/octet-stream" and  we do not need to download
+        # # the image, but with firefox we need to download the dragged image.
+        # # using "text/uri-list" would be more convenient but chrome has that mime format too and, when we drag an image
+        # # from chrome, it will add that image twice. so...
+        # # if event.mimeData().hasFormat("text/uri-list"):
+        # #     print(str(event.mimeData().data("text/uri-list"), encoding='ascii'))
+        # if event.mimeData().hasFormat("_NETSCAPE_URL"):
+        #     # image = QImage(event.mimeData().data("application/octet-stream"))
+        #     # pix = QPixmap()
+        #     # pix.loadFromData(event.mimeData().data("text/unicode"))
+        #     # image = QImage(pix)
+        #     # url = str(event.mimeData().data("_NETSCAPE_URL"), encoding='utf-8').split('\n')[0]
+        #     imageURL = str(event.mimeData().data("text/uri-list"), encoding='utf-8')
+        #     # str(QByteArray, encoding='ascii')
+        #
+        #     uzanti = os.path.splitext(imageURL)[1][1:].lower()
+        #     # fakat chromeda ggledan drop edebiliyoruz..
+        #     # ayrica uzantisi olmayan imajlari da drop edebiliyoruz. cunku mime data da gomulu imaj bilgisi var
+        #     # ffoxta indirmek gerekiyor dosyayi.
+        #     # denemek lazim aslinda uzantisi olmayan imaj dosyasi adresi ile ffox icin.
+        #     # o zaman asagidaki kodun ilgili kismi tekrar aktive edilebilir.
+        #
+        #     # if uzanti:
+        #     #     # This is for image imports from ggle search like pages. They dont have standart file name structure.
+        #     #     if len(uzanti) > 4:
+        #     #         from urllib import parse
+        #     #         # imageURL = parse.unquote(imageURL)
+        #     #         # non-standart key : parse result below, needs a key with a ggle domain name.
+        #     #         # different countries have different ggle adresses. so this is cancelled for now.
+        #     #         yeniImageURL = parse.parse_qs(imageURL)["https://www.ggle.com/imgres?imgurl"]
+        #     #         if yeniImageURL:
+        #     #             imageURL = yeniImageURL
+        #     #             basename = os.path.basename(imageURL)
+        #     #         else:
+        #     #             basename = "image-from-web.jpg"
+        #     #
+        #     #     else:
+        #     #         basename = os.path.basename(imageURL)
+        #     # else:
+        #     #     basename = "image-from-web.jpg"
+        #
+        #     if uzanti not in self.parent().supportedImageFormatList:
+        #         self.parent().log(
+        #             f"Could not load image: {imageURL}\n"
+        #             f"Could not find the direct link to the image or image type is unsupported.",
+        #             7000, 2)
+        #         return None
+        #
+        #     # print(mimeData.imageData())
+        #     # print(image.byteCount())
+        #
+        #     imageSavePath = self.get_unique_path_for_embeded_image(os.path.basename(imageURL))
+        #     # TODO: bunu thread havuzu yapmak lazım,
+        #     # bir resim indirmesi bitmeden digeri baslatilirsa isler karisabilir...
+        #     self.dThread = QThread()
+        #     self.dWorker = DownloadWorker()
+        #     self.dWorker.moveToThread(self.dThread)
+        #     self.dWorker.finished.connect(self.dThread_finished)
+        #     self.dWorker.failed.connect(self.dthread_clean)
+        #     self.dWorker.log.connect(self.parent().log)
+        #
+        #     self.dThread.start()
+        #     self.dWorker.downloadWithThread.emit(imageURL, imageSavePath, event.scenePos())
 
         event.accept()
-
         # super(Scene, self).dropEvent(event)
 
     # ---------------------------------------------------------------------
@@ -1633,7 +1832,7 @@ class Scene(QGraphicsScene):
 
     # ---------------------------------------------------------------------
     @Slot(QObject)
-    def dthread_clean(self, worker):
+    def dthread_clean(self, worker=None):
         self.dThread.quit()
         self.dThread.deleteLater()
         self.dWorker.deleteLater()

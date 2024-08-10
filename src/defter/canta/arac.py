@@ -67,7 +67,7 @@ class Arac(object):
                           Qt.PenCapStyle.FlatCap,
                           Qt.PenJoinStyle.RoundJoin)
 
-        self.arkaPlanRengi = QColor(71, 177, 213)
+        self.arkaPlanRengi = QColor(225, 225, 225)
         self.yaziRengi = QColor(0, 0, 0)
         # asagida property olarak var
         # self.cizgiRengi = kalem.color()
