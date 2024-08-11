@@ -36,7 +36,7 @@ from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, Q
 
 from PySide6.QtCore import (Qt, QRectF, QSettings, QPoint, Slot, QSizeF, QSize, QFile, QSaveFile,
                             QIODevice, QDataStream, QMimeData, QByteArray, QPointF, qCompress, qUncompress, QLocale,
-                            QThread, QUrl, QLineF, QObject, QRect, QTimer, QDir, QTranslator, QTime, Signal)
+                            QThread, QUrl, QLineF, QObject, QDir, QTranslator, QTime, Signal)
 
 from PySide6.QtWebEngineCore import QWebEngineSettings  # , QWebEngineProfile, QWebEnginePage
 from PySide6.QtWebEngineWidgets import QWebEngineView
@@ -93,12 +93,9 @@ from .canta.with_signals_updates_blocked import (signals_blocked_and_updates_dis
 
 from .canta import undoRedoFonksiyonlar as undoRedo
 
-from .canta.ekranGoruntusu.secilen_bolge_comp_manager_on import TamEkranWidget_CM_On
-from .canta.ekranGoruntusu.secilen_bolge_comp_manager_off import TamEkranWidget_CM_Off
-
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.96.7"
+VERSION = "0.96.8"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -4950,8 +4947,6 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionNesneleriDagitDikeyde,
                                           self.actionNesneleriDagitYatayda,
                                           self.actionNesneleriDagit,
-                                          # utilities menu
-                                          self.actionSecimEkranGoruntusuAlCmOn
                                           ))
 
     # ---------------------------------------------------------------------
@@ -5759,33 +5754,9 @@ class DefterAnaPencere(QMainWindow):
         self.actionAlwaysOnTopToggle.triggered.connect(self.act_toggle_always_on_top)
         self.actionAlwaysOnTopToggle.setToolTip(self.tr("If checked on, Defter will stay on top of other windows."))
 
-        ekranGoruntusuMenuPB = QPushButton(self.utilitiesToolBar)
-        ekranGoruntusuMenuPB.setFlat(True)
-        ekranGoruntusuMenuPB.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
-        ekranGoruntusuMenuPB.setText(self.tr("ScreenShot"))
-        ekranGoruntusuMenu = QMenu(self.utilitiesToolBar)
-        ekranGoruntusuMenu.aboutToShow.connect(self.on_ekranGoruntusuMenu_about_to_show)
-        ekranGoruntusuMenuPB.setMenu(ekranGoruntusuMenu)
-
-        self.actionSecimEkranGoruntusuAlCmOn = Action(self.tr("Selected Area (Comp On)"), self.utilitiesToolBar)
-        self.actionSecimEkranGoruntusuAlCmOn.setShortcut(QKeySequence(Qt.Key.Key_Print))
-        self.actionSecimEkranGoruntusuAlCmOn.triggered.connect(self.act_ekran_goruntusu_secim_cm_on)
-
-        self.actionSecimEkranGoruntusuAlCmOff = QAction(self.tr("Selected Area (Comp Off)"), self.utilitiesToolBar)
-        # self.actionSecimEkranGoruntusuAlCmOff.setShortcut(QKeySequence(Qt.Key_Print))
-        self.actionSecimEkranGoruntusuAlCmOff.triggered.connect(self.act_ekran_goruntusu_secim_cm_off)
-
-        self.actionScreenshotFullscreen = QAction(self.tr("Fullscreen"), ekranGoruntusuMenu)
-        self.actionScreenshotFullscreen.triggered.connect(self.act_ekran_goruntusu_tam_ekran)
-
-        ekranGoruntusuMenu.addActions((self.actionSecimEkranGoruntusuAlCmOn,
-                                       self.actionSecimEkranGoruntusuAlCmOff,
-                                       self.actionScreenshotFullscreen))
-
         spacerWidget = QWidget(self.utilitiesToolBar)
         spacerWidget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.utilitiesToolBar.addWidget(spacerWidget)
-        self.utilitiesToolBar.addWidget(ekranGoruntusuMenuPB)
         self.utilitiesToolBar.addAction(self.actionAlwaysOnTopToggle)
 
         self.addToolBar(self.utilitiesToolBar)
@@ -11089,147 +11060,6 @@ class DefterAnaPencere(QMainWindow):
 
             # if self.printer.outputFileName():
             #     self.preview.print()
-
-    # ---------------------------------------------------------------------
-    @Slot()
-    def act_ekran_goruntusu_tam_ekran(self):
-        self.hide()
-        QApplication.processEvents()
-        QTimer.singleShot(10, lambda: self.ekran_goruntusu_cek(QApplication.primaryScreen().geometry()))
-        # self.ekran_goruntusu_cek(QApplication.primaryScreen().geometry())
-        self.show()
-
-    # ---------------------------------------------------------------------
-    @Slot()
-    def act_ekran_goruntusu_secim_cm_on(self):
-        self.hide()
-        self.shot_selection = TamEkranWidget_CM_On()
-        QApplication.setOverrideCursor(Qt.CursorShape.CrossCursor)
-        self.shot_selection.rubberBandReleased.connect(self.bekle_ekran_goruntusu_cek)
-        self.shot_selection.esc_key_pressed.connect(self.kapat_ekran_goruntusu)
-        # self.shot_selection.activateWindow()
-        # self.shot_selection.raise_()
-        # self.shot_selection.showFullScreen()
-
-    # ---------------------------------------------------------------------
-    @Slot()
-    def act_ekran_goruntusu_secim_cm_off(self):
-        self.hide()
-        self.shot_selection = TamEkranWidget_CM_Off()
-        QApplication.setOverrideCursor(Qt.CursorShape.CrossCursor)
-        self.shot_selection.rubberBandReleased.connect(self.bekle_ekran_goruntusu_cek)
-        self.shot_selection.esc_key_pressed.connect(self.kapat_ekran_goruntusu)
-        # self.shot_selection.activateWindow()
-        # self.shot_selection.raise_()
-        # self.shot_selection.showFullScreen()
-
-    # ---------------------------------------------------------------------
-    @Slot(QRect)
-    def bekle_ekran_goruntusu_cek(self, geo):
-        # time.sleep(0.2)
-        # QTimer.singleShot(300, lambda: self.ekran_goruntusu_cek(geo))
-        if not geo.isEmpty():
-            self.ekran_goruntusu_cek(geo)
-
-        # QTimer.singleShot(10, lambda geo=geo: self.ekran_goruntusu_cek(geo))
-        self.kapat_ekran_goruntusu()
-
-    # ---------------------------------------------------------------------
-    @Slot()
-    def kapat_ekran_goruntusu(self):
-        self.shot_selection.close()
-        self.shot_selection.deleteLater()
-        self.shot_selection = None
-        # del self.shot_selection
-        QApplication.restoreOverrideCursor()
-        self.show()
-
-    # ---------------------------------------------------------------------
-    def ekran_goruntusu_cek(self, geo):
-
-        geo = geo.adjusted(2, 2, -2, -2)
-
-        x, y, w, h = geo.x(), geo.y(), geo.width(), geo.height()
-
-        # iki ekran varsa
-        # QPixmap screenshot = QPixmap::grabWindow(desktop->winId(), 0, 0, desktop->width(), desktop->height());
-
-        # self.originalPixmap = QPixmap.grabWindow(QApplication.desktop().winId(), *self.get_screenshot_frame())
-        # self.originalPixmap = QPixmap.grabWindow(QApplication.desktop().winId(), x, y, w, h)
-
-        # TODO: pixmap grabwindow deprecated
-        # self.originalPixmap = QPixmap.grabWindow(QApplication.desktop().winId(), x, y, w, h)
-        # self.originalPixmap = QScreen.grabWindow(QApplication.desktop().winId(), x, y, w, h)
-
-        screen = QApplication.primaryScreen()
-        if screen:
-            originalPixmap = screen.grabWindow(0, x, y, w, h)
-
-            # sahneye direk yerlestir
-            if not originalPixmap.isNull():
-
-                # sahneye direk yerlestir
-                # imageSavePath = self.cScene.get_unique_path_for_embeded_image("screenshot.jpg")
-                # fmt = "jpg"
-                # originalPixmap.save(imageSavePath, fmt, quality=100)
-                # 
-                # self.log("Screenshot saved as: {}".format(imageSavePath))
-                # 
-                # rect = QRectF(originalPixmap.rect())
-                # imageItem = Image(imageSavePath, self.get_mouse_scene_pos(), rect, 
-                #                   self.cScene.ResimAraci.yaziRengi, 
-                #                   self.cScene.ResimAraci.arkaPlanRengi,
-                #                   self.cScene.ResimAraci.kalem, 
-                #                   self.cScene.ResimAraci.yaziTipi)
-                # 
-                # imageItem.isEmbeded = True
-                # 
-                # self.increase_zvalue(imageItem)
-                # undoRedo.undoableAddItem(self.cScene.undoStack, self.tr("_screenshot"), self.cScene, imageItem)
-                # imageItem.reload_image_after_scale()
-                # self.cScene.unite_with_scene_rect(imageItem.sceneBoundingRect())
-
-                # panoya kopyala
-                eskiMimeData = self.clipboard.mimeData()
-
-                mimeData = QMimeData()
-                if eskiMimeData.data('scene/items'):
-                    mimeData.setData('scene/items', eskiMimeData.data('scene/items'))
-                if eskiMimeData.hasText():
-                    mimeData.setText(eskiMimeData.text())
-                if eskiMimeData.hasHtml():
-                    mimeData.setHtml(eskiMimeData.html())
-                if eskiMimeData.hasUrls():
-                    mimeData.setUrls(eskiMimeData.urls())
-                if eskiMimeData.hasColor():
-                    mimeData.setColorData(eskiMimeData.colorData())
-                # if eskiMimeData.hasImage():
-                #     mimeData.setImageData(eskiMimeData.imageData())
-
-                mimeData.setImageData(originalPixmap.toImage())
-                self.clipboard.setMimeData(mimeData)
-
-    # ---------------------------------------------------------------------
-    @Slot()
-    def on_ekranGoruntusuMenu_about_to_show(self):
-        pass
-
-        # if platform.system() == "Linux":
-        #     from PySide2.QtX11Extras import QX11Info
-        # 
-        #     try:
-        #         if QX11Info.isCompositingManagerRunning():
-        #             self.actionSecimEkranGoruntusuAlCmOn.setEnabled(True)
-        #             self.actionSecimEkranGoruntusuAlCmOff.setEnabled(False)
-        # 
-        #         else:
-        #             self.actionSecimEkranGoruntusuAlCmOn.setEnabled(False)
-        #             self.actionSecimEkranGoruntusuAlCmOff.setEnabled(True)
-        # 
-        #             self.log(self.tr("You should install or enable a compositing manager "
-        #                      "to be able to use disabled options in screenshot menu!"))
-        #     except AttributeError:
-        #         pass
 
     # ---------------------------------------------------------------------
     def arsivleme_programi_adres_belirle(self):

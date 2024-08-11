@@ -1306,9 +1306,9 @@ class Scene(QGraphicsScene):
                 return
 
         webImage = []
+        webUrl = []
         if event.mimeData().hasUrls():
             # bu tek eleman, browserdan veya webviewdan drag drop edilirse link, ya da resimde link vardir href gibi..
-            webUrl = []
             yerelImgPaths = []
             defPaths = []
             otherFilePaths = []
@@ -1346,9 +1346,9 @@ class Scene(QGraphicsScene):
                     else:
                         webUrl.append(url)
                         self.parent().log(
-                                f"Could not load image: {url.toString()}\n"
-                                f"Could not find the direct link to the image or image type is unsupported.",
-                                7000, 2)
+                            f"Could not load image: {url.toString()}\n"
+                            f"Could not find the direct link to the image or image type is unsupported.",
+                            7000, 2)
 
             # nesne kutuphanede drag drop edildi ise embeded isaretleyebilmek icin.
             if event.source():
@@ -1735,7 +1735,6 @@ class Scene(QGraphicsScene):
 
             self.dThread.start()
             self.dWorker.downloadWithThread.emit(imageURL, imageSavePath, event.scenePos())
-
 
         # # this is for firefox, with linux chrome we use "application/octet-stream" and  we do not need to download
         # # the image, but with firefox we need to download the dragged image.
