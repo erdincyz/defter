@@ -95,7 +95,7 @@ from .canta import undoRedoFonksiyonlar as undoRedo
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.96.8"
+VERSION = "0.96.9"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -11089,18 +11089,19 @@ class DefterAnaPencere(QMainWindow):
     # ---------------------------------------------------------------------
     def ziple(self, program_adres, zip_dosya_tam_adres, kaynak_klasor_tam_adres):
         eski_dir = os.getcwd()
+        program_adi = os.path.basename(program_adres)
         try:
-            if program_adres.startswith("7"):
+            if program_adi.startswith("7"):
                 subprocess.call(
                     [program_adres, "u", zip_dosya_tam_adres, kaynak_klasor_tam_adres + os.sep + "*", "-mx0", "-tzip"],
                     stdout=subprocess.DEVNULL)  # stderr=subprocess.DEVNULL
 
-            elif program_adres.startswith("z"):
+            elif program_adi.startswith("z"):
                 # subprocess.call([program_adres, "-FS0ryo", zip_dosya_tam_adres, "./*"])
                 subprocess.call([program_adres, "-FS0ryoq", zip_dosya_tam_adres, "." + os.sep + "*"])
                 os.chdir(eski_dir)
 
-            elif program_adres.startswith("_"):
+            elif program_adi.startswith("_"):
                 self._python_zipfile_ile_ziple(zip_dosya_tam_adres, kaynak_klasor_tam_adres)
 
         except Exception as e:
