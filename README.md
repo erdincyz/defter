@@ -30,8 +30,15 @@ kullanma**MA**nız tavsiye edilir.
 **Bilinen hataları ve eklenmek niyetinde olunan özellikleri (şu an güncel olmamakla beraber)** bu sayfadaki *
 *[Issues](https://github.com/erdincyz/defter/issues)** kısmından takip edebilirsiniz.
 
-### KURULUM
+---
 
+### Windows için Alternatif Kurulum Dosyası
+
+[Buradan](https://github.com/erdincyz/defter/releases/tag/v0.97.1-rc) "defter-installer.exe" dosyasını indirip kurmayı deneyebilirsiniz.
+
+---
+
+### KURULUM
 Sisteminizde Python 3 yüklü olması gerekiyor.
 
 Python 3' ü [https://www.python.org/downloads/](https://www.python.org/downloads/) adresinden indirip kurabilirsiniz.
@@ -69,7 +76,11 @@ python -m pip uninstall defter-argekod
 
 komutlarını kullanabilirsiniz.
 
+---
+
 ### [YARDIM SAYFALARI](https://github.com/erdincyz/defter/wiki)
+
+---
 
 ### Dosya Yapısı:
 
@@ -79,6 +90,8 @@ Dosyaları bir zip dosyası gibi açıp içindeki gömülü diger dosyalara eri�
 Ayrıca her dosya kaydedildiğinde, belgedeki her sayfa için bir html dosyası da def içine kaydedilir.
 Böylelikle bu yazılıma ihtiyaç duymadan, def dosyasını bir klasore açıp içindeki html dosyalarını web gezgininde açarak
 da belgenize erişebilirsiniz.
+
+---
 
 ### İpuçları
 
