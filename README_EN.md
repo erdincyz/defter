@@ -33,6 +33,14 @@ without trying it thoroughly.)
 You can follow the known bugs and features that are intended to be added (although not up-to-date at the moment) from
 the [Issues](https://github.com/erdincyz/defter/issues) section on this page.
 
+---
+
+### Alternative Installation File for Windows
+
+You can try downloading and installing the "defter-installer.exe" file [from here](https://github.com/erdincyz/defter/releases/tag/v0.97.1-rc).
+
+---
+
 ### INSTALLING
 
 It works on Python3.
@@ -65,6 +73,7 @@ Also, if you wish, you can uninstall it with
 python -m pip uninstall defter-argekod
 
 ```
+---
 
 ### File Structure:
 
@@ -72,6 +81,8 @@ These are zip files with the extension changed to "def" and a compression ratio 
 containers. You can open them like a zip file and access other files archived in it. Additionally, each time a file is
 saved, an html file for each page in the document is also saved in def. You can also access your document by extracting
 the def file in a folder and opening the html files in it in the web browser.
+
+---
 
 ### Tips:
 
