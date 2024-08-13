@@ -98,7 +98,7 @@ from .canta import undoRedoFonksiyonlar as undoRedo
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.97.0"
+VERSION = "0.97.1"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -11372,22 +11372,21 @@ class DefterAnaPencere(QMainWindow):
 
 # ---------------------------------------------------------------------
 def calistir():
-    prog = QApplication(sys.argv)
 
     # winde gorev cubugunda ikon gosterebilmek icin
     try:
-        from ctypes import windll  # Only exists on Windows.
+        from ctypes import windll
         myappid = f'com.argekod.defter.{VERSION}'
         windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-        prog.setWindowIcon(QIcon(":icons/defter-logo.ico"))
     except ImportError:
-        # pass
-        prog.setWindowIcon(QIcon(":icons/defter-logo.png"))
+        pass
+
+    prog = QApplication(sys.argv)
+    prog.setWindowIcon(QIcon(":icons/defter-logo.png"))
 
     # if > win7 icin fusion, win 10 icin bakilabilir belki win kalabilir
     # "macintosh" var osx icin
     # linux icin "gtk"
-
 
     prog.setStyle("fusion")
 
