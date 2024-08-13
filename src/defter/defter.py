@@ -2804,7 +2804,7 @@ class DefterAnaPencere(QMainWindow):
                 shutil.unpack_archive(zipFilePath, tempDirPath, "zip")
             except Exception as e:
                 self.lutfen_bekleyin_gizle()
-                hata = self.tr('Could not import file  --   "{0:s}"\n{1:s}').format(zipFilePath, str(e))
+                hata = self.tr('Could not open file  --   "{0:s}"\n{1:s}').format(zipFilePath, str(e))
                 self.log(hata, 5000, 3, dialog=True)
                 return False
 
@@ -11415,7 +11415,12 @@ def calistir():
     # Guncelleme: Şimdi pencereyi once de olusturabiliyoruz..
     # o yuzden iptal ettik alt satiri,
     # TODO: su anda yine bozuk :)
+
     pencere = DefterAnaPencere()
+
+    for zipFilePath in sys.argv[1:]:
+        if zipFilePath.endswith(".def"):
+            pencere.act_open_def_file(zipFilePath)
 
     # pencere.show()
     # burda pencere.show() demiyoruz, DefterAnaPencere().__init__ icinde show var.
