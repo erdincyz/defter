@@ -90,13 +90,14 @@ kaydedebiliyor.
 (Arşiv güncelleme özelliği: Sadece eklenen veya değişen dosyaları tekrar diske yazıyor. Belgeyi her kaydettiğimizde
 belgenin içerdiği tüm dosyaları tekrar diske yazmaktan kurtarıyor. )
 
-#### Daha kolay ekran görüntüsü alabilmek için:
+#### Ekran görüntüsü alıp deftere yapıştırabilirsiniz:
 
-Defter ile ekran görüntüsü alabilirsiniz, ama sisteminize bu iş içi yazılmış başka bir program varsa
-onu kullanmanız önerilir.
+Defter panodan görüntü yapıştırmayı destekler. Aşağıdaki yöntemler veya tercih edeceğiniz başka yöntemler ile 
+ekranınızdan dilediğiniz bir alanın görüntüsünü panoya kopyalayıp Deftere yapıştırabilirsiniz.
+
 Mesela linuxta aşagıdaki komutu sistem çapında bir kısayola atayıp kullanabilirsiniz.
 
-Aşağıdaki komut ekran görüntüsünü panoya kopyalar.
+Aşağıdaki komut secilen alanın ekran görüntüsünü panoya kopyalar.
 
 #### Linux için:
 
@@ -121,8 +122,5 @@ Aşağıdaki kısayolu kullanabilirsiniz.
 ```
 Command + Shift + 4
 ```
-
-Defter panodan görüntü yapıştırmayı destekler. Yukardaki yöntemler veya tercih edeceğiniz başka yöntemler ile ekran
-görüntüsünü panoya kopyalayıp deftere yapıştırabilirsiniz.
 
 ### Teşekkürler.

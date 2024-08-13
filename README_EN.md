@@ -84,11 +84,13 @@ being written to the disk again.)
 
 #### To take screenshots more easily:
 
-You can take screenshots with Defter, but if there is another software for this purpose on your system, it is
-recommended that you use it. For example, in Linux, you can assign the following command to a system-wide shortcut and
+Defter supports pasting images from the clipboard. You can copy any area of ​​your screen to the clipboard 
+and paste it into Defter using the methods below or any other method you prefer.
+
+For example, in Linux, you can assign the following command to a system-wide shortcut and
 use it for taking screenshots to clipboard.
 
-The following command takes screenshot and copies it to the clipboard.
+The following command copies the screenshot of the selected area to the clipboard.
 
 #### For Linux:
 
@@ -114,7 +116,5 @@ You can use this shortcut.
 Command + Shift + 4
 ```
 
-Defter supports pasting images from the clipboard. You can copy the screenshot to the clipboard and paste it into the
-Defter using the methods above or any other method you prefer.
 
 ### Thanks.

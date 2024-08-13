@@ -1,6 +1,7 @@
 <RCC>
     <qresource>
         <file>icons/defter-logo.png</file>
+        <file>icons/defter-logo.ico</file>
         <file>icons/reopen-last-closed-tab.png</file>
         <file>icons/delete.png</file>
         <file>icons/parent.png</file>
