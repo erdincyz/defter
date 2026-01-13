@@ -5,10 +5,10 @@ __project_name__ = 'Defter'
 __author__ = 'Erdinç Yılmaz'
 __date__ = '20/Aug/2016'
 
+from urllib.request import Request, urlopen
 from urllib.error import HTTPError
-# from urllib.request import urlretrieve
-from urllib.request import URLopener
-from PySide6.QtCore import QObject, Slot, Signal, QPointF, QPoint, QRunnable
+from PySide6.QtCore import QObject, Signal, QRunnable, QPointF, Slot
+
 
 # from PySide6.QtGui import QIcon
 
@@ -41,42 +41,69 @@ from PySide6.QtCore import QObject, Slot, Signal, QPointF, QPoint, QRunnable
 #             "olmadi"
 
 
-########################################################################
-class DownloadWorker(QObject):
-    downloadWithThread = Signal(str, str, QPointF)
-
-    finished = Signal(str, str, QPointF, QObject)
-    failed = Signal(QObject)
+class WorkerSignals(QObject):
+    """
+    QRunnable sinyal gönderemediği için sinyalleri taşıyan yardımcı sınıf.
+    """
+    finished = Signal(str, str, QPointF, object)  # url, path, pos, targetItem
+    failed = Signal(str)
     log = Signal(str, int, int)
     percentage = Signal(int)
 
-    # ---------------------------------------------------------------------
-    def __init__(self, parent=None):
-        super(DownloadWorker, self).__init__(parent)
 
-        self.downloadWithThread.connect(self.download)
+class DownloadWorker(QRunnable):
+    """
+    QRunnable tabanlı Worker. QThreadPool tarafından yönetilir.
+    """
 
-    # ---------------------------------------------------------------------
-    @Slot(str, str, QPointF)
-    def download(self, url, imageSavePath, scenePos):
+    def __init__(self, url, imageSavePath, scenePos, targetItem=None):
+        super(DownloadWorker, self).__init__()
+        self.url = url
+        self.imageSavePath = imageSavePath
+        self.scenePos = scenePos
+        # Hedef nesneyi (targetItem) burada saklıyoruz, böylece indirme bitince
+        # 'activeItem' değişmiş olsa bile doğru nesneyi bulabiliriz.
+        self.targetItem = targetItem
+        self.signals = WorkerSignals()
 
+    @Slot()
+    def run(self):
         try:
-            self.log.emit("Downloading image from: {}".format(url), 5000, 0)
-            # urlretrieve(url, imageSavePath, reporthook=self.report)
-            opener = URLopener()
-            opener.addheader('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1')
-            # filename, headers = opener.retrieve(url, imageSavePath, reporthook=self.report)
-            opener.retrieve(url, imageSavePath, reporthook=self.report)
+            self.signals.log.emit(f"Downloading image from: {self.url}", 5000, 0)
 
-            self.log.emit("Image succesfully downloaded", 5000, 1)
-            self.finished.emit(url, imageSavePath, scenePos, self)
+            # User-Agent eklemek önemli, bazı siteler Python requestlerini engeller.
+            request = Request(
+                self.url,
+                headers={
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                }
+            )
+
+            with urlopen(request, timeout=10) as response:  # Timeout eklemek iyidir
+                total_size = int(response.headers.get("Content-Length", 0))
+                downloaded = 0
+                block_size = 8192
+
+                with open(self.imageSavePath, "wb") as f:
+                    while True:
+                        buffer = response.read(block_size)
+                        if not buffer:
+                            break
+
+                        f.write(buffer)
+                        downloaded += len(buffer)
+
+                        if total_size > 0:
+                            percent = int(downloaded * 100 / total_size)
+                            self.signals.percentage.emit(percent)
+
+            self.signals.log.emit("Image successfully downloaded", 5000, 1)
+            # İşlem başarılı, gerekli verileri geri gönder
+            self.signals.finished.emit(self.url, self.imageSavePath, self.scenePos, self.targetItem)
 
         except HTTPError as e:
-            self.log.emit("Could not load image: {} ({})".format(url, e), 5000, 2)
-            self.failed.emit(self)
-
-    # ---------------------------------------------------------------------
-    def report(self, count, blockSize, totalSize):
-        percent = int(count * blockSize * 100 / totalSize)
-
-        self.log.emit("\r{0:d}% complete".format(percent), 1000, 0)
+            self.signals.log.emit(f"Could not load image: {self.url} ({e})", 5000, 2)
+            self.signals.failed.emit(self.url)
+        except Exception as e:
+            self.signals.log.emit(f"Download error: {str(e)}", 5000, 2)
+            self.signals.failed.emit(self.url)

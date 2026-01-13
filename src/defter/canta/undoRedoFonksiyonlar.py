@@ -6,19 +6,29 @@ __date__ = '05/Nov/2018'
 __author__ = 'Erdinç Yılmaz'
 
 from .undoRedoSiniflar import (UndoableSayfaAdiDegistir, UndoableAddItem, UndoableRemoveItem, UndoableGroup,
-                               UndoableUnGroup, UndoableParent, UndoableUnParent, UndoableResizeBaseItem, UndoableScaleBaseItemByResizing,
-                               UndoableScalePathItemByScalingPath, UndoableSetFont, UndoableSetFontSizeF, UndoableRotate,
-                               UndoableRotateWithOffset, UndoableSetZValue, UndoableSetLineStyle, UndoableSetLineJoinStyle,
+                               UndoableUnGroup, UndoableParent, UndoableUnParent, UndoableResizeBaseItem,
+                               UndoableScaleBaseItemByResizing,
+                               UndoableScalePathItemByScalingPath, UndoableSetFont, UndoableSetFontSizeF,
+                               UndoableRotate,
+                               UndoableRotateWithOffset, UndoableSetZValue, UndoableSetLineStyle,
+                               UndoableSetLineJoinStyle,
                                UndoableSetLineCapStyle, UndoableSetLineColor, UndoableSetTextColor,
                                UndoableSetLineColorAlpha, UndoableSetTextColorAlpha, UndoableSetItemBackgroundColor,
-                               UndoableSetItemBackgroundColorAlpha, UndoableStilAdiDegistir, UndoableStiliNesneyeUygula, UndoableStiliAracaUygula,
-                               UndoableSetImageOpacity, UndoableSetSceneBackgroundBrush, UndoableSetSceneBackgroundImage,
-                               UndoableEmbedSceneBackgroundImage, UndoableSetPinStatus, UndoableItemSetText, UndoableItemCustomCommand,
-                               UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile, UndoableResizeLineItem,
-                               UndoableMovePathPoint, UndoableSetTextAlignment, UndoableSetCharacterFormat, UndoableSetLineWidthF,
-                               UndoableConvertToPlainText, UndoRedoBaglantisiYaziNesnesiDocuna, UndoableScaleLineItemByScalingLine,
-                               UndoableScaleTextItemByResizing, UndoableScaleGroupItemByResizing, UndoableDeletePathPoint, UndoableResizeGroupItem,
-                               UndoableResizePathItem)
+                               UndoableSetItemBackgroundColorAlpha, UndoableStilAdiDegistir, UndoableStiliNesneyeUygula,
+                               UndoableStiliAracaUygula,
+                               UndoableSetImageOpacity, UndoableSetSceneBackgroundBrush,
+                               UndoableSetSceneBackgroundImage,
+                               UndoableEmbedSceneBackgroundImage, UndoableSetPinStatus, UndoableItemSetText,
+                               UndoableItemCustomCommand,
+                               UndoableEmbedImage, UndoableEmbedVideo, UndoableMove, UndoableEmbedFile,
+                               UndoableResizeLineItem,
+                               UndoableMovePathPoint, UndoableSetTextAlignment, UndoableSetCharacterFormat,
+                               UndoableSetLineWidthF,
+                               UndoableConvertToPlainText, UndoRedoBaglantisiYaziNesnesiDocuna,
+                               UndoableScaleLineItemByScalingLine,
+                               UndoableScaleTextItemByResizing, UndoableScaleGroupItemByResizing,
+                               UndoableDeletePathPoint, UndoableResizeGroupItem,
+                               UndoableResizePathItem, UndoableMarkdowndanHtmlYap, UndoableHtmldenMarkdownYap)
 
 
 # ---------------------------------------------------------------------
@@ -288,6 +298,17 @@ def undoableConvertToPlainText(undoStack, description, item):
     command = UndoableConvertToPlainText(description, item)
     undoStack.push(command)
 
+
+# ---------------------------------------------------------------------
+def undoableMarkdowndanHtmlYap(undoStack, description, item):
+    command = UndoableMarkdowndanHtmlYap(description, item)
+    undoStack.push(command)
+
+
+# ---------------------------------------------------------------------
+def undoableHtmldenMarkdownYap(undoStack, description, item):
+    command = UndoableHtmldenMarkdownYap(description, item)
+    undoStack.push(command)
 
 # ---------------------------------------------------------------------
 def undoableItemCustomCommand(undoStack, description, item, command):

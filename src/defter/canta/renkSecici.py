@@ -43,14 +43,14 @@ class RenkSecilenKareW(QWidget):
     # ---------------------------------------------------------------------
     def renkleriAyarla(self):
         self.renkGrad = QLinearGradient(0, 0, 1, 0)
-        self.renkGrad.setCoordinateMode(QLinearGradient.ObjectMode)
-        self.renkGrad.setSpread(QGradient.PadSpread)
+        self.renkGrad.setCoordinateMode(QLinearGradient.CoordinateMode.ObjectMode)
+        self.renkGrad.setSpread(QGradient.Spread.PadSpread)
         self.renkGrad.setColorAt(0, QColor(255, 255, 255))
         self.renkGrad.setColorAt(1, QColor.fromHsv(self.renkTon, 255, 255))
 
         self.beyazlikGrad = QLinearGradient(0, 0, 0, 1)
-        self.beyazlikGrad.setCoordinateMode(QLinearGradient.ObjectMode)
-        self.beyazlikGrad.setSpread(QGradient.PadSpread)
+        self.beyazlikGrad.setCoordinateMode(QLinearGradient.CoordinateMode.ObjectMode)
+        self.beyazlikGrad.setSpread(QGradient.Spread.PadSpread)
         self.beyazlikGrad.setColorAt(0, QColor(0, 0, 0, 0))
         self.beyazlikGrad.setColorAt(1, QColor(0, 0, 0, 255))
         self.update()

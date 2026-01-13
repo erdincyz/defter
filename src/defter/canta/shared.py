@@ -60,7 +60,7 @@ def kim(kac_basamak):
 # ---------------------------------------------------------------------
 def slugify(s, allow=False):
     # return "".join([x if x.isalnum() else "_" for x in s])
-    return "".join(x for x in s if (x.isalpha() or x in "._- "))
+    return "".join(x for x in s if (x.isalnum() or x in "._- "))
 
 
 # ---------------------------------------------------------------------

@@ -11,7 +11,7 @@ import shutil
 from urllib.parse import urlparse
 
 from shiboken6 import Shiboken
-from PySide6.QtCore import Qt, QRectF, QPointF, Slot, Signal, QThread, QLineF, QObject, QByteArray, QUrl
+from PySide6.QtCore import Qt, QRectF, QPointF, Slot, Signal, QLineF, QByteArray, QUrl, QThreadPool
 from PySide6.QtGui import QPixmap, QPen, QImage, QUndoStack, QColor, QFont
 from PySide6.QtWidgets import QApplication, QGraphicsScene
 from .arac import Arac
@@ -124,6 +124,11 @@ class Scene(QGraphicsScene):
         # DIKKAT: bu item tutuyor, bunu sildikten sonra bir de scene.clear()
         # (tum_nesneleri_sil() e gecildi sonrasinda clear() yerine) gerekti bellek sızıntısı olmamasi icin
         self._kimlik_nesne_sozluk = {}
+
+        # Thread Pool oluşturuyoruz. Global instance da kullanılabilir.
+        self.threadPool = QThreadPool()
+        # Maksimum eşzamanlı indirme sayısını sınırlamak iyi olabilir (örn: 4)
+        self.threadPool.setMaxThreadCount(4)
 
     # ---------------------------------------------------------------------
     def tum_nesneleri_sil(self):
@@ -1702,17 +1707,14 @@ class Scene(QGraphicsScene):
             #         7000, 2)
             #     return None
             imageSavePath = self.get_unique_path_for_embeded_image(os.path.basename(imageURL))
-            # TODO: bunu thread havuzu yapmak lazım,
-            # bir resim indirmesi bitmeden digeri baslatilirsa isler karisabilir...
-            self.dThread = QThread()
-            self.dWorker = DownloadWorker()
-            self.dWorker.moveToThread(self.dThread)
-            self.dWorker.finished.connect(self.dThread_finished)
-            self.dWorker.failed.connect(self.dthread_clean)
-            self.dWorker.log.connect(self.parent().log)
 
-            self.dThread.start()
-            self.dWorker.downloadWithThread.emit(imageURL, imageSavePath, event.scenePos())
+            # YENİ YAPI:
+            worker = DownloadWorker(imageURL, imageSavePath, event.scenePos())
+            worker.signals.finished.connect(self.dThread_finished)
+            worker.signals.log.connect(self.parent().log)
+            # worker.signals.percentage.connect(...) # İstenirse progress bar bağlanabilir
+
+            self.threadPool.start(worker)
 
         if webUrl:
             imageURL = webUrl[0].url()
@@ -1724,17 +1726,14 @@ class Scene(QGraphicsScene):
                     7000, 2)
                 return None
             imageSavePath = self.get_unique_path_for_embeded_image(os.path.basename(imageURL))
-            # TODO: bunu thread havuzu yapmak lazım,
-            # bir resim indirmesi bitmeden digeri baslatilirsa isler karisabilir...
-            self.dThread = QThread()
-            self.dWorker = DownloadWorker()
-            self.dWorker.moveToThread(self.dThread)
-            self.dWorker.finished.connect(self.dThread_finished)
-            self.dWorker.failed.connect(self.dthread_clean)
-            self.dWorker.log.connect(self.parent().log)
 
-            self.dThread.start()
-            self.dWorker.downloadWithThread.emit(imageURL, imageSavePath, event.scenePos())
+            # YENİ YAPI:
+            worker = DownloadWorker(imageURL, imageSavePath, event.scenePos())
+            worker.signals.finished.connect(self.dThread_finished)
+            worker.signals.log.connect(self.parent().log)
+            # worker.signals.percentage.connect(...) # İstenirse progress bar bağlanabilir
+
+            self.threadPool.start(worker)
 
         # # this is for firefox, with linux chrome we use "application/octet-stream" and  we do not need to download
         # # the image, but with firefox we need to download the dragged image.
@@ -1804,36 +1803,43 @@ class Scene(QGraphicsScene):
         # super(Scene, self).dropEvent(event)
 
     # ---------------------------------------------------------------------
-    @Slot(str, str, QPointF, QObject)
-    def dThread_finished(self, url, imagePath, scenePos, worker):
+    @Slot(str, str, QPointF, object)
+    def dThread_finished(self, url, imagePath, scenePos, targetItem):
+        # targetItem: Eğer bu indirme bir "Localize HTML" işlemiyse,
+        # hangi TextItem'ın güncelleneceğini belirtir.
+        # Eğer None ise (Drag&Drop), yeni bir ImageItem oluşturulur.
 
-        # pixMap = QPixmap(imagePath)
-        # pixMap = QPixmap(image)
-        # rectf = QRectF(pixMap.rect())
+        if targetItem:
+            # 1. Senaryo: Var olan bir nesneyi güncelle (Localize HTML)
+            if hasattr(targetItem, "toHtml"):
+                # HTML içindeki eski URL'yi yeni yerel adresle değiştir
+                # Not: activeItem yerine targetItem kullanıyoruz!
+                text = targetItem.toHtml().replace(url, imagePath)
+                targetItem.setHtml(text)
+                targetItem.update()
+        else:
+            # 2. Senaryo: Sahneye yeni resim ekle (Drag & Drop)
+            pixMap = QPixmap(imagePath)
+            # Resim bozuk indiyse kontrol et
+            if pixMap.isNull():
+                self.parent().log(self.tr("Downloaded file is not a valid image."), 5000, 2)
+                return
 
-        imageItem = Image(imagePath, scenePos, None, None,
-                          self.ResimAraci.yaziRengi,
-                          self.ResimAraci.arkaPlanRengi,
-                          QPen(self.ResimAraci.kalem),
-                          QFont(self.ResimAraci.yaziTipi))
-        imageItem.originalSourceFilePath = url
-        imageItem.isEmbeded = True
+            rectf = QRectF(pixMap.rect())
 
-        self.parent().increase_zvalue(imageItem)
-        undoRedo.undoableAddItem(self.undoStack, description=self.tr("drag && drop image from browser"), scene=self,
-                                 item=imageItem)
+            imageItem = Image(imagePath, scenePos, rectf, pixMap,
+                              self.ResimAraci.yaziRengi,
+                              self.ResimAraci.arkaPlanRengi,
+                              QPen(self.ResimAraci.kalem),
+                              QFont(self.ResimAraci.yaziTipi))
+            imageItem.originalSourceFilePath = url
+            imageItem.isEmbeded = True
 
-        imageItem.reload_image_after_scale()
-        # imageItem.update()
-        self.unite_with_scene_rect(imageItem.sceneBoundingRect())
+            self.parent().increase_zvalue(imageItem)
+            self.undoRedo.undoableAddItem(self.undoStack,
+                                          description=self.tr("drag && drop image from browser"),
+                                          scene=self,
+                                          item=imageItem)
 
-        self.dthread_clean()
-
-    # ---------------------------------------------------------------------
-    @Slot(QObject)
-    def dthread_clean(self, worker=None):
-        self.dThread.quit()
-        self.dThread.deleteLater()
-        self.dWorker.deleteLater()
-        del self.dThread
-        del self.dWorker
+            imageItem.reload_image_after_scale()
+            self.unite_with_scene_rect(imageItem.sceneBoundingRect())

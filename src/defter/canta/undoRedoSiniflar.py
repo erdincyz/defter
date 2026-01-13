@@ -9,7 +9,7 @@ import filecmp
 import os
 import shutil
 
-from PySide6.QtGui import QUndoCommand
+from PySide6.QtGui import QUndoCommand, QTextDocument
 from PySide6.QtWidgets import QGraphicsItem
 
 from .nesneler.group import Group
@@ -875,7 +875,8 @@ class UndoableResizeGroupItem(QUndoCommand):
     """ """
 
     # ---------------------------------------------------------------------
-    def __init__(self, description, item, eskiRect, yeniRect, eskiPos, yeniPos, scaleFactorX, scaleFactorY, parent=None):
+    def __init__(self, description, item, eskiRect, yeniRect, eskiPos, yeniPos, scaleFactorX, scaleFactorY,
+                 parent=None):
         super(UndoableResizeGroupItem, self).__init__(description, parent)
         self.item = item
         # self.eskiRect = item._rect
@@ -1909,6 +1910,117 @@ class UndoableConvertToPlainText(QUndoCommand):
         self.item.setHtml(self.html)
         self.item.isPlainText = False
 
+
+########################################################################
+class UndoableMarkdowndanHtmlYap(QUndoCommand):
+    """
+    Düz metin halindeki Markdown sözdizimini (örn: **kalın**) işleyerek
+    zengin metne (HTML) çevirir.
+    """
+
+    # ---------------------------------------------------------------------
+    def __init__(self, description, item, parent=None):
+        super(UndoableMarkdowndanHtmlYap, self).__init__(description, parent)
+
+        self.item = item
+        self.wasPlainText = item.isPlainText
+
+        # Dönüşüm öncesi metni sakla
+        # Eğer zaten HTML ise ve yanlışlıkla basıldıysa görünen metni alır,
+        # Eğer PlainText ise direkt kaynağı alır.
+        self.eski_yazi = item.toPlainText()
+
+        # Geri alma (Undo) işlemi için eski HTML'i sakla (Eğer rich text idiyse)
+        self.eski_html = item.toHtml() if not self.wasPlainText else ""
+
+    # ---------------------------------------------------------------------
+    def redo(self):
+        self.item.document().clear()
+
+        # GitHub tarzı Markdown (Tablolar ve Checklistler için) kullanmak iyidir
+        from PySide6.QtGui import QTextDocument
+        features = QTextDocument.MarkdownFeature.MarkdownDialectGitHub
+
+        self.item.document().setMarkdown(self.eski_yazi, features)
+
+        # Artık bu bir zengin metin nesnesidir
+        self.item.isPlainText = False
+        self.item.update()
+
+    # ---------------------------------------------------------------------
+    def undo(self):
+        self.item.document().clear()
+        self.item.isPlainText = self.wasPlainText
+
+        if self.wasPlainText:
+            self.item.setPlainText(self.eski_yazi)
+        else:
+            self.item.setHtml(self.eski_html)
+        self.item.update()
+
+
+########################################################################
+class UndoableHtmldenMarkdownYap(QUndoCommand):
+    """
+    Zengin metni (HTML) alır ve 'Raw Markdown' kaynak koduna (Düz Metin) çevirir.
+    Renkler ve fontlar silinir, sadece yapı (kalın, italik, liste, başlık) korunur.
+    """
+
+    # ---------------------------------------------------------------------
+    def __init__(self, description, item, parent=None):
+        super(UndoableHtmldenMarkdownYap, self).__init__(description, parent)
+
+        self.item = item
+        self.wasPlainText = item.isPlainText
+
+        # Geri alma işlemi için mevcut durumu sakla
+        if self.wasPlainText:
+            self.eski_yazi = item.toPlainText()
+            # Zaten düz metinse Markdown'a çevirmeye gerek yok, olduğu gibi al
+            self.markdown = self.eski_yazi
+        else:
+            self.eski_html = item.toHtml()
+
+            # --- İYİLEŞTİRME BAŞLANGICI ---
+            # Dönüşümü sahnedeki item üzerinden değil, temiz bir geçici döküman
+            # üzerinden yapıyoruz. Bu, sahne genişliği veya stil ayarlarının
+            # Markdown çıktısını bozmasını engeller.
+            temp_doc = QTextDocument()
+            temp_doc.setHtml(self.eski_html)
+
+            # GitHub diyalekti tabloları ve checklistleri destekler
+            features = QTextDocument.MarkdownFeature.MarkdownDialectGitHub
+            self.markdown = temp_doc.toMarkdown(features)
+            # --- İYİLEŞTİRME SONU ---
+
+    # ---------------------------------------------------------------------
+    def redo(self):
+        # Önce dökümanı temizle
+        self.item.document().clear()
+
+        # Nesneyi "Düz Metin" moduna geçir (Bu, custom Text sınıfınız için önemli)
+        self.item.isPlainText = True
+
+        # Markdown kodunu düz metin olarak yapıştır
+        # Böylece kullanıcı **kalın** işaretlerini görebilir ve düzenleyebilir
+        self.item.setPlainText(self.markdown)
+
+        # Görünümü güncelle
+        self.item.update()
+
+    # ---------------------------------------------------------------------
+    def undo(self):
+        self.item.document().clear()
+
+        # Eski moduna geri döndür
+        self.item.isPlainText = self.wasPlainText
+
+        if self.wasPlainText:
+            self.item.setPlainText(self.eski_yazi)
+        else:
+            self.item.setHtml(self.eski_html)
+
+        self.item.update()
 
 ########################################################################
 class UndoableItemCustomCommand(QUndoCommand):

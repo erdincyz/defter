@@ -118,6 +118,7 @@ class Text(QGraphicsTextItem):
         self._command = {}
 
         self.isPlainText = True
+        self.isMarkdown = False
         self.oklar_dxdy_nokta = {}
 
         # self.zenginYaziBelirteci = QRect(0, 0, 10, 10)
@@ -597,13 +598,6 @@ class Text(QGraphicsTextItem):
 
         super(Text, self).focusOutEvent(event)
 
-    # ---------------------------------------------------------------------
-    def clear_selection(self):
-        cursor = self.textCursor()
-        # self.cursor_eski_pozisyon = cursor.position()
-        # self.cursor_eski_anchor = cursor.anchor()
-        cursor.clearSelection()
-        self.setTextCursor(cursor)
 
     # ---------------------------------------------------------------------
     def mouseDoubleClickEvent(self, event):
@@ -624,6 +618,13 @@ class Text(QGraphicsTextItem):
             self.setFocus()
             # self.clearFocus()
         super(Text, self).mouseDoubleClickEvent(event)
+    # ---------------------------------------------------------------------
+    def clear_selection(self):
+        cursor = self.textCursor()
+        # self.cursor_eski_pozisyon = cursor.position()
+        # self.cursor_eski_anchor = cursor.anchor()
+        cursor.clearSelection()
+        self.setTextCursor(cursor)
 
     # ---------------------------------------------------------------------
     def hoverEnterEvent(self, event):

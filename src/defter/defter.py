@@ -88,6 +88,7 @@ from .canta.yw.yuzenWidget import YuzenWidget
 from .canta.yanBolme.yanBolme import YanBolme
 from .canta.yw.tercumeYW import TercumeYW
 from .canta.yw.altyaziYW import AltyaziYW
+from .canta.yw.yzYW import YzYW
 from .canta.arac import Arac
 from .canta.with_signals_updates_blocked import (signals_blocked_and_updates_disabled as signals_updates_blocked,
                                                  signals_blocked)
@@ -96,7 +97,7 @@ from .canta import undoRedoFonksiyonlar as undoRedo
 
 # DEFTER_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "0.97.1"
+VERSION = "0.97.3"
 DEF_MAGIC_NUMBER = 25032016
 DEF_FILE_VERSION = 1
 DEFSTYLES_MAGIC_NUMBER = 13132017
@@ -242,6 +243,7 @@ class DefterAnaPencere(QMainWindow):
         self.olustur_tercumeYW()
         self.olustur_baskiSiniriYW()
         self.olustur_altyaziYW()
+        self.olustur_yzYW()
         self.olustur_yw_menu()
         self.olustur_dummy_widget_for_actions()
         self.arsivleme_programi_adres_belirle()
@@ -304,6 +306,18 @@ class DefterAnaPencere(QMainWindow):
             lambda: self.altyaziYW.sonKlasorVideolar_guncelle(self.sonKlasorVideolar))
         self.altyaziYW.sahneAktifNesneBilgisiGuncelle.connect(
             lambda: self.altyaziYW.sahneAktifNesneBilgisi_guncelle(self.cScene.activeItem))
+
+    # ---------------------------------------------------------------------
+    def olustur_yzYW(self):
+
+        self.yzYW = YzYW(self)
+
+        self.yzYW.yazBaslik(self.tr("YZ"))
+        # self.yzYW.setMinimumSize(200, 100)
+        self.yzYW.setMinimumSize(400, 700)
+        self.yzYW.resize(400, 700)
+        self.yzYW.kenaraAlVeyaKapatTiklandi.connect(self.yw_cubuga_tasi)
+        # self.altyaziYW.hide()
 
     # ---------------------------------------------------------------------
     def renk_degistir(self):
@@ -2006,6 +2020,10 @@ class DefterAnaPencere(QMainWindow):
             self.altyaziYW.setMinimumSize(self.settings.value("altyaziYWMinSize", QSize(200, 200)))
             self.altyaziYW.yukleme_bilgisi(self.settings.value("altyaziYWYonDurum", "01102"))
 
+            self.yzYW.restoreGeometry(self.settings.value("yzYWGeo"))
+            self.yzYW.setMinimumSize(self.settings.value("yzYWMinSize", QSize(200, 200)))
+            self.yzYW.yukleme_bilgisi(self.settings.value("yzYWYonDurum", "01103"))
+
         else:  # ilk acilis
             self.sayfalarYW.yukleme_bilgisi("00010")
             self.sayfalarYW.sol_kenara_yanastir()
@@ -2015,6 +2033,7 @@ class DefterAnaPencere(QMainWindow):
             self.stillerYW.yukleme_bilgisi("01101")
             self.baskiSiniriCizimAyarlariYW.yukleme_bilgisi("01112")
             self.altyaziYW.yukleme_bilgisi("01102")
+            self.yzYW.yukleme_bilgisi("01103")
         self.settings.endGroup()
 
         self.settings.beginGroup("StylePresets")
@@ -2058,6 +2077,9 @@ class DefterAnaPencere(QMainWindow):
         self.settings.setValue("altyaziYWGeo", self.altyaziYW.saveGeometry())
         self.settings.setValue("altyaziYWMinSize", self.altyaziYW.eskiMinimumSize)
         self.settings.setValue("altyaziYWYonDurum", self.altyaziYW.kaydetme_bilgisi())
+        self.settings.setValue("yzYWGeo", self.yzYW.saveGeometry())
+        self.settings.setValue("yzYWMinSize", self.yzYW.eskiMinimumSize)
+        self.settings.setValue("yzYWYonDurum", self.yzYW.kaydetme_bilgisi())
 
         self.settings.endGroup()
 
@@ -2196,6 +2218,8 @@ class DefterAnaPencere(QMainWindow):
         if degisen_sahne_var_mi:
             cvp = self.do_you_want_to_save_for_close_event()
             if cvp == "d":
+                if hasattr(self, 'yzYW'):
+                    self.yzYW.force_server_shutdown()
                 self.yaz_ayarlar()
                 self.yaz_arac_ayarlari()
                 self.clean_temp_dirs()
@@ -2220,6 +2244,8 @@ class DefterAnaPencere(QMainWindow):
             elif cvp == "c":
                 event.ignore()
         else:
+            if hasattr(self, 'yzYW'):
+                self.yzYW.force_server_shutdown()
             self.yaz_ayarlar()
             self.yaz_arac_ayarlari()
             self.clean_temp_dirs()
@@ -3751,10 +3777,15 @@ class DefterAnaPencere(QMainWindow):
                                          lambda throw_away=0: self.close_selected_tab(self.tabWidget.currentIndex()))
         hot_close_active_tab.setContext(Qt.ShortcutContext.ApplicationShortcut)
 
-        hot_tercume_YW_goster_gizle = QShortcut(QKeySequence("Alt+0"),
-                                                self,
-                                                self.tercumeYW_goster_gizle)
-        hot_tercume_YW_goster_gizle.setContext(Qt.ShortcutContext.ApplicationShortcut)
+        hot_tercumeYW_goster_gizle = QShortcut(QKeySequence("Alt+0"),
+                                               self,
+                                               self.tercumeYW_goster_gizle)
+        hot_tercumeYW_goster_gizle.setContext(Qt.ShortcutContext.ApplicationShortcut)
+
+        hot_yzYW_goster_gizle = QShortcut(QKeySequence("ctrl+space"),
+                                          self,
+                                          self.yzYW_goster_gizle)
+        hot_yzYW_goster_gizle.setContext(Qt.ShortcutContext.ApplicationShortcut)
 
     # ---------------------------------------------------------------------
     def olustur_status_bar(self):
@@ -3861,13 +3892,20 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleAltyaziYW.setCheckable(True)
         self.actionToggleAltyaziYW.triggered.connect(self.altyaziYW.kucult_buyult)
 
+        self.actionToggleYzYW = QAction(QIcon(':icons/properties.png'),
+                                        self.tr('AI'), yuzenWidgetsMenu)
+        self.actionToggleYzYW.setShortcut(QKeySequence("Ctrl+Alt+7"))
+        self.actionToggleYzYW.setCheckable(True)
+        self.actionToggleYzYW.triggered.connect(self.yzYW.kucult_buyult)
+
         yuzenWidgetsMenu.addActions((self.actionTumPanelleriGoster,
                                      self.actionToggleSayfalarYW,
                                      self.actionToggleKutuphaneYW,
                                      self.actionToggleStillerYW,
                                      self.actionToggleNesneOzellikleriYW,
                                      self.actionToggleBaskiSiniriCizimAyarlariYW,
-                                     self.actionToggleAltyaziYW
+                                     self.actionToggleAltyaziYW,
+                                     self.actionToggleYzYW
                                      ))
 
         # self.viewMenu.insertMenu(beforAction, menu)
@@ -4369,6 +4407,18 @@ class DefterAnaPencere(QMainWindow):
         self.actionConvertToPlainText.setShortcut(QKeySequence("Shift+Alt+P"))
         self.actionConvertToPlainText.triggered.connect(self.act_convert_to_plain_text)
 
+        self.actionMarkdowndanHtmlYap = QAction(QIcon(":icons/command.png"),
+                                                self.tr("Render item(s) as markdown"),
+                                                self.nesneSagMenu)
+        self.actionMarkdowndanHtmlYap.setShortcut(QKeySequence("Shift+Alt+M"))
+        self.actionMarkdowndanHtmlYap.triggered.connect(self.act_markdowndan_html_yap)
+
+        self.actionHtmldenMarkdownYap = QAction(QIcon(":icons/command.png"),
+                                                self.tr("View markdown source"),
+                                                self.nesneSagMenu)
+        self.actionHtmldenMarkdownYap.setShortcut(QKeySequence("Shift+Alt+H"))
+        self.actionHtmldenMarkdownYap.triggered.connect(self.act_htmlden_markdown_yap)
+
         self.actionShowHTMLSource = QAction(QIcon(':icons/text-html.png'), self.tr("Show HTML source"),
                                             self.nesneSagMenu)
         self.actionShowHTMLSource.setShortcut(QKeySequence("Ctrl+U"))
@@ -4525,6 +4575,8 @@ class DefterAnaPencere(QMainWindow):
                                      self.actionEditCommand,
                                      self.yaziSagMenu.addSeparator(),
                                      self.actionConvertToPlainText,
+                                     self.actionMarkdowndanHtmlYap,
+                                     self.actionHtmldenMarkdownYap,
                                      self.yaziSagMenu.addSeparator(),
                                      self.actionResizeTextItemToFitView,
                                      self.actionLocalizeHtml,
@@ -4838,6 +4890,8 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionUnPinItem,
                                           self.actionEditCommand,
                                           self.actionConvertToPlainText,
+                                          self.actionMarkdowndanHtmlYap,
+                                          self.actionHtmldenMarkdownYap,
                                           self.actionEmbedImage,
                                           self.actionExportImage,
                                           self.actionShowImageInfo,
@@ -4912,6 +4966,7 @@ class DefterAnaPencere(QMainWindow):
                                           self.actionToggleKutuphaneYW,
                                           self.actionToggleBaskiSiniriCizimAyarlariYW,
                                           self.actionToggleAltyaziYW,
+                                          self.actionToggleYzYW,
                                           # view menu actions
                                           self.actionToggleStatusBar,
                                           self.actionToggleMenuBar,
@@ -5024,6 +5079,29 @@ class DefterAnaPencere(QMainWindow):
             self.nesneOzellikleriYW.kucult()
             if not self.nesneOzellikleriYW.cubukta_mi:
                 self.nesneOzellikleriYW.move(self.nesneOzellikleriYW.eskiYuzenPos)
+
+    # ---------------------------------------------------------------------
+    def yzYW_goster_gizle(self):
+
+        if self.yzYW.kucuk_mu:
+            if not self.yzYW.cubukta_mi:
+                self.yzYW.eskiYuzenPos = self.yzYW.pos()
+                self.yzYW.move(self.cView.mapFromGlobal(QCursor.pos()))
+            self.yzYW.buyult()
+        else:
+            self.yzYW.kucult()
+            if not self.yzYW.cubukta_mi:
+                self.yzYW.move(self.yzYW.eskiYuzenPos)
+
+    # def act_secili_metni_duzelt(self):
+    #     item = self.cScene.activeItem
+    #     if item and item.type() == shared.TEXT_ITEM_TYPE:
+    #         metin = item.toPlainText()
+    #         # YZ Modülüne gönder
+    #         self.yzYW.disardan_prompt_gonder(
+    #             f"Aşağıdaki metindeki imla hatalarını düzelt ve sadece düzeltilmiş metni ver:\n\n{metin}",
+    #             system_prompt_override="Sen profesyonel bir editörsün."
+    #         )
 
     # ---------------------------------------------------------------------
     def olustur_tercumeYW(self):
@@ -5819,6 +5897,7 @@ class DefterAnaPencere(QMainWindow):
         self.actionToggleKutuphaneYW.setChecked(not self.kutuphaneYW.kucuk_mu)
         self.actionToggleBaskiSiniriCizimAyarlariYW.setChecked(not self.baskiSiniriCizimAyarlariYW.kucuk_mu)
         self.actionToggleAltyaziYW.setChecked(not self.altyaziYW.kucuk_mu)
+        self.actionToggleYzYW.setChecked(not self.yzYW.kucuk_mu)
 
     # ---------------------------------------------------------------------
     def act_tum_panelleri_goster(self):
@@ -5828,6 +5907,7 @@ class DefterAnaPencere(QMainWindow):
         self.stillerYW.buyult()
         self.baskiSiniriCizimAyarlariYW.buyult()
         self.altyaziYW.buyult()
+        self.yzYW.buyult()
 
     # ---------------------------------------------------------------------
     def secili_nesnenin_aracina_stil_uygula_yazisi_guncelle(self):
@@ -8825,6 +8905,10 @@ class DefterAnaPencere(QMainWindow):
                 self.altyaziYW.kucult()
                 self.sade_gorunum_oncesi_yw_durumlari_liste.append(self.altyaziYW)
 
+            if not self.yzYW.kucuk_mu:
+                self.yzYW.kucult()
+                self.sade_gorunum_oncesi_yw_durumlari_liste.append(self.yzYW)
+
         else:
             self.mBar.show()
             self._statusBar.show()
@@ -9001,55 +9085,55 @@ class DefterAnaPencere(QMainWindow):
                                      '---------------------------------------'), 0)
 
     # ---------------------------------------------------------------------
-    def create_thread(self, imageURL):
-        extension = os.path.splitext(imageURL)[1][1:].lower()
-        if extension not in self.supportedImageFormatList:
-            self.log(self.tr(f"Could not load image: {imageURL} \n"
-                             "Could not find the direct link to the image "
-                             "or image type is unsupported.: {}").format(imageURL), 7000, 3)
-            return
-
-        imageSavePath = self.cScene.get_unique_path_for_downloaded_html_image(os.path.basename(imageURL))
-        dThread = QThread()
-        dWorker = DownloadWorker()
-        self.workerThreadDict[dWorker] = dThread
-
-        dWorker.moveToThread(dThread)
-
-        dWorker.finished.connect(self.dThread_finished)
-        dWorker.failed.connect(self.dthread_clean)
-        dWorker.log.connect(self.log)
-
-        dThread.start()
-        dWorker.downloadWithThread.emit(imageURL, imageSavePath, QPointF())
-
-    # ---------------------------------------------------------------------
     @Slot()
     def act_localize_html(self):
+        # 1. Hedef nesneyi belirle (Yazı nesnesi mi?)
+        targetItem = self.cScene.activeItem
+        if not targetItem or targetItem.type() != shared.TEXT_ITEM_TYPE:
+            return
 
+        # 2. HTML içindeki resim linklerini bul
         imgSrcParser = ImgSrcParser()
-        imgSrcParser.feed(self.cScene.activeItem.toHtml())
+        imgSrcParser.feed(targetItem.toHtml())
 
-        # print(self.imgUrlList)
-        # to prevent already localized urls to relocalize.
-        self.imgUrlList = [x for x in imgSrcParser.urls if not x.startswith("defter")]
-        # print(self.imgUrlList)
-        self.workerThreadDict = {}
+        # Zaten indirilmiş (yerel) olanları ele
+        # imgUrlList = [x for x in imgSrcParser.urls if not x.startswith("defter")]
+        # Resim formatı desteklenmeyenleri ele
+        valid_urls = []
+        for url in imgSrcParser.urls:
+            if url.startswith("defter"):
+                continue
+            ext = os.path.splitext(url)[1][1:].lower()
+            if ext in self.supportedImageFormatList:
+                valid_urls.append(url)
+
+        if not valid_urls:
+            self.log(self.tr("No downloadable images found."), 3000, 0)
+            return
 
         self.is_fetching = True
-        for imageURL in self.imgUrlList[:5]:
-            self.create_thread(imageURL)
-            self.imgUrlList.remove(imageURL)
+        self.log(self.tr("Localizing {} images...").format(len(valid_urls)), 5000, 0)
 
-            # try:
-            #     from urllib.request import urlretrieve
-            #     urlretrieve(imageURL, imageSavePath)
-            # except HTTPError as e:
-            #     print("hata")
+        # 3. Tüm linkler için işçileri (Worker) oluştur ve havuza at
+        # ThreadPool, maxThreadCount'a göre bunları sıraya dizer ve çalıştırır.
+        for imageURL in valid_urls:
+            imageSavePath = self.cScene.get_unique_path_for_downloaded_html_image(os.path.basename(imageURL))
+
+            # Yeni Worker (QRunnable olan)
+            worker = DownloadWorker(imageURL, imageSavePath, QPointF(), targetItem)
+
+            # Sinyalleri bağla
+            worker.signals.finished.connect(self.dThread_finished)
+            worker.signals.log.connect(self.log)
+            # Hata durumunda log basmak için
+            # worker.signals.failed.connect(lambda url: self.log(f"Failed: {url}", 5000, 2))
+
+            # Havuza gönder
+            self.cScene.threadPool.start(worker)
 
     # ---------------------------------------------------------------------
-    @Slot(str, str, QPointF, QObject)
-    def dThread_finished(self, url, imagePath, scenePos, worker):
+    @Slot(str, str, QPointF, object)
+    def dThread_finished(self, url, imagePath, scenePos, targetItem):
         # todo: COK ONEMLİ, İmajlari temp klasore kaydedip sonra actigimizda yok o klasor.
         # dosyayi kaydederken adresleri degistirmek ya da embed etmek mi lazim.
         # acaba ayri bir klasor mu yapsak web images gibisnden
@@ -9062,52 +9146,76 @@ class DefterAnaPencere(QMainWindow):
         # img src= direkt adres yazabiliyoruz boylelikle
         # text = self.cScene.activeItem.toHtml().replace(url, "{}".format(os.path.join("images-html",
         #                                                                              os.path.basename(imagePath))))
-        text = self.cScene.activeItem.toHtml().replace(url, imagePath)
-        self.cScene.activeItem.setHtml(text)
-        self.cScene.activeItem.update()
+        # SENARYO 1: Localize HTML (targetItem DOLU gelir)
+        if targetItem:
+            if hasattr(targetItem, "toHtml"):
+                # İndirilen resmin yerel yolunu HTML içine göm
+                # replace işlemi yaparken URL'nin tam eşleşmesine dikkat edin
+                # Bazen URL encode farkları olabilir ama basit replace genelde çalışır.
 
-        # self.sender().failed.emit()
-        self.dthread_clean(worker)
-        if self.imgUrlList:
-            self.create_thread(self.imgUrlList.pop(0))
+                # Windows yolları için ters slash düzeltmesi (gerekirse)
+                local_url = imagePath.replace("\\", "/")
+
+                # HTML'i güncelle
+                current_html = targetItem.toHtml()
+                new_html = current_html.replace(url, local_url)
+
+                if current_html != new_html:
+                    targetItem.setHtml(new_html)
+                    targetItem.update()
+                    # self.log(self.tr("Image localized."), 2000, 1, toStatusBarOnly=True)
+
+        # SENARYO 2: Sürükle Bırak (targetItem BOŞ gelir)
         else:
-            self.is_fetching = False
+            # Burası Drag&Drop mantığı (Daha önce yazdığımız kodun aynısı)
+            pixMap = QPixmap(imagePath)
+            if pixMap.isNull():
+                return
 
-    # ---------------------------------------------------------------------
-    @Slot(QObject)
-    def dthread_clean(self, worker):
+            rectf = QRectF(pixMap.rect())
+            imageItem = Image(imagePath, scenePos, rectf, pixMap,
+                              self.ResimAraci.yaziRengi,
+                              self.ResimAraci.arkaPlanRengi,
+                              QPen(self.ResimAraci.kalem),
+                              QFont(self.ResimAraci.yaziTipi))
 
-        self.workerThreadDict[worker].quit()  # thread
-        self.workerThreadDict[worker].deleteLater()  # thread
-        worker.deleteLater()  # worker
-        del self.workerThreadDict[worker]
+            imageItem.originalSourceFilePath = url
+            imageItem.isEmbeded = True
 
-        # print("{} active threads".format(len(self.workerThreadDict)))
-        self.log(self.tr("{} active threads").format(len(self.workerThreadDict)), 0)
+            self.parent().increase_zvalue(imageItem)
+            undoRedo.undoableAddItem(self.undoStack,
+                                     description=self.tr("drag && drop image from browser"),
+                                     scene=self,
+                                     item=imageItem)
 
-        if not len(self.workerThreadDict):
-            self.log(self.tr("All images are succesfully downloaded!"), 1)
+            imageItem.reload_image_after_scale()
+            self.unite_with_scene_rect(imageItem.sceneBoundingRect())
 
-    # ---------------------------------------------------------------------
     def clean_download_threads(self):
+        """
+        QThreadPool geçişi sonrası güncellenmiş temizlik fonksiyonu.
+        Artık workerThreadDict yok, bunun yerine thread havuzundaki
+        bekleyen işleri temizliyoruz.
+        """
+        # Fetching bayrağı kontrolü
+        if not hasattr(self, 'is_fetching') or not self.is_fetching:
+            return
 
-        # TODO: burasi tam olmadi ..
-        # logu if self.fetching icine mi tasisak ya da
-        # close_selected_tab icinde is_fetching ifi oluturup oraya mi tasisak.
+        self.log(self.tr("Stopping background downloads..."), 0)
 
-        if self.is_fetching:
-            self.log(self.tr("Cleaning Threads Please Wait..."), 0)
-            workers = self.workerThreadDict.keys()
-            threads = self.workerThreadDict.values()
+        # Tüm sekmelerdeki (modellerdeki) tüm sayfaların thread havuzlarını temizle
+        # Çünkü kullanıcı farklı bir sekmeye geçip indirme başlatmış olabilir.
+        if hasattr(self, 'tabWidget'):
+            for model in self.tabWidget.modeller:
+                for sayfa in model.sayfalar():
+                    # Eğer sahnenin threadPool'u varsa
+                    if hasattr(sayfa.scene, 'threadPool'):
+                        # clear() metodu, kuyrukta bekleyen ama henüz başlamamış
+                        # QRunnable'ları siler. Çalışanlar bitene kadar devam eder
+                        # (Python kapanırken işletim sistemi onları zaten sonlandırır).
+                        sayfa.scene.threadPool.clear()
 
-            for worker in workers:
-                worker.failed.emit(worker)
-
-            count = len(workers)
-            while count > 0:
-                for thread in threads:
-                    if thread.isFinished():
-                        count -= 1
+        self.is_fetching = False
 
     # ---------------------------------------------------------------------
     @Slot()
@@ -9283,6 +9391,38 @@ class DefterAnaPencere(QMainWindow):
                 self.cScene.undoStack.beginMacro(self.tr("convert to plain text"))
             for item in yaziNesneleri:
                 undoRedo.undoableConvertToPlainText(self.cScene.undoStack, self.tr("convert to plain text"), item)
+            if len(yaziNesneleri) > 1:
+                self.cScene.undoStack.endMacro()
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def act_markdowndan_html_yap(self):
+        if self.cScene.selectionQueue:
+            yaziNesneleri = []
+            for item in self.cScene.selectionQueue:
+                if item.type() == shared.TEXT_ITEM_TYPE:
+                    yaziNesneleri.append(item)
+
+            if len(yaziNesneleri) > 1:
+                self.cScene.undoStack.beginMacro(self.tr("convert to markdown"))
+            for item in yaziNesneleri:
+                undoRedo.undoableMarkdowndanHtmlYap(self.cScene.undoStack, self.tr("convert to markdown"), item)
+            if len(yaziNesneleri) > 1:
+                self.cScene.undoStack.endMacro()
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def act_htmlden_markdown_yap(self):
+        if self.cScene.selectionQueue:
+            yaziNesneleri = []
+            for item in self.cScene.selectionQueue:
+                if item.type() == shared.TEXT_ITEM_TYPE:
+                    yaziNesneleri.append(item)
+
+            if len(yaziNesneleri) > 1:
+                self.cScene.undoStack.beginMacro(self.tr("convert to raw markdown"))
+            for item in yaziNesneleri:
+                undoRedo.undoableHtmldenMarkdownYap(self.cScene.undoStack, self.tr("convert to raw markown"), item)
             if len(yaziNesneleri) > 1:
                 self.cScene.undoStack.endMacro()
 
@@ -10467,9 +10607,582 @@ class DefterAnaPencere(QMainWindow):
             if ic_sayfa.ic_sayfa_var_mi():
                 self._ic_sayfalari_gezin(ic_sayfa, kayit_klasor, def_dosyasi_icine_kaydet, oteleme + 12)
 
+    def get_interactive_js(self):
+        return """
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                let currentZ = 1000;
+                let activeItem = null; // Şu an seçili (resize modunda) olan nesne
+
+                // --- SEÇİMİ TEMİZLE ---
+                function clearSelection() {
+                    if (activeItem) {
+                        activeItem.classList.remove('selected-item');
+                        // Tutamaçları sil
+                        const handles = activeItem.querySelectorAll('.resize-handle');
+                        handles.forEach(h => h.remove());
+                        activeItem = null;
+                    }
+                }
+
+                // --- TUTAMAÇLARI EKLE ---
+                function addResizeHandles(item) {
+                    if (item === activeItem) return; // Zaten seçili
+                    clearSelection();
+
+                    activeItem = item;
+                    item.classList.add('selected-item');
+
+                    const positions = ['nw', 'ne', 'sw', 'se'];
+                    positions.forEach(pos => {
+                        const h = document.createElement('div');
+                        h.className = 'resize-handle handle-' + pos;
+                        h.setAttribute('data-pos', pos);
+                        item.appendChild(h);
+                    });
+                }
+
+                // --- TÜM NESNELERİ BAŞLAT ---
+                const items = document.querySelectorAll('.canvas-container > *[id]');
+
+                // Canvas boşluğuna tıklayınca
+                document.querySelector('main').addEventListener('mousedown', (e) => {
+                    if(e.target.tagName === 'MAIN' || e.target.classList.contains('canvas-container')) {
+                        clearSelection();
+                    }
+                });
+
+                items.forEach(item => {
+                    // Hover
+                    item.addEventListener('mouseenter', () => { 
+                        if(!activeItem && !item.isContentEditable) item.style.cursor = 'move'; 
+                    });
+
+                    // --- DÜZENLEME (Çift Tıklama) ---
+                    item.addEventListener('dblclick', (e) => {
+                        e.stopPropagation(); // Parent'a gitmesin
+                        // Sadece metin içerenler (article, div, p)
+                        if(['ARTICLE', 'DIV', 'P'].includes(item.tagName)) {
+                            // Önce seçimi temizle ki tutamaçlar yazı yazarken engel olmasın
+                            clearSelection(); 
+                            
+                            item.contentEditable = "true";
+                            item.focus();
+                            // Yazı düzenlenirken selection kutusu çıkmasın diye flag koyabiliriz
+                        }
+                    });
+
+                    // Düzenleme Bitişi (Blur)
+                    item.addEventListener('blur', () => {
+                        item.contentEditable = "false";
+                        item.style.cursor = 'move';
+                        // Yüksekliği içeriğe göre güncellemek gerekebilir ama CSS 'height: auto !important' halletti.
+                    });
+
+                    // --- SEÇİM VE SÜRÜKLEME (Mousedown) ---
+                    item.addEventListener('mousedown', (e) => {
+                        // Eğer resize tutamacıysa dur, o ayrı event
+                        if (e.target.classList.contains('resize-handle')) return;
+
+                        // Eğer yazı yazılıyorsa (edit mode), sürüklemeyi ve seçimi engelle
+                        if (item.isContentEditable) {
+                            e.stopPropagation(); 
+                            return; 
+                        }
+
+                        e.stopPropagation();
+                        
+                        addResizeHandles(item);
+
+                        // Z-Index Artır
+                        currentZ++;
+                        item.style.zIndex = currentZ;
+
+                        // Sürükleme Başlat
+                        startDrag(e, item);
+                    });
+                });
+
+                // --- SÜRÜKLEME FONKSİYONU ---
+                function startDrag(e, item) {
+                    let startX = e.clientX;
+                    let startY = e.clientY;
+                    
+                    // getBoundingClientRect scroll'dan etkilenir, offsetLeft/Top daha güvenli
+                    let startLeft = item.offsetLeft;
+                    let startTop = item.offsetTop;
+
+                    function onMouseMove(e) {
+                        let dx = e.clientX - startX;
+                        let dy = e.clientY - startY;
+                        item.style.left = (startLeft + dx) + 'px';
+                        item.style.top = (startTop + dy) + 'px';
+                    }
+
+                    function onMouseUp() {
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                    }
+
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                }
+
+                // ... Resize listener ve Save Button kodları AYNI ...
+                // (Önceki cevaptaki resize ve save kodlarını buraya yapıştırın)
+                
+                // --- RESIZE FONKSİYONU ---
+                document.addEventListener('mousedown', (e) => {
+                    if (!e.target.classList.contains('resize-handle')) return;
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const handle = e.target;
+                    const item = activeItem; // O anki seçili item
+                    const pos = handle.getAttribute('data-pos');
+
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+
+                    // Başlangıç değerleri (ParseInt ile px'i atıyoruz)
+                    const startWidth = parseInt(document.defaultView.getComputedStyle(item).width, 10);
+                    const startHeight = parseInt(document.defaultView.getComputedStyle(item).height, 10);
+                    const startTop = item.offsetTop;
+                    const startLeft = item.offsetLeft;
+
+                    function onResizeMove(e) {
+                        const dx = e.clientX - startX;
+                        const dy = e.clientY - startY;
+                        let newW = startWidth; let newH = startHeight;
+                        let newTop = startTop; let newLeft = startLeft;
+
+                        if (pos.includes('e')) newW = startWidth + dx;
+                        if (pos.includes('s')) newH = startHeight + dy;
+                        if (pos.includes('w')) { newW = startWidth - dx; newLeft = startLeft + dx; }
+                        if (pos.includes('n')) { newH = startHeight - dy; newTop = startTop + dy; }
+
+                        if (newW > 20) { item.style.width = newW + 'px'; item.style.left = newLeft + 'px'; }
+                        if (newH > 20) { item.style.height = newH + 'px'; item.style.top = newTop + 'px'; }
+                    }
+
+                    function onResizeUp() {
+                        document.removeEventListener('mousemove', onResizeMove);
+                        document.removeEventListener('mouseup', onResizeUp);
+                    }
+
+                    document.addEventListener('mousemove', onResizeMove);
+                    document.addEventListener('mouseup', onResizeUp);
+                });
+
+                // --- SAVE BUTTON ---
+                addSaveButton();
+            });
+
+            function addSaveButton() {
+                const btn = document.createElement('button');
+                btn.innerText = '💾 Save Changes';
+                btn.style.cssText = "position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#28a745; color:white; border:none; border-radius:5px; cursor:pointer; z-index:99999; box-shadow:0 2px 5px rgba(0,0,0,0.2); font-family:sans-serif; font-weight:bold;";
+                
+                btn.onclick = async () => {
+                    // 1. Temizlik: Buton ve seçim çizgilerini geçici olarak kaldır
+                    btn.style.display = 'none';
+
+                    // Eğer seçili bir eleman varsa seçim çizgilerini kaldır
+                    const activeItem = document.querySelector('.selected-item');
+                    if(activeItem) {
+                        activeItem.classList.remove('selected-item');
+                        activeItem.querySelectorAll('.resize-handle').forEach(h => h.remove());
+                    }
+                    
+                    // İçerik düzenleme modunda kalmışsa kapat
+                    const editableItem = document.querySelector('[contenteditable="true"]');
+                    if(editableItem) editableItem.contentEditable = "false";
+
+                    // 2. HTML İçeriğini Hazırla
+                    const htmlContent = "<!DOCTYPE html>\\n" + document.documentElement.outerHTML;
+                    
+                    // 3. Dosya Adını Meta Etiketinden Al
+                    const metaName = document.querySelector('meta[name="filename"]');
+                    const fileName = metaName ? metaName.content : 'page.html';
+
+                    // --- YÖNTEM A: MODERN API (Chrome, Edge, Opera) ---
+                    if ('showSaveFilePicker' in window) {
+                        try {
+                            const handle = await window.showSaveFilePicker({
+                                suggestedName: fileName,
+                                types: [{
+                                    description: 'HTML File',
+                                    accept: {'text/html': ['.html']},
+                                }],
+                            });
+                            const writable = await handle.createWritable();
+                            await writable.write(htmlContent);
+                            await writable.close();
+                            alert('Saved successfully!');
+                        } catch (err) {
+                            // Kullanıcı iptal ettiyse veya hata olduysa sessiz kal veya logla
+                            console.error(err);
+                        }
+                    } 
+                    // --- YÖNTEM B: KLASİK İNDİRME (Firefox, Safari, Eski Tarayıcılar) ---
+                    else {
+                        const blob = new Blob([htmlContent], {type: 'text/html'});
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = fileName; // Orijinal ismi kullanıyoruz!
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }
+
+                    // Butonu geri getir
+                    btn.style.display = 'block';
+                };
+
+                document.body.appendChild(btn);
+            }
+        </script>
+        """
+
     # ---------------------------------------------------------------------
+    def _ver_html_dosya_adi(self, sayfa):
+        """
+        Dosya adını üretmek için TEK ve MERKEZİ fonksiyon.
+        Hem kayıt ederken hem de link verirken bu kullanılır.
+        Böylece uyumsuzluk riski %0 olur.
+        """
+        # _kayit_adi varsa onu kullan, yoksa _kim (ID) kullan
+        temel_isim = getattr(sayfa, "_kayit_adi", None)
+        if not temel_isim:
+            temel_isim = sayfa._kim
+
+        # String olduğundan emin ol
+        temel_isim = str(temel_isim)
+
+        # Eğer yanlışlıkla başında "★ " varsa veya boşluk varsa temizle
+        # (Normalde ID'de olmaz ama garantiye alalım)
+        if temel_isim.startswith("★"):
+            temel_isim = temel_isim.replace("★", "").strip()
+
+        return f"{temel_isim}.html"
+
+    # ---------------------------------------------------------------------
+    def _tree_navigasyon_html_olustur(self, aktif_sayfa_kimligi):
+        """
+        Tüm belge ağacını recursive olarak <ul><li> yapısında oluşturur.
+        Aktif olan sayfanın linkine 'active' class'ı ekler.
+        """
+
+        def recursive_gez(sayfa):
+            html = "<ul>\n"
+            for cocuk in sayfa.ic_sayfalar():
+                # --- GÜNCELLEME: Merkezi fonksiyonu kullan ---
+                dosya_adi = self._ver_html_dosya_adi(cocuk)
+                # ---------------------------------------------
+
+                # Görünen isim (Dosya adından bağımsızdır)
+                adi_str = str(cocuk.adi)  # Sayısal isim hatasını önlemek için str()
+                if adi_str.startswith("★"):
+                    gorunen_ad = adi_str[2:]
+                else:
+                    gorunen_ad = adi_str
+
+                # Aktif sayfa kontrolü
+                active_class = ' class="active"' if cocuk._kim == aktif_sayfa_kimligi else ''
+
+                # HTML oluştur
+                html += f'<li{active_class}>'
+                # İkon ve Link
+                html += f'<a href="{dosya_adi}"><span class="icon">📄</span> {gorunen_ad}</a>'
+
+                # Eğer alt sayfaları varsa recursive çağır
+                if cocuk.ic_sayfa_var_mi():
+                    html += recursive_gez(cocuk)
+
+                html += "</li>\n"
+            html += "</ul>\n"
+            return html
+
+        # Kökten başlat
+        nav_html = f"""
+        <div class="sidebar-header">
+            <h2>{self.cModel.fileName}</h2>
+        </div>
+        <div class="sidebar-content">
+            {recursive_gez(self.cModel.kokSayfa)}
+        </div>
+        """
+        return nav_html
+
+    # ---------------------------------------------------------------------
+    def get_modern_css(self):
+        """
+        Modern ve temiz bir görünüm için CSS.
+        """
+        return """
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                display: flex;
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            /* --- SIDEBAR --- */
+            nav {
+                width: 280px;
+                background-color: #f7f9fb;
+                border-right: 1px solid #e1e4e8;
+                display: flex;
+                flex-direction: column;
+                flex-shrink: 0;
+            }
+            .sidebar-header {
+                padding: 20px;
+                border-bottom: 1px solid #e1e4e8;
+                background: #fff;
+            }
+            .sidebar-header h2 {
+                margin: 0;
+                font-size: 1.2rem;
+                color: #24292e;
+            }
+            .sidebar-content {
+                overflow-y: auto;
+                flex-grow: 1;
+                padding: 10px 0;
+            }
+
+            /* Tree Yapısı */
+            ul {
+                list-style-type: none;
+                padding-left: 20px; /* Girinti */
+                margin: 0;
+            }
+            /* Kök ul için girintiyi sıfırla */
+            .sidebar-content > ul {
+                padding-left: 0;
+            }
+
+            li {
+                margin: 2px 0;
+            }
+
+            li a {
+                display: block;
+                padding: 6px 15px;
+                text-decoration: none;
+                color: #444;
+                font-size: 14px;
+                border-radius: 4px;
+                margin-right: 10px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            li a:hover {
+                background-color: #e1e4e8;
+                color: #000;
+            }
+
+            /* Aktif Sayfa Stili */
+            li.active > a {
+                background-color: #0366d6;
+                color: white;
+                font-weight: bold;
+            }
+
+            .icon {
+                margin-right: 5px;
+                opacity: 0.7;
+            }
+
+/* --- MAIN CONTENT --- */
+            main {
+                flex-grow: 1;
+                position: relative;
+                overflow: auto; /* ÖNEMLİ: Scrollbar çıksın */
+                background-color: #f0f0f0; /* Sahne dışı renk */
+                display: block; /* Flex yerine block, scroll için daha iyi */
+                padding: 20px;
+            }
+            
+            .canvas-container {
+                position: relative;
+                box-shadow: 0 0 20px rgba(0,0,0,0.1);
+                margin: 0 auto; /* Ortala */
+                /* Overflow hidden kaldırıldı, içerik taşarsa görünsün */
+                overflow: visible; 
+            }
+            
+             /* --- RESIZE HANDLES (BOYUTLANDIRMA KUTUCUKLARI) --- */
+            .resize-handle {
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                background-color: white;
+                border: 1px solid #0366d6;
+                z-index: 1002; /* Nesnenin üstünde dursun */
+                border-radius: 50%; /* Yuvarlak olsun */
+            }
+            
+            /* Seçili öğe belirteci */
+            .selected-item {
+                outline: 2px dashed #0366d6;
+            }
+
+            /* Köşe Pozisyonları */
+            .handle-nw { top: -5px; left: -5px; cursor: nw-resize; }
+            .handle-ne { top: -5px; right: -5px; cursor: ne-resize; }
+            .handle-sw { bottom: -5px; left: -5px; cursor: sw-resize; }
+            .handle-se { bottom: -5px; right: -5px; cursor: se-resize; }
+            
+            /* Video ve Resimlerin kapsayıcıya tam oturması için */
+            div > img, div > video, article > img {
+                pointer-events: none; /* Sürüklerken içeriğin seçilmesini engelle */
+                width: 100%;
+                height: 100%;
+                object-fit: fill; 
+            }
+            /* Yazı düzenlenirken */
+            [contenteditable="true"] {
+                cursor: text !important;
+                outline: 2px solid #0366d6;
+                background-color: rgba(255, 255, 255, 0.9); /* Okunabilirlik için */
+                min-height: 1em;
+                height: auto !important; /* Yükseklik otomatik uzasın */
+                overflow: visible !important;
+            }
+        """
+
+    # ---------------------------------------------------------------------
+    def sayfa_html_olustur_modern(self, sayfa, html_klasor_kayit_adres, def_dosyasi_icine_kaydet,
+                                  dosya_kopyalaniyor_mu):
+
+        # 1. Navigasyon Ağacını Oluştur (Aktif sayfayı işaretle)
+        nav_html = self._tree_navigasyon_html_olustur(sayfa._kim)
+
+        # 2. Sayfa İçeriğini Oluştur (Mevcut kodunuzdaki mantık)
+        sayfa.scene.setSceneRect(sayfa.scene.sceneRect().united(sayfa.scene.itemsBoundingRect()))
+
+        # Arkaplan mantığı (Mevcut kodunuzdan alındı)
+        if sayfa.view.backgroundImagePath:
+            if def_dosyasi_icine_kaydet:
+                bg_adres = os.path.join("images", os.path.basename(sayfa.view.backgroundImagePath))
+            else:
+                if sayfa.view.backgroundImagePathIsEmbeded:
+                    bg_adres = os.path.join("images", os.path.basename(sayfa.view.backgroundImagePath))
+                else:
+                    if dosya_kopyalaniyor_mu:
+                        bg_adres = os.path.join(html_klasor_kayit_adres, "images",
+                                                os.path.basename(sayfa.view.backgroundImagePath))
+                    else:
+                        bg_adres = sayfa.view.backgroundImagePath
+            bg_style = f"background-image:url('{bg_adres}');"
+        else:
+            bg_style = ""
+
+        bg_color = f"rgba{sayfa.view.backgroundBrush().color().toTuple()}"
+
+        icerik_div = self._icerik_div_olustur(sayfa, def_dosyasi_icine_kaydet, html_klasor_kayit_adres,
+                                              dosya_kopyalaniyor_mu)
+
+        sayfa_adi = sayfa.adi[2:] if sayfa.adi.startswith("★") else sayfa.adi
+
+        # JS Kodunu Al
+        interactive_script = self.get_interactive_js()
+
+        # Dosya adını belirle (ID bazlı)
+        gercek_dosya_adi = self._ver_html_dosya_adi(sayfa)
+
+        # 3. Final HTML Şablonu
+        html = f"""<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+           <meta name="filename" content="{gercek_dosya_adi}">
+            <title>{sayfa_adi} - {self.cModel.fileName}</title>
+            <style>
+                {self.get_modern_css()}
+
+                /* Sayfa Özel Stilleri */
+                .canvas-container {{
+                    width: {sayfa.scene.sceneRect().width()}px;
+                    height: {sayfa.scene.sceneRect().height()}px;
+                    background-color: {bg_color};
+                    {bg_style}
+                    background-repeat: no-repeat;
+                    background-position: center center;
+                    overflow: hidden; /* Taşmaları gizle */
+                }}
+            </style>
+        </head>
+        <body>
+            <nav>
+                {nav_html}
+            </nav>
+            <main>
+                <div class="canvas-container">
+                    {icerik_div}
+                </div>
+            </main>
+            
+            {interactive_script} <!-- JS ENJEKSİYONU BURADA -->
+        </body>
+        </html>
+        """
+        return html
+
     @Slot()
     def act_export_document_as_html(self, html_klasor_kayit_adres=None):
+        def_dosyasi_icine_kaydet = True
+        dosyalar_kopyalansin_mi = False
+
+        if not html_klasor_kayit_adres:
+            def_dosyasi_icine_kaydet = False
+            fn, dosyalar_kopyalansin_mi = self.html_kayit_klasor_adresi_sec(tekSayfaMi=False)
+            if not fn:
+                return
+            html_klasor_kayit_adres = fn[0]
+            self.sonKlasorHTML = os.path.dirname(html_klasor_kayit_adres)
+            os.makedirs(html_klasor_kayit_adres, exist_ok=True)
+
+        self.lutfen_bekleyin_goster()
+
+        if dosyalar_kopyalansin_mi:
+            for sayfa in self.cModel.sayfalar():
+                self.dosyalari_kopyala(sayfa, html_klasor_kayit_adres)
+
+        tum_sayfalar = list(self.cModel.sayfalar())
+
+        for sayfa in tum_sayfalar:
+            # --- GÜNCELLEME: Merkezi fonksiyonu kullan ---
+            sayfa_dosya_adi = self._ver_html_dosya_adi(sayfa)
+            # ---------------------------------------------
+
+            tam_adres = os.path.join(html_klasor_kayit_adres, sayfa_dosya_adi)
+
+            # İçeriği oluştur
+            html_icerik = self.sayfa_html_olustur_modern(
+                sayfa,
+                html_klasor_kayit_adres,
+                def_dosyasi_icine_kaydet,
+                dosyalar_kopyalansin_mi
+            )
+
+            self.html_sayfa_kaydet(html_icerik, tam_adres)
+
+        self.lutfen_bekleyin_gizle()
+        self.log(self.tr("Document exported as HTML successfully."), 5000, 1)
+
+    # ---------------------------------------------------------------------
+    @Slot()
+    def act_export_document_as_htmll(self, html_klasor_kayit_adres=None):
         def_dosyasi_icine_kaydet = True
         dosyalar_kopyalansin_mi = False
         if not html_klasor_kayit_adres:
@@ -11370,7 +12083,6 @@ class DefterAnaPencere(QMainWindow):
 
 # ---------------------------------------------------------------------
 def calistir():
-
     # winde gorev cubugunda ikon gosterebilmek icin
     try:
         from ctypes import windll
@@ -11386,7 +12098,11 @@ def calistir():
     # "macintosh" var osx icin
     # linux icin "gtk"
 
-    prog.setStyle("fusion")
+    # prog.setStyle("fusion")
+
+    # qss_file = os.path.join(shared.DEFTER_KLASOR_ADRES, "./diskod/themes/1.qss")
+    # with open(qss_file, "r", encoding="utf-8") as f:
+    #     prog.setStyleSheet(f.read())
 
     # print(os.path.join(os.path.dirname(QtCore.__file__), "plugins"))
     # prog.addLibraryPath(os.path.join(os.path.dirname(QtCore.__file__), "plugins", "imageformats"))

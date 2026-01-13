@@ -12,5 +12,6 @@ SOURCES	     += canta/videoyuResmeCevirPenceresi.py
 SOURCES	     += canta/yw/yuzenWidget.py
 SOURCES	     += canta/yw/altyaziYW.py
 SOURCES	     += canta/yw/tercumeYW.py
+SOURCES	     += canta/yw/yzYW.py
 TRANSLATIONS += defter_tr_TR.ts
 CODECFORTR = UTF-8
